@@ -1,6 +1,6 @@
 # GoUniverse 
 
-A universal go client bases on Html5 and javascript.
+A universal Go/Baduk/Weiqi client based on Html5 and javascript.
 
 Supported servers:
 
