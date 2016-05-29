@@ -1,0 +1,123 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    
+    <script type="text/javascript" language="JavaScript" src="Common/ListView.js"></script>
+    <script type="text/javascript" language="JavaScript" src="Common/Controls.js"></script>
+    <script type="text/javascript" language="JavaScript" src="Common/HtmlPageEvents.js"></script>
+
+    <script type="text/javascript" language="JavaScript" src="KGS/PlayersList.js"></script>
+    <script type="text/javascript" language="JavaScript" src="KGS/GamesList.js"></script>
+    <script type="text/javascript" language="JavaScript" src="KGS/Main.js"></script>
+
+    <script type="text/javascript" language="JavaScript" src="External/jquery.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="Styles.css">
+</head>
+<body style="position: relative;background-image: url('data:image/png;base64,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')">
+
+<div id="divIdConnection" style="position:absolute; top: 200px; left: 200px; width: 250px; height:130px; border:1px solid silver; background-color: white; box-shadow: 0px 1px 15px rgba(0,0,0,0.8);">
+
+    <input id="inputLoginId" tabindex="1" type="text" placeholder="Login" style="position:absolute; top: 20px; left: 25px; width: 200px; height: 25px"/>
+    <input id="inputPasswordId" tabindex="2" type="password" placeholder="Password" style="position:absolute; top: 55px; left: 25px; width: 200px; height: 25px"/>
+    <div id="connectDivId" tabindex="3" style="position:absolute; top: 90px; left: 25px; width: 200px; height: 25px; background-color: rgb(66, 133, 244); color: #FFFFFF;     box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); vertical-align: middle; text-align: center;
+    transition: .2s ease-out;cursor: pointer; line-height: 22px; font-size: 16px;">Connect to KGS server</div>
+
+</div>
+
+<div id="divIdConnectionError" style="position:absolute; top: 200px; left: 200px; width: 250px; border:1px solid silver; background-color: white; box-shadow: 0px 1px 15px rgba(0,0,0,0.8);">
+    <div id="divIdConnectionErrorText" style="margin:10px;font-family: 'Segoe UI',Helvetica,Tahoma,Geneva,Verdana,sans-serif;font-size:14px;text-align:center">
+     </div>
+</div>
+
+<div id="divMainId" style="display:none; position:absolute; top: 0px; left:0px;width:100vw;height:100vh">
+
+    <div id="divIdTabPanel" style="position:absolute; top: 0px; left:0px;">
+        <div id="divIdHomeButton" style="float:left; height: 50px; position: relative">
+            <button id="divIdCreateButton" style="border: 1px solid transparent; box-sizing: border-box; outline: none; cursor: pointer; -webkit-appearance: none; -webkit-border-radius: 0; overflow: visible; float: left; padding: 0px; height: 100%; width: 52px; background-color: #008272; color: #fff; ">
+                <center>
+                    <div class="">
+                        <div style="font-size: 20px; line-height: 20px; width: 20px; height: 20px;">
+                            <span style="position: absolute; width: 100%; height: 100%; left: 0px; top: 2px;">
+
+                            </span>
+                        </div>
+                    </div>
+                </center>
+            </button>
+            <div style="float: left; border-left: 1px solid #fff; height: 100%; opacity: 0.7;"></div>
+            <div id="divIdMainRoomTab" style="position: relative; padding: 0px 20px; height: 50px; float: left; color: #fff; text-decoration: none; font-size: 24px; margin-right: 14px; outline: none; border: 1px solid transparent; box-sizing: border-box;
+            background-color: #008272; color: #fff; cursor: pointer;
+                font-weight: lighter; -webkit-font-smoothing: antialiased; transition-property: width,height,background,margin,border,padding; transition-duration: .25s">
+                <span style="float: left; padding-top: 7px;">Main Room</span>
+            </div>
+        </div>
+        <div id="divIdTabPanelRooms" style="float: left; height: 50px; position: relative;">
+
+        </div>
+        <div id="divIdPanelRight" style="float:right; height: 50px; position: relative;">
+            <button id="divIdClientName" style="background:none;outline: none;cursor:default;--webkit-appearance:none;-webkit-border-radius:0;overflow: visible;font-family: 'Segoe UI',Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+            -webkit-font-smoothing:antialiased; padding: 0px; border: 1px solid transparent; box-sizing: border-box; font-size: 14px; height: 50px; margin: 0px; padding: 0px 14px; color: #fff; float:left">
+                <div id="divIdClientNameText">Guest</div>
+            </button>
+
+            <button id="divIdExitButton" style="background:none;outline: none;cursor:default;--webkit-appearance:none;-webkit-border-radius:0;overflow: visible;font-family: 'Segoe UI',Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+            -webkit-font-smoothing:antialiased; padding: 0px; border: 1px solid transparent; box-sizing: border-box; font-size: 14px; height: 50px; margin: 0px; padding: 0px 14px; color: #fff; float:left; transition-property: width,height,background,margin,border,padding; transition-duration: .25s">
+                <div>Exit</div>
+            </button>
+        </div>
+    </div>
+    <div id="divIdMainRoom" style="position:absolute; top: 0px; left:0px;">
+
+        <div id="divIdL" style="position:absolute; top: 0px; left:0px;">
+            <div id="divIdLGamesWrapper" style="position:absolute; top: 0px; left:0px;">
+                <div id="divIdLGames" tabindex="0" style="position:absolute; top: 0px; left:0px; border-left: 1px solid #BEBEBE;border-right: 1px solid #BEBEBE;border-bottom: 1px solid #BEBEBE;">
+                </div>
+            </div>
+            <div id="divIdLChat" style="position:absolute; top: 0px; left:0px;">
+                <div id="divIdLChatTabsBack" style="position:absolute; top: 0px; left:0px;border-left: 1px solid #BEBEBE;border-right: 1px solid #BEBEBE;border-bottom: 1px solid #BEBEBE; background-color: #F3F3F3;">
+                </div>
+                <div id="divIdLChatTabs" style="border-bottom: 1px none #BEBEBE; position:absolute; top: 0px; left:0px;">
+                </div>
+                <div id="divIdLChatTextArea" style="position:absolute; top: 0px; left:0px;border-left: 1px solid #BEBEBE;border-right: 1px solid #BEBEBE;border-bottom: 1px solid #BEBEBE; background-color: #F3F3F3">
+                    <div id="textareaChatId" style="position:absolute; top: 0px; left:0px; bottom:0px; right: 0px; overflow-y: auto;font-family: 'Segoe UI',Helvetica,Tahoma,Geneva,Verdana,sans-serif"></div>
+                </div>
+                <div id="divIdLChatInput" style="position:absolute; top: 0px; left:0px; border-left: 1px solid #BEBEBE;border-right: 1px solid #BEBEBE;border-bottom: 1px solid #BEBEBE;">
+                    <textarea id="inputChatId" style="width:100%; height: 100%; border:none; outline: none; -moz-appearance: none; resize: none;font-family: 'Segoe UI',Helvetica,Tahoma,Geneva,Verdana,sans-serif"></textarea>
+                </div>
+            </div>
+        </div>
+        <div id="divPlayersListId" tabindex="0" style="position:absolute; top: 0px; left:0px; background-color: #F3F3F3"></div>
+    </div>
+    <div id="divIdCreatePanel" class="swBar  UnifiedHeader" style="display: none; top:30px;">
+        <ul class="swTileList">
+            <li class="swTile">
+                <div class="swTileLink" id= "123123132" style="background-color:#094ab2;border-color:#094ab2;" onmousedown="document.getElementById('123123132').className += ' tilePressed';">
+                    <span class="clip110x110 ci ">
+                        <div style="position: absolute; left: 10px; top : 0px; margin: 0; padding: 0; width: 100px; height: 100px;background: url('Untitled.png');background-position: 0px 0px"></div>
+                    </span>
+                    <span class="swTileText AppTileUIFont">CREATE MATCH</span>
+                </div>
+            </li>
+            <li class="swTile" id="liIdStartDemo" onclick="CreateDemonstration()">
+                <div class="swTileLink" style="background-color:#217346;border-color:#217346;">
+                    <span class="clip110x110 ci ">
+                        <div style="position: absolute; left: 10px; top : 0px; margin: 0; padding: 0; width: 100px; height: 100px;background: url('Untitled.png');background-position: -100px 0px"></div>
+                    </span>
+                    <span class="swTileText AppTileUIFont">START DEMO</span>
+                </div>
+            </li>
+            <li class="swTile" id="liIdLoadFile" onclick="LoadFile()">
+                <div class="swTileLink swTileLink2" style="background-color:#D83B01;border-color:#D83B01;">
+                        <div style="position: absolute; left: 00px; top : 0px; margin: 0; padding: 0; width: 100px; height: 100px;background: url('Untitled.png');background-position: -200px 0px"></div>
+                    <span class="swTileText AppTileUIFont">LOAD FILE</span>
+                </div>
+            </li>
+        </ul>
+        <span class="border-arrow arrow"></span>
+        <span class="arrow"></span>
+    </div>
+</div>
+
+</body>
+</html>

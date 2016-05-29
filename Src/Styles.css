@@ -1,0 +1,5169 @@
+html, body { height:100%; }
+
+* {margin:0px;padding:0px;overflow-x: hidden;overflow-y: hidden;}
+
+.block_elem {position:absolute;padding:0;margin:0;}
+
+img.button
+{
+width: 25px;
+height: 20px;
+float:left;
+margin:1px;
+}
+
+#NavigatorTreeContainer table
+{
+padding: 0;
+margin: 0;
+border:0;
+}
+
+#NavigatorTreeContainer table td 
+{
+width: 24px;
+height: 24px;
+padding: 0;
+margin: 0;
+}
+
+td.NavCurStart3
+{
+background:url('Images/Navigator/Navigator_Current_Start3.png');
+}
+td.NavCurStart
+{
+background:url('Images/Navigator/Navigator_Current_Start.png');
+}
+td.NavCurStart2
+{
+background:url('Images/Navigator/Navigator_Current_Start2.png');
+}
+td.NavCurEnd
+{
+background:url('Images/Navigator/Navigator_Current_End.png');
+}
+td.NavCurHor
+{
+background:url('Images/Navigator/Navigator_Current_Hor.png');
+}
+td.NavCurHor2
+{
+background:url('Images/Navigator/Navigator_Current_Hor2.png');
+}
+td.NavLineStart2
+{
+background:url('Images/Navigator/NavigatorLine_Start2.png');
+}
+td.NavLineStart
+{
+background:url('Images/Navigator/NavigatorLine_Start.png');
+}
+td.NavLineEnd
+{
+background:url('Images/Navigator/NavigatorLine_End.png');
+}
+td.NavLineHor
+{
+background:url('Images/Navigator/NavigatorLine_Hor.png');
+}
+td.NavLineHor2
+{
+background:url('Images/Navigator/NavigatorLine_Hor2.png');
+}
+td.NavLineVer
+{
+background:url('Images/Navigator/NavigatorLine_Ver.png');
+}
+td.NavLineVer2
+{
+background:url('Images/Navigator/NavigatorLine_Ver2.png');
+}
+td.NavLineVer3
+{
+background:url('Images/Navigator/NavigatorLine_Ver3.png');
+}
+
+
+
+div.NavWhite
+{
+margin:0;
+width:24px;
+height:24px;
+cursor:pointer;
+color:black;
+background:url('Images/Navigator/Navigator_White.png');
+}
+
+div.NavBlack
+{
+margin:0;
+width:24px;
+height:24px;
+cursor:pointer;
+color:white;
+background:url('Images/Navigator/Navigator_Black.png');
+}
+
+div.NavTriangle
+{
+margin:0;
+width:24px;
+height:24px;
+cursor:pointer;
+background:url('Images/Navigator/Navigator_Triangle.png');
+}
+
+div.NavWhite div, div.NavBlack div
+{
+float:left;
+width:19px;
+height:14px;
+text-decoration:none;
+font-size:9px;
+font-family:arial, helvetica, sans-serif;
+text-align:center;margin:0 0 3px 3px;
+padding:7px 0 0 0;
+}
+
+.closeSpan:before
+{
+    content: '\274C';
+}
+
+.swBar .border-arrow
+{
+    border-bottom-color: #b6b6b6;
+    top: -9px;
+}
+
+.swBar .arrow
+{
+    display: block;
+    position: absolute;
+    top: -8px;
+    left: 6px;
+    margin: 0;
+    border-bottom: 8px solid #fff;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 0;
+    padding: 0;
+    width: 0;
+    height: 0;
+    font-size: 0;
+    line-height: 0;
+}
+
+.inlineScreenReaderOnly {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    overflow: hidden
+}
+
+.UnselectableText {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none
+}
+
+.BorderBoxSizing {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box
+}
+
+.FlexDisplay {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex
+}
+
+.FlexGrow0 {
+    flex-grow: 0;
+    flexGrow: 0;
+    -ms-flex-positive: 0;
+    -webkit-flex-grow: 0
+}
+
+.FlexShrink0 {
+    flex-shrink: 0;
+    flexShrink: 0;
+    -ms-flex-negative: 0;
+    -webkit-flex-shrink: 0
+}
+
+.FlexGrow1 {
+    flex-grow: 1;
+    flexGrow: 1;
+    -ms-flex-positive: 1;
+    -webkit-flex-grow: 1
+}
+
+.FlexShrink1 {
+    flex-shrink: 1;
+    flexShrink: 1;
+    -ms-flex-negative: 1;
+    -webkit-flex-shrink: 1
+}
+
+.WhiteButton {
+    background-color: white;
+    color: #505050
+}
+
+.WhiteButtonHover {
+    background-color: #e6e6e6;
+    color: #505050
+}
+
+.WhiteButtonActive {
+    background-color: #969696;
+    color: #505050
+}
+
+.WhiteButtonFocus {
+    background-color: white;
+    border: 1px solid #969696;
+    color: #505050
+}
+
+.WhiteButtonSelected {
+    background-color: #d2d2d2;
+    color: #505050
+}
+
+.WhiteButtonDisabled {
+    background-color: transparent;
+    color: #505050;
+    opacity: 0.3
+}
+
+.BlackButton {
+    background-color: black;
+    color: #fff
+}
+
+.BlackButtonHover {
+    background-color: #505050;
+    color: #fff
+}
+
+.BlackButtonActive {
+    background-color: #969696;
+    color: #fff
+}
+
+.BlackButtonFocus {
+    background-color: black;
+    color: #fff;
+    border: 1px solid #d2d2d2
+}
+
+.BlackButtonPressed {
+    background-color: #969696;
+    color: #fff
+}
+
+.BlackButtonSelected {
+    background-color: #737373;
+    color: #fff
+}
+
+.BlackButtonDisabled {
+    color: #fff;
+    opacity: 0.3
+}
+
+.NeutralButton {
+    background-color: #d2d2d2;
+    color: #505050
+}
+
+.NeutralButtonHover {
+    background-color: #f3f3f3;
+    color: #505050
+}
+
+.NeutralButtonActive {
+    background-color: #969696;
+    color: #505050
+}
+
+.NeutralButtonFocus {
+    background-color: #d2d2d2;
+    color: #505050;
+    border: 1px solid #969696
+}
+
+.NeutralButtonDisabled {
+    color: #505050;
+    opacity: 0.3;
+    background-color: rgba(210,210,210,0.3)
+}
+
+.EmphasisButton {
+    background-color: #008272;
+    color: #fff
+}
+
+.EmphasisButtonHover {
+    background-color: #009983;
+    color: #fff
+}
+
+.EmphasisButtonActive {
+    background-color: #006d6c;
+    color: #fff
+}
+
+.EmphasisButtonFocus {
+    background-color: #008272;
+    color: #fff;
+    border: 1px solid black
+}
+
+.EmphasisButtonDisabled {
+    background-color: rgba(210,210,210,0.3);
+    color: #505050;
+    opacity: 0.3
+}
+
+.DocsEmphasisButton {
+    background-color: #d83b01;
+    color: #fff
+}
+
+.DocsEmphasisButtonHover {
+    background-color: #ea6115;
+    color: #fff
+}
+
+.DocsEmphasisButtonActive {
+    background-color: #d83b01;
+    color: #fff
+}
+
+.DocsEmphasisButtonFocus {
+    background-color: #d83b01;
+    color: #464646;
+    border: 1px solid #6c6c6c
+}
+
+.TransparentButton {
+    background-color: transparent;
+    color: #505050
+}
+
+.TransparentButtonHover {
+    background-color: rgba(0,0,0,0.1);
+    color: #505050
+}
+
+.TransparentButtonActive {
+    background-color: rgba(0,0,0,0.3);
+    color: #505050
+}
+
+.TransparentButtonFocus {
+    background-color: rgba(0,0,0,0.1);
+    color: #505050;
+    border: 1px solid #969696
+}
+
+.TransparentButtonSelected {
+    background-color: rgba(0,0,0,0.2);
+    color: #505050
+}
+
+.TransparentButtonDisabled {
+    background-color: transparent;
+    color: #505050;
+    opacity: 0.3
+}
+
+.TextBoxCommon {
+    color: #505050;
+    border: 1px solid #d2d2d2
+}
+
+.TextBoxCommonHover {
+    color: #505050;
+    border: 1px solid #969696
+}
+
+.TextBoxCommonPressed {
+    color: #505050;
+    border: 1px solid #505050
+}
+
+.Thumbnails {
+    border: 1px solid #e6e6e6
+}
+
+.ThumbnailsHover {
+    border: 1px solid #969696;
+    outline: none
+}
+
+.ThumbnailsActive {
+    outline: none;
+    border: 1px solid #505050
+}
+
+.ThumbnailsFocus {
+    border: 1px solid #fff;
+    outline: 2px solid #969696
+}
+
+.ThumbnailsSelected {
+    outline: 2px solid #505050;
+    border: 1px solid #fff
+}
+
+.ThumbnailInnerBorderRest {
+    position: absolute;
+    border: 1px solid #e6e6e6;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px
+}
+
+.ThumbnailInnerBorderPressed {
+    position: absolute;
+    border: 1px solid #505050;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px
+}
+
+.ThumbnailInnerBorderHovered {
+    position: absolute;
+    border: 1px solid #969696;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px
+}
+
+.ThumbnailInnerBorderFocused,.ThumbnailInnerBorderSelected {
+    position: absolute;
+    border: 1px solid white;
+    top: 2px;
+    bottom: 2px;
+    left: 2px;
+    right: 2px
+}
+
+.ThumbnailOuterBorderFocused {
+    position: absolute;
+    border: 2px solid #969696;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px
+}
+
+.ThumbnailOuterBorderSelected {
+    position: absolute;
+    border: 2px solid #505050;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px
+}
+
+.ThumbnailOuterBorderRest {
+    position: absolute;
+    border: 2px solid transparent;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px
+}
+
+.ThumbnailInnerBorderRestDark {
+    position: absolute;
+    border: 1px solid #e6e6e6;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    border: 1px solid #d2d2d2
+}
+
+.NeutralHyperlinks {
+    color: #006d6c
+}
+
+.NeutralHyperlinks:hover {
+    color: #009983
+}
+
+.NeutralHyperlinks:active {
+    color: #004b50
+}
+
+.NeutralHyperlinks:focus {
+    color: #004b50;
+    background-color: #d2d2d2
+}
+
+.AuthenticationDialog .dlg {
+    padding: 0px
+}
+
+.AuthenticationDialog .dlgTitle,.AuthenticationDialogEmail .dlgTitle {
+    color: #006c5f;
+    margin-bottom: 12px;
+    font-size: 42px
+}
+
+.AuthenticationDialog .dlgContent {
+    margin: 34px 0px;
+    text-align: center
+}
+
+.AuthenticationDialog .dlgButtons,.AuthenticationDialogEmail .dlgButtons {
+    margin-left: auto;
+    margin-right: auto
+}
+
+.AuthenticationDialog .dlgButton,.AuthenticationDialogEmail .dlgButton {
+    float: none;
+    font-size: 15px;
+    height: 36px;
+    margin: 34px 10px 0px 0px;
+    padding: 5px 10px
+}
+
+.AuthenticationDialogEmail {
+    margin: 34px 0px;
+    padding: 20px 20px 20px 33vw;
+    position: absolute;
+    z-index: 100
+}
+
+.AuthenticationDialogEmailErrorMessage {
+    color: #c50500
+}
+
+.EmailAddressInput {
+    font-family: "Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    max-width: 700px;
+    width: 100%;
+    font-size: 14px;
+    margin-bottom: 10px;
+    margin-top: 20px;
+    box-sizing: border-box;
+    color: #505050;
+    border: 1px solid #d2d2d2
+}
+
+.EmailAddressInput:hover {
+    color: #505050;
+    border: 1px solid #969696
+}
+
+.EmailAddressInput:focus,.EmailAddressInput:active {
+    color: #505050;
+    border: 1px solid #505050
+}
+
+.AppTileUIFont,.segoeUI {
+    font-family: "Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased
+}
+
+.segoeUILight {
+    font-family: "Segoe UI Light","Segoe UI Semilight","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    font-weight: lighter;
+    -webkit-font-smoothing: antialiased
+}
+
+.segoeUILightItalic {
+    font-family: "Segoe UI Light Italic","Segoe UI Light","Segoe UI Semilight","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    font-weight: lighter;
+    -webkit-font-smoothing: antialiased
+}
+
+.segoeUIItalic {
+    font-family: "Segoe UI Italic","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased
+}
+
+.segoeUISemilight {
+    font-family: "Segoe UI Semilight","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    font-weight: lighter;
+    -webkit-font-smoothing: antialiased
+}
+
+.segoeUISemilightItalic {
+    font-family: "Segoe UI Semilight Italic","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    font-weight: lighter;
+    -webkit-font-smoothing: antialiased
+}
+
+.segoeUISemibold {
+    font-family: "Segoe UI Semibold","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased
+}
+
+.segoeUISemiboldItalic {
+    font-family: "Segoe UI Semibold Italic","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased
+}
+
+.segoeUIBlack {
+    font-family: "Segoe UI Black","Segoe UI Semibold","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    font-weight: bolder;
+    -webkit-font-smoothing: antialiased
+}
+
+.segoeUIRegular {
+    font-family: "Segoe UI Regular","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased
+}
+
+.sitkaRegular {
+    font-family: "Sitka Regular","Sitka Text","Sitka Display",Helvetica,Tahoma,Geneva,Verdana,sans-serif
+}
+
+.calibriRegular {
+    font-family: Calibri,Arial,sans-serif
+}
+
+.calibriLight {
+    font-family: "Calibri Light",Calibri,Arial,sans-serif;
+    font-weight: 300
+}
+
+.calibriSemilight {
+    font-family: "Calibri Semilight","Calibri Light",Calibri,Arial,sans-serif;
+    font-weight: 300
+}
+
+.fontBold {
+    font-weight: bold
+}
+
+.fontLight {
+    font-weight: lighter
+}
+
+.fontItalic {
+    font-style: italic
+}
+
+.font6 {
+    font-size: 8px
+}
+
+.font7 {
+    font-size: 9px
+}
+
+.font8 {
+    font-size: 11px
+}
+
+.font9 {
+    font-size: 12px
+}
+
+.font10 {
+    font-size: 13px
+}
+
+.font11 {
+    font-size: 15px
+}
+
+.font12 {
+    font-size: 16px
+}
+
+.font13 {
+    font-size: 17px
+}
+
+.font14 {
+    font-size: 19px
+}
+
+.font16 {
+    font-size: 21px
+}
+
+.font17 {
+    font-size: 22px
+}
+
+.font18 {
+    font-size: 24px
+}
+
+.font21 {
+    font-size: 28px
+}
+
+.font22 {
+    font-size: 29px
+}
+
+.font27 {
+    font-size: 36px
+}
+
+.textSmall {
+    font-size: 13px;
+    line-height: 16px
+}
+
+.textMedium {
+    font-size: 15px;
+    line-height: 20px
+}
+
+.textLarge {
+    font-size: 18px;
+    line-height: 24px
+}
+
+.textLargePlus {
+    font-size: 21px;
+    line-height: 28px
+}
+
+.textExtraLarge {
+    font-size: 28px;
+    line-height: 33px
+}
+
+.textHuge {
+    font-size: 42px;
+    line-height: 44px
+}
+
+.textFromSway {
+    font-family: "Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    color: #424242
+}
+
+.PlaceholderText {
+    font-family: "Segoe UI Italic","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    color: #737373
+}
+
+.textFromUser {
+    font-family: Calibri,Arial,sans-serif;
+    color: #212121
+}
+
+.IconSaveAsWordDocxLayer1::before {
+    color: #fff;
+    -ms-high-contrast-adjust: none
+}
+
+.IconSaveAsWordDocxLayer2::before {
+    color: #999;
+    -ms-high-contrast-adjust: none
+}
+
+.IconSaveAsWordDocxLayer3::before {
+    color: #a7a5a6;
+    -ms-high-contrast-adjust: none
+}
+
+.IconSaveAsWordDocxLayer4::before {
+    color: #2b579a;
+    -ms-high-contrast-adjust: none
+}
+
+.IconSaveAsWordDocxLayer5::before {
+    color: #fff;
+    -ms-high-contrast-adjust: none
+}
+
+.IconSaveAsPowerPointPptxLayer1::before {
+    color: #fff;
+    -ms-high-contrast-adjust: none
+}
+
+.IconSaveAsPowerPointPptxLayer2::before {
+    color: #949494;
+    -ms-high-contrast-adjust: none
+}
+
+.IconSaveAsPowerPointPptxLayer3::before {
+    color: #f5ba9d;
+    -ms-high-contrast-adjust: none
+}
+
+.IconSaveAsPowerPointPptxLayer4::before {
+    color: #a7a5a6;
+    -ms-high-contrast-adjust: none
+}
+
+.IconSaveAsPowerPointPptxLayer5::before {
+    color: #d04727;
+    -ms-high-contrast-adjust: none
+}
+
+.IconSaveAsPowerPointPptxLayer6::before {
+    color: #fff;
+    -ms-high-contrast-adjust: none
+}
+
+.IconSaveAsExcelXlsxLayer1::before {
+    color: #fff;
+    -ms-high-contrast-adjust: none
+}
+
+.IconSaveAsExcelXlsxLayer2::before {
+    color: #999;
+    -ms-high-contrast-adjust: none
+}
+
+.IconSaveAsExcelXlsxLayer3::before {
+    color: #86bfa0;
+    -ms-high-contrast-adjust: none
+}
+
+.IconSaveAsExcelXlsxLayer4::before {
+    color: #a7a5a6;
+    -ms-high-contrast-adjust: none
+}
+
+.IconSaveAsExcelXlsxLayer5::before {
+    color: #207347;
+    -ms-high-contrast-adjust: none
+}
+
+.IconSaveAsExcelXlsxLayer6::before {
+    color: #fff;
+    -ms-high-contrast-adjust: none
+}
+
+.IconMoreShareThisOptionsLayer1::before {
+    color: #00bf00;
+    -ms-high-contrast-adjust: none
+}
+
+.IconMoreShareThisOptionsLayer2::before {
+    color: #fff;
+    -ms-high-contrast-adjust: none
+}
+
+.IconSourceIcon_FlikrLayer1::before {
+    color: #0063dc
+}
+
+.IconSourceIcon_FlikrLayer2::before {
+    color: #ff0084
+}
+
+.IconSourceIcon_PichitLayer1::before {
+    color: #f0a
+}
+
+.IconPdfFileLayer1::before {
+    color: #fff;
+    -ms-high-contrast-adjust: none
+}
+
+.IconPdfFileLayer2::before {
+    color: gray;
+    -ms-high-contrast-adjust: none
+}
+
+.IconPdfFileLayer3::before {
+    color: #d86344;
+    -ms-high-contrast-adjust: none
+}
+
+.IconOneNoteLayer1::before {
+    color: #7e3879
+}
+
+.IconShareOnFacebookLayer1::before {
+    color: #3b5996;
+    -ms-high-contrast-adjust: none
+}
+
+.IconShareOnFacebookLayer2::before {
+    color: #fff;
+    -ms-high-contrast-adjust: none
+}
+
+.IconShareToDocsLayer1::before {
+    color: #fff;
+    -ms-high-contrast-adjust: none
+}
+
+.IconShareToDocsLayer2::before {
+    color: #dc3c00;
+    -ms-high-contrast-adjust: none
+}
+
+.IconShareToDocsLayer3::before {
+    color: #dc3c00;
+    -ms-high-contrast-adjust: none
+}
+
+.IconShareToDocsLayer4::before {
+    color: #fff;
+    -ms-high-contrast-adjust: none
+}
+
+.IconLogoSwayTealLayer1::before {
+    color: #008272
+}
+
+.IconOneDriveLogoContextMenuLayer1::before {
+    color: #0748ac
+}
+
+.IconSourceIcon_BingLayer1::before {
+    color: #ffb900
+}
+
+.IconSourceIcon_YouTubeLayer1::before {
+    color: #ff3334
+}
+
+.IconHintBarEllipsesLayer1::before {
+    content: '\E000'
+}
+
+.IconDownChevronLayer1::before {
+    content: '\E001'
+}
+
+.IconBackChevronLayer1::before {
+    content: '\E002'
+}
+
+.IconSharingSet_Start_GlyphLayer1::before {
+    content: '\E003'
+}
+
+.IconShareGlyphLayer1::before {
+    content: '\E004'
+}
+
+.IconSharingSet_NumberActivelySharing_GlyphLayer1::before {
+    content: '\E005'
+}
+
+.IconOneDriveLogoContextMenuLayer1::before {
+    content: '\E006'
+}
+
+.IconCancelGlyphLayer1::before {
+    content: '\E007'
+}
+
+.IconUploadMediaLayer1::before {
+    content: '\E008'
+}
+
+.IconsearchLayer1::before {
+    content: '\E009'
+}
+
+.IconOneNoteLayer1::before {
+    content: '\E00A'
+}
+
+.IconRightChevronLayer1::before {
+    content: '\E00B'
+}
+
+.IconUndoQuickCommand_GlyphLayer1::before {
+    content: '\E00C'
+}
+
+.IconRedoQuickCommand_GlyphLayer1::before {
+    content: '\E00D'
+}
+
+.IconHamburgerLayer1::before {
+    content: '\E00E'
+}
+
+.IconEnterFullscreenHoverLayer1::before {
+    content: '\E00F'
+}
+
+.IconExitFullscreenHoverLayer1::before {
+    content: '\E010'
+}
+
+.IconSaveAsWordDocxLayer1::before {
+    content: '\E011'
+}
+
+.IconSaveAsWordDocxLayer2::before {
+    content: '\E012'
+}
+
+.IconSaveAsWordDocxLayer3::before {
+    content: '\E013'
+}
+
+.IconSaveAsWordDocxLayer4::before {
+    content: '\E014'
+}
+
+.IconSaveAsWordDocxLayer5::before {
+    content: '\E015'
+}
+
+.IconSaveAsPowerPointPptxLayer1::before {
+    content: '\E016'
+}
+
+.IconSaveAsPowerPointPptxLayer2::before {
+    content: '\E017'
+}
+
+.IconSaveAsPowerPointPptxLayer3::before {
+    content: '\E018'
+}
+
+.IconSaveAsPowerPointPptxLayer4::before {
+    content: '\E019'
+}
+
+.IconSaveAsPowerPointPptxLayer5::before {
+    content: '\E01A'
+}
+
+.IconSaveAsPowerPointPptxLayer6::before {
+    content: '\E01B'
+}
+
+.IconSaveAsExcelXlsxLayer1::before {
+    content: '\E01C'
+}
+
+.IconSaveAsExcelXlsxLayer2::before {
+    content: '\E01D'
+}
+
+.IconSaveAsExcelXlsxLayer3::before {
+    content: '\E01E'
+}
+
+.IconSaveAsExcelXlsxLayer4::before {
+    content: '\E01F'
+}
+
+.IconSaveAsExcelXlsxLayer5::before {
+    content: '\E020'
+}
+
+.IconSaveAsExcelXlsxLayer6::before {
+    content: '\E021'
+}
+
+.Icon23_16_NLayer1::before {
+    content: '\E022'
+}
+
+.IconAddHeaderLayer1::before {
+    content: '\E023'
+}
+
+.IconAddMediaCardLayer1::before {
+    content: '\E024'
+}
+
+.IconAddTextCardLayer1::before {
+    content: '\E025'
+}
+
+.IconBuildPresentationLayer1::before {
+    content: '\E026'
+}
+
+.IconBulletsLayer1::before {
+    content: '\E027'
+}
+
+.IconCameraLayer1::before {
+    content: '\E028'
+}
+
+.IconCardHandleLayer1::before {
+    content: '\E029'
+}
+
+.IconChartCardLayer1::before {
+    content: '\E02A'
+}
+
+.IconChartChangeColorsLayer1::before {
+    content: '\E02B'
+}
+
+.IconComparisonCardLayer1::before {
+    content: '\E02C'
+}
+
+.IconCreateNewsletterLayer1::before {
+    content: '\E02D'
+}
+
+.IconCropLayer1::before {
+    content: '\E02E'
+}
+
+.IconDeleteCardLayer1::before {
+    content: '\E02F'
+}
+
+.IconDoughboyLayer1::before {
+    content: '\E030'
+}
+
+.IconDownChevronLargeLayer1::before {
+    content: '\E031'
+}
+
+.IconDuplicateSwayLayer1::before {
+    content: '\E032'
+}
+
+.IconEditGenericLayer1::before {
+    content: '\E033'
+}
+
+.IconExtraSmallLayer1::before {
+    content: '\E034'
+}
+
+.IconFocusPointsLayer1::before {
+    content: '\E035'
+}
+
+.IconGraphLayer1::before {
+    content: '\E036'
+}
+
+.IconGridCardLayer1::before {
+    content: '\E037'
+}
+
+.IconGroupCardLayer1::before {
+    content: '\E038'
+}
+
+.IconGroupCommandLayer1::before {
+    content: '\E039'
+}
+
+.IconGroupTypeLayer1::before {
+    content: '\E03A'
+}
+
+.IconHtmlEmbedLayer1::before {
+    content: '\E03B'
+}
+
+.IconInsertMenuLayer1::before {
+    content: '\E03C'
+}
+
+.IconInsertPictureSimpleLayer1::before {
+    content: '\E03D'
+}
+
+.IconIntenseLayer1::before {
+    content: '\E03E'
+}
+
+.IconMakeTutorialLayer1::before {
+    content: '\E03F'
+}
+
+.IconModerateLayer1::before {
+    content: '\E040'
+}
+
+.IconMoreShareThisOptionsLayer1::before {
+    content: '\E041'
+}
+
+.IconMoreShareThisOptionsLayer2::before {
+    content: '\E042'
+}
+
+.IconNavigateToTopCircleLayer1::before {
+    content: '\E043'
+}
+
+.IconNumberingLayer1::before {
+    content: '\E044'
+}
+
+.IconOfficeAppSwitcherLayer1::before {
+    content: '\E045'
+}
+
+.IconPaintbrushLayer1::before {
+    content: '\E046'
+}
+
+.IconPauseLayer1::before {
+    content: '\E047'
+}
+
+.IconPdfFileLayer1::before {
+    content: '\E048'
+}
+
+.IconPdfFileLayer2::before {
+    content: '\E049'
+}
+
+.IconPdfFileLayer3::before {
+    content: '\E04A'
+}
+
+.IconPlayLayer1::before {
+    content: '\E04B'
+}
+
+.IconplussignglyphLayer1::before {
+    content: '\E04C'
+}
+
+.IconRemixLayer1::before {
+    content: '\E04D'
+}
+
+.IconRemoveImageLayer1::before {
+    content: '\E04E'
+}
+
+.IconShareasLinkLayer1::before {
+    content: '\E04F'
+}
+
+.IconShareByEmailLayer1::before {
+    content: '\E050'
+}
+
+.IconShareByEmailLayer2::before {
+    content: '\E051'
+}
+
+.IconShareOnFacebookLayer1::before {
+    content: '\E052'
+}
+
+.IconShareOnFacebookLayer2::before {
+    content: '\E053'
+}
+
+.IconShareOnTwitterLayer1::before {
+    content: '\E054'
+}
+
+.IconShareToBloggerLayer1::before {
+    content: '\E055'
+}
+
+.IconShareToBloggerLayer2::before {
+    content: '\E056'
+}
+
+.IconShareToDocsLayer1::before {
+    content: '\E057'
+}
+
+.IconShareToDocsLayer2::before {
+    content: '\E058'
+}
+
+.IconShareToDocsLayer3::before {
+    content: '\E059'
+}
+
+.IconShareToDocsLayer4::before {
+    content: '\E05A'
+}
+
+.IconShareToGooglePlusLayer1::before {
+    content: '\E05B'
+}
+
+.IconShareToLinkedInLayer1::before {
+    content: '\E05C'
+}
+
+.IconShareToLinkedInLayer2::before {
+    content: '\E05D'
+}
+
+.IconShareToPinterestLayer1::before {
+    content: '\E05E'
+}
+
+.IconShareToPinterestLayer2::before {
+    content: '\E05F'
+}
+
+.IconShareToRedditLayer1::before {
+    content: '\E060'
+}
+
+.IconShareToRedditLayer2::before {
+    content: '\E061'
+}
+
+.IconShareToRedditLayer3::before {
+    content: '\E062'
+}
+
+.IconShareToTumblrLayer1::before {
+    content: '\E063'
+}
+
+.IconShareToTumblrLayer2::before {
+    content: '\E064'
+}
+
+.IconShareToYammerLayer1::before {
+    content: '\E065'
+}
+
+.IconShareVacationLayer1::before {
+    content: '\E066'
+}
+
+.IconShowcaseLayer1::before {
+    content: '\E067'
+}
+
+.IconSlideshowCardLayer1::before {
+    content: '\E068'
+}
+
+.IconSourceIcon_FlikrLayer1::before {
+    content: '\E069'
+}
+
+.IconSourceIcon_FlikrLayer2::before {
+    content: '\E06A'
+}
+
+.IconSourceIcon_PichitLayer1::before {
+    content: '\E06B'
+}
+
+.IconLeftChevronLayer1::before {
+    content: '\E06C'
+}
+
+.IconSubtleLayer1::before {
+    content: '\E06D'
+}
+
+.IconSyncNowQuickCommand_GlyphLayer1::before {
+    content: '\E06E'
+}
+
+.IconTutorialVideosLayer1::before {
+    content: '\E06F'
+}
+
+.IconUngroupLayer1::before {
+    content: '\E070'
+}
+
+.IconVideoCardLayer1::before {
+    content: '\E071'
+}
+
+.IconWikipediaIndicatorLayer1::before {
+    content: '\E072'
+}
+
+.Icon13_16_NLayer1::before {
+    content: '\E073'
+}
+
+.IconTrashCanLayer1::before {
+    content: '\E074'
+}
+
+.IconSendAFrownLayer1::before {
+    content: '\E075'
+}
+
+.IconStackCardLayer1::before {
+    content: '\E076'
+}
+
+.IconAnimFxMediaAudioLayer1::before {
+    content: '\E077'
+}
+
+.IconFollowBlogLayer1::before {
+    content: '\E078'
+}
+
+.IconGearLayer1::before {
+    content: '\E079'
+}
+
+.IconInsertMovieFromFileLayer1::before {
+    content: '\E07B'
+}
+
+.IconRetryTransferLayer1::before {
+    content: '\E07C'
+}
+
+.IconOfficeAssistantLayer1::before {
+    content: '\E07D'
+}
+
+.IconSendASmileQuickCommandLayer1::before {
+    content: '\E07E'
+}
+
+.IconOpenJackMenuLayer1::before {
+    content: '\E07F'
+}
+
+.IconChangePictureLayer1::before {
+    content: '\E080'
+}
+
+.IconCardCaptionLayer1::before {
+    content: '\E081'
+}
+
+.IconOpenLayer1::before {
+    content: '\E082'
+}
+
+.IconCommentCollapseLayer1::before {
+    content: '\E083'
+}
+
+.IconCommentExpandLayer1::before {
+    content: '\E084'
+}
+
+.IconLogo_SwayLayer1::before {
+    content: '\E085'
+}
+
+.IconLogoSwayTealLayer1::before {
+    content: '\E086'
+}
+
+.IconPeopleOnlyLayer1::before {
+    content: '\E087'
+}
+
+.IconSourceIcon_BingLayer1::before {
+    content: '\E088'
+}
+
+.IconSourceIcon_YouTubeLayer1::before {
+    content: '\E089'
+}
+
+.fontIconSize12x12 {
+    font-family: 'SwayIcons Bold','SwayIcons Semibold','SwayIcons','SwayIcons Semilight','SwayIcons Thin';
+    font-size: 12px;
+    line-height: 12px;
+    width: 12px;
+    height: 12px
+}
+
+.fontIconSize16x16 {
+    font-family: 'SwayIcons Bold','SwayIcons Semibold','SwayIcons','SwayIcons Semilight','SwayIcons Thin';
+    font-size: 16px;
+    line-height: 16px;
+    width: 16px;
+    height: 16px
+}
+
+.fontIconSize20x20 {
+    font-family: 'SwayIcons Semibold','SwayIcons Bold','SwayIcons','SwayIcons Semilight','SwayIcons Thin';
+    font-size: 20px;
+    line-height: 20px;
+    width: 20px;
+    height: 20px
+}
+
+.fontIconSize24x24 {
+    font-family: 'SwayIcons','SwayIcons Semibold','SwayIcons Bold','SwayIcons Semilight','SwayIcons Thin';
+    font-size: 24px;
+    line-height: 24px;
+    width: 24px;
+    height: 24px
+}
+
+.fontIconSize28x28 {
+    font-family: 'SwayIcons','SwayIcons Semibold','SwayIcons Bold','SwayIcons Semilight','SwayIcons Thin';
+    font-size: 28px;
+    line-height: 28px;
+    width: 28px;
+    height: 28px
+}
+
+.fontIconSize32x32 {
+    font-family: 'SwayIcons Semilight','SwayIcons','SwayIcons Thin','SwayIcons Semibold','SwayIcons Bold';
+    font-size: 32px;
+    line-height: 32px;
+    width: 32px;
+    height: 32px
+}
+
+.fontIconSize10x32 {
+    font-family: 'SwayIcons Semilight','SwayIcons','SwayIcons Thin','SwayIcons Semibold','SwayIcons Bold';
+    font-size: 32px;
+    line-height: 32px;
+    width: 10px;
+    height: 32px
+}
+
+.fontIconSize36x36 {
+    font-family: 'SwayIcons Semilight','SwayIcons Thin','SwayIcons','SwayIcons Semibold','SwayIcons Bold';
+    font-size: 36px;
+    line-height: 36px;
+    width: 36px;
+    height: 36px
+}
+
+.fontIconSize40x40 {
+    font-family: 'SwayIcons Thin','SwayIcons Semilight','SwayIcons','SwayIcons Semibold','SwayIcons Bold';
+    font-size: 40px;
+    line-height: 40px;
+    width: 40px;
+    height: 40px
+}
+
+.fontIconSize48x48 {
+    font-family: 'SwayIcons Thin','SwayIcons Semilight','SwayIcons','SwayIcons Semibold','SwayIcons Bold';
+    font-size: 48px;
+    line-height: 48px;
+    width: 48px;
+    height: 48px
+}
+
+.fontIconSize64x64 {
+    font-family: 'SwayIcons Thin','SwayIcons Semilight','SwayIcons','SwayIcons Semibold','SwayIcons Bold';
+    font-size: 64px;
+    line-height: 64px;
+    width: 64px;
+    height: 64px
+}
+
+.FacebookPageItem {
+    float: left;
+    text-align: center;
+    border: 5px;
+    padding: 15px;
+    outline: 2px;
+    outline-style: double;
+    outline-color: #008072;
+    margin: 10px;
+    opacity: 1;
+    height: 75px;
+    width: 75px;
+    cursor: pointer;
+    overflow: hidden;
+    font-family: "Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    font-size: 14px
+}
+
+.FacebookPageBrowser {
+    border: 1px solid #b2b2b2;
+    box-shadow: 1px 1px 5px 0 rgba(0,0,0,0.5);
+    font-size: 15px;
+    padding: 22px;
+    background-color: #fff;
+    position: fixed;
+    max-height: 80%;
+    max-width: 80%;
+    left: 30%;
+    top: 20%;
+    z-index: 100;
+    width: 40%;
+    height: 60%
+}
+
+.FacebookPageBrowserContainer {
+    top: 0px;
+    position: absolute;
+    z-index: 100;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5)
+}
+
+.FacebookSelectPage {
+    font-size: 25px;
+    padding: 7px;
+    float: left;
+    font-family: "Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif
+}
+
+.FacebookSearchBar {
+    padding: 10px;
+    position: relative;
+    padding-left: 30%
+}
+
+.FacebookSearchBarInput {
+    width: 252px;
+    height: 25px;
+    font-size: 11px;
+    line-height: 100%
+}
+
+.FacebookPageItemContainer {
+    padding-bottom: 20px;
+    width: 100%;
+    height: 90%;
+    -ms-overflow-style: -ms-autohiding-scrollbar;
+    overflow-y: scroll
+}
+
+.FacebookPageImage {
+    width: 50px;
+    height: 50px
+}
+
+.FacebookConnectButton {
+    position: absolute;
+    top: 150px;
+    left: 50%;
+    width: 200px;
+    margin-left: -100px;
+    text-align: center;
+    background-color: #008072;
+    color: white;
+    padding: 10px 0px
+}
+
+.AppTileUIFont {
+    font-size: 12px
+}
+
+body,html,.eventWrapper {
+    padding: 0px;
+    margin: 0px;
+    width: 100%;
+    height: 100%
+}
+
+.ButtonVE {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    font-family: "Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding: 0px;
+    border: 1px solid transparent;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    background: none;
+    outline: none;
+    cursor: pointer;
+    -webkit-appearance: none;
+    -webkit-border-radius: 0;
+    overflow: visible
+}
+
+.ButtonVEDisabled {
+    opacity: .4;
+    cursor: default
+}
+
+.CheckboxVELabel {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    font-family: "Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 15px;
+    display: inline;
+    padding-right: 15px;
+    padding-left: 5px;
+    cursor: default
+}
+
+#templates {
+    display: none
+}
+
+#header {
+    position: absolute;
+    top: 0px;
+    width: 100%;
+    height: 50px;
+    font-size: 12px;
+    background-color: black;
+    color: #ccc;
+    cursor: default;
+    z-index: 1;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex
+}
+
+.application-root {
+    width: 100%;
+    height: 100%;
+    overflow: hidden
+}
+
+.page-root {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0
+}
+
+ul.hUl {
+    width: 100%;
+    height: 100%;
+    list-style: none;
+    margin: 0;
+    padding: 0
+}
+
+ul.hUl li {
+    float: left;
+    margin-left: 30px;
+    vertical-align: middle;
+    line-height: 50px;
+    height: 100%;
+    position: relative
+}
+
+ul.hUl li.hSelected {
+    font-weight: bold;
+    color: #fff
+}
+
+ul.hUl li#hTitle {
+    float: left;
+    font-size: 24px;
+    font-weight: lighter;
+    margin-left: 30px;
+    line-height: normal
+}
+
+#hTitle div {
+    padding: 8px 0 12px 0
+}
+
+ul.hUl li#hSignIn {
+    margin-right: 30px;
+    float: right;
+    color: #fff
+}
+
+ul.hUl li#hUser {
+    padding-right: 45px;
+    float: right
+}
+
+ul.hUl li#hDivider {
+    border-left: 1px solid #ccc;
+    height: 48%;
+    top: 26%
+}
+
+ul.hUl li.hButton {
+    cursor: pointer;
+    text-transform: uppercase
+}
+
+ul.hUl li.hDebugButton {
+    cursor: pointer;
+    float: right
+}
+
+div#hUserName {
+    color: #fff;
+    text-overflow: ellipsis;
+    max-width: 300px;
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+    display: inline-block;
+    text-transform: none
+}
+
+span#hUserName:hover,span#hUserName:active {
+    color: #eb078a
+}
+
+img#hUserPic {
+    height: 21px;
+    width: 21px;
+    border: 1px solid #fff;
+    position: relative;
+    float: right;
+    top: 14px;
+    left: 15px;
+    display: inline-block
+}
+
+.hLink {
+    text-decoration: none;
+    color: inherit;
+    display: inline-block
+}
+
+.hLink img {
+    border: none
+}
+
+.hLogo {
+    margin-top: 8px;
+    background-position: 0% center;
+    background-repeat: no-repeat;
+    height: 17px;
+    width: 63px
+}
+
+#hCreateNew {
+    float: right;
+    margin-left: 30px;
+    line-height: normal;
+    cursor: pointer
+}
+
+#officeFileInput {
+    position: absolute;
+    opacity: 0.0;
+    filter: alpha(opacity=0);
+    height: 1px;
+    width: 1px
+}
+
+.hiddenContent {
+    display: none
+}
+
+div.clickEater {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0px;
+    left: 0px;
+    z-index: 4000;
+    cursor: default;
+    background-color: #000;
+    opacity: 0
+}
+
+#content {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    top: 50px;
+    min-height: 320px;
+    min-width: 320px;
+    z-index: 0
+}
+
+div.dlg {
+    border: 1px solid #b2b2b2;
+    box-shadow: 1px 1px 5px 0 rgba(0,0,0,0.5);
+    font-size: 15px;
+    padding: 0% 25%;
+    background-color: #fff;
+    position: fixed;
+    overflow: auto;
+    z-index: 5100;
+    opacity: 1;
+    left: 0px;
+    right: 0px;
+    max-height: 100%
+}
+
+@media (max-width: 544px) {
+    div.dlg {
+        max-width:80%
+    }
+}
+
+@media (max-width: 600px) {
+    div.dlg {
+        padding:0px 15px
+    }
+}
+
+@media (max-width: 950px) {
+    div.dlg {
+        padding:0% 15%
+    }
+}
+
+.dlgContent {
+    padding: 22px
+}
+
+@media (max-width: 544px) {
+    .dlgContent {
+        padding:11px
+    }
+}
+
+.dlgContentP {
+    line-height: 20px
+}
+
+div.dlg.uxSlim {
+    padding: 8px;
+    font-size: 14px
+}
+
+div.dlgTitle {
+    color: #000;
+    font-size: 28px;
+    font-weight: lighter;
+    margin-bottom: 20px
+}
+
+div.dlg.uxSlim .dlgTitle {
+    margin-bottom: 8px;
+    font-size: 16px
+}
+
+.dlgDragHandle {
+    cursor: move
+}
+
+.dlgBtnBtn {
+    float: right
+}
+
+.dlgBtnLink {
+    float: left
+}
+
+.btn {
+    color: #444;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 2px 5px;
+    border: none;
+    margin: 34px 5px 0px 5px;
+    white-space: nowrap
+}
+
+div.dlg.uxSlim .btn {
+    margin-top: 8px
+}
+
+div.dlg.uxSlim .dlgButtons {
+    bottom: 8px
+}
+
+div.dlgContentOuter {
+    overflow: auto !important
+}
+
+div.dlgContentScroll {
+    position: relative
+}
+
+div.dlgContentInner {
+    position: absolute;
+    left: 0;
+    top: 0
+}
+
+div.dlgContent {
+    overflow: auto !important
+}
+
+.dialogTable th {
+    text-align: left
+}
+
+.dialogTable td {
+    padding-right: 20px
+}
+
+.dlgButtonCommon {
+    font-size: 13px;
+    cursor: pointer;
+    padding: 0px;
+    border: none;
+    margin: 0px;
+    margin-left: 8px;
+    margin-top: 16px;
+    min-height: 32px;
+    min-width: 96px;
+    white-space: nowrap;
+    float: right;
+    border: 1px solid transparent
+}
+
+button.dlgButton {
+    font-size: 13px;
+    cursor: pointer;
+    padding: 0px;
+    border: none;
+    margin: 0px;
+    margin-left: 8px;
+    margin-top: 16px;
+    min-height: 32px;
+    min-width: 96px;
+    white-space: nowrap;
+    float: right;
+    border: 1px solid transparent;
+    background-color: #008272;
+    color: #fff
+}
+
+button.dlgButtonHovered {
+    background-color: #009983;
+    color: #fff
+}
+
+button.dlgButtonFocused {
+    background-color: #008272;
+    color: #fff;
+    border: 1px solid black
+}
+
+button.dlgButtonPressed {
+    background-color: #006d6c;
+    color: #fff
+}
+
+button.dlgButtonActive {
+    background-color: #006d6c;
+    color: #fff
+}
+
+button.dlgButtonNeutral {
+    font-size: 13px;
+    cursor: pointer;
+    padding: 0px;
+    border: none;
+    margin: 0px;
+    margin-left: 8px;
+    margin-top: 16px;
+    min-height: 32px;
+    min-width: 96px;
+    white-space: nowrap;
+    float: right;
+    border: 1px solid transparent;
+    background-color: #d2d2d2;
+    color: #505050
+}
+
+button.dlgButtonNeutralHovered {
+    background-color: #f3f3f3;
+    color: #505050
+}
+
+button.dlgButtonNeutralFocused {
+    background-color: #d2d2d2;
+    color: #505050;
+    border: 1px solid #969696
+}
+
+button.dlgButtonNeutralPressed {
+    background-color: #d2d2d2;
+    color: #505050;
+    border: 1px solid #969696
+}
+
+button.dlgButtonNeutralActive {
+    background-color: #969696;
+    color: #505050
+}
+
+div.dlgButtonText {
+    padding-right: 24px;
+    padding-left: 24px
+}
+
+.btn:hover {
+    color: #000
+}
+
+.btnSelected:active,.btnSelected:focus {
+    color: #444
+}
+
+.btn:active,.btn:focus,.btnSelected {
+    color: #eb078a
+}
+
+.btn:disabled {
+    color: #b2b2b2
+}
+
+button.btn,button.btnSelected:active,button.btnSelected:focus {
+    background-color: #ccc;
+    height: 21px;
+    min-width: 75px
+}
+
+button.btn:hover {
+    background-color: #a6a6a6
+}
+
+button.btn:active,button.btn:focus,button.btnSelected {
+    color: #fff;
+    background-color: #eb078a;
+    border: none
+}
+
+button.btn:disabled {
+    background-color: #e6e6e6
+}
+
+.pinkActionButton {
+    position: relative;
+    width: auto;
+    height: 35px;
+    text-transform: uppercase
+}
+
+.pinkActionButton a {
+    font-weight: bold;
+    font-size: 12px;
+    color: #fff;
+    cursor: pointer;
+    padding: 10px 15px 1px 15px;
+    background-color: #008072;
+    text-decoration: none;
+    position: relative;
+    height: 100%;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box
+}
+
+.pinkActionButton a:active {
+    background-color: #006657
+}
+
+div.dlgFrost {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0px;
+    left: 0px;
+    background-color: #000;
+    z-index: 5099;
+    opacity: 0.25
+}
+
+.dlgWrapperClass {
+    z-index: 5100;
+    position: absolute;
+    width: 100%;
+    height: 100%
+}
+
+div.dlgTitle {
+    font-family: "Segoe UI Light","Segoe UI Semilight","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    font-weight: lighter;
+    -webkit-font-smoothing: antialiased;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none
+}
+
+table.dlgTable {
+    table-layout: fixed;
+    border-collapse: collapse;
+    width: 100%;
+    height: 100%;
+    display: block;
+    border: none
+}
+
+.dlgTable tbody,.dlgTable tr,.dlgTable td {
+    border: none;
+    padding: 0
+}
+
+table.dlgTable tbody tr td {
+    padding: 0
+}
+
+.diagTabsContents {
+    position: relative;
+    overflow: scroll !important
+}
+
+.diagBtn {
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    margin: 0;
+    padding: 0
+}
+
+td .dlgButtons {
+    position: static
+}
+
+.diagTabContent table,.diagTabContent tr,.diagTabContent th,.diagTabContent td {
+    width: 100%;
+    height: 100%;
+    border: 1px solid black;
+    padding: 2px;
+    border-collapse: collapse
+}
+
+.diagTabContent th,.diagTabContent td {
+    padding: 2px
+}
+
+.ui-resizable-handle.ui-resizable-se.ui-icon.ui-icon-gripsmall-diagonal-se {
+    background-image: url(..)
+}
+
+.LoadingMessage {
+    position: absolute;
+    bottom: 50%;
+    left: 0px;
+    right: 0px;
+    z-index: 1;
+    background-color: #fff;
+    opacity: 0.9;
+    padding: 20px;
+    margin: 0 17px
+}
+
+.LoadingMessageWrapper {
+    height: 20px;
+    text-align: center
+}
+
+.AddContentLoadingText {
+    font-family: "Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 15px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    display: inline-block;
+    vertical-align: top;
+    padding-left: 10px
+}
+
+.LoadingDots {
+    display: inline-block;
+    vertical-align: top;
+    padding: 2px
+}
+
+.NotificationBar {
+    background-color: #fcf198;
+    width: 100%;
+    position: absolute;
+    z-index: 2999;
+    cursor: default
+}
+
+.NotificationBarText {
+    font-family: "Segoe UI Semilight","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    font-weight: lighter;
+    -webkit-font-smoothing: antialiased;
+    padding: 10px 0;
+    margin-left: 40px;
+    margin-right: 70px;
+    color: #000;
+    text-align: left;
+    font-size: 15px;
+    line-height: 20px
+}
+
+.NotificationDismissButton {
+    position: absolute;
+    right: 25px;
+    top: 0px;
+    width: 40px;
+    height: 40px
+}
+
+.FeedbackOverlayBackground_Narrow {
+    min-height: 100% !important;
+    overflow: auto
+}
+
+.FeedbackMainContainer_Narrow {
+    min-height: 100% !important;
+    margin-top: 60px !important;
+    top: 0px !important;
+    height: auto !important;
+    border: none !important;
+    -webkit-animation-name: none !important;
+    animation-name: none !important
+}
+
+#officeBrowserFeedbackMainContentHolder {
+    width: 1080px
+}
+
+#officeBrowserFeedbackColumnSeparatorDiv {
+    height: 200px
+}
+
+#officeBrowserFeedbackLeftFormContainer {
+    margin-left: 180px
+}
+
+.officeBrowserFeedbackNarrowLayout #officeBrowserFeedbackLeftFormContainer {
+    float: none
+}
+
+#officeBrowserFeedbackMiddleFormContainer {
+    float: left;
+    margin-left: 0px;
+    padding-top: 75px
+}
+
+.officeBrowserFeedbackNarrowLayout #officeBrowserFeedbackMiddleFormContainer {
+    padding-top: 20px
+}
+
+#officeBrowserFeedbackQuestionMiddleText {
+    padding-top: 0px
+}
+
+#officeBrowserFeedbackComment {
+    width: 240px
+}
+
+.officeBrowserFeedbackNarrowLayout #officeBrowserFeedbackSubmitButtonContainer {
+    width: 240px;
+    height: 34px;
+    margin-bottom: 24px
+}
+
+#officeBrowserFeedbackRightFormContainer {
+    float: left;
+    margin-left: 0px;
+    padding-top: 75px;
+    padding-left: 60px;
+    width: 300px
+}
+
+.officeBrowserFeedbackNarrowLayout #officeBrowserFeedbackRightFormContainer {
+    border-top: 1px solid gray;
+    padding-top: 20px;
+    padding-left: 0px
+}
+
+#officeBrowserFeedbackQuestionRightText {
+    padding-bottom: 18px
+}
+
+.SurveyQuestionWrapper {
+    padding-bottom: 20px
+}
+
+.SurveyQuestionTitle {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    font-family: "Segoe UI Semibold","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 19px
+}
+
+.SurveyQuestionExplanation {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    font-family: "Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 16px
+}
+
+.SurveyQuestionSubtitle {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    font-family: "Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 17px
+}
+
+.SurveyQuestionTextBox {
+    width: 300px
+}
+
+.SurveyQuestionTextBoxSmall {
+    width: 120px;
+    top: 2px;
+    position: relative
+}
+
+.SurveyQuestionTextBoxText {
+    font-family: "Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 15px;
+    display: inline;
+    padding-right: 15px;
+    padding-left: 5px;
+    cursor: default
+}
+
+.SurveyQuestionCheckboxTwoColumnsWidth {
+    width: 50%;
+    display: inline-block
+}
+
+.BlockingProgress {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(64,64,64,0.85);
+    position: absolute;
+    z-index: 5000;
+    top: 0
+}
+
+.BlockingProgress img {
+    position: relative;
+    height: 32px;
+    width: 32px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    top: 50%
+}
+
+.BlockingProgressMessage {
+    font-family: "Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    position: relative;
+    margin-left: 10%;
+    margin-right: 10%;
+    top: 38%;
+    color: white;
+    font-size: 18pt;
+    text-align: center
+}
+
+.BlockingProgressMessage img {
+    height: 32px;
+    width: 32px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 40px;
+    display: block
+}
+
+.BlockingProgressCancel {
+    font-family: "Segoe UI Semilight","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    font-weight: lighter;
+    -webkit-font-smoothing: antialiased;
+    font-size: 21px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-color: #d2d2d2;
+    color: #505050;
+    color: #424242;
+    height: 32px;
+    padding: 0px 12px;
+    min-width: 96px;
+    margin-top: 32px
+}
+
+.BlockingProgressCancel:active {
+    background-color: #969696;
+    color: #505050
+}
+
+.BlockingProgressCancel:disabled {
+    color: #505050;
+    opacity: 0.3;
+    background-color: rgba(210,210,210,0.3)
+}
+
+.BlockingProgressCancel:hover {
+    background-color: #f3f3f3;
+    color: #505050
+}
+
+.BlockingProgressCancel:focus {
+    background-color: #d2d2d2;
+    color: #505050;
+    border: 1px solid #969696
+}
+
+.copyTextBox {
+    width: 100%;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    color: #505050;
+    border: 1px solid #d2d2d2
+}
+
+.copyTextBox:hover {
+    color: #505050;
+    border: 1px solid #969696
+}
+
+.copyTextBox:focus,.copyTextBox:active {
+    color: #505050;
+    border: 1px solid #505050
+}
+
+.DuplicateStoryDialogTextInput {
+    font-family: "Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    width: 100%;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    color: #505050;
+    border: 1px solid #d2d2d2
+}
+
+.DuplicateStoryDialogTextInput:hover {
+    color: #505050;
+    border: 1px solid #969696
+}
+
+.DuplicateStoryDialogTextInput:active,.DuplicateStoryDialogTextInput:focus {
+    color: #505050;
+    border: 1px solid #505050
+}
+
+.OpenUrlDialogTextInput {
+    font-family: "Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    width: 100%;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    color: #505050;
+    border: 1px solid #d2d2d2
+}
+
+.OpenUrlDialogTextInput:hover {
+    color: #505050;
+    border: 1px solid #969696
+}
+
+.OpenUrlDialogTextInput:active,.OpenUrlDialogTextInput:focus {
+    color: #505050;
+    border: 1px solid #505050
+}
+
+.FontIconLayersContainer {
+    position: relative
+}
+
+.FontIconLayer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0px;
+    top: 2px
+}
+
+.MissingFontIcon {
+    border-radius: 50%;
+    width: 13px;
+    height: 13px;
+    background: #505050;
+    border: 1px solid #fff;
+    box-shadow: 0px 0px 0px 1px #505050;
+    top: calc(50% - 8px);
+    left: calc(50% - 8px)
+}
+
+.CloseButtonFontIcon {
+    color: #000
+}
+
+.CloseButtonFontIconFocus,.CloseButtonFontIconHover {
+    color: #008272
+}
+
+.CloseButtonFontIconPressed {
+    color: #006d6c
+}
+
+.headerNew {
+    font-family: "Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    position: fixed;
+    height: 50px;
+    font-size: 12px;
+    background-color: #050708;
+    cursor: default;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 4000
+}
+
+.microsoftLogo {
+    width: 40px;
+    height: 100%;
+    background-color: #006657;
+    float: left
+}
+
+.homeButtonWrapper {
+    float: left;
+    height: 50px;
+    position: relative
+}
+
+.homeLink {
+    position: relative;
+    padding: 0px 20px;
+    height: 50px;
+    float: left;
+    color: #fff;
+    text-decoration: none;
+    font-size: 24px;
+    margin-right: 14px;
+    outline: none;
+    border: 1px solid transparent;
+    box-sizing: border-box
+}
+
+a.homeLink:hover {
+    background-color: #009983;
+    color: #fff
+}
+
+a.homeLink:focus {
+    background-color: #008272;
+    color: #fff;
+    border: 1px solid black
+}
+
+a.homeLink:active {
+    background-color: #006d6c;
+    color: #fff
+}
+
+.newStoryLink,.myStoriesLink {
+    position: relative;
+    left: 0px;
+    top: 0px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 9px;
+    float: right;
+    color: #fff;
+    text-decoration: none;
+    font-size: 14.5px;
+    border-right: 1px solid #161616;
+    border-left: 1px solid #161616;
+    background-color: #050708
+}
+
+.headerFarButtonDynamic,.headerFarButton,.headerSignIn {
+    font-size: 14px;
+    float: left;
+    height: 50px;
+    margin: 0px
+}
+
+.headerFarButton {
+    padding: 0px 15px;
+    color: #fff
+}
+
+.headerFarButtonDynamic {
+    padding: 0px 15px;
+    color: #fff
+}
+
+.headerFarButtonWrapper {
+    float: right;
+    height: 100%;
+    position: relative
+}
+
+.conditionalHeaderFarButton {
+    display: block
+}
+
+.headerPaddedFarButton {
+    font-size: 14px;
+    float: left;
+    height: 50px;
+    margin: 0px;
+    padding: 0px 15px;
+    color: #fff;
+    padding-right: 36px
+}
+
+.headerFarButtonText {
+    padding-left: 10px
+}
+
+.conditionalHeaderFarButtonText {
+    display: block
+}
+
+.headerFarButtonTextDynamic {
+    display: block
+}
+
+.headerFarButtonGlyph {
+    padding-top: 2px
+}
+
+.linkFarButtonWrapper {
+    padding-top: 17px;
+    padding-bottom: 17px;
+    text-decoration: none;
+    outline: none;
+    height: auto;
+    border: 1px solid transparent;
+    line-height: 14px
+}
+
+.overflowLinkButton {
+    display: block;
+    text-decoration: none;
+    border: 1px solid transparent;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box
+}
+
+.headerSignIn,.headerUserInfo {
+    background-color: #e4e5e6;
+    color: #444445;
+    float: right
+}
+
+.headerSignIn {
+    padding-left: 26px;
+    padding-right: 26px
+}
+
+.headerSignIn:hover,.headerUserMenuButtonHover {
+    background-color: #fff
+}
+
+.headerUserName {
+    padding-left: 26px;
+    padding-right: 26px
+}
+
+.headerUserPic {
+    float: right;
+    padding-top: 8px;
+    padding-right: 8px
+}
+
+.headerUserName {
+    font-size: 14.5px;
+    padding-left: 26px;
+    padding-right: 26px;
+    padding-top: 10px;
+    float: right
+}
+
+.headerUserMenuButton {
+    font-size: 14.5px;
+    text-decoration: none;
+    color: #444445;
+    line-height: 45px;
+    display: inherit;
+    width: 100%;
+    text-align: left;
+    padding-left: 36px;
+    padding-right: 36px
+}
+
+.headerStyleGlyphWrapper {
+    padding-top: 2px;
+    padding-right: 4px
+}
+
+.linkFarButtonWrapper:hover,.headerFarButtonHover {
+    background-color: #505050;
+    color: #fff
+}
+
+.linkFarButtonWrapper::selection,.linkFarButtonWrapper::-moz-selection {
+    background-color: #737373;
+    color: #fff
+}
+
+button.headerFarButtonActive {
+    background-color: #737373;
+    color: #fff
+}
+
+.linkFarButtonWrapper:focus,.headerFarButtonFocused {
+    background-color: black;
+    color: #fff;
+    border: 1px solid #d2d2d2
+}
+
+.headerFarButtonPressed {
+    background-color: #969696;
+    color: #fff
+}
+
+.linkFarButtonWrapper:active {
+    background-color: #969696;
+    color: #fff
+}
+
+.homeLink,.appSwitcher {
+    background-color: #008272;
+    color: #fff
+}
+
+.activeHomeLink:hover,.appSwitcher:hover {
+    background-color: #009983;
+    color: #fff
+}
+
+.activeHomeLink:focus,.appSwitcher:focus {
+    background-color: #008272;
+    color: #fff;
+    border: 1px solid black
+}
+
+.activeHomeLink:active,.appSwitcher:active {
+    background-color: #006d6c;
+    color: #fff
+}
+
+.homeLink.brandDocs,.appSwitcher.brandDocs {
+    background-color: #d83b01;
+    color: #fff
+}
+
+.activeHomeLink.brandDocs:hover,.appSwitcher.brandDocs:hover {
+    background-color: #ea6115;
+    color: #fff
+}
+
+.activeHomeLink.brandDocs:focus,.appSwitcher.brandDocs:focus {
+    background-color: #d83b01;
+    color: #464646;
+    border: 1px solid #6c6c6c
+}
+
+.activeHomeLink.brandDocs:active,.appSwitcher.brandDocs:active {
+    background-color: #d83b01;
+    color: #fff
+}
+
+.overflowLinkButton:hover,.userInfoWrapper:hover,.overflowButton:hover {
+    background-color: #e6e6e6;
+    color: #505050
+}
+
+.overflowLinkButton:focus,.userInfoWrapper:focus,.overflowButton:focus {
+    background-color: white;
+    border: 1px solid #969696;
+    color: #505050
+}
+
+.overflowLinkButton:active,.userInfoWrapper:active,.overflowButton:active {
+    background-color: #969696;
+    color: #505050
+}
+
+.overflowLinkButton::selection,.userInfoWrapper::selection,.overflowButton::selection,.overflowLinkButton::-moz-selection,.userInfoWrapper::-moz-selection,.overflowButton::-moz-selection {
+    background-color: #d2d2d2;
+    color: #505050
+}
+
+.appSwitcher {
+    float: left;
+    padding: 0px;
+    height: 100%;
+    width: 52px
+}
+
+.homeText {
+    float: left;
+    padding-top: 7px
+}
+
+.homeIcon {
+    float: left;
+    padding-top: 5px;
+    padding-right: 5px
+}
+
+.pipeNear {
+    float: left;
+    border-left: 1px solid #fff;
+    height: 100%;
+    opacity: 0.7
+}
+
+button.brandDocs+.pipeNear {
+    float: left;
+    border: none;
+    height: 100%;
+    opacity: 0.7
+}
+
+.homeLinkWrapper {
+    float: left;
+    height: 100%
+}
+
+.AppBarHamburgerButton {
+    position: fixed;
+    z-index: 4101;
+    padding: 0px 14px;
+    height: 50px;
+    background-color: transparent;
+    color: #fff
+}
+
+.appBarHamburgerButtonPlaceholder {
+    height: 100%;
+    width: 52px;
+    background-color: #008272;
+    float: left
+}
+
+.aboutPaneWrapper {
+    font-family: "Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    float: right;
+    position: fixed;
+    top: 0;
+    left: 360px;
+    right: auto;
+    bottom: 0px;
+    width: 360px;
+    z-index: 4000;
+    color: white;
+    background-color: #1f1f1f;
+    border: none;
+    transition: .367s;
+    overflow-y: auto
+}
+
+.aboutPaneWrapper .aboutPaneTitle {
+    padding: 15px;
+    padding-left: 24px;
+    font-weight: bold;
+    font-size: 15px;
+    vertical-align: text-bottom
+}
+
+.aboutPaneWrapper .aboutTileWrapper {
+    padding-bottom: 16px;
+    padding-left: 24px
+}
+
+.aboutPaneWrapper .aboutTileWrapper center {
+    float: left
+}
+
+.aboutPaneWrapper .aboutTileWrapper center .aboutIcon {
+    padding-right: 16px
+}
+
+.aboutPaneWrapper .aboutTileWrapper .aboutText {
+    color: white;
+    padding-left: 16px;
+    text-align: left;
+    vertical-align: text-bottom;
+    display: block
+}
+
+.aboutPaneWrapper .aboutTileWrapper .aboutText .aboutProductName {
+    font-size: 18px
+}
+
+.aboutPaneWrapper .aboutTileWrapper .aboutText .aboutProductVersion {
+    font-size: 15px;
+    line-height: 22px
+}
+
+.aboutPaneWrapper .aboutPaneDivider {
+    margin-left: 16px;
+    margin-right: 16px;
+    height: 1px;
+    border-top: 1px solid #999
+}
+
+.aboutSwayLinks {
+    color: #99d6cd;
+    margin-left: 24px;
+    margin-right: 24px;
+    margin-top: 28px;
+    text-align: left;
+    text-decoration: none;
+    font-size: 15px;
+    vertical-align: text-bottom;
+    line-height: 20px;
+    display: block
+}
+
+.accountsPaneWrapper {
+    font-family: "Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    float: right;
+    position: fixed;
+    top: 0;
+    left: 360px;
+    right: auto;
+    bottom: 0px;
+    width: 360px;
+    z-index: 4000;
+    font-size: 15px;
+    color: white;
+    background-color: #1f1f1f;
+    border: none;
+    transition: .367s;
+    overflow-y: auto
+}
+
+.accountsPaneWrapper .accountsPaneTitle {
+    padding: 12px;
+    padding-left: 24px;
+    text-transform: uppercase;
+    font-weight: bold
+}
+
+.accountsPaneWrapper .accountsPaneHeading {
+    font-family: "Segoe UI Semilight","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    font-weight: lighter;
+    -webkit-font-smoothing: antialiased;
+    font-size: 28px;
+    padding: 30px 20px 12px 24px
+}
+
+.accountsPaneWrapper .accountTileWrapper {
+    display: block;
+    min-height: 72px;
+    padding-left: 12px
+}
+
+.accountsPaneWrapper .accountTileWrapper .accountSwitchButton center {
+    float: left
+}
+
+.accountsPaneWrapper .accountTileWrapper .accountSwitchButton center .accountPicture {
+    margin: 12px;
+    padding: 0;
+    border-radius: 24px
+}
+
+.accountsPaneWrapper .accountTileWrapper .accountSwitchButton center .accountPicture .IconDoughboyLayer1 {
+    color: white
+}
+
+.accountsPaneWrapper .accountTileWrapper .accountSwitchButton .accountText {
+    float: left;
+    width: 210px;
+    text-align: left;
+    font-size: 15px
+}
+
+.accountsPaneWrapper .accountTileWrapper .accountSwitchButton .accountText .cutoffLongText {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis
+}
+
+.accountsPaneWrapper .accountTileWrapper .accountSwitchButton .accountText .accountName {
+    padding-top: 12px;
+    color: white
+}
+
+.accountsPaneWrapper .accountTileWrapper .accountSwitchButton .accountText .accountEmail {
+    padding-top: 4px;
+    color: #c7c7c7
+}
+
+.accountsPaneWrapper .accountTileWrapper .accountDeleteButton {
+    padding: 11px;
+    margin: 16px 0px;
+    border-left: 1px solid #999
+}
+
+.accountsPaneWrapper .accountTileWrapper:hover {
+    background-color: #173133
+}
+
+.accountsPaneWrapper .accountTileWrapper:focus {
+    background-color: #173133
+}
+
+.accountsPaneWrapper .accountTileWrapper:active {
+    background-color: #006d6c
+}
+
+.accountsPaneWrapper .accountsPaneDivider {
+    margin: 16px;
+    height: 1px;
+    border-top: 1px solid #999
+}
+
+.accountsPaneWrapper .accountsPaneTop {
+    min-height: 100%;
+    margin-bottom: -146px
+}
+
+.accountsPaneWrapper .accountsPaneBottom,.accountsPaneWrapper .accountsPaneContentPush {
+    height: 130px
+}
+
+.newAccountButton {
+    min-width: 100%
+}
+
+.newAccountButton center {
+    float: left
+}
+
+.newAccountButton center .newAccountPicture {
+    padding: 8px 16px 8px 28px
+}
+
+.newAccountButton .newAccountText {
+    color: white;
+    padding: 8px;
+    text-align: left;
+    height: 33px;
+    display: table-cell;
+    vertical-align: middle
+}
+
+.accountFocusableButton:focus {
+    border: 1px dashed white
+}
+
+.overflowWrapper {
+    float: right;
+    position: absolute;
+    font-size: 14px
+}
+
+.overflowWrapperWeb {
+    top: 50px;
+    right: 0px;
+    width: 220px;
+    z-index: 2999;
+    border: 1px solid #b2b2b2;
+    border-top: none;
+    background-color: white;
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: calc(100vh - 50px);
+    max-height: -webkit-calc(100vh - 50px);
+    -ms-overflow-style: -ms-autohiding-scrollbar
+}
+
+.overflowMenuFontIcon,.overflowMenuGlyph {
+    display: none
+}
+
+.hamburgerMenu {
+    top: 0px;
+    left: 0px;
+    right: auto;
+    bottom: 0px;
+    z-index: 4100;
+    width: 360px;
+    background-color: #008272;
+    border: none;
+    overflow-y: auto;
+    float: right;
+    position: fixed;
+    font-size: 14px
+}
+
+.hamburgerMenu .userInfoWrapper,.hamburgerMenu .overflowButton {
+    border: none;
+    color: white;
+    padding-left: 16px;
+    padding-right: 16px;
+    display: block
+}
+
+.hamburgerMenu .userInfoWrapper center,.hamburgerMenu .overflowButton center {
+    float: left
+}
+
+.hamburgerMenu .overflowButton .overflowMenuGlyph {
+    padding-right: 16px;
+    display: block
+}
+
+.hamburgerMenu .overflowButton .overflowMenuFontIcon {
+    margin-right: 16px;
+    margin-top: -2px;
+    display: block
+}
+
+.hamburgerMenu .overflowButton .overflowMenuText {
+    float: left
+}
+
+.hamburgerMenu .userInfoWrapper .userInfoPicture {
+    border-radius: 10px;
+    margin-right: 14px;
+    display: block
+}
+
+.hamburgerMenu .userInfoWrapper .userInfoContent {
+    float: left
+}
+
+.hamburgerMenu .userInfoWrapper .userInfoContent .userEmailDisplay {
+    margin: 0;
+    display: none
+}
+
+.hamburgerMenu .userInfoWrapper:hover,.hamburgerMenu .overflowButton:hover {
+    color: white;
+    background-color: #009983
+}
+
+.hamburgerMenu .userInfoWrapper:active,.hamburgerMenu .overflowButton:active {
+    color: white;
+    background-color: #006d6c
+}
+
+.hamburgerMenu .userInfoWrapper:focus,.hamburgerMenu .overflowButton:focus {
+    color: white;
+    background-color: #009983
+}
+
+.hamburgerMenu .hamburgerMenuDivider {
+    margin-left: 16px;
+    margin-right: 16px;
+    margin-top: 12px;
+    margin-bottom: 12px;
+    height: 1px;
+    border-top: 1px solid #999
+}
+
+.hamburgerMenu .hamburgerMenuTop {
+    min-height: 100%;
+    margin-bottom: -182px
+}
+
+.hamburgerMenu .hamburgerMenuBottom,.hamburgerMenu .hamburgerMenuContentPush {
+    height: 170px
+}
+
+.hamburgerTitle {
+    font-family: "Segoe UI Light","Segoe UI Semilight","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    font-weight: lighter;
+    -webkit-font-smoothing: antialiased;
+    font-size: 27px;
+    color: white;
+    line-height: 50px;
+    padding-left: 48px;
+    padding-right: 50px;
+    margin-top: -2px;
+    transition: opacity .367s;
+    transition-delay: .367s;
+    cursor: default
+}
+
+.createNewOverflowButtonFontIconWrapper {
+    border: 1px solid #fff;
+    border-radius: 50%
+}
+
+.refreshAppBarButton {
+    margin-right: 5px
+}
+
+.refreshAppBarButtonIcon {
+    -webkit-animation: none;
+    -moz-animation: none;
+    animation: none
+}
+
+.refreshAppBarButtonIconSpinning {
+    -webkit-animation: refreshIconSpin 3s linear infinite;
+    -moz-animation: refreshIconSpin 3s linear infinite;
+    animation: refreshIconSpin 3s linear infinite
+}
+
+@-moz-keyframes refreshIconSpin {
+    100% {
+        -moz-transform: rotate(360deg)
+    }
+}
+@-webkit-keyframes refreshIconSpin {
+    100% {
+        -webkit-transform: rotate(360deg)
+    }
+}
+@keyframes refreshIconSpin {
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg)
+    }
+}
+.overflowLastSyncTime {
+    font-family: "Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 13px;
+    color: #737374;
+    padding: 10px 15px 9px 15px;
+    background-color: #f1f1f1;
+    border-bottom: 1px solid #d2d2d2;
+    cursor: default
+}
+
+.userInfoWrapper {
+    border: 1px solid transparent
+}
+
+.userInfoWrapper,.overflowButton {
+    width: 100%;
+    outline: none;
+    text-align: left;
+    font-size: 12px;
+    padding-left: 16px;
+    padding-top: 16px;
+    padding-bottom: 16px;
+    margin: 0px;
+    background-color: white;
+    color: #505050;
+    background-color: transparent
+}
+
+.userInfoWrapper.conditionalOverflowButton,.overflowButton.conditionalOverflowButton {
+    display: none
+}
+
+.userInfoWrapper:hover {
+    background-color: #e6e6e6;
+    color: #505050
+}
+
+.userInfoWrapper:focus {
+    background-color: white;
+    border: 1px solid #969696;
+    color: #505050
+}
+
+.userInfoWrapper:active {
+    background-color: #969696;
+    color: #505050
+}
+
+.userInfoPicture {
+    display: none
+}
+
+.userNameDisplay {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 120px;
+    overflow: hidden;
+    margin: 0
+}
+
+.userEmailDisplay {
+    margin: 0px 0px 0px 0px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap
+}
+
+.internalHeaderButtonDynamic {
+    color: red;
+    font-weight: bold
+}
+
+.glyphOnlyHeaderButton {
+    display: none
+}
+
+.overflowInternalEnabledDynamic {
+    background-color: red
+}
+
+.overflowButtonActive {
+    background-color: #969696;
+    color: #505050
+}
+
+.replayClickMarker {
+    height: 26px;
+    width: 26px;
+    border-radius: 13px;
+    background: #ec008c;
+    position: absolute;
+    display: block;
+    opacity: 0.8;
+    pointer-events: none
+}
+
+.replayClickMarker.removed {
+    opacity: 0;
+    -webkit-transition: all 0.3s linear;
+    -moz-transition: all 0.3s linear;
+    -ms-transition: all 0.3s linear;
+    -o-transition: all 0.3s linear;
+    transition: all 0.3s linear
+}
+
+div#replayNotice {
+    position: absolute;
+    top: 65px;
+    background-color: #ec008c;
+    border-radius: 15px;
+    height: 20px;
+    line-height: 20px;
+    padding: 6px 10px;
+    color: #fff;
+    font-weight: bold;
+    font-size: 11pt;
+    z-index: 10010
+}
+
+div#replayNotice.controls {
+    right: 15px
+}
+
+div#replayNotice.keypress {
+    left: 15px
+}
+
+div#replayNotice .replayButton {
+    height: 10px;
+    width: 10px;
+    padding: 5px;
+    display: inline-block;
+    cursor: pointer;
+    vertical-align: top
+}
+
+div#replayNotice #replayStop {
+    margin-left: 5px
+}
+
+div#replayNotice #replayStop .replayStopIcon {
+    background: #fff;
+    height: 10px;
+    width: 10px;
+    float: left
+}
+
+div#replayNotice #replayStop:hover .replayStopIcon {
+    background: #000
+}
+
+input.idshUrl {
+    border: 1px solid #eb078a;
+    width: 100%
+}
+
+.freDialogBackgroundLarge {
+    width: 616px;
+    min-width: 616px;
+    height: 576px;
+    padding-left: 32px !important;
+    padding-right: 32px !important;
+    margin: 0 auto;
+    background-color: #fff !important;
+    border-width: 1px !important;
+    border-color: #008272 !important;
+    overflow: hidden !important
+}
+
+.freDialogBackgroundSmall {
+    width: 360px;
+    height: 379px;
+    min-width: 320px;
+    min-height: 360px;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    margin: 0 auto;
+    background-color: #fff !important;
+    border-width: 1px !important;
+    border-color: #008272 !important;
+    overflow: hidden !important
+}
+
+.freDialogWrapperOverride {
+    height: 0px !important;
+    position: static !important
+}
+
+.freDialogContentOverride {
+    padding: 0 !important;
+    overflow: hidden !important
+}
+
+.freDialogCloseButton {
+    background-color: transparent;
+    color: #505050;
+    position: absolute;
+    right: 13px;
+    top: 13px;
+    opacity: .8
+}
+
+.freDialogCloseButton:hover {
+    background-color: rgba(0,0,0,0.1);
+    color: #505050
+}
+
+.freDialogCloseButton:focus {
+    background-color: rgba(0,0,0,0.1);
+    color: #505050;
+    border: 1px solid #969696
+}
+
+.freDialogCloseButton:active {
+    background-color: rgba(0,0,0,0.3);
+    color: #505050
+}
+
+.freDialogCloseButton:disabled {
+    background-color: transparent;
+    color: #505050;
+    opacity: 0.3
+}
+
+.freDialogCloseButtonFontIcon {
+    color: #969696
+}
+
+.freCarouselWrapper {
+    overflow: hidden !important
+}
+
+.freCarouselContentWrapperLarge {
+    height: 522px;
+    margin: 0px auto
+}
+
+.freCarouselContentWrapperSmall {
+    height: 342px;
+    margin: 0px auto
+}
+
+.freCarouselFooterWrapper {
+    border-top-color: #d0d0d0;
+    border-top-width: 1px;
+    border-top-style: solid;
+    text-align: center;
+    position: relative
+}
+
+.freCarouselFooterWrapperLarge {
+    border-top-color: #d0d0d0;
+    border-top-width: 1px;
+    border-top-style: solid;
+    text-align: center;
+    position: relative;
+    height: 53px
+}
+
+.freCarouselFooterWrapperSmall {
+    border-top-color: #d0d0d0;
+    border-top-width: 1px;
+    border-top-style: solid;
+    text-align: center;
+    position: relative;
+    height: 36px
+}
+
+.freCarouselDismissButtonWrapper {
+    position: absolute;
+    bottom: 100%;
+    width: 100%
+}
+
+.freCarouselDismissButtonWrapperLarge {
+    position: absolute;
+    bottom: 100%;
+    width: 100%;
+    padding-top: 22px;
+    padding-bottom: 28px
+}
+
+.freCarouselDismissButtonWrapperSmall {
+    position: absolute;
+    bottom: 100%;
+    width: 100%;
+    padding-top: 16px;
+    padding-bottom: 12px
+}
+
+.freCarouselDismissButton {
+    text-align: center
+}
+
+.freCarouselDismissButtonText {
+    font-family: "Segoe UI Regular","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 16px;
+    line-height: 20px;
+    padding-top: 9px;
+    padding-bottom: 9px;
+    padding-left: 11px;
+    padding-right: 11px;
+    color: #fff;
+    background-color: #008372
+}
+
+.freCarouselIndexButtonsWrapper {
+    width: 100%;
+    position: absolute;
+    height: 22px;
+    margin: 0px auto;
+    top: calc(50% - 11px)
+}
+
+.freCarouselIndexButtonWrapper {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-left: 12px;
+    margin-right: 12px
+}
+
+.freCarouselIndexButton {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-left: 12px;
+    margin-right: 12px;
+    background: #008372
+}
+
+.freCarouselIndexButtonActive {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-left: 12px;
+    margin-right: 12px;
+    background: #fff;
+    border: 2px solid;
+    border-color: #008247
+}
+
+.freCarouselIndexButton:focus,.freCarouselIndexButton:hover {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-left: 12px;
+    margin-right: 12px;
+    border: 1px solid;
+    border-color: black
+}
+
+.freCarouselNavButtonWrapper {
+    height: 26px;
+    z-index: 100;
+    position: absolute;
+    overflow: visible
+}
+
+.freCarouselNavButtonWrapperLarge {
+    height: 26px;
+    z-index: 100;
+    position: absolute;
+    overflow: visible;
+    bottom: 17px
+}
+
+.freCarouselNavButtonWrapperSmall {
+    height: 26px;
+    z-index: 100;
+    position: absolute;
+    overflow: visible;
+    bottom: 7px
+}
+
+.freCarouselNavButtonWrapperLargeFallback {
+    height: 26px;
+    z-index: 100;
+    position: absolute;
+    overflow: visible;
+    bottom: 16px
+}
+
+.freCarouselNavButtonWrapperSmallFallback {
+    height: 26px;
+    z-index: 100;
+    position: absolute;
+    overflow: visible;
+    bottom: 6px
+}
+
+.freCarouselAnimButtonWrapper {
+    left: 0px;
+    width: 28px
+}
+
+.freCarouselPreviousButtonWrapper {
+    left: 34px
+}
+
+.freCarouselNextButtonWrapper {
+    right: 0px
+}
+
+.freCarouselNavButton {
+    background-color: #008272;
+    color: #fff;
+    background-color: rgba(0,0,0,0.2);
+    background-position: center;
+    height: 25px;
+    padding-top: 1px;
+    overflow: hidden
+}
+
+.freCarouselNavButtonFocused {
+    background-color: rgba(0,0,0,0.2) !important;
+    border: #666 solid 1px !important;
+    outline: none !important
+}
+
+.freCarouselNavButtonActive,.freCarouselNavButtonPressed {
+    background-color: rgba(0,0,0,0.6) !important;
+    border: #666 solid 1px !important;
+    outline: none !important
+}
+
+.freCarouselNavButtonHover {
+    background-color: #008272 !important;
+    border: #666 solid 1px !important;
+    outline: none !important
+}
+
+.freCarouselNavButtonFallback {
+    background-color: #008272;
+    color: #fff;
+    background-color: rgba(0,0,0,0.2);
+    background-position: center;
+    height: 25px;
+    padding-top: 1px;
+    overflow: hidden;
+    height: 26px !important;
+    width: 28px
+}
+
+.freCarouselAnimButton {
+    background-color: #008272;
+    color: #fff;
+    background-color: rgba(0,0,0,0.2);
+    border: 1px solid white;
+    background-position: center;
+    height: 28px;
+    width: 28px;
+    overflow: hidden;
+    -ms-high-contrast-adjust: none;
+    float: left
+}
+
+.freCarouselAnimButtonFallback {
+    background-color: #008272;
+    color: #fff;
+    background-color: rgba(0,0,0,0.2);
+    border: 1px solid white;
+    background-position: center;
+    height: 28px;
+    width: 28px;
+    overflow: hidden;
+    -ms-high-contrast-adjust: none;
+    float: left;
+    height: 26px !important
+}
+
+.freCarouselNavButtonCaption {
+    font-family: "Segoe UI Regular","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    color: #707070;
+    position: absolute;
+    top: 7px
+}
+
+.freCarouselNavButtonCaptionLarge {
+    font-size: 12px;
+    line-height: 14px
+}
+
+.freCarouselNavButtonCaptionSmall {
+    font-size: 10px;
+    line-height: 12px
+}
+
+.freCarouselPreviousButtonCaption {
+    font-family: "Segoe UI Regular","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    color: #707070;
+    position: absolute;
+    top: 7px;
+    left: 36px
+}
+
+.freCarouselNextButtonCaption {
+    font-family: "Segoe UI Regular","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    color: #707070;
+    position: absolute;
+    top: 7px;
+    right: 36px
+}
+
+.frePageTitle {
+    font-family: "Segoe UI Semilight","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    font-weight: lighter;
+    -webkit-font-smoothing: antialiased;
+    text-align: center;
+    color: #008372
+}
+
+.frePageTitleLarge {
+    font-family: "Segoe UI Semilight","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    font-weight: lighter;
+    -webkit-font-smoothing: antialiased;
+    text-align: center;
+    color: #008372;
+    font-size: 28px;
+    line-height: 37px
+}
+
+.frePageTitleSmall {
+    font-family: "Segoe UI Semilight","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    font-weight: lighter;
+    -webkit-font-smoothing: antialiased;
+    text-align: center;
+    color: #008372;
+    font-size: 18px;
+    line-height: 24px
+}
+
+.frePage1TitleLarge {
+    font-family: "Segoe UI Semilight","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    font-weight: lighter;
+    -webkit-font-smoothing: antialiased;
+    text-align: center;
+    color: #008372;
+    font-size: 28px;
+    line-height: 37px;
+    padding-top: 34px;
+    padding-bottom: 22px
+}
+
+.frePage1TitleSmall {
+    font-family: "Segoe UI Semilight","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    font-weight: lighter;
+    -webkit-font-smoothing: antialiased;
+    text-align: center;
+    color: #008372;
+    font-size: 18px;
+    line-height: 24px;
+    padding-top: 30px;
+    padding-bottom: 13px
+}
+
+.frePage1SubtitleWrapper {
+    width: 100%;
+    position: relative
+}
+
+.frePage1SubtitleWrapperLarge {
+    width: 100%;
+    position: relative;
+    height: 30px
+}
+
+.frePage1SubtitleWrapperSmall {
+    width: 100%;
+    position: relative;
+    height: 21px
+}
+
+.frePage1SubtitleWrap {
+    border-bottom: solid;
+    border-bottom-width: 1px;
+    border-bottom-color: #d0d0d0;
+    height: 50%;
+    width: 60%;
+    margin-left: 20%;
+    margin-right: 20%;
+    z-index: 20;
+    position: absolute;
+    top: 0px;
+    left: 0px
+}
+
+.frePage1Subtitle {
+    font-family: "Segoe UI Semilight","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    font-weight: lighter;
+    -webkit-font-smoothing: antialiased;
+    text-align: center;
+    color: #707070;
+    position: relative;
+    margin: 0px auto;
+    max-width: 170px;
+    background-color: #fff;
+    z-index: 3000;
+    display: table;
+    margin: auto
+}
+
+.frePage1SubtitleLarge {
+    font-family: "Segoe UI Semilight","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    font-weight: lighter;
+    -webkit-font-smoothing: antialiased;
+    text-align: center;
+    color: #707070;
+    position: relative;
+    margin: 0px auto;
+    max-width: 170px;
+    background-color: #fff;
+    z-index: 3000;
+    display: table;
+    margin: auto;
+    font-size: 23px;
+    line-height: 30px;
+    padding-left: 9px;
+    padding-right: 9px
+}
+
+.frePage1SubtitleSmall {
+    font-family: "Segoe UI Semilight","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    font-weight: lighter;
+    -webkit-font-smoothing: antialiased;
+    text-align: center;
+    color: #707070;
+    position: relative;
+    margin: 0px auto;
+    max-width: 170px;
+    background-color: #fff;
+    z-index: 3000;
+    display: table;
+    margin: auto;
+    font-size: 16px;
+    line-height: 21px;
+    padding-left: 8px;
+    padding-right: 8px
+}
+
+.frePage1Image {
+    margin-left: auto;
+    margin-right: auto;
+    display: block !important
+}
+
+.frePage1ImageLarge {
+    margin-left: auto;
+    margin-right: auto;
+    display: block !important;
+    padding-top: 35px;
+    width: 600px;
+    height: 260px
+}
+
+.frePage1ImageSmall {
+    margin-left: auto;
+    margin-right: auto;
+    display: block !important;
+    padding-top: 19px;
+    width: 296px;
+    height: 125px
+}
+
+.frePage2Title1Large {
+    font-family: "Segoe UI Semilight","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    font-weight: lighter;
+    -webkit-font-smoothing: antialiased;
+    text-align: center;
+    color: #008372;
+    font-size: 28px;
+    line-height: 37px;
+    padding-top: 26px
+}
+
+.frePage2Title1Small {
+    font-family: "Segoe UI Semilight","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    font-weight: lighter;
+    -webkit-font-smoothing: antialiased;
+    text-align: center;
+    color: #008372;
+    font-size: 18px;
+    line-height: 24px;
+    padding-top: 30px
+}
+
+.frePage2Title2Large {
+    font-family: "Segoe UI Semilight","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    font-weight: lighter;
+    -webkit-font-smoothing: antialiased;
+    text-align: center;
+    color: #008372;
+    font-size: 28px;
+    line-height: 37px;
+    padding-bottom: 25px
+}
+
+.frePage2Title2Small {
+    font-family: "Segoe UI Semilight","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    font-weight: lighter;
+    -webkit-font-smoothing: antialiased;
+    text-align: center;
+    color: #008372;
+    font-size: 18px;
+    line-height: 24px;
+    padding-bottom: 28px
+}
+
+.frePage2ImageWrapperLarge {
+    width: 100%;
+    height: 320px;
+    position: relative
+}
+
+.frePage2ImageWrapperSmall {
+    width: 100%;
+    height: 185px;
+    position: relative
+}
+
+.frePageAction {
+    font-family: "Segoe UI Regular","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-align: center;
+    z-index: 3000;
+    color: #fff;
+    background-color: #393939;
+    position: absolute;
+    top: 0px
+}
+
+.frePage2ActionLarge {
+    font-family: "Segoe UI Regular","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-align: center;
+    z-index: 3000;
+    color: #fff;
+    background-color: #393939;
+    position: absolute;
+    top: 0px;
+    font-size: 18px;
+    line-height: 27px;
+    min-width: 70px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 14px;
+    padding-right: 14px;
+    border: 4px solid rgba(255,255,255,0.5);
+    left: 170px
+}
+
+.frePage2ActionSmall {
+    font-family: "Segoe UI Regular","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-align: center;
+    z-index: 3000;
+    color: #fff;
+    background-color: #393939;
+    position: absolute;
+    top: 0px;
+    font-size: 12px;
+    line-height: 15px;
+    min-width: 25px;
+    padding-top: 6px;
+    padding-bottom: 7px;
+    padding-left: 14px;
+    padding-right: 14px;
+    border: 3px solid rgba(255,255,255,0.5);
+    left: 90px
+}
+
+.frePage2ImageLarge {
+    position: absolute;
+    bottom: 0px;
+    left: 237px
+}
+
+.frePage2ImageSmall {
+    position: absolute;
+    bottom: 0px;
+    left: 139px
+}
+
+.frePage2SourceImageLarge {
+    position: absolute;
+    right: 50%
+}
+
+.frePage2SourceImageSmall {
+    position: absolute;
+    right: 50%
+}
+
+.frePage3TitleLarge {
+    font-family: "Segoe UI Semilight","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    font-weight: lighter;
+    -webkit-font-smoothing: antialiased;
+    text-align: center;
+    color: #008372;
+    font-size: 28px;
+    line-height: 37px;
+    min-height: 74px;
+    width: 100%;
+    padding-top: 26px;
+    padding-bottom: 5px
+}
+
+.frePage3TitleSmall {
+    font-family: "Segoe UI Semilight","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    font-weight: lighter;
+    -webkit-font-smoothing: antialiased;
+    text-align: center;
+    color: #008372;
+    font-size: 18px;
+    line-height: 24px;
+    padding-top: 30px;
+    padding-bottom: 28px
+}
+
+.frePage3ImageWrapperLarge {
+    width: 502px;
+    height: 298px;
+    margin: 9px auto;
+    position: relative;
+    padding-top: 15px;
+    padding-left: 30px;
+    padding-right: 30px
+}
+
+.frePage3ImageWrapperSmall {
+    width: 255px;
+    height: 144px;
+    margin: 20px auto;
+    position: relative;
+    padding-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px
+}
+
+.frePage3ActionLarge {
+    font-family: "Segoe UI Regular","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-align: center;
+    z-index: 3000;
+    color: #fff;
+    background-color: #393939;
+    position: absolute;
+    top: 0px;
+    font-size: 18px;
+    line-height: 27px;
+    min-width: 70px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 14px;
+    padding-right: 14px;
+    border: 4px solid rgba(255,255,255,0.5);
+    right: 0px;
+    top: -10px !important
+}
+
+.frePage3ActionSmall {
+    font-family: "Segoe UI Regular","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-align: center;
+    z-index: 3000;
+    color: #fff;
+    background-color: #393939;
+    position: absolute;
+    top: 0px;
+    font-size: 12px;
+    line-height: 15px;
+    min-width: 25px;
+    padding-top: 6px;
+    padding-bottom: 7px;
+    padding-left: 14px;
+    padding-right: 14px;
+    border: 3px solid rgba(255,255,255,0.5);
+    right: 0px;
+    top: -10px !important
+}
+
+.frePage3SubtitleLarge1 {
+    font-family: "Univers Cond","Univers";
+    color: #fff;
+    font-size: 32px;
+    line-height: 43px;
+    padding-left: 28px;
+    padding-right: 28px;
+    padding-bottom: 93px;
+    position: absolute;
+    width: 446px;
+    bottom: 0px;
+    text-align: center
+}
+
+.frePage3SubtitleSmall1 {
+    font-family: "Univers Cond","Univers";
+    color: #fff;
+    font-size: 16px;
+    line-height: 21px;
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-bottom: 45px;
+    position: absolute;
+    width: 223px;
+    bottom: 0px;
+    text-align: center
+}
+
+.frePage3SubtitleLarge2 {
+    font-family: "Ford's Folly";
+    color: #413938;
+    font-size: 32px;
+    line-height: 43px;
+    padding-left: 17px;
+    padding-right: 205px;
+    padding-top: 38px;
+    position: absolute;
+    width: 280px;
+    top: 0px;
+    text-align: center
+}
+
+.frePage3SubtitleSmall2 {
+    font-family: "Ford's Folly";
+    color: #413938;
+    font-size: 15px;
+    line-height: 21px;
+    padding-left: 11px;
+    padding-right: 104px;
+    padding-top: 21px;
+    position: absolute;
+    width: 140px;
+    top: 0px;
+    text-align: center
+}
+
+.frePage3SubtitleLarge3 {
+    font-family: "Bodoni MT";
+    color: #fff;
+    font-size: 34px;
+    line-height: 45px;
+    padding-left: 28px;
+    padding-right: 28px;
+    padding-top: 35px;
+    position: absolute;
+    width: 446px;
+    top: 0px;
+    text-align: center
+}
+
+.frePage3SubtitleSmall3 {
+    font-family: "Bodoni MT";
+    color: #fff;
+    font-size: 17px;
+    line-height: 22px;
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-top: 27px;
+    position: absolute;
+    width: 223px;
+    top: 0px;
+    text-align: center
+}
+
+.frePage3SubtitleLarge4 {
+    font-family: "Rockwell Nova";
+    font-weight: bold;
+    color: #fff;
+    font-size: 26px;
+    line-height: 34px;
+    padding-left: 20px;
+    padding-right: 231px;
+    padding-top: 33px;
+    position: absolute;
+    width: 251px;
+    top: 0px;
+    text-align: left
+}
+
+.frePage3SubtitleSmall4 {
+    font-family: "Rockwell Nova";
+    font-weight: bold;
+    color: #fff;
+    font-size: 12px;
+    line-height: 15px;
+    padding-left: 11px;
+    padding-right: 114px;
+    padding-top: 19px;
+    position: absolute;
+    width: 130px;
+    top: 0px;
+    text-align: left
+}
+
+img {
+    border: none;
+}
+
+.ci {
+    display: inline-block;
+}
+
+html,body,.bodyContainer {
+    min-height: 100%;
+}
+
+html,body {
+    height: 100%;
+}
+
+.bodyContent {
+    padding: 50px 0 40px;
+}
+
+.bodyContent.HeaderPopupShown {
+    padding-top: 90px;
+}
+
+@media all and (max-width: 540px) {
+    .ResizableBodyContent {
+        padding:50px 0 70px;
+    }
+}
+
+.headBar {
+    white-space: nowrap;
+    height: 50px;
+    overflow: visible;
+    background-color: #000;
+    color: #fff;
+    position: absolute;
+    min-width: 800px;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 997;
+}
+
+.headBar.HeaderPopupShown {
+    height: 90px;
+}
+
+.headBar a,.headBar a:visited {
+    text-decoration: none;
+    color: #fff;
+    display: inline-block;
+}
+
+.headBar a:hover {
+    text-decoration: none;
+    color: #fff;
+    background-color: #444;
+}
+
+.headTLC {
+    height: 50px;
+    position: absolute;
+}
+
+.headLogo {
+    height: 50px;
+    display: inline-block;
+    padding: 0;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: -moz-none;
+    -ms-user-select: none;
+}
+
+.brandedLogo {
+    margin-left: 10px;
+    float: left;
+}
+
+.AppRtl .brandedLogo {
+    margin-left: 0px;
+    margin-right: 10px;
+    float: right;
+}
+
+.headBrand {
+    line-height: 50px;
+    font-size: 22px;
+    margin-left: 20px;
+    margin-right: 20px;
+    font-family: 'Segoe UI Light','Segoe UI Web Light','Segoe UI Web Regular','Segoe UI','Segoe UI Web','Segoe UI Symbol',HelveticaNeue-Light,'Helvetica Neue',Arial,sans-serif;
+}
+
+.headLogoPipe {
+    border-left: solid 1px #fff;
+    margin: 0;
+    cursor: default;
+    width: 0px;
+    opacity: 0.3;
+    filter: alpha(opacity=30);
+    height: 50px;
+}
+
+.headChevLink {
+    padding: 0;
+    height: 50px;
+    width: 50px;
+    background-color: #E83F24;
+}
+
+.headBar .headChevLink:hover {
+    background-color: #AA2D00;
+}
+
+.headChev {
+    display: block;
+    vertical-align: top;
+    margin-top: 21px;
+}
+
+.headChev img {
+    display: block;
+    margin: 0 auto;
+}
+
+.headTRC {
+    height: 50px;
+    position: absolute;
+    right: 0;
+}
+
+.HeaderRtl .headTRC {
+    right: auto;
+    left: 0;
+}
+
+.headTRC a,.headTRC .headMeName {
+    padding: 10px;
+    height: 30px;
+    line-height: 30px;
+}
+
+.headTRC a {
+    cursor: pointer;
+}
+
+.headMeContainer {
+    display: inline-block;
+    height: 50px;
+}
+
+.headMeNameContainer.headSignedIn {
+    display: inline-block;
+    height: 50px;
+    background-color: #E1E1E1;
+}
+
+.headMeLink,.headMeName,.headMyAccountLink,.headXLinks,.headLogoPipe,.headChevLink,.headXContent {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.headMeName {
+    color: #444444;
+    padding-left: 15px;
+}
+
+.HeaderRtl .headMeName {
+    padding-left: 10px;
+    padding-right: 15px;
+}
+
+.headUsernamePipe {
+    display: none;
+    width: 1px;
+    height: 16px;
+    margin-top: 17px;
+    background-color: #777777;
+}
+
+.headSignedIn a.headMeLink,.headSignedIn a.headMeLink:visited {
+    color: #444444;
+}
+
+.headSignedIn a.headMeLink:hover {
+    background-color: transparent;
+    text-decoration: underline;
+}
+
+.headXContent {
+    height: 50px;
+}
+
+a.headHighlight,a.headHighlight:visited,span.headHighlight {
+    background-color: #444444;
+}
+
+a.headHighlight:hover,span.headHighlight:hover {
+    background-color: #666666;
+}
+
+.headerMenusContainer {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+}
+
+.linkWithMenu.selected {
+    background-color: #F2F2F2;
+}
+
+.dropDownMenu {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    background-color: #F2F2F2;
+    display: none;
+}
+
+.dropDownMenuRowList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.alignMenuLeft .dropDownMenuRowList {
+    text-align: left;
+}
+
+.alignMenuCenter .dropDownMenuRowList {
+    text-align: center;
+}
+
+.alignMenuRight .dropDownMenuRowList {
+    text-align: right;
+}
+
+.HeaderRtl .alignMenuLeft .dropDownMenuRowList {
+    text-align: right;
+}
+
+.HeaderRtl .alignMenuRight .dropDownMenuRowList {
+    text-align: left;
+}
+
+.dropDownMenuRow {
+    list-style: none;
+}
+
+.dropDownMenuLinkList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.dropDownMenuLinkContainer {
+    display: inline;
+}
+
+.dropDownMenuLink {
+    padding: 10px;
+}
+
+.headPopup {
+    position: relative;
+    display: table;
+    text-align: right;
+    white-space: normal;
+    width: 100%;
+    background-color: #fff;
+    color: #707070;
+}
+
+.HeaderRtl .headPopup {
+    text-align: left;
+}
+
+.headPopup a,.headPopup a:visited,.headPopup span {
+    color: #707070;
+    display: inline-block;
+}
+
+.headBar .headPopup a:hover {
+    color: #000;
+    background-color: transparent;
+    text-decoration: underline;
+}
+
+.headBar .headPopup a:hover img {
+    background-color: #ddd;
+}
+
+.popupOuterCellLeft,.popupOuterCellRight {
+    display: table-cell;
+    vertical-align: middle;
+    height: 40px;
+}
+
+.popupOuterCellLeft {
+    text-align: left;
+}
+
+.HeaderRtl .popupOuterCellLeft {
+    text-align: right;
+}
+
+.popupOuterCellRight {
+    text-align: right;
+}
+
+.HeaderRtl .popupOuterCellRight {
+    text-align: left;
+}
+
+.popupOuterCellRight .popupInnerCell {
+    white-space: nowrap;
+}
+
+.popupInnerCell {
+    display: inline-block;
+    max-height: 40px;
+}
+
+.popupOuterCellLeft .popupInnerCell {
+    overflow-y: auto;
+}
+
+.popupMessage {
+    margin: 0 10px 0;
+}
+
+.popupLink {
+    margin: -2px 2px 0;
+    vertical-align: top;
+}
+
+.popupClose {
+    margin: -5px 8px 0;
+    line-height: 1px;
+    vertical-align: middle;
+}
+
+.popupClose img {
+    padding: 4px;
+    margin: -3px;
+}
+
+.footerContainer {
+    display: table;
+    border-top: solid 1px transparent;
+    height: 39px;
+    min-width: 800px;
+    margin-top: -40px;
+    background-color: #fff;
+    width: 100%;
+    color: #707070;
+    position: relative;
+    z-index: 997;
+}
+
+.footerContainer.DarkColorPalette {
+    background-color: #333;
+    color: #b3b3b3;
+    border-top-color: transparent;
+}
+
+.footerContainer a,.footerContainer a:visited {
+    text-decoration: none;
+    display: inline-block;
+    color: #707070;
+    padding: 10px;
+    padding-top: 11px;
+    height: 18px;
+}
+
+.footerContainer a:hover {
+    color: #333;
+    text-decoration: none;
+}
+
+.footerContainer.DarkColorPalette a,.footerContainer.DarkColorPalette a:visited {
+    color: #b3b3b3;
+}
+
+.footerContainer.DarkColorPalette a:hover {
+    color: #f2f2f2;
+}
+
+.footerBLC {
+    display: inline-block;
+    height: 100%;
+    float: left;
+}
+
+.FooterRtl .footerBLC {
+    float: right;
+}
+
+.footerBRC {
+    display: inline-block;
+    height: 100%;
+    float: right;
+    white-space: normal;
+}
+
+.FooterRtl .footerBRC {
+    float: left;
+}
+
+.footerBRCoutercell {
+    display: inline-block;
+    height: 100%;
+}
+
+.footerBRCinnerrow {
+    display: inline-block;
+    height: 100%;
+}
+
+.footerGlobe {
+    vertical-align: top;
+    margin: -1px 6px 0 0;
+}
+
+.FooterRtl .footerGlobe {
+    margin: -1px 0 0 6px;
+}
+
+@media all and (max-width: 540px) {
+    .ResizableFooterContainer .footerBLC,.ResizableFooterContainer.FooterRtl .footerBLC {
+        display:block;
+        float: none;
+    }
+
+    .ResizableFooterContainer {
+        margin-top: -70px;
+    }
+
+    .ResizableFooterContainer .footerBRC {
+        float: left;
+    }
+
+    .ResizableFooterContainer.FooterRtl .footerBRC {
+        float: right;
+    }
+}
+
+.headerBlurbpanel {
+    background-color: #ffffff;
+    position: absolute;
+    height: 350px;
+    margin-top: -175px;
+    top: 50%;
+    min-width: 800px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    display: none;
+    z-index: 996;
+}
+
+.signinframe {
+    width: 800px;
+    height: 350px;
+}
+
+.iframeloading {
+    background-image: url('./progress.gif');
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+}
+
+.headerOverlay {
+    background-color: #262626;
+    opacity: 0.5;
+    filter: alpha(opacity=50);
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: none;
+    z-index: 995;
+}
+
+img {
+    border: none;
+}
+
+.ci {
+    display: inline-block;
+}
+
+.swBar {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    background-color: #fff;
+    padding: 20px 10px 10px 20px;
+    top: 30px;
+    left: auto;
+    right: auto;
+    border: 1px solid #b6b6b6;
+    margin: 10px;
+    box-sizing: content-box;
+    box-shadow: 0px 1px 15px rgba(0,0,0,0.4);
+    opacity: 0;
+    transition-property: opacity,top;
+    transition-duration: 0.5s;
+    transition-timing-function: cubic-bezier(0,0,0,1);
+    transition-delay: 0s;
+    width: 600px;
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.swBar:focus {
+    outline: none;
+}
+
+.swBar.closeAnimation {
+    transition-duration: 0.2s;
+    transition-timing-function: cubic-bezier(0.33,0,0.67,1);
+}
+
+.swBar.HeaderRtl.O365Switcher {
+    padding-left: 10px;
+    padding-right: 20px;
+}
+
+@media (min-width: 660px) {
+    .swBar,.swBar.O365Switcher {
+        width:370px;
+    }
+}
+
+@media (min-width: 900px) {
+    .swBar.O365Switcher {
+        width:840px;
+    }
+}
+
+@media (max-width: 899px) and (min-width:780px) {
+    .swBar.O365Switcher {
+        width:720px;
+    }
+}
+
+@media (max-width: 659px) {
+    .swBar,.swBar.O365Switcher {
+        width:480px;
+    }
+}
+
+@media (max-width: 539px) {
+    .swBar,.swBar.O365Switcher {
+        width:360px;
+    }
+}
+
+@media (max-width: 419px) {
+    .swBar,.swBar.O365Switcher {
+        width:240px;
+    }
+}
+
+.swBar.SwitcherLoading {
+    width: 270px;
+    height: 130px;
+    text-align: center;
+    padding: 0;
+}
+
+.swBar.SwitcherError {
+    width: 250px;
+    padding: 20px;
+}
+
+.swBar .swLoadingErrorText {
+    display: none;
+}
+
+.swBar.SwitcherError .swLoadingErrorText {
+    display: inline;
+}
+
+.swBar .swLoadingText {
+    display: none;
+}
+
+.swBar.SwitcherLoading .swLoadingText {
+    display: inline;
+}
+
+.swLoadingText {
+    color: #000;
+    font-size: 20px;
+    line-height: 130px;
+}
+
+.swLoadingErrorText {
+    color: #000;
+}
+
+.swErrorTitle {
+    font-size: 20px;
+}
+
+.swErrorBody {
+    font-size: 14px;
+}
+
+.swBar a {
+    text-decoration: none;
+}
+
+.swBar .arrow {
+    display: block;
+    position: absolute;
+    top: -8px;
+    left: 6px;
+    margin: 0;
+    border-bottom: 8px solid #fff;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 0;
+    padding: 0;
+    width: 0;
+    height: 0;
+    font-size: 0;
+    line-height: 0;
+}
+
+.HeaderRtl.swBar .arrow {
+    left: auto;
+    right: 6px;
+}
+
+.swBar .border-arrow {
+    border-bottom-color: #b6b6b6;
+    top: -9px;
+}
+
+.swTileList {
+    list-style: none outside none;
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+}
+
+.swTile {
+    margin-bottom: 10px;
+    margin-right: 10px;
+}
+
+.swTileLink {
+    border: 0px solid transparent;
+    margin: 0px;
+    position: relative;
+    text-align: center;
+    color: #fff;
+}
+
+.swTileLink:hover,.swTileLink:focus {
+    border: 2px solid;
+    margin: -2px;
+    text-decoration: none;
+}
+
+.swTileLink2:hover
+{
+    border: 2px solid;
+    margin: -2px;
+    text-decoration: none;
+}
+
+.swTileLink:focus {
+    outline: 0;
+}
+
+.swTile,.swTileLink {
+    display: inline-block;
+    width: 110px;
+    height: 110px;
+}
+
+.swTile.tilePressed {
+    transform: scale(.9215);
+}
+
+.swTileText {
+    max-width: 90px;
+    position: absolute;
+    bottom: 6px;
+    left: 10px;
+    line-height: 110%;
+    text-align: left;
+}
+
+.HeaderRtl .swTileText {
+    left: auto;
+    right: 10px;
+    text-align: right;
+}
+
+.headerBarBG {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: #fff;
+    opacity: 0;
+    filter: alpha(opacity=0);
+    position: absolute;
+    z-index: 998;
+}
+
+.clip110x110 {
+    position: relative;
+    overflow: hidden;
+}
+
+.clip110x110 {
+    width: 110px;
+    height: 110px;
+}
+
+.clip110x110 img,.clip110x110 input {
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    width: auto;
+    height: auto;
+}
+
+.wapsw_ODC_TileExcel_110x110x32 {
+    top: -1px;
+    left: -1px;
+}
+
+.wapsw_ODC_TileOneNote_110x110x32 {
+    top: -1px;
+    left: -113px;
+}
+
+.wapsw_ODC_TilePeople_110x110x32 {
+    top: -113px;
+    left: -1px;
+}
+
+.wapsw_ODC_TileSway_110x110x32 {
+    top: -113px;
+    left: -113px;
+}
+
+.wapsw_ODC_TileWord_110x110x32 {
+    top: -1px;
+    left: -225px;
+}
+
+.wapsw_ODC_TileDocsDocCom_110x110x32 {
+    top: -113px;
+    left: -225px;
+}
+
+.wapsw_ODC_TilePowerPoint_110x110x32 {
+    top: -225px;
+    left: -1px;
+}
+
+.wapsw_ODC_TileOutlook_110x110x32 {
+    top: -225px;
+    left: -113px;
+}
+
+.wapsw_ODC_TileOfficeOnline_110x110x32 {
+    top: -225px;
+    left: -225px;
+}
+
+.wapsw_ODC_TileCloudLogo_110x110x32 {
+    top: -1px;
+    left: -337px;
+}
+
+.wapsw_ODC_TileCalendar_110x110x32 {
+    top: -113px;
+    left: -337px;
+}
+
