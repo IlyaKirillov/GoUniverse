@@ -132,6 +132,14 @@ var g_oPlayersList =
         {
             oClient.LoadUserInfo(Record.m_sName);
         }
+    },
+
+    Handle_RightClick : function(Record)
+    {
+        if (oClient)
+        {
+            oClient.EnterPrivateChat(Record.m_sName);
+        }
     }
 };
 

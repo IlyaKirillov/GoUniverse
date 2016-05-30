@@ -127,6 +127,7 @@ function CListView()
 
     this.private_OnMouseDown = function(e)
     {
+        var bRet = null;
         check_MouseDownEvent(e, true);
         var oPos = oThis.private_UpdateMousePos(global_mouseEvent.X, global_mouseEvent.Y);
         oThis.m_nSelectedIndex = oThis.private_GetIndexByXY(oPos.X, oPos.Y);
@@ -143,10 +144,20 @@ function CListView()
         else
         {
             if (2 == global_mouseEvent.ClickCount && oThis.m_oListObject && oThis.m_oListObject.Handle_DoubleClick)
+            {
                 oThis.m_oListObject.Handle_DoubleClick(oThis.m_aList[oThis.m_nSelectedIndex]);
+            }
+            else if (1 == global_mouseEvent.ClickCount && g_mouse_button_right === global_mouseEvent.Button && oThis.m_oListObject && oThis.m_oListObject.Handle_RightClick)
+            {
+                oThis.m_oListObject.Handle_RightClick(oThis.m_aList[oThis.m_nSelectedIndex]);
+                bRet = false;
+            }
         }
 
         e.preventDefault();
+
+        if (null !== bRet)
+            return bRet;
     };
 
     this.private_OnMouseUp = function(e)

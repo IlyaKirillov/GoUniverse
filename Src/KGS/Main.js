@@ -733,7 +733,7 @@ function EnterGameRoom2(GameRoomId, SGF, ManagerId, sBlackName, sBlackRank, sWhi
     OnPanelTabClick(GameRoomDiv);
 }
 
-function EnterChatRoom(ChatRoomId, sRoomName)
+function EnterChatRoom(ChatRoomId, sRoomName, isPrivate)
 {
     var ChatRoom = {};
     ChatRoom.ChatRoomId = ChatRoomId;
@@ -886,9 +886,24 @@ function EnterChatRoom(ChatRoomId, sRoomName)
 
     CloseButton.onclick = function()
     {
-        //LeaveGameRoom(GameRoomId);
-        //OnRemoveTab(GameRoomDiv);
-        //TabPanel.removeChild(DivTab);
+        oClient.LeaveChatRoom(ChatRoomId);
+        TabPanel.removeChild(DivTab);
+
+        if (CurrentChatTab === ChatRoom)
+            CurrentChatTab = null;
+
+        for (var Pos in ChatTabs)
+        {
+            var Tab = ChatTabs[Pos];
+            if (Tab === ChatRoom)
+            {
+                ChatTabs.splice(Pos, 1);
+            }
+            else if (null === CurrentChatTab)
+            {
+                OnPanelChatTabClick(Tab.ChatRoomId);
+            }
+        }
     };
 
     DivTab.onmouseover = function()
@@ -1094,6 +1109,13 @@ CKGSClient.prototype.LeaveGameRoom = function(nGameRoomId)
         "channelId" : nGameRoomId
     });
 };
+CKGSClient.prototype.LeaveChatRoom = function(nChatRoomId)
+{
+    this.private_SendMessage({
+        "type"      : "UNJOIN_REQUEST",
+        "channelId" : nChatRoomId
+    });
+};
 CKGSClient.prototype.SendChatMessage = function(sText)
 {
     this.private_SendMessage({
@@ -1112,6 +1134,14 @@ CKGSClient.prototype.LoadUserInfo = function(sUserName)
 CKGSClient.prototype.SetCurrentChatRoom = function(nChatRoomId)
 {
     this.m_nChatChannelId = nChatRoomId;
+};
+CKGSClient.prototype.EnterPrivateChat = function(sUserName)
+{
+    this.private_SendMessage({
+        "type"        : "CONVO_REQUEST",
+        "callbackKey" : 12345,
+        "name"        : sUserName
+    });
 };
 CKGSClient.prototype.private_SendMessage = function(oMessage)
 {
@@ -1281,6 +1311,10 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
     {
         this.private_HandleLoginFailedNoSuchUser(oMessage);
     }
+    else if ("CONVO_JOIN" === oMessage.type)
+    {
+        this.private_HandleConvoJoin(oMessage);
+    }
     else
     {
         console.log(oMessage);
@@ -1314,7 +1348,7 @@ CKGSClient.prototype.private_HandleRoomNames = function(oMessage)
         if ("English Game Room" === sName)
             this.nCurrentChannelId = nChannelId;
 
-        EnterChatRoom(nChannelId, sName);
+        EnterChatRoom(nChannelId, sName, false);
         if (null === CurrentChatTab)
         {
             this.m_nChatChannelId = nChannelId;
@@ -1590,6 +1624,7 @@ CKGSClient.prototype.private_HandleDetailsJoin = function(oMessage)
 CKGSClient.prototype.private_HandleUnjoin = function(oMessage)
 {
     // Ничего не делаем
+    console.log(oMessage);
 };
 CKGSClient.prototype.private_HandleRoomDesc = function(oMessage)
 {
@@ -1625,6 +1660,13 @@ CKGSClient.prototype.private_HandleLoginFailedNoSuchUser = function(oMessage)
 {
     this.isLoggedIn = false;
     OnLogout("Login or password is incorrect.");
+};
+CKGSClient.prototype.private_HandleConvoJoin = function(oMessage)
+{
+    var nChannelId = oMessage.channelId;
+    var sUserName  = oMessage.user.name;
+
+    EnterChatRoom(nChannelId, sUserName + "(P)", true);
 };
 CKGSClient.prototype.private_GetRank = function(sRank)
 {
