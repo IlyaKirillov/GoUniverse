@@ -53,10 +53,9 @@ var g_oGamesList =
 
     SortFunction : function (oRecord1, oRecord2)
     {
-        if ("" === oRecord1.m_sGameInfo && "" !== oRecord2.m_sGameInfo)
-            return -1;
-        else if ("" !== oRecord1.m_sGameInfo && "" === oRecord2.m_sGameInfo)
-            return 1;
+        var nPreSortResult = g_oGamesList.private_PreSort(oRecord1, oRecord2);
+        if (0 !== nPreSortResult)
+            return nPreSortResult;
 
         var SortType = g_oGamesList.SortType;
         if (EGameListRecord.Id === SortType)
@@ -75,33 +74,17 @@ var g_oGamesList =
         }
         else if (EGameListRecord.WRank === SortType)
         {
-            var nRes = g_oGamesList.private_SortByInfoState(oRecord1, oRecord2);
-            if (0 !== nRes)
-                return nRes;
-
             if (oRecord1.m_nWhiteRank < oRecord2.m_nWhiteRank)
                 return -1;
             else if (oRecord1.m_nWhiteRank > oRecord2.m_nWhiteRank)
                 return 1;
-
-            var nResult = g_oGamesList.private_SortByWhiteName(oRecord1, oRecord2);
-            if (0 !== nResult)
-                return nResult;
         }
         else if (-EGameListRecord.WRank === SortType)
         {
-            var nRes = g_oGamesList.private_SortByInfoState(oRecord1, oRecord2);
-            if (0 !== nRes)
-                return nRes;
-
             if (oRecord1.m_nWhiteRank < oRecord2.m_nWhiteRank)
                 return 1;
             else if (oRecord1.m_nWhiteRank > oRecord2.m_nWhiteRank)
                 return -1;
-
-            var nResult = g_oGamesList.private_SortByWhiteName(oRecord1, oRecord2);
-            if (0 !== nResult)
-                return nResult;
         }
         else if (EGameListRecord.WName === SortType)
         {
@@ -119,33 +102,17 @@ var g_oGamesList =
         }
         else if (EGameListRecord.BRank === SortType)
         {
-            var nRes = g_oGamesList.private_SortByInfoState(oRecord1, oRecord2);
-            if (0 !== nRes)
-                return nRes;
-
             if (oRecord1.m_nBlackRank < oRecord2.m_nBlackRank)
                 return -1;
             else if (oRecord1.m_nBlackRank > oRecord2.m_nBlackRank)
                 return 1;
-
-            var nResult = g_oGamesList.private_SortByBlackName(oRecord1, oRecord2);
-            if (0 !== nResult)
-                return nResult;
         }
         else if (-EGameListRecord.BRank === SortType)
         {
-            var nRes = g_oGamesList.private_SortByInfoState(oRecord1, oRecord2);
-            if (0 !== nRes)
-                return nRes;
-
             if (oRecord1.m_nBlackRank < oRecord2.m_nBlackRank)
                 return 1;
             else if (oRecord1.m_nBlackRank > oRecord2.m_nBlackRank)
                 return -1;
-
-            var nResult = g_oGamesList.private_SortByBlackName(oRecord1, oRecord2);
-            if (0 !== nResult)
-                return nResult;
         }
         else if (EGameListRecord.BName === SortType)
         {
@@ -190,36 +157,51 @@ var g_oGamesList =
                 return -1;
         }
 
+        return g_oGamesList.private_PostSort(oRecord1, oRecord2);
+    },
+
+    private_PreSort : function(oRecord1, oRecord2)
+    {
+        // Все отложенные партии в самом низу списка
+        if (false === oRecord1.m_bAdjourned && false !== oRecord2.m_bAdjourned)
+            return -1;
+        else if (false !== oRecord1.m_bAdjourned && false === oRecord2.m_bAdjourned)
+            return 1;
+
+        // Матчи, привязанные к событию на сервере, в самом верху списка
+        if (true === oRecord1.m_bEvent && true !== oRecord2.m_bEvent)
+            return -1;
+        else if (true !== oRecord1.m_bAdjourned && true !== oRecord2.m_bEvent)
+            return 1;
+
+        return 0;
+    },
+
+    private_PostSort : function(oRecord1, oRecord2)
+    {
+        // Сортируем по рейтингу белого, потом по рейтингу черного, потом по количесту наблюдателей, потом по id партии.
+
+        if (oRecord1.m_nWhiteRank < oRecord2.m_nWhiteRank)
+            return 1;
+        else if (oRecord1.m_nWhiteRank > oRecord2.m_nWhiteRank)
+            return -1;
+
+        if (oRecord1.m_nBlackRank < oRecord2.m_nBlackRank)
+            return 1;
+        else if (oRecord1.m_nBlackRank > oRecord2.m_nBlackRank)
+            return -1;
+
+        if (oRecord1.m_nObserversCount < oRecord2.m_nObserversCount)
+            return 1;
+        else if (oRecord1.m_nObserversCount > oRecord2.m_nObserversCount)
+            return -1;
+
         if (oRecord1.m_nGameId < oRecord2.m_nGameId)
             return -1;
         else if (oRecord1.m_nGameId > oRecord2.m_nGameId)
             return 1;
 
-        return 0;
-    },
-
-    private_SortByInfoState : function(oRecord1, oRecord2)
-    {
-        return 0;
-    },
-
-    private_SortByWhiteName : function(oRecord1, oRecord2)
-    {
-        if (oRecord1.m_sWhiteName < oRecord2.m_sWhiteName)
-            return -1;
-        else if (oRecord1.m_sWhiteName > oRecord2.m_sWhiteName)
-            return 1;
-
-        return 0;
-    },
-
-    private_SortByBlackName : function(oRecord1, oRecord2)
-    {
-        if (oRecord1.m_sBlackName < oRecord2.m_sBlackName)
-            return -1;
-        else if (oRecord1.m_sBlackName > oRecord2.m_sBlackName)
-            return 1;
-
+        // Сюда мы уже не должны попадать, потому что Id партий не должны совпадать между собой.
         return 0;
     },
 
@@ -295,11 +277,13 @@ function CGameListRecord()
     this.m_nMove           = 0;
     this.m_bPrivate        = false;
     this.m_sPlace          = "";
+    this.m_bAdjourned      = false;
+    this.m_bEvent          = false;
 }
 
 CGameListRecord.prototype.Draw = function(oContext, dX, dY, eType)
 {
-    if ("" !== this.m_sGameInfo) // законченная игра
+    if (true === this.m_bAdjourned) // Отложенная игра
         oContext.fillStyle = "#CCCCCC";
     else
         oContext.fillStyle = "#000000";
@@ -350,6 +334,8 @@ CGameListRecord.prototype.Update = function(aLine)
     this.m_nMove      = aLine[11] | 0;
     this.m_bPrivate   = aLine[12];
     this.m_sPlace     = aLine[13];
+    this.m_bAdjourned = aLine[14];
+    this.m_bEvent     = aLine[15];
 };
 
 CGameListRecord.prototype.private_GetRank = function(nRank)

@@ -1389,6 +1389,8 @@ CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
     var nWhiteR     = oGameRecord.players.white ? this.private_GetRank(oGameRecord.players.white.rank) : -3;
     var bPrivate    = true === oGameRecord.private ? true : false;
     var sPlace      = (undefined !== this.m_aRooms[oGameRecord.roomId] ? this.m_aRooms[oGameRecord.roomId].Name : "Global");
+    var bAdjourned  = oGameRecord.adjourned ? oGameRecord.adjourned : false;
+    var bEvent      = oGameRecord.event ? oGameRecord.event : false;
 
     if ("demonstration" === oGameRecord.gameType)
     {
@@ -1414,7 +1416,10 @@ CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
     else if ("tournament" === oGameRecord.gameType)
         sGameType = "*";
 
-    GamesListView.Handle_Record([nAdd, nGameId, sGameType, nObservers, "", sWhite, nWhiteR, "", sBlack, nBlackR, sComment, nMoveNumber, bPrivate, sPlace]);
+    if (true === bPrivate)
+        sGameType = "P";
+
+    GamesListView.Handle_Record([nAdd, nGameId, sGameType, nObservers, "", sWhite, nWhiteR, "", sBlack, nBlackR, sComment, nMoveNumber, bPrivate, sPlace, bAdjourned, bEvent]);
 };
 CKGSClient.prototype.private_HandleUserRecord = function(oUserRecord, bAdd)
 {
