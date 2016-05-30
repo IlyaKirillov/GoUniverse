@@ -171,7 +171,7 @@ var g_oGamesList =
         // Матчи, привязанные к событию на сервере, в самом верху списка
         if (true === oRecord1.m_bEvent && true !== oRecord2.m_bEvent)
             return -1;
-        else if (true !== oRecord1.m_bAdjourned && true !== oRecord2.m_bEvent)
+        else if (true !== oRecord1.m_bEvent && true === oRecord2.m_bEvent)
             return 1;
 
         return 0;

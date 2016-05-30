@@ -1394,7 +1394,6 @@ CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
 
     if ("demonstration" === oGameRecord.gameType)
     {
-		//console.log(oGameRecord);
         sGameType = "D";
         sComment = "Demonstration by " + oGameRecord.players.owner.name;
     }
@@ -1446,10 +1445,10 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
     this.m_aGames[GameRoomId] = oGame;
 
     var nSize      = oMessage.gameSummary.size | 0;
-    var sBlackName = oMessage.gameSummary.players.black ? oMessage.gameSummary.players.black.name : "";
-    var sBlackRank = oMessage.gameSummary.players.black ? oMessage.gameSummary.players.black.rank : "";
-    var sWhiteName = oMessage.gameSummary.players.white ? oMessage.gameSummary.players.white.name : "";
-    var sWhiteRank = oMessage.gameSummary.players.white ? oMessage.gameSummary.players.white.rank : "";
+    var sBlackName = oMessage.gameSummary.players.black && oMessage.gameSummary.players.black.name ? oMessage.gameSummary.players.black.name : "-";
+    var sBlackRank = oMessage.gameSummary.players.black && oMessage.gameSummary.players.black.rank ? oMessage.gameSummary.players.black.rank : "-";
+    var sWhiteName = oMessage.gameSummary.players.white && oMessage.gameSummary.players.white.name ? oMessage.gameSummary.players.white.name : "-";
+    var sWhiteRank = oMessage.gameSummary.players.white && oMessage.gameSummary.players.white.rank ? oMessage.gameSummary.players.white.rank : "-";
 
     var sSGF = "(;FF[4]";
     sSGF += "SZ[" + nSize + "]";
@@ -1810,10 +1809,10 @@ CKGSClient.prototype.private_ReadSgfEvents = function(oGame, arrSgfEvents)
 	{
 		if (undefined === nRank || null === nRank)
 			return "?";
-		else if (nRank <= 29)
-			return (30 - nRank) + "k";
+		else if (nRank <= 30)
+			return (31 - nRank) + "k";
 		else if (nRank <= 39)
-			return (nRank - 29) + "d";
+			return (nRank - 30) + "d";
 		else
 			return (nRank - 39) + "p";
 	}
