@@ -1071,6 +1071,7 @@ function CKGSClient()
     this.m_aRooms         = {};
     this.m_sUserName      = "";
     this.m_nChatChannelId = -1;
+    this.m_aAllRooms      = {};
 }
 CKGSClient.prototype.GetUserName = function()
 {
@@ -1339,25 +1340,28 @@ CKGSClient.prototype.private_HandleRoomNames = function(oMessage)
         var nChannelId = oMessage.rooms[nIndex].channelId;
         var sName      = oMessage.rooms[nIndex].name;
 
-        this.m_aRooms[nChannelId] =
+        this.m_aAllRooms[nChannelId] =
         {
-            ChannelId : nChannelId,
-            Name      : sName
+            ChannelId       : nChannelId,
+            Name            : sName,
+            GreetingMessage : ""
         };
-
-        if ("English Game Room" === sName)
-            this.nCurrentChannelId = nChannelId;
-
-        EnterChatRoom(nChannelId, sName, false);
-        if (null === CurrentChatTab)
-        {
-            this.m_nChatChannelId = nChannelId;
-            OnPanelChatTabClick(nChannelId);
-        }
     }
 };
 CKGSClient.prototype.private_HandleRoomJoin = function(oMessage)
 {
+    this.m_aRooms[oMessage.channelId] = 1;
+
+    if ("English Game Room" === this.m_aAllRooms[oMessage.channelId].Name)
+        this.nCurrentChannelId = oMessage.channelId;
+
+    EnterChatRoom(oMessage.channelId, this.m_aAllRooms[oMessage.channelId].Name, false);
+    if (null === CurrentChatTab)
+    {
+        this.m_nChatChannelId = oMessage.channelId;
+        OnPanelChatTabClick(oMessage.channelId);
+    }
+
     var Games = oMessage.games;
     if (Games && Games.length > 0)
     {
@@ -1422,7 +1426,7 @@ CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
     var sWhite      = oGameRecord.players.white ? oGameRecord.players.white.name : "";
     var nWhiteR     = oGameRecord.players.white ? this.private_GetRank(oGameRecord.players.white.rank) : -3;
     var bPrivate    = true === oGameRecord.private ? true : false;
-    var sPlace      = (undefined !== this.m_aRooms[oGameRecord.roomId] ? this.m_aRooms[oGameRecord.roomId].Name : "Global");
+    var sPlace      = (undefined !== this.m_aAllRooms[oGameRecord.roomId] ? this.m_aAllRooms[oGameRecord.roomId].Name : "Global");
     var bAdjourned  = oGameRecord.adjourned ? oGameRecord.adjourned : false;
     var bEvent      = oGameRecord.event ? oGameRecord.event : false;
 
@@ -1599,9 +1603,9 @@ CKGSClient.prototype.private_HandleUserUpdate = function(oMessage)
 };
 CKGSClient.prototype.private_HandleJoinComplete = function(oMessage)
 {
-    var oRoom = this.m_aRooms[oMessage.channelId];
-    if (oRoom)
+    if (this.m_aRooms[oMessage.channelId])
     {
+        var oRoom = this.m_aAllRooms[oMessage.channelId];
         AddRoomGreetingMessage(oMessage.channelId, oRoom.GreetingMessage);
     }
 };
@@ -1628,9 +1632,9 @@ CKGSClient.prototype.private_HandleUnjoin = function(oMessage)
 };
 CKGSClient.prototype.private_HandleRoomDesc = function(oMessage)
 {
-    if (this.m_aRooms[oMessage.channelId])
+    if (this.m_aAllRooms[oMessage.channelId])
     {
-        var oRoom = this.m_aRooms[oMessage.channelId];
+        var oRoom = this.m_aAllRooms[oMessage.channelId];
         oRoom.GreetingMessage = oMessage.description;
         oRoom.Owners = [];
 
