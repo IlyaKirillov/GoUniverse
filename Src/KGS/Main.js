@@ -1059,6 +1059,11 @@ function GetTabByRoomId(RoomId)
     return null;
 }
 
+function OpenRoomsList()
+{
+
+}
+
 
 function CKGSClient()
 {
@@ -1072,6 +1077,7 @@ function CKGSClient()
     this.m_sUserName      = "";
     this.m_nChatChannelId = -1;
     this.m_aAllRooms      = {};
+    this.m_oRoomCategory  = {};
 }
 CKGSClient.prototype.GetUserName = function()
 {
@@ -1143,6 +1149,13 @@ CKGSClient.prototype.EnterPrivateChat = function(sUserName)
         "callbackKey" : 12345,
         "name"        : sUserName
     });
+};
+CKGSClient.prototype.GetRoomName = function(nRoomId)
+{
+    if (this.m_aAllRooms[nRoomId])
+        return this.m_aAllRooms[nRoomId].Name;
+
+    return "Global";
 };
 CKGSClient.prototype.private_SendMessage = function(oMessage)
 {
@@ -1337,16 +1350,17 @@ CKGSClient.prototype.private_HandleRoomNames = function(oMessage)
 
     for (var nIndex = 0, nCount = oMessage.rooms.length; nIndex < nCount; ++nIndex)
     {
-        var nChannelId = oMessage.rooms[nIndex].channelId;
-        var sName      = oMessage.rooms[nIndex].name;
-
-        this.m_aAllRooms[nChannelId] =
+        var oRoom = this.m_aAllRooms[oMessage.rooms[nIndex].channelId];
+        if (undefined !== oRoom)
         {
-            ChannelId       : nChannelId,
-            Name            : sName,
-            GreetingMessage : ""
-        };
+            oRoom.Name            = oMessage.rooms[nIndex].name;
+            oRoom.Private         = undefined !== oMessage.rooms[nIndex].private ? oMessage.rooms[nIndex].private : false;
+            oRoom.TournamentOnly  = undefined !== oMessage.rooms[nIndex].tournOnly ? oMessage.rooms[nIndex].tournOnly : false;
+            oRoom.GlobalGamesOnly = undefined !== oMessage.rooms[nIndex].globalGamesOnly ? oMessage.rooms[nIndex].globalGamesOnly : false;
+        }
     }
+
+    GamesListView.Update();
 };
 CKGSClient.prototype.private_HandleRoomJoin = function(oMessage)
 {
@@ -1408,6 +1422,38 @@ CKGSClient.prototype.private_HandleLoginSuccess = function(oMessage)
         "list" : "ACTIVES"
     });
 
+    var oRoomCategoryId = oMessage.roomCategoryChannelIds;
+    for (var sCategoryId in oRoomCategoryId)
+    {
+        this.m_oRoomCategory[oRoomCategoryId[sCategoryId]] = sCategoryId;
+    }
+
+    var arrAllRoomChannelIds = [];
+    var arrRooms = oMessage.rooms;
+    for (var nIndex = 0, nCount = arrRooms.length; nIndex < nCount; ++nIndex)
+    {
+        var nChannelId  = arrRooms[nIndex].channelId;
+        var sCategory   = arrRooms[nIndex].category;
+        var nCategoryId = oRoomCategoryId[sCategory] ? oRoomCategoryId[sCategory] : -1;
+
+        this.m_aAllRooms[nChannelId] = {
+            ChannelId       : nChannelId,
+            Category        : nCategoryId,
+            Name            : "",
+            GreetingMessage : "",
+            Private         : false,
+            TournamentOnly  : false,
+            GlobalGamesOnly : false
+        };
+
+        arrAllRoomChannelIds.push(nChannelId);
+    }
+
+    this.private_SendMessage({
+        "type"  : "ROOM_NAMES_REQUEST",
+        "rooms" : arrAllRoomChannelIds
+    });
+
     OnConnect();
 };
 CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
@@ -1426,7 +1472,7 @@ CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
     var sWhite      = oGameRecord.players.white ? oGameRecord.players.white.name : "";
     var nWhiteR     = oGameRecord.players.white ? this.private_GetRank(oGameRecord.players.white.rank) : -3;
     var bPrivate    = true === oGameRecord.private ? true : false;
-    var sPlace      = (undefined !== this.m_aAllRooms[oGameRecord.roomId] ? this.m_aAllRooms[oGameRecord.roomId].Name : "Global");
+    var nRoomId     = oGameRecord.roomId;
     var bAdjourned  = oGameRecord.adjourned ? oGameRecord.adjourned : false;
     var bEvent      = oGameRecord.event ? oGameRecord.event : false;
 
@@ -1456,7 +1502,7 @@ CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
     if (true === bPrivate)
         sGameType = "P";
 
-    GamesListView.Handle_Record([nAdd, nGameId, sGameType, nObservers, "", sWhite, nWhiteR, "", sBlack, nBlackR, sComment, nMoveNumber, bPrivate, sPlace, bAdjourned, bEvent]);
+    GamesListView.Handle_Record([nAdd, nGameId, sGameType, nObservers, "", sWhite, nWhiteR, "", sBlack, nBlackR, sComment, nMoveNumber, bPrivate, nRoomId, bAdjourned, bEvent]);
 };
 CKGSClient.prototype.private_HandleUserRecord = function(oUserRecord, bAdd)
 {
@@ -1469,16 +1515,13 @@ CKGSClient.prototype.private_HandleUserRecord = function(oUserRecord, bAdd)
 };
 CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 {
-    console.log(oMessage);
-
     var GameRoomId = oMessage.channelId;
-    var oGame =
-        {
-            GameRoomId : GameRoomId,
-            GameTree   : null,
-            Nodes      : {},
-            CurNode    : null
-        };
+    var oGame = {
+        GameRoomId : GameRoomId,
+        GameTree   : null,
+        Nodes      : {},
+        CurNode    : null
+    };
 
     this.m_aGames[GameRoomId] = oGame;
 
@@ -1721,147 +1764,148 @@ CKGSClient.prototype.private_TranslateUnicodeMessage = function(sMessage)
 };
 CKGSClient.prototype.private_ReadSgfEvents = function(oGame, arrSgfEvents)
 {
-	var oGameTree = oGame.GameTree;
-	var oNode = null;
-	var oActivetedNode = null;
-	for (var nIndex = 0, nCount = arrSgfEvents.length; nIndex < nCount; ++nIndex)
-	{
-		var sgfEvent = arrSgfEvents[nIndex];
+    var oGameTree      = oGame.GameTree;
+    var oNode          = null;
+    var oActivatedNode = null;
+    for (var nIndex = 0, nCount = arrSgfEvents.length; nIndex < nCount; ++nIndex)
+    {
+        var sgfEvent = arrSgfEvents[nIndex];
 
-		var sNodeId = sgfEvent.nodeId;
-		if (!oGame.Nodes[sNodeId])
-		{
-			// Сюда мы должны попадать ровно 1 раз в самом начале с самой первой нодой
-			oGame.Nodes[sNodeId] = oGameTree.Get_FirstNode();
-		}
+        var sNodeId = sgfEvent.nodeId;
+        if (!oGame.Nodes[sNodeId])
+        {
+            // Сюда мы должны попадать ровно 1 раз в самом начале с самой первой нодой
+            oGame.Nodes[sNodeId] = oGameTree.Get_FirstNode();
+        }
 
-		oNode = oGame.Nodes[sNodeId];
-		if (!oNode)
-			continue;
+        oNode = oGame.Nodes[sNodeId];
+        if (!oNode)
+            continue;
 
-		if ("PROP_GROUP_ADDED" === sgfEvent.type)
-		{
-			var oProps = sgfEvent.props;
-			for (var nPropsIndex = 0, nPropsCount = oProps.length; nPropsIndex < nPropsCount; ++nPropsIndex)
-			{
-				private_ReadProp(oProps[nPropsIndex]);
-			}
-		}
-		else if ("PROP_ADDED" === sgfEvent.type)
-		{
-			private_ReadProp(sgfEvent.prop);
-		}
-		else if ("CHILD_ADDED" === sgfEvent.type)
-		{
-			var oNewNode = new CNode(oGameTree);
-			oNode.Add_Next(oNewNode, true);
-			oGame.Nodes[sgfEvent.childNodeId] = oNewNode;
-		}
-		else if ("ACTIVATED" === sgfEvent.type)
-		{
-			if (oGame.Nodes[sgfEvent.nodeId])
-				oActivetedNode = oGame.Nodes[sgfEvent.nodeId];
-		}
-		else if ("PROP_CHANGED" === sgfEvent.type)
-		{
-			private_ReadProp(sgfEvent.prop);
-		}
-		else
-		{
-			console.log(sgfEvent);
-		}
-	}
+        if ("PROP_GROUP_ADDED" === sgfEvent.type)
+        {
+            var oProps = sgfEvent.props;
+            for (var nPropsIndex = 0, nPropsCount = oProps.length; nPropsIndex < nPropsCount; ++nPropsIndex)
+            {
+                private_ReadProp(oProps[nPropsIndex]);
+            }
+        }
+        else if ("PROP_ADDED" === sgfEvent.type)
+        {
+            private_ReadProp(sgfEvent.prop);
+        }
+        else if ("CHILD_ADDED" === sgfEvent.type)
+        {
+            var oNewNode = new CNode(oGameTree);
+            oNode.Add_Next(oNewNode, true);
+            oGame.Nodes[sgfEvent.childNodeId] = oNewNode;
+        }
+        else if ("ACTIVATED" === sgfEvent.type)
+        {
+            if (oGame.Nodes[sgfEvent.nodeId])
+                oActivatedNode = oGame.Nodes[sgfEvent.nodeId];
+        }
+        else if ("PROP_CHANGED" === sgfEvent.type)
+        {
+            private_ReadProp(sgfEvent.prop);
+        }
+        else
+        {
+            console.log(sgfEvent);
+        }
+    }
 
-	function private_ReadProp(oProp)
-	{
-		if ("MOVE" === oProp.name)
-		{
-			var nX = oProp.loc.x;
-			var nY = oProp.loc.y;
-			var nColor = "black" === oProp.color ? BOARD_BLACK : BOARD_WHITE;
-			oNode.Add_Move(nX + 1, nY + 1, nColor);
-		}
-		else if ("ADDSTONE" === oProp.name)
-		{
-			var nX = oProp.loc.x;
-			var nY = oProp.loc.y;
-			var nColor = "black" === oProp.color ? BOARD_BLACK : BOARD_WHITE;
-			oNode.AddOrRemove_Stones(nColor, [Common_XYtoValue(nX + 1, nY + 1)]);
-		}
-		else if ("COMMENT" === oProp.name)
-		{
-			oNode.Add_Comment(oProp.text);
-		}
-		else if ("RULES" === oProp.name)
-		{
-			if (oProp.size)
-				oGameTree.Set_BoardSize(oProp.size, oProp.size);
+    function private_ReadProp(oProp)
+    {
+        if ("MOVE" === oProp.name)
+        {
+            var nX     = oProp.loc.x;
+            var nY     = oProp.loc.y;
+            var nColor = "black" === oProp.color ? BOARD_BLACK : BOARD_WHITE;
+            oNode.Add_Move(nX + 1, nY + 1, nColor);
+        }
+        else if ("ADDSTONE" === oProp.name)
+        {
+            var nX     = oProp.loc.x;
+            var nY     = oProp.loc.y;
+            var nColor = "black" === oProp.color ? BOARD_BLACK : BOARD_WHITE;
+            oNode.AddOrRemove_Stones(nColor, [Common_XYtoValue(nX + 1, nY + 1)]);
+        }
+        else if ("COMMENT" === oProp.name)
+        {
+            oNode.Add_Comment(oProp.text);
+        }
+        else if ("RULES" === oProp.name)
+        {
+            if (oProp.size)
+                oGameTree.Set_BoardSize(oProp.size, oProp.size);
 
-			if (oProp.komi)
-				oGameTree.Set_Komi(oProp.komi);
+            if (oProp.komi)
+                oGameTree.Set_Komi(oProp.komi);
 
-			if (oProp.rules)
-				oGameTree.Set_Rules(oProp.rules);
+            if (oProp.rules)
+                oGameTree.Set_Rules(oProp.rules);
 
-			if (oProp.handicap)
-				oGameTree.Set_Handicap(oProp.handicap);
+            if (oProp.handicap)
+                oGameTree.Set_Handicap(oProp.handicap);
 
-			// TODO: РЕализовать TimeSystem
-		}
-		else if ("PLAYERNAME" === oProp.name)
-		{
-			if ("white" === oProp.color)
-				oGameTree.Set_White(oProp.text);
-			else if ("black" === oProp.color)
-				oGameTree.Set_Black(oProp.text);
-		}
-		else if ("PLAYERRANK" === oProp.name)
-		{
-			if ("white" === oProp.color)
-				oGameTree.Set_WhiteRating(private_GetRank(oProp.int));
-			else if ("black" === oProp.color)
-				oGameTree.Set_BlackRating(private_GetRank(oProp.int));
-		}
-		else if ("DATE" === oProp.name)
-		{
-			if (oProp.text)
-				oGameTree.Set_DateTime(oProp.text);
-		}
-		else if ("EVENT" === oProp.name)
-		{
-			if (oProp.text)
-				oGameTree.Set_GameEvent(oProp.text);
-		}
-		else if ("ROUND" === oProp.name)
-		{
-			if (oProp.text)
-				oGameTree.Set_GameRound(oProp.text);
-		}
-		else if ("PLACE" === oProp.name)
-		{
-			if (oProp.text)
-				oGameTree.Set_GamePlace(oProp.text);
-		}
-		else if ("TIMELEFT" === oProp.name)
-		{
-			// TODO: Реализовать TimeSystem
-		}
-		else
-		{
-			console.log(oProp);
-		}
-	}
-	function private_GetRank(nRank)
-	{
-		if (undefined === nRank || null === nRank)
-			return "?";
-		else if (nRank <= 30)
-			return (31 - nRank) + "k";
-		else if (nRank <= 39)
-			return (nRank - 30) + "d";
-		else
-			return (nRank - 39) + "p";
-	}
+            // TODO: РЕализовать TimeSystem
+        }
+        else if ("PLAYERNAME" === oProp.name)
+        {
+            if ("white" === oProp.color)
+                oGameTree.Set_White(oProp.text);
+            else if ("black" === oProp.color)
+                oGameTree.Set_Black(oProp.text);
+        }
+        else if ("PLAYERRANK" === oProp.name)
+        {
+            if ("white" === oProp.color)
+                oGameTree.Set_WhiteRating(private_GetRank(oProp.int));
+            else if ("black" === oProp.color)
+                oGameTree.Set_BlackRating(private_GetRank(oProp.int));
+        }
+        else if ("DATE" === oProp.name)
+        {
+            if (oProp.text)
+                oGameTree.Set_DateTime(oProp.text);
+        }
+        else if ("EVENT" === oProp.name)
+        {
+            if (oProp.text)
+                oGameTree.Set_GameEvent(oProp.text);
+        }
+        else if ("ROUND" === oProp.name)
+        {
+            if (oProp.text)
+                oGameTree.Set_GameRound(oProp.text);
+        }
+        else if ("PLACE" === oProp.name)
+        {
+            if (oProp.text)
+                oGameTree.Set_GamePlace(oProp.text);
+        }
+        else if ("TIMELEFT" === oProp.name)
+        {
+            // TODO: Реализовать TimeSystem
+        }
+        else
+        {
+            console.log(oProp);
+        }
+    }
 
-	return oActivetedNode;
+    function private_GetRank(nRank)
+    {
+        if (undefined === nRank || null === nRank)
+            return "?";
+        else if (nRank <= 30)
+            return (31 - nRank) + "k";
+        else if (nRank <= 39)
+            return (nRank - 30) + "d";
+        else
+            return (nRank - 39) + "p";
+    }
+
+    return oActivatedNode;
 };

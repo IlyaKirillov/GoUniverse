@@ -276,7 +276,7 @@ function CGameListRecord()
     this.m_sGameInfo       = "";
     this.m_nMove           = 0;
     this.m_bPrivate        = false;
-    this.m_sPlace          = "";
+    this.m_nRoomId         = -1;
     this.m_bAdjourned      = false;
     this.m_bEvent          = false;
 }
@@ -302,7 +302,7 @@ CGameListRecord.prototype.Draw = function(oContext, dX, dY, eType)
         case EGameListRecord.Move     : sString += "" + this.m_nMove; break;
         case EGameListRecord.Info     : sString += this.m_sGameInfo; break;
         case EGameListRecord.Private  : sString += this.m_bPrivate ? "private" : ""; break;
-        case EGameListRecord.Place    : sString += this.m_sPlace; break;
+        case EGameListRecord.Place    : sString += this.private_GetRoomName(this.m_nRoomId); break;
     }
 
     oContext.fillText(sString, dX, dY);
@@ -333,7 +333,7 @@ CGameListRecord.prototype.Update = function(aLine)
     this.m_sGameInfo  = aLine[10];
     this.m_nMove      = aLine[11] | 0;
     this.m_bPrivate   = aLine[12];
-    this.m_sPlace     = aLine[13];
+    this.m_nRoomId    = aLine[13] | 0;
     this.m_bAdjourned = aLine[14];
     this.m_bEvent     = aLine[15];
 };
@@ -352,4 +352,12 @@ CGameListRecord.prototype.private_GetRank = function(nRank)
         return "[" + (nRank - 29) + "d]";
     else
         return "[" + (nRank - 49) + "p]";
+};
+
+CGameListRecord.prototype.private_GetRoomName = function(nRoomId)
+{
+    if (oClient)
+        return oClient.GetRoomName(nRoomId);
+
+    return "";
 };
