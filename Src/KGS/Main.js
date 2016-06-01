@@ -744,7 +744,7 @@ function EnterChatRoom(ChatRoomId, sRoomName, isPrivate)
     ChatRoom.ChatRoomId = ChatRoomId;
     ChatRoom.NewMessagesCount = 0;
 
-    var sHeight = "24px";
+    var sHeight = "21px";
 
     ChatTabs.push(ChatRoom);
 
@@ -762,6 +762,7 @@ function EnterChatRoom(ChatRoomId, sRoomName, isPrivate)
     DivTab.style.color              = "#000";
     DivTab.style.whiteSpace         = "nowrap";
     DivTab.style.textOverflow       = "ellipsis";
+	DivTab.style.borderTop          = "3px solid #F3F3F3";
     DivTab.style.borderRight        = "1px solid #BEBEBE";
     DivTab.style.borderBottom       = "1px solid #BEBEBE";
 
@@ -793,9 +794,11 @@ function EnterChatRoom(ChatRoomId, sRoomName, isPrivate)
 
     var NewTabDiv = document.createElement("div");
     NewTabDiv.style.textAlign = "left";
-    var oDiv = document.createElement("div");
-    oDiv.innerHTML = sRoomName;
-    NewTabDiv.appendChild(oDiv);
+    var oCaptionDiv = document.createElement("div");
+	//oCaptionDiv.style.fontWeight = "normal";
+	//oCaptionDiv.style.color      = "rgb(0, 0, 0)";
+	oCaptionDiv.innerHTML = sRoomName;
+    NewTabDiv.appendChild(oCaptionDiv);
 
     NewTabDiv.onselectstart = function(){return false;};
     NewTab.appendChild(NewTabDiv);
@@ -807,7 +810,6 @@ function EnterChatRoom(ChatRoomId, sRoomName, isPrivate)
     };
     NewTab.onmousedown = function()
     {
-        NewTab.style.textDecoration  = "underline";
     };
 
     DivTab.appendChild(NewTab);
@@ -913,24 +915,21 @@ function EnterChatRoom(ChatRoomId, sRoomName, isPrivate)
 
     DivTab.onmouseover = function()
     {
-        DivTab.style.textDecoration      = "underline";
         CBCDSpan.style.visibility        = "visible";
         NewMessagesSpan.style.visibility = "hidden";
+		//oCaptionDiv.style.fontWeight     = "bold";
     };
     DivTab.onmouseout = function()
     {
-        if (null === CurrentChatTab || CurrentChatTab.TabDiv !== DivTab)
-            NewTab.style.textDecoration  = "none";
-        else
-            NewTab.style.textDecoration  = "underline";
-
         CBCDSpan.style.visibility        = "hidden";
         NewMessagesSpan.style.visibility = "visible";
+		//oCaptionDiv.style.fontWeight     = "normal";
     };
 
     TabPanel.appendChild(DivTab);
-    ChatRoom.TabDiv  = DivTab;
-    ChatRoom.TextDiv = NewTab;
+    ChatRoom.TabDiv     = DivTab;
+    ChatRoom.TextDiv    = NewTab;
+	ChatRoom.CaptionDiv = oCaptionDiv;
     ChatRoom.NewMessagesCountDiv = NewMessagesSpan;
 }
 
@@ -955,15 +954,15 @@ function OnPanelChatTabClick(ChatRoomId)
     if (CurTab)
     {
         CurTab.TabDiv.style.borderBottom    = "1px solid #BEBEBE";
-        CurTab.TabDiv.style.borderTop       = "none";
-        //CurTab.TextDiv.style.textDecoration = "none";
+        CurTab.TabDiv.style.borderTop       = "3px solid #F3F3F3";
+		//CurTab.CaptionDiv.style.color       = "rgb(0, 0, 0)";
     }
 
     if (NewTab)
     {
         NewTab.TabDiv.style.borderBottom     = "1px solid #F3F3F3";
         NewTab.TabDiv.style.borderTop        = "3px solid rgb(0, 130, 114)";
-        //NewTab.TextDiv.style.textDecoration  = "underline";
+		//NewTab.CaptionDiv.style.color        = "rgb(0, 130, 114)";
         NewTab.NewMessagesCount              = 0;
         NewTab.NewMessagesCountDiv.innerHTML = "";
     }
@@ -1066,7 +1065,7 @@ function GetTabByRoomId(RoomId)
 
 function OpenRoomsList()
 {
-    CreateKGSWindow("divMainId", EKGSWindowType.RoomsList, {});
+    CreateKGSWindow("divMainId", EKGSWindowType.RoomsList, {Client : oClient});
 }
 
 
@@ -1120,6 +1119,13 @@ CKGSClient.prototype.LeaveGameRoom = function(nGameRoomId)
         "channelId" : nGameRoomId
     });
 };
+CKGSClient.prototype.EnterChatRoom = function(nChatRoomId)
+{
+	this.private_SendMessage({
+		"type"      : "JOIN_REQUEST",
+		"channelId" : nChatRoomId
+	});
+};
 CKGSClient.prototype.LeaveChatRoom = function(nChatRoomId)
 {
     this.private_SendMessage({
@@ -1160,6 +1166,14 @@ CKGSClient.prototype.GetRoomName = function(nRoomId)
         return this.m_aAllRooms[nRoomId].Name;
 
     return "Global";
+};
+CKGSClient.prototype.GetAllRooms = function()
+{
+	return this.m_aAllRooms;
+};
+CKGSClient.prototype.GetCategoryName = function(nCategoryId)
+{
+	return this.m_oRoomCategory[nCategoryId];
 };
 CKGSClient.prototype.private_SendMessage = function(oMessage)
 {
@@ -1978,8 +1992,75 @@ CKGSClient.prototype.private_ReadSgfEvents = function(oGame, arrSgfEvents)
 function CKGSRoomsListWindow()
 {
     CKGSRoomsListWindow.superclass.constructor.call(this);
+
+	this.m_oClient          = null;
+	this.m_oRoomListView    = new CListView();
+	this.m_oRoomListControl = null;
+
+	this.m_nInnerH = -1;
+	this.m_nInnerW = -1;
 }
 CommonExtend(CKGSRoomsListWindow, CDrawingWindow);
+
+CKGSRoomsListWindow.prototype.Init = function(sDivId, oPr)
+{
+	CKGSRoomsListWindow.superclass.Init.call(this, sDivId);
+
+	this.Set_Caption("Rooms list");
+
+	var oMainDiv     = this.HtmlElement.InnerDiv;
+	var oMainControl = this.HtmlElement.InnerControl;
+
+	var sListId       = sDivId + "L";
+	var oListElement = this.protected_CreateDivElement(oMainDiv, sListId);
+	this.m_oRoomListView.Set_BGColor(243, 243, 243);
+	var oListControl = this.m_oRoomListView.Init(sListId, g_oKGSRoomsList);
+	oListControl.Bounds.SetParams(0, 0, 0, 0, true, true, true, true, -1, -1);
+	oListControl.Anchor = (g_anchor_left | g_anchor_top | g_anchor_bottom  | g_anchor_right);
+	oMainControl.AddControl(oListControl);
+	this.m_oRoomListControl = oListControl;
+
+	if (oPr && oPr.Client)
+		this.m_oClient = oPr.Client;
+
+	this.Update_Size(true);
+	this.Show(oPr);
+};
+CKGSRoomsListWindow.prototype.Show = function()
+{
+	CKGSRoomsListWindow.superclass.Show.call(this);
+
+	this.m_oRoomListView.Clear();
+
+	if (this.m_oClient)
+	{
+		var oRooms    = this.m_oClient.GetAllRooms();
+		for (var nRoomId in oRooms)
+		{
+			var oRoom = oRooms[nRoomId];
+			this.m_oRoomListView.Handle_Record([0, oRoom.ChannelId, oRoom.Name, this.m_oClient.GetCategoryName(oRoom.Category)]);
+		}
+
+	}
+
+	this.m_oRoomListView.Update();
+	this.m_oRoomListView.Update_Size();
+};
+CKGSRoomsListWindow.prototype.Update_Size = function(bForce)
+{
+	CKGSRoomsListWindow.superclass.Update_Size.call(this, bForce);
+
+	var W = this.HtmlElement.InnerDiv.clientWidth;
+	var H = this.HtmlElement.InnerDiv.clientHeight;
+
+	if (true === bForce || Math.abs(W - this.m_nInnerW) > 0.001 || Math.abs(H - this.m_nInnerH) > 0.001)
+	{
+		this.m_nInnerW = W;
+		this.m_nInnerH = H;
+		this.m_oRoomListView.Update();
+		this.m_oRoomListView.Update_Size();
+	}
+};
 
 
 var EKGSWindowType = {
