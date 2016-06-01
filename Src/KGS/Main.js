@@ -330,6 +330,11 @@ function OnDocumentReady()
 
     window.onresize();
     document.getElementById("divIdConnectionError").style.display = "none";
+
+    // // TEST
+    // OnConnect();
+    // OpenRoomsList();
+    //----------------------
 }
 
 function OnDocumentClose()
@@ -1061,7 +1066,7 @@ function GetTabByRoomId(RoomId)
 
 function OpenRoomsList()
 {
-
+    CreateKGSWindow("divMainId", EKGSWindowType.RoomsList, {});
 }
 
 
@@ -1152,7 +1157,7 @@ CKGSClient.prototype.EnterPrivateChat = function(sUserName)
 };
 CKGSClient.prototype.GetRoomName = function(nRoomId)
 {
-    if (this.m_aAllRooms[nRoomId])
+    if (this.m_aAllRooms[nRoomId] && "" !== this.m_aAllRooms[nRoomId].Name)
         return this.m_aAllRooms[nRoomId].Name;
 
     return "Global";
@@ -1909,3 +1914,65 @@ CKGSClient.prototype.private_ReadSgfEvents = function(oGame, arrSgfEvents)
 
     return oActivatedNode;
 };
+
+function CKGSRoomsListWindow()
+{
+    CKGSRoomsListWindow.superclass.constructor.call(this);
+}
+CommonExtend(CKGSRoomsListWindow, CDrawingWindow);
+
+
+var EKGSWindowType = {
+    RoomsList : 0
+};
+
+var g_aKGSWindows = {};
+function CreateKGSWindow(sParentId, nWindowType, oPr)
+{
+    if (!g_aKGSWindows[sParentId])
+        g_aKGSWindows[sParentId] = {};
+
+    var oWindows = g_aKGSWindows[sParentId];
+    if (oWindows[nWindowType])
+    {
+        var oWindow = oWindows[nWindowType];
+        oWindow.Show(oPr);
+        return oWindow;
+    }
+    else
+    {
+        var sApp = "unknownwindow";
+        switch (nWindowType)
+        {
+        case EKGSWindowType.RoomsList : sApp = "RoomList"; break;
+        }
+        var sId = sParentId + sApp;
+
+        var oDiv = document.createElement("div");
+        oDiv.setAttribute("id", sId);
+        oDiv.setAttribute("style", "position:absolute;padding:0;margin:0;width:500px;height:500px;left:300px;top:300px;");
+        oDiv.setAttribute("oncontextmenu", "return false;");
+
+        var oContainerDiv = document.getElementById(sParentId);
+        oContainerDiv.appendChild(oDiv);
+
+        var oWindow = null;
+
+        switch (nWindowType)
+        {
+        case EKGSWindowType.RoomsList : oWindow = new CKGSRoomsListWindow(); break;
+        }
+
+        oWindows[nWindowType] = oWindow;
+
+        if (null !== oWindow)
+        {
+            oWindow.Init(sId, oPr);
+            oWindow.Update_Size(true);
+        }
+
+        return oWindow;
+    }
+
+    return null;
+}
