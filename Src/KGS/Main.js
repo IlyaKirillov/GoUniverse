@@ -1485,7 +1485,7 @@ CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
     {
         sGameType = "D";
         sComment  = "";
-        sWhite    = oGameRecord.players.owner.name + " demonstration";
+        sWhite    = oGameRecord.players.owner.name;
 		nWhiteR   = oGameRecord.players.owner && oGameRecord.players.owner.rank ? this.private_GetRank(oGameRecord.players.owner.rank) : -3;
 		bDemo     = true;
     }
@@ -1497,7 +1497,7 @@ CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
 		sWhite    = oGameRecord.players.owner.name;
 
 		if (oGameRecord.players.black && oGameRecord.players.black.name && oGameRecord.players.white && oGameRecord.players.white.name)
-			sWhite += " review (" + oGameRecord.players.white.name + "vs." + oGameRecord.players.black.name + ")";
+			sWhite += " review (" + oGameRecord.players.white.name + " vs. " + oGameRecord.players.black.name + ")";
 
 		nWhiteR   = oGameRecord.players.owner && oGameRecord.players.owner.rank ? this.private_GetRank(oGameRecord.players.owner.rank) : -3;
 		bDemo     = true;
@@ -1834,17 +1834,25 @@ CKGSClient.prototype.private_ReadSgfEvents = function(oGame, arrSgfEvents)
     {
         if ("MOVE" === oProp.name)
         {
-            var nX     = oProp.loc.x;
-            var nY     = oProp.loc.y;
-            var nColor = "black" === oProp.color ? BOARD_BLACK : BOARD_WHITE;
-            oNode.Add_Move(nX + 1, nY + 1, nColor);
+			var nX = oProp.loc.x + 1;
+			var nY = oProp.loc.y + 1;
+
+			if ("black" === oProp.color)
+				oNode.Add_Move(nX, nY, BOARD_BLACK);
+			else if ("white" === oProp.color)
+				oNode.Add_Move(nX, nY, BOARD_WHITE);
         }
         else if ("ADDSTONE" === oProp.name)
         {
-            var nX     = oProp.loc.x;
-            var nY     = oProp.loc.y;
-            var nColor = "black" === oProp.color ? BOARD_BLACK : BOARD_WHITE;
-            oNode.AddOrRemove_Stones(nColor, [Common_XYtoValue(nX + 1, nY + 1)]);
+            var nX = oProp.loc.x + 1;
+            var nY = oProp.loc.y + 1;
+
+			if ("black" === oProp.color)
+				oNode.AddOrRemove_Stones(BOARD_BLACK, [Common_XYtoValue(nX, nY)]);
+			else if ("white" === oProp.color)
+				oNode.AddOrRemove_Stones(BOARD_WHITE, [Common_XYtoValue(nX, nY)]);
+			else if ("empty" === oProp.color)
+				oNode.AddOrRemove_Stones(BOARD_EMPTY, [Common_XYtoValue(nX, nY)]);
         }
         else if ("COMMENT" === oProp.name)
         {
@@ -1904,6 +1912,48 @@ CKGSClient.prototype.private_ReadSgfEvents = function(oGame, arrSgfEvents)
         {
             // TODO: Реализовать TimeSystem
         }
+		else if ("TRIANGLE" === oProp.name)
+		{
+			var nX = oProp.loc.x + 1;
+			var nY = oProp.loc.y + 1;
+			oNode.Add_Mark(EDrawingMark.Tr, [Common_XYtoValue(nX, nY)]);
+		}
+		else if ("SQUARE" === oProp.name)
+		{
+			var nX = oProp.loc.x + 1;
+			var nY = oProp.loc.y + 1;
+			oNode.Add_Mark(EDrawingMark.Sq, [Common_XYtoValue(nX, nY)]);
+		}
+		else if ("LABEL" === oProp.name)
+		{
+			var nX = oProp.loc.x + 1;
+			var nY = oProp.loc.y + 1;
+			oNode.Add_TextMark(oProp.text, Common_XYtoValue(nX, nY));
+		}
+		else if ("PHANTOMCLEAR" === oProp.name)
+		{
+			// Нам это не нужно
+		}
+		else if ("GAMENAME" === oProp.name)
+		{
+			oGameTree.Set_GameName(oProp.text);
+		}
+		else if ("TERRITORY" === oProp.name)
+		{
+			oNode.Set_TerritoryForceUse(true);
+
+			var nX = oProp.loc.x + 1;
+			var nY = oProp.loc.y + 1;
+
+			if ("black" === oProp.color)
+				oNode.Add_TerritoryPoint(Common_XYtoValue(nX, nY), BOARD_BLACK);
+			else if ("white" === oProp.color)
+				oNode.Add_TerritoryPoint(Common_XYtoValue(nX, nY), BOARD_WHITE);
+		}
+		else if ("DEAD" === oProp.name)
+		{
+			// Нам это не нужно
+		}
         else
         {
             console.log(oProp);
