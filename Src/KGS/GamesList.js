@@ -162,16 +162,16 @@ var g_oGamesList =
 
     private_PreSort : function(oRecord1, oRecord2)
     {
-        // Все отложенные партии в самом низу списка
-        if (false === oRecord1.m_bAdjourned && false !== oRecord2.m_bAdjourned)
-            return -1;
-        else if (false !== oRecord1.m_bAdjourned && false === oRecord2.m_bAdjourned)
-            return 1;
-
         // Матчи, привязанные к событию на сервере, в самом верху списка
         if (true === oRecord1.m_bEvent && true !== oRecord2.m_bEvent)
             return -1;
         else if (true !== oRecord1.m_bEvent && true === oRecord2.m_bEvent)
+            return 1;
+
+        // Все отложенные партии в самом низу списка
+        if (false === oRecord1.m_bAdjourned && false !== oRecord2.m_bAdjourned)
+            return -1;
+        else if (false !== oRecord1.m_bAdjourned && false === oRecord2.m_bAdjourned)
             return 1;
 
         return 0;
@@ -240,10 +240,24 @@ var g_oGamesList =
         oContext.fillText(sHeaderText, dX, dY);
     },
 
-    Draw_Record : function(dX, dY, oContext, oRecord, nColNum)
+    Draw_Record : function(dX, dY, oContext, oRecord, nColNum, oListView)
     {
         var eType = nColNum + 1;
-        oRecord.Draw(oContext, dX, dY, eType);
+        if (true === oRecord.m_bDemo)
+        {
+            if (true === oRecord.m_bDemo && 3 === nColNum)
+                oListView.Start_ClipException(oContext, 3, 7);
+
+            if (4 !== nColNum && 5 !== nColNum && 6 !== nColNum)
+                oRecord.Draw(oContext, dX, dY, eType);
+
+            if (true === oRecord.m_bDemo && 3 === nColNum)
+                oListView.Restore_Clip(oContext, 3);
+        }
+        else
+        {
+            oRecord.Draw(oContext, dX, dY, eType);
+        }
     },
 
     Get_Record : function(aLine)
@@ -279,6 +293,7 @@ function CGameListRecord()
     this.m_nRoomId         = -1;
     this.m_bAdjourned      = false;
     this.m_bEvent          = false;
+    this.m_bDemo           = false;
 }
 
 CGameListRecord.prototype.Draw = function(oContext, dX, dY, eType)
@@ -336,6 +351,7 @@ CGameListRecord.prototype.Update = function(aLine)
     this.m_nRoomId    = aLine[13] | 0;
     this.m_bAdjourned = aLine[14];
     this.m_bEvent     = aLine[15];
+    this.m_bDemo      = aLine[16];
 };
 
 CGameListRecord.prototype.private_GetRank = function(nRank)

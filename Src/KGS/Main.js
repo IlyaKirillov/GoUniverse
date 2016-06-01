@@ -1072,10 +1072,9 @@ function OpenRoomsList()
 
 function CKGSClient()
 {
-    this.isLoggedIn = false;
-
     this.nCurrentChannelId = -1;
 
+	this.m_bLoggedIn      = false;
     this.m_aGames         = {};
     this.m_aFriends       = [];
     this.m_aRooms         = {};
@@ -1182,7 +1181,7 @@ CKGSClient.prototype.private_SendMessage = function(oMessage)
                     // After our login message has been sent, we kick off the first download operation to see the result.
                     // After this first download call, each download will automatically trigger the next,
                     // so we won't need to call this again.
-                    oThis.isLoggedIn = true;
+                    oThis.m_bLoggedIn = true;
                     oThis.private_RecieveMessage();
                 }
             }
@@ -1228,7 +1227,7 @@ CKGSClient.prototype.private_RecieveMessage = function()
                     }
                 }
 
-                if (oThis.isLoggedIn)
+                if (oThis.m_bLoggedIn)
                 {
                     oThis.private_RecieveMessage();
                 }
@@ -1236,7 +1235,7 @@ CKGSClient.prototype.private_RecieveMessage = function()
             else
             {
                 console.log("Download failure: Status = " + req.status + ", response text = " + req.responseText);
-                oThis.isLoggedIn = false;
+                oThis.m_bLoggedIn = false;
                 OnLogout("Server is unavaliable. Try again later.");
             }
         }
@@ -1341,7 +1340,7 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
 };
 CKGSClient.prototype.private_HandleLogout = function(oMessage)
 {
-    this.isLoggedIn = false;
+    this.m_bLoggedIn = false;
     OnLogout(oMessage.text);
 };
 CKGSClient.prototype.private_HandleHello = function(oMessage)
@@ -1480,17 +1479,29 @@ CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
     var nRoomId     = oGameRecord.roomId;
     var bAdjourned  = oGameRecord.adjourned ? oGameRecord.adjourned : false;
     var bEvent      = oGameRecord.event ? oGameRecord.event : false;
+	var bDemo       = false;
 
     if ("demonstration" === oGameRecord.gameType)
     {
         sGameType = "D";
-        sComment = "Demonstration by " + oGameRecord.players.owner.name;
+        sComment  = "";
+        sWhite    = oGameRecord.players.owner.name + " demonstration";
+		nWhiteR   = oGameRecord.players.owner && oGameRecord.players.owner.rank ? this.private_GetRank(oGameRecord.players.owner.rank) : -3;
+		bDemo     = true;
     }
     else if ("review" === oGameRecord.gameType || "rengo_review" === oGameRecord.gameType)
     {
         sGameType = "D";
-        sComment = "Review by " + oGameRecord.players.owner.name;
-    }
+        sComment = "";
+
+		sWhite    = oGameRecord.players.owner.name;
+
+		if (oGameRecord.players.black && oGameRecord.players.black.name && oGameRecord.players.white && oGameRecord.players.white.name)
+			sWhite += " review (" + oGameRecord.players.white.name + "vs." + oGameRecord.players.black.name + ")";
+
+		nWhiteR   = oGameRecord.players.owner && oGameRecord.players.owner.rank ? this.private_GetRank(oGameRecord.players.owner.rank) : -3;
+		bDemo     = true;
+	}
     else if ("free" === oGameRecord.gameType)
         sGameType = "F";
     else if ("ranked" === oGameRecord.gameType)
@@ -1507,7 +1518,7 @@ CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
     if (true === bPrivate)
         sGameType = "P";
 
-    GamesListView.Handle_Record([nAdd, nGameId, sGameType, nObservers, "", sWhite, nWhiteR, "", sBlack, nBlackR, sComment, nMoveNumber, bPrivate, nRoomId, bAdjourned, bEvent]);
+    GamesListView.Handle_Record([nAdd, nGameId, sGameType, nObservers, "", sWhite, nWhiteR, "", sBlack, nBlackR, sComment, nMoveNumber, bPrivate, nRoomId, bAdjourned, bEvent, bDemo]);
 };
 CKGSClient.prototype.private_HandleUserRecord = function(oUserRecord, bAdd)
 {
@@ -1676,7 +1687,6 @@ CKGSClient.prototype.private_HandleDetailsJoin = function(oMessage)
 CKGSClient.prototype.private_HandleUnjoin = function(oMessage)
 {
     // Ничего не делаем
-    console.log(oMessage);
 };
 CKGSClient.prototype.private_HandleRoomDesc = function(oMessage)
 {
@@ -1705,12 +1715,12 @@ CKGSClient.prototype.private_HandleGlobalGamesJoin = function(oMessage)
 };
 CKGSClient.prototype.private_HandleLoginFailedBadPassword = function(oMessage)
 {
-    this.isLoggedIn = false;
+    this.m_bLoggedIn = false;
     OnLogout("Login or password is incorrect.");
 };
 CKGSClient.prototype.private_HandleLoginFailedNoSuchUser = function(oMessage)
 {
-    this.isLoggedIn = false;
+    this.m_bLoggedIn = false;
     OnLogout("Login or password is incorrect.");
 };
 CKGSClient.prototype.private_HandleConvoJoin = function(oMessage)

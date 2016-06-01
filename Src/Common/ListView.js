@@ -492,10 +492,37 @@ CListView.prototype.private_Draw = function(oContext, dYOffset, dXLimit, dYLimit
             if (dY - this.m_dRowHeight > dYLimit)
                 break;
 
-            this.m_oListObject.Draw_Record(dX + dLeftPadding, dY - this.m_dDescentHeight, oContext, this.m_aList[nRecordIndex], nIndex);
+            this.m_oListObject.Draw_Record(dX + dLeftPadding, dY - this.m_dDescentHeight, oContext, this.m_aList[nRecordIndex], nIndex, this);
         }
         oContext.restore();
     }
+};
+
+CListView.prototype.Start_ClipException = function(oContext, nStartColIndex, nEndColIndex)
+{
+	oContext.restore();
+	oContext.save();
+	oContext.font = this.m_sFontRecord;
+
+	var dX = this.m_aX[nStartColIndex];
+	var dW = this.m_aX[nEndColIndex] - dX;
+
+	oContext.beginPath();
+	oContext.rect(dX, 0, dW, this.m_dYLimit);
+	oContext.clip();
+};
+CListView.prototype.Restore_Clip = function(oContext, nColIndex)
+{
+	oContext.restore();
+	oContext.save();
+	oContext.font = this.m_sFontRecord;
+
+	var dX = this.m_aX[nColIndex];
+	var dW = this.m_aX[nColIndex + 1] - dX;
+
+	oContext.beginPath();
+	oContext.rect(dX, 0, dW, this.m_dYLimit);
+	oContext.clip();
 };
 
 CListView.prototype.private_DrawGrid = function(oContext)
