@@ -1220,6 +1220,8 @@ function CKGSUserInfoWindow()
 
 	this.m_sUserName = "";
 	this.m_oClient   = null;
+
+	this.m_oContainerDiv = null;
 }
 CommonExtend(CKGSUserInfoWindow, CDrawingWindow);
 
@@ -1233,10 +1235,19 @@ CKGSUserInfoWindow.prototype.Init = function(sDivId, oPr)
 		this.m_oClient   = oPr.Client;
 	}
 
-	this.Set_Caption(this.m_sUserName + " info");
+	this.Set_Caption(this.m_sUserName);
 
 	var oMainDiv     = this.HtmlElement.InnerDiv;
 	var oMainControl = this.HtmlElement.InnerControl;
+
+	oMainDiv.style.fontSize = "16px";
+
+	this.m_oContainerDiv = this.protected_CreateDivElement(oMainDiv, sDivId + "C");
+	var oContainerControl = CreateControlContainer(sDivId + "C");
+	oContainerControl.Bounds.SetParams(5, 5, 5, 5, true, true, true, true, -1, -1);
+	oContainerControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
+	oMainControl.AddControl(oContainerControl);
+
 
 	oMainDiv.style.backgroundColor = "rgb(243, 243, 243)";
 };
@@ -1254,6 +1265,8 @@ CKGSUserInfoWindow.prototype.OnUserDetails = function(oDetails)
 {
 	if (oDetails)
 	{
+		this.OnUserAvatar();
+
 		this.private_AddConsoleMessage("UserName", oDetails.user.name);
 		this.private_AddConsoleMessage("Rank", oDetails.user.rank ? oDetails.user.rank : "-");
 		this.private_AddConsoleMessage("Last on", oDetails.lastOn);
@@ -1262,13 +1275,26 @@ CKGSUserInfoWindow.prototype.OnUserDetails = function(oDetails)
 		this.private_AddConsoleMessage("Info", oDetails.personalInfo);
 	}
 };
+CKGSUserInfoWindow.prototype.OnUserAvatar = function(oMessage)
+{
+	var oDiv = this.m_oContainerDiv;
+	var oImg = document.createElement("img");
+
+	oImg.align        = "right";
+	oImg.style.width  = "141px";
+	oImg.style.height = "200px";
+	oImg.src          = "http://goserver.gokgs.com/avatars/" + this.m_sUserName + ".jpg";
+
+	oDiv.appendChild(oImg);
+
+};
 CKGSUserInfoWindow.prototype.OnUserGameArchive = function(oMessage)
 {
 
 };
 CKGSUserInfoWindow.prototype.private_AddConsoleMessage = function(sField, sText)
 {
-	var oDiv     = this.HtmlElement.InnerDiv;
+	var oDiv     = this.m_oContainerDiv;
 	var oTextDiv = document.createElement("div");
 
 	var oTextSpan;
