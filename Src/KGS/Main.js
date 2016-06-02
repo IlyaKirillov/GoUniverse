@@ -273,14 +273,14 @@ function OnDocumentReady()
     // Список игроков
     PlayersListControl = PlayersListView.Init("divPlayersListId", g_oPlayersList);
     var oPlayersListDiv = PlayersListControl;
-    oPlayersListDiv.Bounds.SetParams(0, 0, 0, 1000, false, false, true, false, 300, -1);
+    oPlayersListDiv.Bounds.SetParams(0, 0, 0, 1000, false, false, true, false, 200, -1);
     oPlayersListDiv.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right);
     oPlayersListDiv.HtmlElement.style.background = "#F3F3F3";
     oMainRoomControl.AddControl(oPlayersListDiv);
 
     // Левая часть
     var oLeftPartControl = CreateControlContainer("divIdL");
-    oLeftPartControl.Bounds.SetParams(0, 0, 300, 1000, false, false, true, false, -1, -1);
+    oLeftPartControl.Bounds.SetParams(0, 0, 200, 1000, false, false, true, false, -1, -1);
     oLeftPartControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
     oMainRoomControl.AddControl(oLeftPartControl);
 
@@ -1204,7 +1204,7 @@ CKGSRoomListWindow.prototype.private_CreateFindInput = function(sInputId, oParen
 			for (var nRoomId in oRooms)
 			{
 				var oRoom = oRooms[nRoomId];
-				if (oRoom.Name && "" !== oRoom.Name && -1 !== oRoom.Name.indexOf(sValue))
+				if (oRoom.Name && "" !== oRoom.Name && -1 !== oRoom.Name.toLowerCase().indexOf(sValue.toLowerCase()))
 					oRoomListView.Handle_Record([0, oRoom.ChannelId, oRoom.Name, oRoom.CategoryName]);
 			}
 		}
