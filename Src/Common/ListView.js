@@ -38,6 +38,8 @@ function CListView()
     this.m_dRowHeight     = this.m_dAscentHeight * 4 / 3; // чтобы 1/4 ушла в descent
     this.m_dDescentHeight = this.m_dRowHeight - this.m_dAscentHeight;
 
+    this.m_dTopOffset     = this.m_dRowHeight - 1;
+
     this.m_sFontHeader   = "14px bold 'Segoe UI',Helvetica,Tahoma,Geneva,Verdana,sans-serif";
     this.m_sFontRecord   = "14px      'Segoe UI',Helvetica,Tahoma,Geneva,Verdana,sans-serif";
 
@@ -246,19 +248,14 @@ function CListView()
     this.private_OnDragVerScroll = function(X, Y)
     {
         var dOverallH = oThis.m_aY[oThis.m_aY.length - 1];
-        var dLogicH   = oThis.m_dYLimit - oThis.m_dRowHeight;
+        var dLogicH   = oThis.m_dYLimit - oThis.m_dTopOffset;
 
         var dScrollH = Math.max(20, dLogicH * dLogicH / dOverallH);
 
         if (Math.abs(Y - oThis.m_dRowHeight - (dLogicH - dScrollH)) < 2)
-            oThis.m_dYOffset = -(dOverallH - dLogicH);
+            oThis.m_dYOffset = oThis.m_dTopOffset + -(dOverallH - dLogicH);
         else
-            oThis.m_dYOffset = -(Y - oThis.m_dRowHeight) * (dOverallH - dLogicH) / (dLogicH - dScrollH);
-
-        console.log("OverallH " + dOverallH);
-        console.log("dLogicH " + dLogicH);
-        console.log("YOffset " + oThis.m_dYOffset);
-        console.log("Y " + Y);
+            oThis.m_dYOffset = -(Y - oThis.m_dTopOffset) * (dOverallH - dLogicH) / (dLogicH - dScrollH);
 
         oThis.private_UpdateMainContext();
         oThis.private_UpdateSelectionContext();
@@ -321,12 +318,12 @@ CListView.prototype.Update = function()
         return;
 
     var dOverallH = this.m_aY[this.m_aY.length - 1];
-    var dLogicH   = this.m_dYLimit;
+    var dLogicH   = this.m_dYLimit - this.m_dTopOffset;
 
     if (dLogicH > dOverallH)
-        this.m_dYOffset = 0;
+        this.m_dYOffset = this.m_dTopOffset;
     else if (this.m_dYOffset < -(dOverallH - dLogicH))
-        this.m_dYOffset = -(dOverallH - dLogicH);
+        this.m_dYOffset = this.m_dTopOffset + -(dOverallH - dLogicH);
 
     this.private_Sort();
     this.private_UpdateMainContext();
@@ -339,7 +336,7 @@ CListView.prototype.private_UpdateScrollSize = function()
     var oVerScroll = this.HtmlElement.VerScroll;
 
     var dOverallH = this.m_aY[this.m_aY.length - 1];
-    var dLogicH   = this.m_dYLimit - this.m_dRowHeight;
+    var dLogicH   = this.m_dYLimit - this.m_dTopOffset;
 
     if (dOverallH < dLogicH)
     {
@@ -354,16 +351,16 @@ CListView.prototype.private_UpdateScrollSize = function()
     oVerScroll.style.position = "absolute";
 
     if (Math.abs(this.m_dYOffset + (dOverallH - dLogicH)) < 2)
-        oVerScroll.style.top = (this.m_dRowHeight + dLogicH - dScrollH) + "px";
+        oVerScroll.style.top = (this.m_dTopOffset + dLogicH - dScrollH) + "px";
     else
-        oVerScroll.style.top = (this.m_dRowHeight + -this.m_dYOffset * (dLogicH - dScrollH) / (dOverallH - dLogicH)) + "px";
+        oVerScroll.style.top = (this.m_dTopOffset + -this.m_dYOffset * (dLogicH - dScrollH) / (dOverallH - dLogicH)) + "px";
 
     oVerScroll.style.left       = this.m_dXLimit;
     oVerScroll.style.width      = 14;
     oVerScroll.style.background = "rgb(255,255,255)";
     oVerScroll.style.border     = "1px solid rgb(190, 193, 196)";
 
-    Common_DragHandler.Init(oVerScroll, null, this.m_dXLimit, this.m_dXLimit, this.m_dRowHeight, this.m_dRowHeight + dLogicH - dScrollH);
+    Common_DragHandler.Init(oVerScroll, null, this.m_dXLimit, this.m_dXLimit, this.m_dTopOffset, this.m_dTopOffset + dLogicH - dScrollH);
 
     oVerScroll.onDrag = this.private_OnDragVerScroll;
 };
@@ -373,14 +370,14 @@ CListView.prototype.private_UpdateScroll = function ()
     var oVerScroll = this.HtmlElement.VerScroll;
 
     var dOverallH = this.m_aY[this.m_aY.length - 1] - this.m_aY[0];
-    var dLogicH   = this.m_dYLimit - this.m_dRowHeight;
+    var dLogicH   = this.m_dYLimit - this.m_dTopOffset;
 
     var dScrollH = Math.max(20, dLogicH * dLogicH / dOverallH);
 
     if (Math.abs(this.m_dYOffset + (dOverallH - dLogicH)) < 2)
-        oVerScroll.style.top = (this.m_dRowHeight + dLogicH - dScrollH) + "px";
+        oVerScroll.style.top = (this.m_dTopOffset + dLogicH - dScrollH) + "px";
     else
-        oVerScroll.style.top = (this.m_dRowHeight + -this.m_dYOffset * (dLogicH - dScrollH) / (dOverallH - dLogicH)) + "px";
+        oVerScroll.style.top = (this.m_dTopOffset + -this.m_dYOffset * (dLogicH - dScrollH) / (dOverallH - dLogicH)) + "px";
 };
 
 CListView.prototype.private_IsValid = function()
