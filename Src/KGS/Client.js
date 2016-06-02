@@ -21,6 +21,8 @@ function CKGSClient()
 	this.m_nChatChannelId = -1;
 	this.m_aAllRooms      = {};
 	this.m_oRoomCategory  = {};
+
+	this.m_oUserInfo      = {}; // Список открытых окон с информацией пользователя
 }
 CKGSClient.prototype.GetUserName = function()
 {
@@ -62,12 +64,19 @@ CKGSClient.prototype.LeaveGameRoom = function(nGameRoomId)
 CKGSClient.prototype.EnterChatRoom = function(nChatRoomId)
 {
 	this.private_SendMessage({
+		"type"      : "ROOM_DESC_REQUEST",
+		"channelId" : nChatRoomId
+	});
+
+	this.private_SendMessage({
 		"type"      : "JOIN_REQUEST",
 		"channelId" : nChatRoomId
 	});
 };
 CKGSClient.prototype.LeaveChatRoom = function(nChatRoomId)
 {
+	delete this.m_aRooms[nChatRoomId];
+
 	this.private_SendMessage({
 		"type"      : "UNJOIN_REQUEST",
 		"channelId" : nChatRoomId
@@ -83,10 +92,46 @@ CKGSClient.prototype.SendChatMessage = function(sText)
 };
 CKGSClient.prototype.LoadUserInfo = function(sUserName)
 {
+	// TODO: Сделать обертку для КГС-клиента, и туда пихать все окна, а не в <body>
+	this.m_oUserInfo[sUserName] = {
+		Window         : CreateKGSWindow("bodyId", EKGSWindowType.UserInfo, {UserName : sUserName, Client : this}),
+		UserName       : sUserName,
+		DetailsChannel : -1,
+		ArchiveChannel : -1
+	};
+
 	this.private_SendMessage({
 		"type" : "DETAILS_JOIN_REQUEST",
 		"name" : sUserName
 	});
+
+	this.private_SendMessage({
+		"type" : "JOIN_ARCHIVE_REQUEST",
+		"name" : sUserName
+	});
+};
+CKGSClient.prototype.CloseUserInfo = function(sUserName)
+{
+	if (this.m_oUserInfo[sUserName])
+	{
+		if (-1 !== this.m_oUserInfo[sUserName].DetailsChannel)
+		{
+			this.private_SendMessage({
+				"type"      : "UNJOIN_REQUEST",
+				"channelId" : this.m_oUserInfo[sUserName].DetailsChannel
+			});
+		}
+
+		if (-1 !== this.m_oUserInfo[sUserName].ArchiveChannel)
+		{
+			this.private_SendMessage({
+				"type"      : "UNJOIN_REQUEST",
+				"channelId" : this.m_oUserInfo[sUserName].ArchiveChannel
+			});
+		}
+
+		delete this.m_oUserInfo[sUserName];
+	}
 };
 CKGSClient.prototype.SetCurrentChatRoom = function(nChatRoomId)
 {
@@ -625,19 +670,21 @@ CKGSClient.prototype.private_HandleJoinComplete = function(oMessage)
 };
 CKGSClient.prototype.private_HandleDetailsJoin = function(oMessage)
 {
-	AddConsoleMessage("///////////////////////////////////////////////////////////////", "");
-	AddConsoleMessage("UserName", oMessage.user.name);
-	AddConsoleMessage("Rank", oMessage.user.rank);
-	AddConsoleMessage("Last on", oMessage.lastOn);
-	AddConsoleMessage("Locale", oMessage.locale);
-	AddConsoleMessage("Name", oMessage.personalName);
-	AddConsoleMessage("Info", oMessage.personalInfo);
-	AddConsoleMessage("///////////////////////////////////////////////////////////////", "");
-
-	this.private_SendMessage({
-		"type"      : "UNJOIN_REQUEST",
-		"channelId" : oMessage.channelId
-	});
+	var sUserName = oMessage.user.name;
+	if (this.m_oUserInfo[sUserName])
+	{
+		this.m_oUserInfo[sUserName].Window.OnUserDetails(oMessage);
+	}
+	else
+	{
+		if (-1 !== this.m_oUserInfo[sUserName].DetailsChannel)
+		{
+			this.private_SendMessage({
+				"type"      : "UNJOIN_REQUEST",
+				"channelId" : oMessage.channelId
+			});
+		}
+	}
 };
 CKGSClient.prototype.private_HandleUnjoin = function(oMessage)
 {
@@ -654,6 +701,12 @@ CKGSClient.prototype.private_HandleRoomDesc = function(oMessage)
 		for (var nIndex = 0, nCount = oMessage.owners.length; nIndex < nCount; ++nIndex)
 		{
 			oRoom.Owners.push(oMessage.owners[nIndex].name);
+		}
+
+		if (this.m_aRooms[oMessage.channelId])
+		{
+			var oRoom = this.m_aAllRooms[oMessage.channelId];
+			AddRoomGreetingMessage(oMessage.channelId, oRoom.GreetingMessage);
 		}
 	}
 };

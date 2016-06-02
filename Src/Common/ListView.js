@@ -318,12 +318,12 @@ CListView.prototype.Update = function()
         return;
 
     var dOverallH = this.m_aY[this.m_aY.length - 1];
-    var dLogicH   = this.m_dYLimit - this.m_dTopOffset;
+    var dLogicH   = this.m_dYLimit;
 
     if (dLogicH > dOverallH)
-        this.m_dYOffset = this.m_dTopOffset;
+        this.m_dYOffset = 0;
     else if (this.m_dYOffset < -(dOverallH - dLogicH))
-        this.m_dYOffset = this.m_dTopOffset + -(dOverallH - dLogicH);
+        this.m_dYOffset = -(dOverallH - dLogicH);
 
     this.private_Sort();
     this.private_UpdateMainContext();

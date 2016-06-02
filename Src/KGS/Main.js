@@ -1214,9 +1214,93 @@ CKGSRoomListWindow.prototype.private_CreateFindInput = function(sInputId, oParen
 	});
 };
 
+function CKGSUserInfoWindow()
+{
+	CKGSUserInfoWindow.superclass.constructor.call(this);
+
+	this.m_sUserName = "";
+	this.m_oClient   = null;
+}
+CommonExtend(CKGSUserInfoWindow, CDrawingWindow);
+
+CKGSUserInfoWindow.prototype.Init = function(sDivId, oPr)
+{
+	CKGSUserInfoWindow.superclass.Init.call(this, sDivId);
+
+	if (oPr)
+	{
+		this.m_sUserName = oPr.UserName;
+		this.m_oClient   = oPr.Client;
+	}
+
+	this.Set_Caption(this.m_sUserName + " info");
+
+	var oMainDiv     = this.HtmlElement.InnerDiv;
+	var oMainControl = this.HtmlElement.InnerControl;
+
+	oMainDiv.style.backgroundColor = "rgb(243, 243, 243)";
+};
+CKGSUserInfoWindow.prototype.Get_DefaultWindowSize = function(bForce)
+{
+	return {W : 500, H : 600};
+};
+CKGSUserInfoWindow.prototype.Close = function()
+{
+	CKGSUserInfoWindow.superclass.Close.call(this);
+	if (this.m_oClient)
+		this.m_oClient.CloseUserInfo(this.m_sUserName);
+};
+CKGSUserInfoWindow.prototype.OnUserDetails = function(oDetails)
+{
+	if (oDetails)
+	{
+		this.private_AddConsoleMessage("UserName", oDetails.user.name);
+		this.private_AddConsoleMessage("Rank", oDetails.user.rank ? oDetails.user.rank : "-");
+		this.private_AddConsoleMessage("Last on", oDetails.lastOn);
+		this.private_AddConsoleMessage("Locale", oDetails.locale);
+		this.private_AddConsoleMessage("Name", oDetails.personalName);
+		this.private_AddConsoleMessage("Info", oDetails.personalInfo);
+	}
+};
+CKGSUserInfoWindow.prototype.OnUserGameArchive = function(oMessage)
+{
+
+};
+CKGSUserInfoWindow.prototype.private_AddConsoleMessage = function(sField, sText)
+{
+	var oDiv     = this.HtmlElement.InnerDiv;
+	var oTextDiv = document.createElement("div");
+
+	var oTextSpan;
+
+	if (sField)
+	{
+		oTextSpan                 = document.createElement("span");
+		oTextSpan.style.fontStyle = "italic";
+		oTextSpan.textContent     = sField + ": ";
+		oTextDiv.appendChild(oTextSpan);
+	}
+
+	var aLines = SplitTextToLines(sText);
+	for (var nIndex = 0, nCount = aLines.length; nIndex < nCount; ++nIndex)
+	{
+		oTextSpan            = document.createElement("span");
+		oTextSpan.innerHTML  = aLines[nIndex];
+
+		oTextDiv.appendChild(oTextSpan);
+		oTextDiv.appendChild(document.createElement("br"));
+	}
+
+	oDiv.appendChild(oTextDiv);
+	oDiv.scrollTop = oDiv.scrollHeight;
+
+	return oTextDiv;
+};
+
 
 var EKGSWindowType = {
-    RoomList : 0
+    RoomList : 0,
+	UserInfo : 1
 };
 
 var g_aKGSWindows = {};
@@ -1226,21 +1310,23 @@ function CreateKGSWindow(sParentId, nWindowType, oPr)
         g_aKGSWindows[sParentId] = {};
 
     var oWindows = g_aKGSWindows[sParentId];
-    if (oWindows[nWindowType])
+
+	var sApp = "unknownwindow";
+	switch (nWindowType)
+	{
+		case EKGSWindowType.RoomList : sApp = "RoomList"; break;
+		case EKGSWindowType.UserInfo : sApp = "UserInfo_" + oPr.UserName; break;
+	}
+	var sId = sParentId + sApp;
+
+    if (oWindows[sId])
     {
-        var oWindow = oWindows[nWindowType];
+        var oWindow = oWindows[sId];
         oWindow.Show(oPr);
         return oWindow;
     }
     else
     {
-        var sApp = "unknownwindow";
-        switch (nWindowType)
-        {
-        case EKGSWindowType.RoomList : sApp = "RoomList"; break;
-        }
-        var sId = sParentId + sApp;
-
         var oDiv = document.createElement("div");
         oDiv.setAttribute("id", sId);
         oDiv.setAttribute("style", "position:absolute;padding:0;margin:0;width:500px;height:500px;left:300px;top:300px;");
@@ -1253,10 +1339,11 @@ function CreateKGSWindow(sParentId, nWindowType, oPr)
 
         switch (nWindowType)
         {
-        case EKGSWindowType.RoomList : oWindow = new CKGSRoomListWindow(); break;
+        	case EKGSWindowType.RoomList : oWindow = new CKGSRoomListWindow(); break;
+			case EKGSWindowType.UserInfo : oWindow = new CKGSUserInfoWindow(); break;
         }
 
-        oWindows[nWindowType] = oWindow;
+        oWindows[sId] = oWindow;
 
         if (null !== oWindow)
         {
