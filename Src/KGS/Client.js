@@ -397,6 +397,7 @@ CKGSClient.prototype.private_HandleLoginSuccess = function(oMessage)
 		this.m_aAllRooms[nChannelId] = {
 			ChannelId       : nChannelId,
 			Category        : nCategoryId,
+			CategoryName    : sCategory,
 			Name            : "",
 			GreetingMessage : "",
 			Private         : false,

@@ -333,7 +333,7 @@ function OnDocumentReady()
 
     // // TEST
     // OnConnect();
-    // OpenRoomsList();
+    // OpenRoomList();
     //----------------------
 }
 
@@ -1063,14 +1063,14 @@ function GetTabByRoomId(RoomId)
     return null;
 }
 
-function OpenRoomsList()
+function OpenRoomList()
 {
-    CreateKGSWindow("divMainId", EKGSWindowType.RoomsList, {Client : oClient});
+    CreateKGSWindow("divMainId", EKGSWindowType.RoomList, {Client : oClient});
 }
 
-function CKGSRoomsListWindow()
+function CKGSRoomListWindow()
 {
-    CKGSRoomsListWindow.superclass.constructor.call(this);
+    CKGSRoomListWindow.superclass.constructor.call(this);
 
 	this.m_oClient          = null;
 	this.m_oRoomListView    = new CListView();
@@ -1079,25 +1079,29 @@ function CKGSRoomsListWindow()
 	this.m_nInnerH = -1;
 	this.m_nInnerW = -1;
 }
-CommonExtend(CKGSRoomsListWindow, CDrawingWindow);
+CommonExtend(CKGSRoomListWindow, CDrawingWindow);
 
-CKGSRoomsListWindow.prototype.Init = function(sDivId, oPr)
+CKGSRoomListWindow.prototype.Init = function(sDivId, oPr)
 {
-	CKGSRoomsListWindow.superclass.Init.call(this, sDivId);
+	CKGSRoomListWindow.superclass.Init.call(this, sDivId);
 
 	this.Set_Caption("Rooms list");
 
 	var oMainDiv     = this.HtmlElement.InnerDiv;
 	var oMainControl = this.HtmlElement.InnerControl;
 
+	oMainDiv.style.backgroundColor = "rgb(243, 243, 243)";
+
 	var sListId       = sDivId + "L";
 	var oListElement = this.protected_CreateDivElement(oMainDiv, sListId);
 	this.m_oRoomListView.Set_BGColor(243, 243, 243);
-	var oListControl = this.m_oRoomListView.Init(sListId, g_oKGSRoomsList);
-	oListControl.Bounds.SetParams(0, 0, 0, 0, true, true, true, true, -1, -1);
+	var oListControl = this.m_oRoomListView.Init(sListId, g_oKGSRoomList);
+	oListControl.Bounds.SetParams(0, 41, 0, 0, true, true, true, true, -1, -1);
 	oListControl.Anchor = (g_anchor_left | g_anchor_top | g_anchor_bottom  | g_anchor_right);
 	oMainControl.AddControl(oListControl);
 	this.m_oRoomListControl = oListControl;
+
+	this.private_CreateFindInput(sDivId + "F", oMainDiv, oMainControl);
 
 	if (oPr && oPr.Client)
 		this.m_oClient = oPr.Client;
@@ -1105,9 +1109,9 @@ CKGSRoomsListWindow.prototype.Init = function(sDivId, oPr)
 	this.Update_Size(true);
 	this.Show(oPr);
 };
-CKGSRoomsListWindow.prototype.Show = function()
+CKGSRoomListWindow.prototype.Show = function()
 {
-	CKGSRoomsListWindow.superclass.Show.call(this);
+	CKGSRoomListWindow.superclass.Show.call(this);
 
 	this.m_oRoomListView.Clear();
 
@@ -1117,7 +1121,8 @@ CKGSRoomsListWindow.prototype.Show = function()
 		for (var nRoomId in oRooms)
 		{
 			var oRoom = oRooms[nRoomId];
-			this.m_oRoomListView.Handle_Record([0, oRoom.ChannelId, oRoom.Name, this.m_oClient.GetCategoryName(oRoom.Category)]);
+            if (oRoom.Name && "" !== oRoom.Name)
+				this.m_oRoomListView.Handle_Record([0, oRoom.ChannelId, oRoom.Name, this.m_oClient.GetCategoryName(oRoom.Category)]);
 		}
 
 	}
@@ -1125,9 +1130,9 @@ CKGSRoomsListWindow.prototype.Show = function()
 	this.m_oRoomListView.Update();
 	this.m_oRoomListView.Update_Size();
 };
-CKGSRoomsListWindow.prototype.Update_Size = function(bForce)
+CKGSRoomListWindow.prototype.Update_Size = function(bForce)
 {
-	CKGSRoomsListWindow.superclass.Update_Size.call(this, bForce);
+	CKGSRoomListWindow.superclass.Update_Size.call(this, bForce);
 
 	var W = this.HtmlElement.InnerDiv.clientWidth;
 	var H = this.HtmlElement.InnerDiv.clientHeight;
@@ -1140,14 +1145,78 @@ CKGSRoomsListWindow.prototype.Update_Size = function(bForce)
 		this.m_oRoomListView.Update_Size();
 	}
 };
-CKGSRoomsListWindow.prototype.Get_DefaultWindowSize = function()
+CKGSRoomListWindow.prototype.Get_DefaultWindowSize = function()
 {
 	return {W : 385, H : 670};
+};
+CKGSRoomListWindow.prototype.private_CreateFindInput = function(sInputId, oParentDiv, oParentControl)
+{
+	var oFindInput = document.createElement("input");
+	oFindInput.setAttribute("id", sInputId);
+	oFindInput.setAttribute("style", "position:absolute;padding:0;margin:0;");
+	oFindInput.setAttribute("oncontextmenu", "return false;");
+
+	oFindInput.type           = "text";
+	oFindInput.maxLength      = "256";
+	oFindInput["aria-label"]  = "Enter room name here";
+	oFindInput["placeholder"] = "Enter room name here";
+
+	oFindInput.style.color           = "#505050";
+	oFindInput.style.backgroundColor = "#fff";
+	oFindInput.style.border          = "1px solid #969696";
+	oFindInput.style.fontFamily      = '"Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif';
+	oFindInput.style.height          = "37px";
+	oFindInput.style.fontSize        = "13px";
+	oFindInput.style.padding         = "0px 47px 0px 6px";
+	oFindInput.style.outline         = "none";
+
+	oParentDiv.appendChild(oFindInput);
+
+	var oFindControl = CreateControlContainer(sInputId);
+	oFindControl.Bounds.SetParams(5, 2, 5, -1, true, true, true, false, -1, 37);
+	oFindControl.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right);
+	oParentControl.AddControl(oFindControl);
+
+	var oThis = this;
+
+	oFindInput.addEventListener("input", function()
+	{
+		var oClient       = oThis.m_oClient;
+		var oRoomListView = oThis.m_oRoomListView;
+
+		if (!oClient || !oRoomListView)
+			return;
+
+		var sValue = this.value;
+		var oRooms = oClient.GetAllRooms();
+		oRoomListView.Clear();
+		if ("" === sValue)
+		{
+			for (var nRoomId in oRooms)
+			{
+				var oRoom = oRooms[nRoomId];
+				if (oRoom.Name && "" !== oRoom.Name)
+					oRoomListView.Handle_Record([0, oRoom.ChannelId, oRoom.Name, oRoom.CategoryName]);
+			}
+		}
+		else
+		{
+			for (var nRoomId in oRooms)
+			{
+				var oRoom = oRooms[nRoomId];
+				if (oRoom.Name && "" !== oRoom.Name && -1 !== oRoom.Name.indexOf(sValue))
+					oRoomListView.Handle_Record([0, oRoom.ChannelId, oRoom.Name, oRoom.CategoryName]);
+			}
+		}
+
+		oRoomListView.Update();
+		oRoomListView.Update_Size();
+	});
 };
 
 
 var EKGSWindowType = {
-    RoomsList : 0
+    RoomList : 0
 };
 
 var g_aKGSWindows = {};
@@ -1168,7 +1237,7 @@ function CreateKGSWindow(sParentId, nWindowType, oPr)
         var sApp = "unknownwindow";
         switch (nWindowType)
         {
-        case EKGSWindowType.RoomsList : sApp = "RoomList"; break;
+        case EKGSWindowType.RoomList : sApp = "RoomList"; break;
         }
         var sId = sParentId + sApp;
 
@@ -1184,7 +1253,7 @@ function CreateKGSWindow(sParentId, nWindowType, oPr)
 
         switch (nWindowType)
         {
-        case EKGSWindowType.RoomsList : oWindow = new CKGSRoomsListWindow(); break;
+        case EKGSWindowType.RoomList : oWindow = new CKGSRoomListWindow(); break;
         }
 
         oWindows[nWindowType] = oWindow;

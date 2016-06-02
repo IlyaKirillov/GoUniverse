@@ -9,12 +9,12 @@
  * Time     22:55
  */
 
-var EKGSRoomsListRecord = {
+var EKGSRoomListRecord = {
 	Name     : 1,
 	Category : 2
 };
 
-var g_oKGSRoomsList = {
+var g_oKGSRoomList = {
 
 	Headers : {
 		Sizes : [0, 245],
@@ -23,28 +23,28 @@ var g_oKGSRoomsList = {
 		2     : "Category"
 	},
 
-	SortType : EKGSRoomsListRecord.Name,
+	SortType : EKGSRoomListRecord.Name,
 
 	Set_SortType : function(nColNum, Direction)
 	{
 		if (Direction > 0)
-			g_oKGSRoomsList.SortType = nColNum + 1;
+			g_oKGSRoomList.SortType = nColNum + 1;
 		else
-			g_oKGSRoomsList.SortType = -(nColNum + 1);
+			g_oKGSRoomList.SortType = -(nColNum + 1);
 	},
 
 	SortFunction : function(oRecord1, oRecord2)
 	{
 		var nRes = 0;
-		var SortType = g_oKGSRoomsList.SortType;
+		var SortType = g_oKGSRoomList.SortType;
 
-		if (EKGSRoomsListRecord.Name === SortType)
+		if (EKGSRoomListRecord.Name === SortType)
 			nRes = Common.Compare_Strings(oRecord1.m_sName, oRecord2.m_sName);
-		else if (-EKGSRoomsListRecord.Name === SortType)
+		else if (-EKGSRoomListRecord.Name === SortType)
 			nRes = Common.Compare_Strings(oRecord2.m_sName, oRecord1.m_sName);
-		else if (EKGSRoomsListRecord.Category === SortType)
+		else if (EKGSRoomListRecord.Category === SortType)
 			nRes = Common.Compare_Strings(oRecord1.m_sCategory, oRecord2.m_sCategory);
-		else if (-EKGSRoomsListRecord.Category === SortType)
+		else if (-EKGSRoomListRecord.Category === SortType)
 			nRes = Common.Compare_Strings(oRecord2.m_sCategory, oRecord1.m_sCategory);
 
 		if (0 !== nRes)
@@ -72,15 +72,15 @@ var g_oKGSRoomsList = {
 	Draw_Header : function(dX, dY, oContext, nColNum)
 	{
 		var eType    = nColNum + 1;
-		var SortType = g_oKGSRoomsList.SortType;
+		var SortType = g_oKGSRoomList.SortType;
 
 		var sHeaderText;
 		if (eType === SortType)
-			sHeaderText = g_oKGSRoomsList.Headers[eType] + String.fromCharCode(0x25B2);
+			sHeaderText = g_oKGSRoomList.Headers[eType] + String.fromCharCode(0x25B2);
 		else if (eType === -SortType)
-			sHeaderText = g_oKGSRoomsList.Headers[eType] + String.fromCharCode(0x25BC);
+			sHeaderText = g_oKGSRoomList.Headers[eType] + String.fromCharCode(0x25BC);
 		else
-			sHeaderText = g_oKGSRoomsList.Headers[eType];
+			sHeaderText = g_oKGSRoomList.Headers[eType];
 
 		oContext.fillStyle = "#000000";
 		oContext.fillText(sHeaderText, dX, dY);
@@ -125,8 +125,8 @@ CKGSRoomListRecord.prototype.Draw = function(oContext, dX, dY, eType)
 	var sString = "";
 	switch(eType)
 	{
-	case EKGSRoomsListRecord.Name     : sString += this.m_sName; break;
-	case EKGSRoomsListRecord.Category : sString += this.m_sCategory; break;
+	case EKGSRoomListRecord.Name     : sString += this.m_sName; break;
+	case EKGSRoomListRecord.Category : sString += this.m_sCategory; break;
 	}
 
 	oContext.fillText(sString, dX, dY);
