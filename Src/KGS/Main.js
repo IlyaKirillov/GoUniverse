@@ -1085,7 +1085,7 @@ CKGSRoomListWindow.prototype.Init = function(sDivId, oPr)
 {
 	CKGSRoomListWindow.superclass.Init.call(this, sDivId);
 
-	this.Set_Caption("Rooms list");
+	this.Set_Caption("Room list");
 
 	var oMainDiv     = this.HtmlElement.InnerDiv;
 	var oMainControl = this.HtmlElement.InnerControl;
