@@ -1280,7 +1280,8 @@ CKGSUserInfoWindow.prototype.OnUserDetails = function(oDetails)
 {
 	if (oDetails)
 	{
-		this.OnUserAvatar();
+		if (-1 !== oDetails.user.flags.indexOf("a"))
+			this.OnUserAvatar();
 
 		this.private_AddConsoleMessage("UserName", oDetails.user.name);
 		this.private_AddConsoleMessage("Rank", oDetails.user.rank ? oDetails.user.rank : "-");
@@ -1398,4 +1399,26 @@ function CreateKGSWindow(nWindowType, oPr)
     }
 
     return null;
+}
+
+function RemoveWindow(oWindow)
+{
+	var sParentId = "bodyId";
+
+	var sDivId = oWindow.Get_Id();
+	var oDiv = document.getElementById(sDivId);
+	if (oDiv)
+	{
+		var oContainerDiv = document.getElementById(sParentId);
+		oContainerDiv.removeChild(oDiv);
+	}
+
+	for (var sId in g_aKGSWindows[sParentId])
+	{
+		if (oWindow === g_aKGSWindows[sParentId][sId])
+		{
+			delete g_aKGSWindows[sParentId][sId];
+			break;
+		}
+	}
 }

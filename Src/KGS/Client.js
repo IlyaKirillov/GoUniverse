@@ -135,14 +135,7 @@ CKGSClient.prototype.CloseUserInfo = function(sUserName)
 
 		if (this.m_oUserInfo[sUserName].Window)
 		{
-			for (var sId in g_aKGSWindows[sParentId])
-			{
-				if (this.m_oUserInfo[sUserName].Window === g_aKGSWindows[sParentId][sId])
-				{
-					delete g_aKGSWindows[sParentId][sId];
-					break;
-				}
-			}
+			RemoveWindow(this.m_oUserInfo[sUserName].Window);
 		}
 
 		delete this.m_oUserInfo[sUserName];
@@ -347,6 +340,10 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
 	else if ("CONVO_JOIN" === oMessage.type)
 	{
 		this.private_HandleConvoJoin(oMessage);
+	}
+	else if ("ARCHIVE_JOIN" === oMessage.type)
+	{
+		this.private_HandleArchiveJoin(oMessage);
 	}
 	else
 	{
@@ -700,6 +697,7 @@ CKGSClient.prototype.private_HandleDetailsJoin = function(oMessage)
 	var sUserName = oMessage.user.name;
 	if (this.m_oUserInfo[sUserName])
 	{
+		this.m_oUserInfo[sUserName].DetailsChannel = oMessage.channelId;
 		this.m_oUserInfo[sUserName].Window.OnUserDetails(oMessage);
 	}
 	else
@@ -773,6 +771,25 @@ CKGSClient.prototype.private_HandleConvoJoin = function(oMessage)
 	this.private_HandleUserRecord(oMessage.user, this.m_oPrivateChats[nChannelId]);
 
 	EnterChatRoom(nChannelId, sUserName + "(P)", true);
+};
+CKGSClient.prototype.private_HandleArchiveJoin = function(oMessage)
+{
+	var sUserName = oMessage.user.name;
+	if (this.m_oUserInfo[sUserName])
+	{
+		this.m_oUserInfo[sUserName].ArchiveChannel = oMessage.channelId;
+		this.m_oUserInfo[sUserName].Window.OnUserGameArchive(oMessage);
+	}
+	else
+	{
+		if (-1 !== this.m_oUserInfo[sUserName].ArchiveChannel)
+		{
+			this.private_SendMessage({
+				"type"      : "UNJOIN_REQUEST",
+				"channelId" : oMessage.channelId
+			});
+		}
+	}
 };
 CKGSClient.prototype.private_GetRank = function(sRank)
 {
