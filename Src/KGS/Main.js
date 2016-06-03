@@ -1288,7 +1288,7 @@ CKGSUserInfoWindow.prototype.OnUserDetails = function(oDetails)
 		this.private_AddConsoleMessage("Last on", oDetails.lastOn);
 		this.private_AddConsoleMessage("Locale", oDetails.locale);
 		this.private_AddConsoleMessage("Name", oDetails.personalName);
-		this.private_AddConsoleMessage("Info", oDetails.personalInfo);
+		this.private_AddInfo(oDetails.personalInfo);
 	}
 };
 CKGSUserInfoWindow.prototype.OnUserAvatar = function(oMessage)
@@ -1317,9 +1317,10 @@ CKGSUserInfoWindow.prototype.private_AddConsoleMessage = function(sField, sText)
 
 	if (sField)
 	{
-		oTextSpan                 = document.createElement("span");
-		oTextSpan.style.fontStyle = "italic";
-		oTextSpan.textContent     = sField + ": ";
+		oTextSpan                  = document.createElement("span");
+		oTextSpan.style.fontWeight = "bold";
+		oTextSpan.style.fontStyle  = "italic";
+		oTextSpan.textContent      = sField + ": ";
 		oTextDiv.appendChild(oTextSpan);
 	}
 
@@ -1334,8 +1335,38 @@ CKGSUserInfoWindow.prototype.private_AddConsoleMessage = function(sField, sText)
 	}
 
 	oDiv.appendChild(oTextDiv);
-	oDiv.scrollTop = oDiv.scrollHeight;
+	return oTextDiv;
+};
+CKGSUserInfoWindow.prototype.private_AddInfo = function(sText)
+{
+	var oDiv     = this.m_oContainerDiv;
+	var oTextDiv = document.createElement("div");
 
+	var oTextSpan;
+
+	oTextSpan                  = document.createElement("div");
+	oTextSpan.style.fontWeight = "bold";
+	oTextSpan.style.fontStyle  = "italic";
+	oTextSpan.textContent      = "Info: ";
+	oTextDiv.appendChild(oTextSpan);
+
+	var oInfoDiv = document.createElement("div");
+	oInfoDiv.style.width  = "100%";
+	oInfoDiv.style.bottom = "0px";
+	oInfoDiv.style.overflowY = "scroll";
+
+	var aLines = SplitTextToLines(sText);
+	for (var nIndex = 0, nCount = aLines.length; nIndex < nCount; ++nIndex)
+	{
+		var oTextSpan        = document.createElement("span");
+		oTextSpan.innerHTML  = aLines[nIndex];
+
+		oInfoDiv.appendChild(oTextSpan);
+		oInfoDiv.appendChild(document.createElement("br"));
+	}
+
+	oTextDiv.appendChild(oInfoDiv);
+	oDiv.appendChild(oTextDiv);
 	return oTextDiv;
 };
 
