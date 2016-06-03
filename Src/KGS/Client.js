@@ -94,7 +94,7 @@ CKGSClient.prototype.LoadUserInfo = function(sUserName)
 {
 	// TODO: Сделать обертку для КГС-клиента, и туда пихать все окна, а не в <body>
 	this.m_oUserInfo[sUserName] = {
-		Window         : CreateKGSWindow("bodyId", EKGSWindowType.UserInfo, {UserName : sUserName, Client : this}),
+		Window         : CreateKGSWindow(EKGSWindowType.UserInfo, {UserName : sUserName, Client : this}),
 		UserName       : sUserName,
 		DetailsChannel : -1,
 		ArchiveChannel : -1
@@ -114,6 +114,7 @@ CKGSClient.prototype.CloseUserInfo = function(sUserName)
 {
 	if (this.m_oUserInfo[sUserName])
 	{
+
 		if (-1 !== this.m_oUserInfo[sUserName].DetailsChannel)
 		{
 			this.private_SendMessage({
@@ -128,6 +129,11 @@ CKGSClient.prototype.CloseUserInfo = function(sUserName)
 				"type"      : "UNJOIN_REQUEST",
 				"channelId" : this.m_oUserInfo[sUserName].ArchiveChannel
 			});
+		}
+
+		if (this.m_oUserInfo[sUserName].Window)
+		{
+			
 		}
 
 		delete this.m_oUserInfo[sUserName];

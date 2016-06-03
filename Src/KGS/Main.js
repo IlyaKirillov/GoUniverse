@@ -182,29 +182,14 @@ function OnDocumentReady()
     PanelTabs.push({Div : MainDiv, Id : -1, TabDiv : MainDivTab});
     CurrentTab = PanelTabs[0];
 
-    MainDivTab.onmousemove   = function()
-    {
-        MainDivTab.style.backgroundColor = "#009983";
-    };
-    MainDivTab.onmousedown   = function()
-    {
-        MainDivTab.style.backgroundColor = "#008272";
-        MainDivTab.style.border          = "1px solid black";
-    };
-    MainDivTab.onmouseout    = function()
-    {
-        MainDivTab.style.backgroundColor = "#008272";
-        MainDivTab.style.border          = "1px solid transparent";
-    };
-    MainDivTab.onmouseup     = function()
-    {
-        MainDivTab.style.border = "1px solid transparent";
-        OnPanelTabClick(MainDiv);
-    };
-    MainDivTab.onselectstart = function()
-    {
-        return false;
-    };
+	MainDivTab.onclick = function()
+	{
+		OnPanelTabClick(MainDiv);
+	};
+	MainDivTab.onselectstart = function()
+	{
+	    return false;
+	};
 
     window.onresize = function()
     {
@@ -297,9 +282,29 @@ function OnDocumentReady()
     oChatControl.AddControl(oChatTabsBack);
 
     var oChatTabs = CreateControlContainer("divIdLChatTabs");
-    oChatTabs.Bounds.SetParams(0, 0, 2, 0, true, true, true, false, -1, 25);
+    oChatTabs.Bounds.SetParams(0, 0, 31, 0, true, true, true, false, -1, 25);
     oChatTabs.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left);
     oChatControl.AddControl(oChatTabs);
+
+	var oChatAddElement = document.getElementById("divIdLChatAdd");
+	var oChatAddControl = CreateControlContainer("divIdLChatAdd");
+	oChatAddControl.Bounds.SetParams(0, 0, 1, 0, false, true, true, false, 30, 24);
+	oChatAddControl.Anchor = (g_anchor_top | g_anchor_right);
+	oChatControl.AddControl(oChatAddControl);
+
+	oChatAddElement.title           = "Add a channel";
+	oChatAddElement.style.fontSize  = "24px";
+	oChatAddElement.style.textAlign = "center";
+	oChatAddElement.onselectstart   = function()
+	{
+		return false;
+	};
+	oChatAddElement.onclick         = function()
+	{
+		OpenRoomList();
+	};
+
+
 
     // Все сообщения
     var oChatTextAreaControl = CreateControlContainer("divIdLChatTextArea");
@@ -1065,7 +1070,7 @@ function GetTabByRoomId(RoomId)
 
 function OpenRoomList()
 {
-    CreateKGSWindow("divMainId", EKGSWindowType.RoomList, {Client : oClient});
+    CreateKGSWindow(EKGSWindowType.RoomList, {Client : oClient});
 }
 
 function CKGSRoomListWindow()
@@ -1330,8 +1335,10 @@ var EKGSWindowType = {
 };
 
 var g_aKGSWindows = {};
-function CreateKGSWindow(sParentId, nWindowType, oPr)
+function CreateKGSWindow(nWindowType, oPr)
 {
+	var sParentId = "bodyId";
+
     if (!g_aKGSWindows[sParentId])
         g_aKGSWindows[sParentId] = {};
 
