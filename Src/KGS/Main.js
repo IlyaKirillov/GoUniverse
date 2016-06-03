@@ -365,7 +365,7 @@ function EnterGameRoom(GameRoomId)
     if (!oClient)
         return;
 
-    oClient.ConnectToGameRoom(GameRoomId);
+    oClient.EnterToGameRoom(GameRoomId);
 }
 
 function LeaveGameRoom(GameRoomId)
@@ -1083,6 +1083,8 @@ function CKGSRoomListWindow()
 
 	this.m_nInnerH = -1;
 	this.m_nInnerW = -1;
+
+	this.m_oFindInputElement = null;
 }
 CommonExtend(CKGSRoomListWindow, CDrawingWindow);
 
@@ -1117,6 +1119,12 @@ CKGSRoomListWindow.prototype.Init = function(sDivId, oPr)
 CKGSRoomListWindow.prototype.Show = function()
 {
 	CKGSRoomListWindow.superclass.Show.call(this);
+
+	if (this.m_oFindInputElement)
+	{
+		this.m_oFindInputElement.value = "";
+		this.m_oFindInputElement.focus();
+	}
 
 	this.m_oRoomListView.Clear();
 
@@ -1217,6 +1225,8 @@ CKGSRoomListWindow.prototype.private_CreateFindInput = function(sInputId, oParen
 		oRoomListView.Update();
 		oRoomListView.Update_Size();
 	});
+
+	this.m_oFindInputElement = oFindInput;
 };
 
 function CKGSUserInfoWindow()
