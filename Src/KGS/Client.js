@@ -345,6 +345,10 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
 	{
 		this.private_HandleArchiveJoin(oMessage);
 	}
+	else if ("GAME_STATE" === oMessage.type)
+	{
+		this.private_HandleGameState(oMessage);
+	}
 	else
 	{
 		console.log(oMessage);
@@ -643,6 +647,8 @@ CKGSClient.prototype.private_HandleUserAdded = function(oMessage)
 
 	if (oMessage.channelId === this.m_nChatChannelId)
 	{
+		var oUser = oRoom.Users[oMessage.user.name];
+		PlayersListView.Handle_Record([0, oUser.Name, oUser.Rank, oUser.Friend]);
 		PlayersListView.Update_Size();
 		PlayersListView.Update();
 	}
@@ -659,6 +665,7 @@ CKGSClient.prototype.private_HandleUserRemoved = function(oMessage)
 
 	if (oMessage.channelId === this.m_nChatChannelId)
 	{
+		PlayersListView.Handle_Record([1, oMessage.user.name]);
 		PlayersListView.Update_Size();
 		PlayersListView.Update();
 	}
@@ -791,6 +798,10 @@ CKGSClient.prototype.private_HandleArchiveJoin = function(oMessage)
 		}
 	}
 };
+CKGSClient.prototype.private_HandleGameState = function(oMessage)
+{
+	// TODO: GAME_STATE
+};
 CKGSClient.prototype.private_GetRank = function(sRank)
 {
 	if (!sRank)
@@ -884,6 +895,18 @@ CKGSClient.prototype.private_ReadSgfEvents = function(oGame, arrSgfEvents)
 		else if ("PROP_CHANGED" === sgfEvent.type)
 		{
 			private_ReadProp(sgfEvent.prop);
+		}
+		else if ("PROP_REMOVED" === sgfEvent.type)
+		{
+			private_ReadPropRemove(sgfEvent.prop);
+		}
+		else if ("PROP_GROUP_REMOVED" === sgfEvent.type)
+		{
+			var oProps = sgfEvent.props;
+			for (var nPropsIndex = 0, nPropsCount = oProps.length; nPropsIndex < nPropsCount; ++nPropsIndex)
+			{
+				private_ReadPropRemove(oProps[nPropsIndex]);
+			}
 		}
 		else
 		{
@@ -991,6 +1014,18 @@ CKGSClient.prototype.private_ReadSgfEvents = function(oGame, arrSgfEvents)
 			var nY = oProp.loc.y + 1;
 			oNode.Add_TextMark(oProp.text, Common_XYtoValue(nX, nY));
 		}
+		else if ("CIRCLE" === oProp.name)
+		{
+			var nX = oProp.loc.x + 1;
+			var nY = oProp.loc.y + 1;
+			oNode.Add_Mark(EDrawingMark.Cr, [Common_XYtoValue(nX, nY)]);
+		}
+		else if ("CROSS" === oProp.name)
+		{
+			var nX = oProp.loc.x + 1;
+			var nY = oProp.loc.y + 1;
+			oNode.Add_Mark(EDrawingMark.X, [Common_XYtoValue(nX, nY)]);
+		}
 		else if ("PHANTOMCLEAR" === oProp.name)
 		{
 			// Нам это не нужно
@@ -1015,8 +1050,53 @@ CKGSClient.prototype.private_ReadSgfEvents = function(oGame, arrSgfEvents)
 		{
 			// Нам это не нужно
 		}
+		else if ("SETWHOSEMOVE" === oProp.name)
+		{
+			if ("black" === oProp.color)
+				oNode.Set_NextMove(BOARD_BLACK);
+			else if ("white" === oProp.color)
+				oNode.Set_NextMove(BOARD_WHITE);
+		}
+		else if ("ARROW" === oProp.name || "LINE" === oProp.name)
+		{
+			// Ничего не делаем
+		}
 		else
 		{
+			console.log("PROP_ADD/PROP_CHANGE");
+			console.log(oProp);
+		}
+	}
+
+	function private_ReadPropRemove(oProp)
+	{
+		if ("ADDSTONE" === oProp.name)
+		{
+			// Пропускаем, т.к. добавление/удаление камней полностью регулируется в PROP_ADDED/PROP_CHANGED
+		}
+		if ("TRIANGLE" === oProp.name || "SQUARE" === oProp.name || "LABEL" === oProp.name || "CIRCLE" === oProp.name || "CROSS" === oProp.name)
+		{
+			var nX = oProp.loc.x + 1;
+			var nY = oProp.loc.y + 1;
+			oNode.Add_Mark(ECommand.RM, [Common_XYtoValue(nX, nY)]);
+		}
+		else if ("TERRITORY" === oProp.name)
+		{
+			oNode.Set_TerritoryForceUse(true);
+
+			var nX = oProp.loc.x + 1;
+			var nY = oProp.loc.y + 1;
+
+			if ("black" === oProp.color || "white" === oProp.color)
+				oNode.Remove_TerritoryPoint(Common_XYtoValue(nX, nY));
+		}
+		else if ("ARROW" === oProp.name || "LINE" === oProp.name)
+		{
+			// Ничего не делаем
+		}
+		else
+		{
+			console.log("PROP_REMOVE");
 			console.log(oProp);
 		}
 	}
