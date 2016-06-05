@@ -58,15 +58,9 @@ CKGSUserInfoWindow.prototype.Init = function(sDivId, oPr)
 	oExtensionControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left | g_anchor_bottom);
 	oMainControl.AddControl(oExtensionControl);
 
-
-	// this.m_oContainerDiv = this.protected_CreateDivElement(oMainDiv, sDivId + "C");
-	// var oContainerControl = CreateControlContainer(sDivId + "C");
-	// oContainerControl.Bounds.SetParams(5, 5, 5, 5, true, true, true, true, -1, -1);
-	// oContainerControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
-	// oMainControl.AddControl(oContainerControl);
-
-
 	oMainDiv.style.backgroundColor = "rgb(243, 243, 243)";
+
+	this.private_AddMainInfo();
 };
 CKGSUserInfoWindow.prototype.Get_DefaultWindowSize = function(bForce)
 {
@@ -85,7 +79,12 @@ CKGSUserInfoWindow.prototype.OnUserDetails = function(oDetails)
 		if (-1 !== oDetails.user.flags.indexOf("a"))
 			this.OnUserAvatar();
 
-		this.private_AddMainInfo(oDetails);
+		this.private_AddConsoleMessage("UserName", oDetails.user.name);
+		this.private_AddConsoleMessage("Rank", oDetails.user.rank ? oDetails.user.rank : "-");
+		this.private_AddConsoleMessage("Last on", oDetails.lastOn);
+		this.private_AddConsoleMessage("Locale", oDetails.locale);
+		this.private_AddConsoleMessage("Name", oDetails.personalName);
+
 		this.private_AddInfo(oDetails.personalInfo);
 	}
 };
@@ -100,7 +99,72 @@ CKGSUserInfoWindow.prototype.OnUserAvatar = function(oMessage)
 };
 CKGSUserInfoWindow.prototype.OnUserGameArchive = function(oMessage)
 {
-	console.log(oMessage);
+	var arrGames = oMessage.games;
+	if (!arrGames)
+		return;
+
+	var nWins = 0, nLoses = 0, nUnfinished = 0;
+
+	var nRecentGamesCount = 20;
+	var sRecentGames = "";
+
+	for (var nIndex = arrGames.length - 1; nIndex >= 0; --nIndex)
+	{
+		var oGame  = arrGames[nIndex];
+		var sType  = oGame.gameType;
+
+		if ("ranked" === sType || "free" === sType)
+		{
+			var sBlack = oGame.players.black.name;
+			var sWhite = oGame.players.white.name;
+			var sScore = "" + oGame.score;
+
+			var bBlackWon = false;
+
+			if (-1 !== sScore.indexOf("B+"))
+				bBlackWon = true;
+			else if (-1 !== sScore.indexOf("W+"))
+				bBlackWon = false;
+			else if (-1 !== sScore.indexOf("UNFINISHED"))
+				bBlackWon = null;
+			else
+			{
+				var dScore = parseFloat(sScore);
+				if (dScore < 0)
+					bBlackWon = false;
+				else
+					bBlackWon = true;
+			}
+
+			if (null === bBlackWon)
+			{
+				nUnfinished++;
+			}
+			else if ((true === bBlackWon && sBlack === this.m_sUserName)
+				|| (true !== bBlackWon && sWhite === this.m_sUserName))
+			{
+				nWins++;
+
+				if (nRecentGamesCount > 0)
+				{
+					sRecentGames = sRecentGames + "W";
+					nRecentGamesCount--;
+				}
+			}
+			else
+			{
+				nLoses++;
+				if (nRecentGamesCount > 0)
+				{
+					sRecentGames = sRecentGames + "L";
+					nRecentGamesCount--;
+				}
+			}
+		}
+	}
+
+	this.private_AddConsoleMessage("Games", "" + nWins + "-" + nLoses + "-" + nUnfinished);
+	this.private_AddConsoleMessage("Recent games", sRecentGames);
 };
 CKGSUserInfoWindow.prototype.private_AddMainInfo = function(oDetails)
 {
@@ -108,11 +172,6 @@ CKGSUserInfoWindow.prototype.private_AddMainInfo = function(oDetails)
 
 	this.m_oMainInfoTable = document.createElement("table");
 
-	this.private_AddConsoleMessage("UserName", oDetails.user.name);
-	this.private_AddConsoleMessage("Rank", oDetails.user.rank ? oDetails.user.rank : "-");
-	this.private_AddConsoleMessage("Last on", oDetails.lastOn);
-	this.private_AddConsoleMessage("Locale", oDetails.locale);
-	this.private_AddConsoleMessage("Name", oDetails.personalName);
 
 	oDiv.appendChild(this.m_oMainInfoTable);
 };

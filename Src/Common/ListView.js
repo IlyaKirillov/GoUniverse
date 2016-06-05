@@ -147,11 +147,13 @@ function CListView()
         {
             if (2 == global_mouseEvent.ClickCount && oThis.m_oListObject && oThis.m_oListObject.Handle_DoubleClick)
             {
-                oThis.m_oListObject.Handle_DoubleClick(oThis.m_aList[oThis.m_nSelectedIndex]);
+                if (oThis.m_aList[oThis.m_nSelectedIndex])
+                    oThis.m_oListObject.Handle_DoubleClick(oThis.m_aList[oThis.m_nSelectedIndex]);
             }
             else if (1 == global_mouseEvent.ClickCount && g_mouse_button_right === global_mouseEvent.Button && oThis.m_oListObject && oThis.m_oListObject.Handle_RightClick)
             {
-                oThis.m_oListObject.Handle_RightClick(oThis.m_aList[oThis.m_nSelectedIndex]);
+                if (oThis.m_aList[oThis.m_nSelectedIndex])
+                    oThis.m_oListObject.Handle_RightClick(oThis.m_aList[oThis.m_nSelectedIndex]);
                 bRet = false;
             }
         }
