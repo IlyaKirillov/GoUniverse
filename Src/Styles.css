@@ -44,9 +44,42 @@
 }
 
 .ButtonGreen:active {
-    background-color : #008272;
-    border           : 1px solid black;
+	background-color : #008272;
+	border           : 1px solid black;
 }
+
+.ButtonExit {
+	background-color       : transparent;
+
+	outline                : none;
+	cursor                 : default;
+	--webkit-appearance    : none;
+	-webkit-border-radius  : 0;
+	overflow               : visible;
+	font-family            : 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif;
+	-webkit-font-smoothing : antialiased;
+	border                 : 1px solid transparent;
+	box-sizing             : border-box;
+	font-size              : 14px;
+	height                 : 50px;
+	margin                 : 0px;
+	padding                : 0px 14px;
+	color                  : #FFFFFF;
+	float                  : left;
+	transition-property    : width, height, background, margin, border, padding;
+	transition-duration    : .25s;
+}
+
+.ButtonExit:hover {
+	background-color : #505050;
+}
+
+.ButtonExit:active {
+	background-color: #969696;
+}
+
+
+
 
 
 html, body { height:100%; }
