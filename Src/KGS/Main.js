@@ -1063,6 +1063,9 @@ function OpenRoomList()
 
 function CApplicationClient()
 {
+	this.m_oClientDiv          = null; // Основная дивка страницы с клиентом
+	this.m_oClientControl      = null;
+
 	this.m_oPlayersListControl = null;
 	this.m_oPlayersListView    = new CListView();
 	this.m_oPlayersListView.Set_BGColor(243, 243, 243);
@@ -1072,36 +1075,12 @@ function CApplicationClient()
 	this.m_oGamesListView.Set_BGColor(243, 243, 243);
 
 	this.m_oClient             = null;
+
 }
 CApplicationClient.prototype.Init = function()
 {
 	this.private_InitLoginPage();
 	this.private_InitExitButton();
-	//------------------------------------------------------------------------------------------------------------------
-	// Расположим начальное окно с коннектом посередине
-	//------------------------------------------------------------------------------------------------------------------
-	var ConnectionDiv        = document.getElementById("divIdConnection");
-	ConnectionDiv.style.left = (document.body.clientWidth - 250) / 2 + "px";
-	ConnectionDiv.style.top  = (document.body.clientHeight - 100) / 2 + "px";
-	//------------------------------------------------------------------------------------------------------------------
-	function AddGreetingMessage()
-	{
-		var oDiv     = document.getElementById("textareaChatId");
-		var oTextDiv = document.createElement("div");
-
-		oTextDiv.style.textAlign   = "center";
-		var oTextSpan              = document.createElement("span");
-		oTextSpan.style.fontWeight = "bold";
-		oTextSpan.textContent      = "Welcome to Kiseido Go Server!";
-
-
-		oTextDiv.appendChild(oTextSpan);
-		oDiv.appendChild(oTextDiv);
-
-		oDiv.scrollTop = oDiv.scrollHeight;
-	}
-
-	AddGreetingMessage();
 
 	var MainDiv    = document.getElementById("divIdMainRoom");
 	var MainDivTab = document.getElementById("divIdMainRoomTab");
@@ -1117,43 +1096,6 @@ CApplicationClient.prototype.Init = function()
 	MainDivTab.onselectstart = function()
 	{
 		return false;
-	};
-
-	window.onresize = function()
-	{
-		if ("none" !== document.getElementById("divIdConnection").style.display)
-		{
-			// Расположим начальное окно с коннектом посередине
-			var ConnectionDiv = document.getElementById("divIdConnection");
-			ConnectionDiv.style.left = (document.body.clientWidth - 250) / 2 + "px";
-			ConnectionDiv.style.top  = (document.body.clientHeight - 100) / 2 + "px";
-		}
-
-		if ("none" !== document.getElementById("divIdConnectionError").style.display)
-		{
-			var ErrorDiv = document.getElementById("divIdConnectionError");
-			ErrorDiv.style.left = (document.body.clientWidth - 250) / 2 + "px";
-			ErrorDiv.style.top  = (document.body.clientHeight - 100) / 2 + 150 + "px";
-		}
-
-		if (oBody)
-		{
-			var W = oBody.HtmlElement.clientWidth;
-			var H = oBody.HtmlElement.clientHeight;
-			oBody.Resize(W, H);
-			PlayersListView.Update();
-			PlayersListView.Update_Size();
-
-			GamesListView.Update();
-			GamesListView.Update_Size();
-
-			for (var Pos in PanelTabs)
-			{
-				var Tab = PanelTabs[Pos];
-				if (Tab.Div.style.display === "block" && Tab.GameTree)
-					GoBoardApi.Update_Size(Tab.GameTree);
-			}
-		}
 	};
 
 	document.getElementById("inputChatId").onkeydown = SendChatMessage;
@@ -1276,9 +1218,40 @@ CApplicationClient.prototype.ConnectToKGS = function()
 };
 CApplicationClient.prototype.OnResize = function()
 {
-	var ConnectionDiv        = document.getElementById("divIdConnection");
-	ConnectionDiv.style.left = (document.body.clientWidth - 250) / 2 + "px";
-	ConnectionDiv.style.top  = (document.body.clientHeight - 100) / 2 + "px";
+	if ("none" !== document.getElementById("divIdConnection").style.display)
+	{
+		var ConnectionDiv = document.getElementById("divIdConnection");
+		ConnectionDiv.style.left = (document.body.clientWidth - 250) / 2 + "px";
+		ConnectionDiv.style.top  = (document.body.clientHeight - 100) / 2 + "px";
+	}
+
+	if ("none" !== document.getElementById("divIdConnectionError").style.display)
+	{
+		var ErrorDiv = document.getElementById("divIdConnectionError");
+		ErrorDiv.style.left = (document.body.clientWidth - 250) / 2 + "px";
+		ErrorDiv.style.top  = (document.body.clientHeight - 100) / 2 + 150 + "px";
+	}
+
+	if (this.m_oClientControl)
+	{
+		var W = m_oClientControl.HtmlElement.clientWidth;
+		var H = m_oClientControl.HtmlElement.clientHeight;
+		m_oClientControl.Resize(W, H);
+
+		this.m_oPlayersListView.Update();
+		this.m_oPlayersListView.Update_Size();
+
+		this.m_oGamesListView.Update();
+		this.m_oGamesListView.Update_Size();
+
+		// for (var Pos in PanelTabs)
+		// {
+		// 	var Tab = PanelTabs[Pos];
+		// 	if (Tab.Div.style.display === "block" && Tab.GameTree)
+		// 		GoBoardApi.Update_Size(Tab.GameTree);
+		// }
+	}
+
 };
 CApplicationClient.prototype.private_InitLoginPage = function()
 {
@@ -1356,5 +1329,19 @@ CApplicationClient.prototype.private_ReturnToMainMenu = function()
 	document.getElementById("divMainId").style.display       = "none";
 	document.getElementById("divIdConnection").style.display = "block";
 };
+
+function CVisualTabs()
+{
+	this.m_arrTabs = [];
+}
+CVisualTabs.prototype.AddTab = function()
+{
+
+};
+CVisualTabs.prototype.RemoveTab = function()
+{
+
+};
+
 
 
