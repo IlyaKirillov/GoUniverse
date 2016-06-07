@@ -372,8 +372,8 @@ CGameListRecord.prototype.private_GetRank = function(nRank)
 
 CGameListRecord.prototype.private_GetRoomName = function(nRoomId)
 {
-    if (oClient)
-        return oClient.GetRoomName(nRoomId);
+    if (oApp && oApp.GetClient())
+        return oApp.GetClient().GetRoomName(nRoomId);
 
     return "";
 };

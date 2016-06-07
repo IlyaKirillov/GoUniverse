@@ -248,7 +248,7 @@ CKGSClient.prototype.private_RecieveMessage = function()
 			{
 				console.log("Download failure: Status = " + req.status + ", response text = " + req.responseText);
 				oThis.m_bLoggedIn = false;
-				OnLogout("Server is unavaliable. Try again later.");
+				othis.m_oApp.Logout("Server is unavaliable. Try again later.");
 			}
 		}
 	};
@@ -361,7 +361,7 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
 CKGSClient.prototype.private_HandleLogout = function(oMessage)
 {
 	this.m_bLoggedIn = false;
-	OnLogout(oMessage.text);
+	this.m_oApp.Logout(oMessage.text);
 };
 CKGSClient.prototype.private_HandleHello = function(oMessage)
 {
@@ -390,11 +390,12 @@ CKGSClient.prototype.private_HandleRoomJoin = function(oMessage)
 {
 	this.m_aRooms[oMessage.channelId] = 1;
 
-	EnterChatRoom(oMessage.channelId, this.m_aAllRooms[oMessage.channelId].Name, false);
-	if (null === CurrentChatTab)
+	this.m_oApp.AddChatRoom(oMessage.channelId, this.m_aAllRooms[oMessage.channelId].Name, false);
+
+	if (null === this.m_oApp.GetCurrentChatRoomTab())
 	{
 		this.m_nChatChannelId = oMessage.channelId;
-		OnPanelChatTabClick(oMessage.channelId);
+		this.m_oApp.SetCurrentChatRoomTab(oMessage.channelId);
 	}
 
 	var Games = oMessage.games;
@@ -700,7 +701,7 @@ CKGSClient.prototype.private_HandleJoinComplete = function(oMessage)
 	if (this.m_aRooms[oMessage.channelId])
 	{
 		var oRoom = this.m_aAllRooms[oMessage.channelId];
-		AddRoomGreetingMessage(oMessage.channelId, oRoom.GreetingMessage);
+		this.m_oApp.AddRoomGreetingMessage(oMessage.channelId, oRoom.GreetingMessage);
 	}
 };
 CKGSClient.prototype.private_HandleDetailsJoin = function(oMessage)
@@ -742,7 +743,7 @@ CKGSClient.prototype.private_HandleRoomDesc = function(oMessage)
 		if (this.m_aRooms[oMessage.channelId])
 		{
 			var oRoom = this.m_aAllRooms[oMessage.channelId];
-			AddRoomGreetingMessage(oMessage.channelId, oRoom.GreetingMessage);
+			this.m_oApp.AddRoomGreetingMessage(oMessage.channelId, oRoom.GreetingMessage);
 		}
 	}
 };
@@ -760,12 +761,12 @@ CKGSClient.prototype.private_HandleGlobalGamesJoin = function(oMessage)
 CKGSClient.prototype.private_HandleLoginFailedBadPassword = function(oMessage)
 {
 	this.m_bLoggedIn = false;
-	OnLogout("Login or password is incorrect.");
+	this.m_oApp.Logout("Login or password is incorrect.");
 };
 CKGSClient.prototype.private_HandleLoginFailedNoSuchUser = function(oMessage)
 {
 	this.m_bLoggedIn = false;
-	OnLogout("Login or password is incorrect.");
+	this.m_oApp.Logout("Login or password is incorrect.");
 };
 CKGSClient.prototype.private_HandleConvoJoin = function(oMessage)
 {
@@ -781,7 +782,7 @@ CKGSClient.prototype.private_HandleConvoJoin = function(oMessage)
 	this.private_HandleUserRecord({name : this.GetUserName(), rank : undefined}, this.m_oPrivateChats[nChannelId]);
 	this.private_HandleUserRecord(oMessage.user, this.m_oPrivateChats[nChannelId]);
 
-	EnterChatRoom(nChannelId, sUserName + "(P)", true);
+	this.m_oApp.AddChatRoom(nChannelId, sUserName + "(P)", true);
 };
 CKGSClient.prototype.private_HandleArchiveJoin = function(oMessage)
 {

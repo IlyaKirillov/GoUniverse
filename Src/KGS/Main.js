@@ -7,6 +7,7 @@
 
 window.onload         = OnDocumentReady;
 window.onbeforeunload = OnDocumentClose;
+window.onresize       = OnDocumentResize;
 
 //var oClient     = new CKGSClient();
 
@@ -43,6 +44,33 @@ function OpenCreatePanel()
     Panel.style.opacity = "1";
 }
 
+var urlRegEx = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-]*)?\??(?:[\-\+=&;%@\.\w]*)#?(?:[\.\!\/\\\w]*))?)/g;
+function SplitTextToLines(sText)
+{
+	var aLines = [];
+
+	var nBreakPos = -1;
+	var nCurPos   = 0;
+	while (-1 !== (nBreakPos = sText.indexOf(String.fromCharCode(10), nCurPos)))
+	{
+		aLines.push(sText.substr(nCurPos, nBreakPos - nCurPos));
+
+		nCurPos = nBreakPos + 1;
+		if (nCurPos >= sText.length)
+			break;
+	}
+
+	if (nCurPos < sText.length)
+		aLines.push(sText.substr(nCurPos, sText.length - nCurPos));
+
+	for (var nIndex = 0, nCount = aLines.length; nIndex < nCount; ++nIndex)
+	{
+		aLines[nIndex] = aLines[nIndex].replace(urlRegEx, "<a href='$1' target='_blank'>$1</a>");
+	}
+
+	return aLines;
+}
+
 var oApp = null;
 function OnDocumentReady()
 {
@@ -54,6 +82,12 @@ function OnDocumentClose()
 {
 	if (oApp)
 		oApp.Close();
+}
+
+function OnDocumentResize()
+{
+	if (oApp)
+		oApp.OnResize();
 }
 
 function EnterGameRoom(GameRoomId)
@@ -122,91 +156,7 @@ function OnAddChatMessage(ChatRoomId, UserName, Text)
     }
 }
 
-function AddRoomGreetingMessage(ChatRoomId, sGreetingMessage)
-{
-    var oTextDiv = AddConsoleMessage("", sGreetingMessage);
-    oTextDiv.chatRoomId = ChatRoomId;
 
-    if (ChatRoomId === CurrentChatTab.ChatRoomId)
-    {
-        oTextDiv.style.display = "block";
-        document.getElementById("textareaChatId").scrollTop = document.getElementById("textareaChatId").scrollHeight;
-    }
-    else
-    {
-        oTextDiv.style.display = "none";
-    }
-}
-
-var urlRegEx = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-]*)?\??(?:[\-\+=&;%@\.\w]*)#?(?:[\.\!\/\\\w]*))?)/g;
-
-function AddConsoleMessage(sField, sText)
-{
-    var oDiv     = document.getElementById("textareaChatId");
-    var oTextDiv = document.createElement("div");
-
-    var oTextSpan;
-
-    if (sField)
-    {
-        oTextSpan                 = document.createElement("span");
-        oTextSpan.style.fontStyle = "italic";
-        oTextSpan.textContent     = sField + ": ";
-        oTextDiv.appendChild(oTextSpan);
-    }
-
-    var aLines = SplitTextToLines(sText);
-    for (var nIndex = 0, nCount = aLines.length; nIndex < nCount; ++nIndex)
-    {
-        oTextSpan            = document.createElement("span");
-        oTextSpan.innerHTML  = aLines[nIndex];
-
-        oTextDiv.appendChild(oTextSpan);
-        oTextDiv.appendChild(document.createElement("br"));
-    }
-
-    oDiv.appendChild(oTextDiv);
-    oDiv.scrollTop = oDiv.scrollHeight;
-
-    return oTextDiv;
-}
-
-function SplitTextToLines(sText)
-{
-    var aLines = [];
-
-    var nBreakPos = -1;
-    var nCurPos   = 0;
-    while (-1 !== (nBreakPos = sText.indexOf(String.fromCharCode(10), nCurPos)))
-    {
-        aLines.push(sText.substr(nCurPos, nBreakPos - nCurPos));
-
-        nCurPos = nBreakPos + 1;
-        if (nCurPos >= sText.length)
-            break;
-    }
-
-    if (nCurPos < sText.length)
-        aLines.push(sText.substr(nCurPos, sText.length - nCurPos));
-
-    for (var nIndex = 0, nCount = aLines.length; nIndex < nCount; ++nIndex)
-    {
-        aLines[nIndex] = aLines[nIndex].replace(urlRegEx, "<a href='$1' target='_blank'>$1</a>");
-    }
-
-    return aLines;
-}
-
-function SendChatMessage(e)
-{
-    var oInputArea = document.getElementById("inputChatId");
-    if (13 === e.keyCode && true !== e.ctrlKey && true !== e.shiftKey && oClient)
-    {
-        oClient.SendChatMessage(oInputArea.value);
-        oInputArea.value = "";
-        e.preventDefault();
-    }
-}
 
 
 function EnterGameRoom2(GameRoomId, SGF, ManagerId, sBlackName, sBlackRank, sWhiteName, sWhiteRank)
@@ -403,260 +353,6 @@ function EnterGameRoom2(GameRoomId, SGF, ManagerId, sBlackName, sBlackRank, sWhi
     OnPanelTabClick(GameRoomDiv);
 }
 
-function EnterChatRoom(ChatRoomId, sRoomName, isPrivate)
-{
-    var ChatRoom = {};
-    ChatRoom.ChatRoomId = ChatRoomId;
-    ChatRoom.NewMessagesCount = 0;
-
-    var sHeight = "21px";
-
-    ChatTabs.push(ChatRoom);
-
-    var TabPanel = document.getElementById("divIdLChatTabs");
-
-    var DivTab                      = document.createElement("div");
-    DivTab["aria-label"]            = sRoomName;
-    DivTab.title                    = sRoomName;
-    DivTab.style.transitionProperty = "width,height,background,margin,border,padding";
-    DivTab.style.transitionDuration = ".25s";
-    DivTab.style.float              = "left";
-    DivTab.style.height             = sHeight;
-    DivTab.style.margin             = "0px";
-    DivTab.style.padding            = "0px";
-    DivTab.style.color              = "#000";
-    DivTab.style.whiteSpace         = "nowrap";
-    DivTab.style.textOverflow       = "ellipsis";
-	DivTab.style.borderTop          = "3px solid #F3F3F3";
-    DivTab.style.borderRight        = "1px solid #BEBEBE";
-    DivTab.style.borderBottom       = "1px solid #BEBEBE";
-
-
-    var NewTab                             = document.createElement("button");
-    NewTab.tabIndex                        = "0";
-    NewTab.style.transitionProperty        = "all";
-    NewTab.style.transitionDuration        = ".25s";
-    NewTab.style.background                = "none";
-    NewTab.style.outline                   = "none";
-    NewTab.style.cursor                    = "pointer";
-    NewTab.style["-webkit-appearance"]     = "none";
-    NewTab.style["-webkit-border-radius"]  = "0";
-    NewTab.style.overflow                  = "visible";
-    NewTab.style.fontFamily                = '"Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif';
-    NewTab.style["-webkit-font-smoothing"] = "antialiased";
-    NewTab.style.padding                   = "0px";
-    NewTab.style.border                    = "1px solid transparent";
-    NewTab.style.boxSizing                 = "border-box";
-    NewTab.style.fontSize                  = "14px";
-    NewTab.style.lineHeight                = "20px";
-    NewTab.style.height                    = "100%";
-    NewTab.style.margin                    = "0px";
-    NewTab.style.padding                   = "0px 0px 0px 14px";
-    NewTab.style.maxWidth                  = "200px";
-    NewTab.style.overflow                  = "hidden";
-    NewTab.style.float                     = "left";
-
-
-    var NewTabDiv = document.createElement("div");
-    NewTabDiv.style.textAlign = "left";
-    var oCaptionDiv = document.createElement("div");
-	//oCaptionDiv.style.fontWeight = "normal";
-	//oCaptionDiv.style.color      = "rgb(0, 0, 0)";
-	oCaptionDiv.innerHTML = sRoomName;
-    NewTabDiv.appendChild(oCaptionDiv);
-
-    NewTabDiv.onselectstart = function(){return false;};
-    NewTab.appendChild(NewTabDiv);
-
-
-    NewTab.onclick = function()
-    {
-        OnPanelChatTabClick(ChatRoomId);
-    };
-    NewTab.onmousedown = function()
-    {
-    };
-
-    DivTab.appendChild(NewTab);
-
-    var CloseButton = document.createElement("button");
-    CloseButton.tabIndex = "0";
-    CloseButton["aria-label"] = "Close " + sRoomName;
-    CloseButton.title         = "Close " + sRoomName;
-
-    CloseButton.style.fontFamily                = '"Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif';
-    CloseButton.style["-webkit-font-smoothing"] = "antialiased";
-    CloseButton.style.padding                   = "0px";
-    CloseButton.style.border                    = "1px solid transparent";
-    CloseButton.style.boxSizing                 = "border-box";
-    CloseButton.style["-moz-box-sizing"]        = "border-box";
-    CloseButton.style.background                = "none";
-    CloseButton.style.outline                   = "none";
-    CloseButton.style.cursor                    = "pointer";
-    CloseButton.style["-webkit-appearance"]     = "none";
-    CloseButton.style["-webkit-border-radius"]  = "0";
-    CloseButton.style.overflow                  = "visible";
-    CloseButton.style.color                     = "#000";
-    CloseButton.style.lineHeight                = "20px";
-    CloseButton.style.float                     = "left";
-    CloseButton.style.height                    = "100%";
-    CloseButton.style.width                     = "26px";
-    CloseButton.style.transitionProperty        = "color";
-    CloseButton.style.transitionDuration        = ".25s";
-
-
-    CloseButton.onmousedown = function()
-    {
-        CloseButton.style.color = "#008272";
-    };
-    CloseButton.onmouseout = function()
-    {
-        CloseButton.style.color = "#111";
-    };
-    CloseButton.onmouseover = function()
-    {
-        CloseButton.style.color = "#009983";
-    };
-
-
-    var CBCenter = document.createElement("center");
-    var CBCDiv   = document.createElement("div");
-    CBCDiv.style.fontSize   = "14px";
-    CBCDiv.style.lineHeight = "20px";
-    CBCDiv.style.width      = "14px";
-    CBCDiv.style.height     = "20px";
-    CBCDiv.style.position   = "relative";
-    var CBCDSpan = document.createElement("span");
-
-    CBCDSpan.style.position   = "absolute";
-    CBCDSpan.style.width      = "100%";
-    CBCDSpan.style.height     = "100%";
-    CBCDSpan.style.left       = "0px";
-    CBCDSpan.style.top        = "1px";
-    CBCDSpan.style.visibility = "hidden";
-
-    CBCDSpan.className += " " + "closeSpan";
-    CBCDiv.appendChild(CBCDSpan);
-
-    var NewMessagesSpan = document.createElement("span");
-
-    NewMessagesSpan.style.position   = "absolute";
-    NewMessagesSpan.style.width      = "100%";
-    NewMessagesSpan.style.height     = "100%";
-    NewMessagesSpan.style.left       = "0px";
-    NewMessagesSpan.style.top        = "1px";
-    NewMessagesSpan.style.fontSize   = "12px";
-    NewMessagesSpan.style.lineHeight = "18px";
-    NewMessagesSpan.style.color      = "#008272";
-    NewMessagesSpan.innerHTML        = "";
-    CBCDiv.appendChild(NewMessagesSpan);
-
-
-    CBCenter.appendChild(CBCDiv);
-    CloseButton.appendChild(CBCenter);
-    DivTab.appendChild(CloseButton);
-
-    CloseButton.onclick = function()
-    {
-        oClient.LeaveChatRoom(ChatRoomId);
-        TabPanel.removeChild(DivTab);
-
-        if (CurrentChatTab === ChatRoom)
-            CurrentChatTab = null;
-
-        for (var Pos in ChatTabs)
-        {
-            var Tab = ChatTabs[Pos];
-            if (Tab === ChatRoom)
-            {
-                ChatTabs.splice(Pos, 1);
-            }
-            else if (null === CurrentChatTab)
-            {
-                OnPanelChatTabClick(Tab.ChatRoomId);
-            }
-        }
-    };
-
-    DivTab.onmouseover = function()
-    {
-        CBCDSpan.style.visibility        = "visible";
-        NewMessagesSpan.style.visibility = "hidden";
-		//oCaptionDiv.style.fontWeight     = "bold";
-    };
-    DivTab.onmouseout = function()
-    {
-        CBCDSpan.style.visibility        = "hidden";
-        NewMessagesSpan.style.visibility = "visible";
-		//oCaptionDiv.style.fontWeight     = "normal";
-    };
-
-    TabPanel.appendChild(DivTab);
-    ChatRoom.TabDiv     = DivTab;
-    ChatRoom.TextDiv    = NewTab;
-	ChatRoom.CaptionDiv = oCaptionDiv;
-    ChatRoom.NewMessagesCountDiv = NewMessagesSpan;
-}
-
-function OnPanelChatTabClick(ChatRoomId)
-{
-    var CurTab = CurrentChatTab;
-    var NewTab = null;
-
-    for (var Pos in ChatTabs)
-    {
-        var Tab = ChatTabs[Pos];
-        if (ChatRoomId === Tab.ChatRoomId)
-        {
-            NewTab = Tab;
-            break;
-        }
-    }
-
-    if (!NewTab || NewTab === CurTab)
-        return;
-
-    if (CurTab)
-    {
-        CurTab.TabDiv.style.borderBottom    = "1px solid #BEBEBE";
-        CurTab.TabDiv.style.borderTop       = "3px solid #F3F3F3";
-		//CurTab.CaptionDiv.style.color       = "rgb(0, 0, 0)";
-    }
-
-    if (NewTab)
-    {
-        NewTab.TabDiv.style.borderBottom     = "1px solid #F3F3F3";
-        NewTab.TabDiv.style.borderTop        = "3px solid rgb(0, 130, 114)";
-		//NewTab.CaptionDiv.style.color        = "rgb(0, 130, 114)";
-        NewTab.NewMessagesCount              = 0;
-        NewTab.NewMessagesCountDiv.innerHTML = "";
-    }
-
-    CurrentChatTab = NewTab;
-
-    oClient.SetCurrentChatRoom(ChatRoomId);
-    UpdateChatMessages();
-}
-
-function UpdateChatMessages()
-{
-    var oDiv = document.getElementById("textareaChatId");
-    for (var nIndex = 0, nCount = oDiv.childNodes.length; nIndex < nCount; ++nIndex)
-    {
-        var oChild = oDiv.childNodes[nIndex];
-        if (oChild.chatRoomId === CurrentChatTab.ChatRoomId)
-        {
-            oChild.style.display = "block";
-        }
-        else
-        {
-            oChild.style.display = "none";
-        }
-    }
-
-    document.getElementById("textareaChatId").scrollTop = document.getElementById("textareaChatId").scrollHeight;
-}
-
 function OnPanelTabClick(Div)
 {
     var CurTab = CurrentTab;
@@ -742,8 +438,8 @@ function CGoUniverseApplication()
 
 	this.m_oClient             = null;
 
-	this.m_oGameRoomTabs       = new CVisualTabs();
-
+	this.m_oGameRoomTabs       = new CVisualGameRoomTabs();
+	this.m_oChatRoomTabs       = new CVisualChatRoomTabs();
 }
 CGoUniverseApplication.prototype.Init = function()
 {
@@ -818,7 +514,13 @@ CGoUniverseApplication.prototype.OpenRoomList = function()
 };
 CGoUniverseApplication.prototype.SendChatMessage = function()
 {
-
+	var oInputArea = document.getElementById("inputChatId");
+	if (13 === e.keyCode && true !== e.ctrlKey && true !== e.shiftKey && this.m_oClient)
+	{
+		this.m_oClient.SendChatMessage(oInputArea.value);
+		oInputArea.value = "";
+		e.preventDefault();
+	}
 };
 CGoUniverseApplication.prototype.Logout = function(sText)
 {
@@ -847,6 +549,88 @@ CGoUniverseApplication.prototype.GetPlayersListView = function()
 CGoUniverseApplication.prototype.GetGamesListView = function()
 {
 	return this.m_oGamesListView;
+};
+CGoUniverseApplication.prototype.AddChatRoom = function(nChatRoomId, sRoomName)
+{
+	var oTab = new CVisualChatRoomTab(this);
+	oTab.Init(nChatRoomId, sRoomName);
+	this.m_oChatRoomTabs.AddTab(oTab);
+};
+CGoUniverseApplication.prototype.SetCurrentChatRoom = function(nChatRoomId)
+{
+	if (this.m_oClient)
+		this.m_oClient.SetCurrentChatRoom(nChatRoomId);
+
+	var oDiv = document.getElementById("textareaChatId");
+	for (var nIndex = 0, nCount = oDiv.childNodes.length; nIndex < nCount; ++nIndex)
+	{
+		var oChild = oDiv.childNodes[nIndex];
+		if (oChild.chatRoomId === nChatRoomId)
+		{
+			oChild.style.display = "block";
+		}
+		else
+		{
+			oChild.style.display = "none";
+		}
+	}
+
+	document.getElementById("textareaChatId").scrollTop = document.getElementById("textareaChatId").scrollHeight;
+};
+CGoUniverseApplication.prototype.GetCurrentChatRoomTab = function()
+{
+	return this.m_oChatRoomTabs.GetCurrent();
+};
+CGoUniverseApplication.prototype.SetCurrentChatRoomTab = function(nChatRoomId)
+{
+	var oTab = this.m_oChatRoomTabs.GetTab(nChatRoomId);
+	if (oTab)
+		oTab.OnClick();
+};
+CGoUniverseApplication.prototype.AddRoomGreetingMessage = function(nChatRoomId, sGreetingMessage)
+{
+	var oTextDiv = this.AddConsoleMessage("", sGreetingMessage);
+	oTextDiv.chatRoomId = nChatRoomId;
+
+	if (nChatRoomId === this.m_oChatRoomTabs.GetCurrent().GetId())
+	{
+		oTextDiv.style.display = "block";
+		document.getElementById("textareaChatId").scrollTop = document.getElementById("textareaChatId").scrollHeight;
+	}
+	else
+	{
+		oTextDiv.style.display = "none";
+	}
+};
+CGoUniverseApplication.prototype.AddConsoleMessage = function(sField, sText)
+{
+	var oDiv     = document.getElementById("textareaChatId");
+	var oTextDiv = document.createElement("div");
+
+	var oTextSpan;
+
+	if (sField)
+	{
+		oTextSpan                 = document.createElement("span");
+		oTextSpan.style.fontStyle = "italic";
+		oTextSpan.textContent     = sField + ": ";
+		oTextDiv.appendChild(oTextSpan);
+	}
+
+	var aLines = SplitTextToLines(sText);
+	for (var nIndex = 0, nCount = aLines.length; nIndex < nCount; ++nIndex)
+	{
+		oTextSpan            = document.createElement("span");
+		oTextSpan.innerHTML  = aLines[nIndex];
+
+		oTextDiv.appendChild(oTextSpan);
+		oTextDiv.appendChild(document.createElement("br"));
+	}
+
+	oDiv.appendChild(oTextDiv);
+	oDiv.scrollTop = oDiv.scrollHeight;
+
+	return oTextDiv;
 };
 CGoUniverseApplication.prototype.private_InitLoginPage = function()
 {
@@ -912,15 +696,15 @@ CGoUniverseApplication.prototype.private_InitClientPage = function()
 };
 CGoUniverseApplication.prototype.private_InitGameTabs = function()
 {
-	// Добавляем таб "MAIN ROOM"
-	var oMainRoomTab = new CVisualGameRoomTab();
-	oMainRoomTab.Init(-1, "divIdMainRoom", "divIdMainRoomTab");
-	this.m_oGameRoomTabs.AddTab(oMainRoomTab, true);
-
 	var oTabsControl = this.m_oGameRoomTabs.Init("divIdTabPanel");
 	oTabsControl.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, 50);
 	oTabsControl.Anchor = (g_anchor_top |g_anchor_left | g_anchor_right);
 	this.m_oClientControl.AddControl(oTabsControl);
+
+	// Добавляем таб "MAIN ROOM"
+	var oMainRoomTab = new CVisualGameRoomTab(this);
+	oMainRoomTab.Init(-1, "divIdMainRoom", "divIdMainRoomTab");
+	this.m_oGameRoomTabs.AddTab2(oMainRoomTab, true);
 };
 CGoUniverseApplication.prototype.private_InitMainRoom = function()
 {
@@ -970,7 +754,7 @@ CGoUniverseApplication.prototype.private_InitChats = function(oChatControl)
 	oChatTabsBack.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left);
 	oChatControl.AddControl(oChatTabsBack);
 
-	var oChatTabs = CreateControlContainer("divIdLChatTabs");
+	var oChatTabs = this.m_oChatRoomTabs.Init("divIdLChatTabs");
 	oChatTabs.Bounds.SetParams(0, 0, 31, 0, true, true, true, false, -1, 25);
 	oChatTabs.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left);
 	oChatControl.AddControl(oChatTabs);
@@ -1061,26 +845,28 @@ function CVisualTabs()
 	this.m_oPanelElement = null; // Div, которая будет содержать все наши табы
 	this.m_oPanelControl = null;
 }
-CVisualTabs.prototype.Init = function(sDivId, oPr)
+CVisualTabs.prototype.Init = function(sDivId)
 {
 	this.m_oPanelElement = document.getElementById(sDivId);
 	this.m_oPanelControl = CreateControlContainer(sDivId);
-
-
-	var oPanelElement = this.m_oPanelElement;
-
-	oPanelElement.style.fontSize                  = "12px";
-	oPanelElement.style.backgroundColor           = "#050708";
-	oPanelElement.style.fontFamily                = '"Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif';
-	oPanelElement.style.cursor                    = "default";
-	oPanelElement.style["-webkit-font-smoothing"] = "antialiased";
-
 	return this.m_oPanelControl;
 };
 CVisualTabs.prototype.AddTab = function(oTab, bMakeCurrent)
 {
 	this.m_arrTabs.push(oTab);
 	oTab.SetParent(this);
+
+	var oTabDiv = oTab.GetDiv();
+	this.m_oPanelElement.appendChild(oTabDiv);
+
+	if (true === bMakeCurrent)
+		this.m_oCurrentTab = oTab;
+};
+CVisualTabs.prototype.AddTab2 = function(oTab, bMakeCurrent)
+{
+	this.m_arrTabs.push(oTab);
+	oTab.SetParent(this);
+
 
 	if (true === bMakeCurrent)
 		this.m_oCurrentTab = oTab;
@@ -1098,7 +884,7 @@ CVisualTabs.prototype.OnClick = function(oTab)
 	{
 		if (this.m_arrTabs[nIndex] === oTab)
 		{
-			oNewTab = Tab;
+			oNewTab = oTab;
 			break;
 		}
 	}
@@ -1109,26 +895,79 @@ CVisualTabs.prototype.OnClick = function(oTab)
 	this.m_oCurrentTab = oNewTab;
 	return oCurTab;
 };
+CVisualTabs.prototype.OnClickClose = function(oTab)
+{
+	var nFindIndex = -1;
+	for (var nIndex = 0, nCount = this.m_arrTabs.length; nIndex < nCount; ++nIndex)
+	{
+		if (oTab === this.m_arrTabs[nIndex])
+		{
+			nFindIndex = nIndex;
+			break;
+		}
+	}
+
+	if (-1 === nFindIndex)
+		return;
+
+	this.m_arrTabs.splice(nFindIndex, 1);
+	if (this.m_arrTabs.length > 0)
+	{
+		this.m_arrTabs[0].OnClick();
+		return true;
+	}
+
+	return false;
+};
 CVisualTabs.prototype.UpdateSize = function()
 {
 	if (this.m_oCurrentTab)
 		this.m_oCurrentTab.UpdateSize();
 };
-
-function CVisualTab()
+CVisualTabs.prototype.GetCurrent = function()
 {
-	this.m_nId     = -1;
-	this.m_oTabDiv = null;
+	return this.m_oCurrentTab;
+};
+CVisualTabs.prototype.GetTab = function(nId)
+{
+	for (var nIndex = 0, nCount = this.m_arrTabs.length; nIndex < nCount; ++nIndex)
+	{
+		if (nId === this.m_arrTabs[nIndex].GetId())
+			return this.m_arrTabs[nIndex];
+	}
+
+	return null;
+};
+
+function CVisualGameRoomTabs()
+{
+	CVisualGameRoomTabs.superclass.constructor.call(this);
 }
-
-function CVisualGameRoomTab()
+CommonExtend(CVisualGameRoomTabs, CVisualTabs);
+CVisualGameRoomTabs.prototype.Init = function(sDivId)
 {
-	this.m_oParent  = null;
+	var oControl = CVisualGameRoomTabs.superclass.Init.call(this, sDivId);
 
+	var oPanelElement = this.m_oPanelElement;
+
+	oPanelElement.style.fontSize                  = "12px";
+	oPanelElement.style.backgroundColor           = "#050708";
+	oPanelElement.style.fontFamily                = '"Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif';
+	oPanelElement.style.cursor                    = "default";
+	oPanelElement.style["-webkit-font-smoothing"] = "antialiased";
+
+	return oControl;
+};
+
+
+function CVisualGameRoomTab(oApp)
+{
+	this.m_oApp     = oApp;
+	this.m_oParent  = null;
 	this.m_nId      = -1;
 	this.m_oTabDiv  = null; // Дивка самого таба
-	this.m_oMainDiv = null; // Дивка того, что мы показываем по нажатию на таб
 
+	this.m_oMainDiv  = null; // Дивка того, что мы показываем по нажатию на таб
 	this.m_oGameTree = null;
 }
 CVisualGameRoomTab.prototype.Init = function(nId, sMainDivId, sTabDivId, oGameTree)
@@ -1139,11 +978,15 @@ CVisualGameRoomTab.prototype.Init = function(nId, sMainDivId, sTabDivId, oGameTr
 	this.m_oGameTree = oGameTree ? oGameTree : null;
 
 	this.m_oTabDiv.addEventListener("selectstart", function(){return false;}, false);
-	this.m_oTabDiv.addEventListener("click", this.private_OnClick, false);
+	this.m_oTabDiv.addEventListener("click", this.OnClick, false);
 };
 CVisualGameRoomTab.prototype.GetId = function()
 {
 	return this.m_nId;
+};
+CVisualGameRoomTab.prototype.GetDiv = function()
+{
+	return this.m_oTabDiv;
 };
 CVisualGameRoomTab.prototype.SetParent = function(oParent)
 {
@@ -1154,12 +997,14 @@ CVisualGameRoomTab.prototype.UpdateSize = function()
 	if (this.m_oGameTree)
 		this.m_oGameTree.UpdateSize();
 };
-CVisualGameRoomTab.prototype.private_OnClick = function()
+CVisualGameRoomTab.prototype.OnClick = function()
 {
 	if (!this.m_oParent)
 		return;
 
 	var oOldTab = this.m_oParent.OnClick(this);
+	if (!oOldTab)
+		return;
 
 	if (oOldTab)
 	{
@@ -1175,6 +1020,233 @@ CVisualGameRoomTab.prototype.private_OnClick = function()
 		this.m_oGameTree.Update_Size();
 	}
 };
+
+function CVisualChatRoomTabs()
+{
+	CVisualChatRoomTabs.superclass.constructor.call(this);
+}
+CommonExtend(CVisualChatRoomTabs, CVisualTabs);
+
+function CVisualChatRoomTab(oApp)
+{
+	this.m_oApp    = oApp;
+	this.m_oParent = null;
+	this.m_nId     = -1;
+	this.m_oTabDiv = null;
+
+	this.m_nNewMessagesCount = 0;
+	this.m_oTextDiv          = null;
+	this.m_oCaptionDiv       = null;
+	this.m_oMessagesDiv      = null;
+}
+CVisualChatRoomTab.prototype.Init = function(nId, sRoomName)
+{
+	this.m_nId               = nId;
+	this.m_nNewMessagesCount = 0;
+	this.m_oTabDiv           = document.createElement("div");
+
+	var sHeight = "21px";
+
+	var DivTab = this.m_oTabDiv;
+	DivTab["aria-label"]            = sRoomName;
+	DivTab.title                    = sRoomName;
+	DivTab.style.transitionProperty = "width,height,background,margin,border,padding";
+	DivTab.style.transitionDuration = ".25s";
+	DivTab.style.float              = "left";
+	DivTab.style.height             = sHeight;
+	DivTab.style.margin             = "0px";
+	DivTab.style.padding            = "0px";
+	DivTab.style.color              = "#000";
+	DivTab.style.whiteSpace         = "nowrap";
+	DivTab.style.textOverflow       = "ellipsis";
+	DivTab.style.borderTop          = "3px solid #F3F3F3";
+	DivTab.style.borderRight        = "1px solid #BEBEBE";
+	DivTab.style.borderBottom       = "1px solid #BEBEBE";
+	DivTab.addEventListener("selectstart", function()
+	{
+		return false;
+	}, false);
+
+
+	var NewTab                             = document.createElement("button");
+	NewTab.tabIndex                        = "0";
+	NewTab.style.transitionProperty        = "all";
+	NewTab.style.transitionDuration        = ".25s";
+	NewTab.style.background                = "none";
+	NewTab.style.outline                   = "none";
+	NewTab.style.cursor                    = "pointer";
+	NewTab.style["-webkit-appearance"]     = "none";
+	NewTab.style["-webkit-border-radius"]  = "0";
+	NewTab.style.overflow                  = "visible";
+	NewTab.style.fontFamily                = '"Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif';
+	NewTab.style["-webkit-font-smoothing"] = "antialiased";
+	NewTab.style.padding                   = "0px";
+	NewTab.style.border                    = "1px solid transparent";
+	NewTab.style.boxSizing                 = "border-box";
+	NewTab.style.fontSize                  = "14px";
+	NewTab.style.lineHeight                = "20px";
+	NewTab.style.height                    = "100%";
+	NewTab.style.margin                    = "0px";
+	NewTab.style.padding                   = "0px 0px 0px 14px";
+	NewTab.style.maxWidth                  = "200px";
+	NewTab.style.overflow                  = "hidden";
+	NewTab.style.float                     = "left";
+	NewTab.addEventListener("selectstart", this.OnClick);
+
+	var NewTabDiv = document.createElement("div");
+	NewTabDiv.style.textAlign = "left";
+	var oCaptionDiv = document.createElement("div");
+	oCaptionDiv.innerHTML = sRoomName;
+	NewTabDiv.appendChild(oCaptionDiv);
+	NewTabDiv.addEventListener("selectstart", function()
+	{
+		return false;
+	}, false);
+	NewTab.appendChild(NewTabDiv);
+	DivTab.appendChild(NewTab);
+
+	var CloseButton = document.createElement("button");
+	CloseButton.tabIndex = "0";
+	CloseButton["aria-label"] = "Close " + sRoomName;
+	CloseButton.title         = "Close " + sRoomName;
+
+	CloseButton.style.fontFamily                = '"Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif';
+	CloseButton.style["-webkit-font-smoothing"] = "antialiased";
+	CloseButton.style.padding                   = "0px";
+	CloseButton.style.border                    = "1px solid transparent";
+	CloseButton.style.boxSizing                 = "border-box";
+	CloseButton.style["-moz-box-sizing"]        = "border-box";
+	CloseButton.style.background                = "none";
+	CloseButton.style.outline                   = "none";
+	CloseButton.style.cursor                    = "pointer";
+	CloseButton.style["-webkit-appearance"]     = "none";
+	CloseButton.style["-webkit-border-radius"]  = "0";
+	CloseButton.style.overflow                  = "visible";
+	CloseButton.style.color                     = "#000";
+	CloseButton.style.lineHeight                = "20px";
+	CloseButton.style.float                     = "left";
+	CloseButton.style.height                    = "100%";
+	CloseButton.style.width                     = "26px";
+	CloseButton.style.transitionProperty        = "color";
+	CloseButton.style.transitionDuration        = ".25s";
+
+
+	CloseButton.onmousedown = function()
+	{
+		CloseButton.style.color = "#008272";
+	};
+	CloseButton.onmouseout = function()
+	{
+		CloseButton.style.color = "#111";
+	};
+	CloseButton.onmouseover = function()
+	{
+		CloseButton.style.color = "#009983";
+	};
+
+
+	var CBCenter = document.createElement("center");
+	var CBCDiv   = document.createElement("div");
+	CBCDiv.style.fontSize   = "14px";
+	CBCDiv.style.lineHeight = "20px";
+	CBCDiv.style.width      = "14px";
+	CBCDiv.style.height     = "20px";
+	CBCDiv.style.position   = "relative";
+	var CBCDSpan = document.createElement("span");
+
+	CBCDSpan.style.position   = "absolute";
+	CBCDSpan.style.width      = "100%";
+	CBCDSpan.style.height     = "100%";
+	CBCDSpan.style.left       = "0px";
+	CBCDSpan.style.top        = "1px";
+	CBCDSpan.style.visibility = "hidden";
+
+	CBCDSpan.className += " " + "closeSpan";
+	CBCDiv.appendChild(CBCDSpan);
+
+	var NewMessagesSpan = document.createElement("span");
+
+	NewMessagesSpan.style.position   = "absolute";
+	NewMessagesSpan.style.width      = "100%";
+	NewMessagesSpan.style.height     = "100%";
+	NewMessagesSpan.style.left       = "0px";
+	NewMessagesSpan.style.top        = "1px";
+	NewMessagesSpan.style.fontSize   = "12px";
+	NewMessagesSpan.style.lineHeight = "18px";
+	NewMessagesSpan.style.color      = "#008272";
+	NewMessagesSpan.innerHTML        = "";
+	CBCDiv.appendChild(NewMessagesSpan);
+
+
+	CBCenter.appendChild(CBCDiv);
+	CloseButton.appendChild(CBCenter);
+	DivTab.appendChild(CloseButton);
+
+	CloseButton.onclick = this.OnClickClose;
+
+	DivTab.onmouseover = function()
+	{
+		CBCDSpan.style.visibility        = "visible";
+		NewMessagesSpan.style.visibility = "hidden";
+	};
+	DivTab.onmouseout = function()
+	{
+		CBCDSpan.style.visibility        = "hidden";
+		NewMessagesSpan.style.visibility = "visible";
+	};
+
+	this.m_oTabDiv     = DivTab;
+	this.m_oTextDiv    = NewTab;
+	this.m_oCaptionDiv = oCaptionDiv;
+	this.m_oMessagesDiv = NewMessagesSpan;
+};
+CVisualChatRoomTab.prototype.GetId = function()
+{
+	return this.m_nId;
+};
+CVisualChatRoomTab.prototype.GetDiv = function()
+{
+	return this.m_oTabDiv;
+};
+CVisualChatRoomTab.prototype.SetParent = function(oParent)
+{
+	this.m_oParent = oParent;
+};
+CVisualChatRoomTab.prototype.UpdateSize = function()
+{
+};
+CVisualChatRoomTab.prototype.OnClick = function()
+{
+	if (!this.m_oParent)
+		return;
+
+	var oOldTab = this.m_oParent.OnClick(this);
+	if (!oOldTab)
+		return;
+
+	if (oOldTab)
+	{
+		oOldTab.m_oTabDiv.style.borderBottom = "1px solid #BEBEBE";
+		oOldTab.m_oTabDiv.style.borderTop    = "3px solid #F3F3F3";
+	}
+
+	this.m_oTabDiv.style.borderBottom = "1px solid #F3F3F3";
+	this.m_oTabDiv.style.borderTop    = "3px solid rgb(0, 130, 114)";
+	this.m_nNewMessagesCount          = 0;
+	this.m_oMessagesDiv.innerHTML     = "";
+
+	this.m_oApp.SetCurrentChatRoom(this.m_nId);
+};
+CVisualChatRoomTab.prototype.OnClickClose = function()
+{
+	var oClient = this.m_oApp.GetClient();
+	if (oClient)
+		oClient.LeaveChatRoom(this.m_nId);
+
+	if (false === this.m_oParent.OnClickClose())
+		this.m_oApp.SetCurrentChatRoom(-1);
+};
+
 
 
 
