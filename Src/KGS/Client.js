@@ -642,7 +642,7 @@ CKGSClient.prototype.private_HandleGameUpdate = function(oMessage)
 };
 CKGSClient.prototype.private_HandleChat = function(oMessage)
 {
-	OnAddChatMessage(oMessage.channelId, oMessage.user.name, oMessage.text);
+	this.m_oApp.OnAddChatMessage(oMessage.channelId, oMessage.user.name, oMessage.text);
 };
 CKGSClient.prototype.private_HandleUserAdded = function(oMessage)
 {
