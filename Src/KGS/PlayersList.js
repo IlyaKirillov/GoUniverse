@@ -128,17 +128,17 @@ var g_oPlayersList =
 
     Handle_DoubleClick : function(Record)
     {
-        if (oClient)
+        if (oApp && oApp.GetClient())
         {
-            oClient.LoadUserInfo(Record.m_sName);
+            oApp.GetClient().LoadUserInfo(Record.m_sName);
         }
     },
 
     Handle_RightClick : function(Record)
     {
-        if (oClient)
+        if (oApp && oApp.GetClient())
         {
-            oClient.EnterPrivateChat(Record.m_sName);
+            oApp && oApp.GetClient().EnterPrivateChat(Record.m_sName);
         }
     }
 };

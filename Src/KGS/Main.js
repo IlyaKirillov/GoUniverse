@@ -8,16 +8,9 @@
 window.onload         = OnDocumentReady;
 window.onbeforeunload = OnDocumentClose;
 
-var oClient     = new CKGSClient();
+//var oClient     = new CKGSClient();
 
 var oBody = null;
-var PlayersListControl = null;
-var PlayersListView    = new CListView();
-PlayersListView.Set_BGColor(243, 243, 243);
-
-var GamesListControl   = null;
-var GamesListView      = new CListView();
-GamesListView.Set_BGColor(243, 243, 243);
 
 var PanelTabs = [];
 var CurrentTab = null;
@@ -25,29 +18,6 @@ var CurrentTab = null;
 var ChatTabs = [];
 var CurrentChatTab = null;
 
-function Connect()
-{
-    var sLogin    = document.getElementById("inputLoginId").value;
-    var sPassword = document.getElementById("inputPasswordId").value;
-    document.getElementById("inputPasswordId").value = "";
-    oClient.Connect(sLogin, sPassword, "en_US");
-
-    var oDiv = document.getElementById("divIdConnection");
-    $(oDiv).fadeOut(200);
-
-    var oDiv2 = document.getElementById("divIdConnectionError");
-    $(oDiv2).fadeOut(200);
-}
-
-function OnConnect()
-{
-    document.title = "KGS: " + oClient.GetUserName();
-    document.getElementById("divIdClientNameText").innerHTML = oClient.GetUserName();
-
-    var oDiv = document.getElementById("divMainId");
-    $(oDiv).fadeIn(200);
-    window.onresize();
-}
 
 function RemoveCreatePanel()
 {
@@ -73,269 +43,17 @@ function OpenCreatePanel()
     Panel.style.opacity = "1";
 }
 
+var oApp = null;
 function OnDocumentReady()
 {
-    document.title = "KGS: Login";
-    document.getElementById("inputLoginId").focus();
-    document.getElementById("inputLoginId").onkeypress    = function(e)
-    {
-        var event    = e || window.event;
-        var charCode = event.which || event.keyCode;
-        if (13 === charCode)
-        {
-            document.getElementById("inputPasswordId").focus();
-            return false;
-        }
-    };
-    document.getElementById("inputPasswordId").onkeypress = function(e)
-    {
-        var event    = e || window.event;
-        var charCode = event.which || event.keyCode;
-        if (13 === charCode)
-        {
-            Connect();
-            return false;
-        }
-    };
-    document.getElementById("connectDivId").onkeypress = function(e)
-    {
-        var event    = e || window.event;
-        var charCode = event.which || event.keyCode;
-        if (13 === charCode)
-        {
-            Connect();
-            return false;
-        }
-    };
-    document.getElementById("connectDivId").onmouseup    = Connect;
-    document.getElementById("divMainId").onclick         = CollapseCreatePanel;
-    document.getElementById("divIdCreateButton").onclick = function(e)
-    {
-        var Panel = document.getElementById("divIdCreatePanel");
-        if (1 == Panel.style.opacity)
-            CollapseCreatePanel();
-        else
-            OpenCreatePanel();
-
-        if (event && event.stopPropagation())
-            event.stopPropagation();
-    };
-
-    //------------------------------------------------------------------------------------------------------------------
-    // Exit button
-    //------------------------------------------------------------------------------------------------------------------
-    var oDivExtButtton         = document.getElementById("divIdExitButton");
-    oDivExtButtton.onclick     = function()
-    {
-        if (oClient)
-        {
-            oClient.Disconnect();
-            document.getElementById("divMainId").style.display       = "none";
-            document.getElementById("divIdConnection").style.display = "block";
-
-            GamesListView.Clear();
-            PlayersListView.Clear();
-        }
-    };
-    //------------------------------------------------------------------------------------------------------------------
-    // Расположим начальное окно с коннектом посередине
-    //------------------------------------------------------------------------------------------------------------------
-    var ConnectionDiv        = document.getElementById("divIdConnection");
-    ConnectionDiv.style.left = (document.body.clientWidth - 250) / 2 + "px";
-    ConnectionDiv.style.top  = (document.body.clientHeight - 100) / 2 + "px";
-    //------------------------------------------------------------------------------------------------------------------
-    function AddGreetingMessage()
-    {
-        var oDiv     = document.getElementById("textareaChatId");
-        var oTextDiv = document.createElement("div");
-
-        oTextDiv.style.textAlign   = "center";
-        var oTextSpan              = document.createElement("span");
-        oTextSpan.style.fontWeight = "bold";
-        oTextSpan.textContent      = "Welcome to Kiseido Go Server!";
-
-
-        oTextDiv.appendChild(oTextSpan);
-        oDiv.appendChild(oTextDiv);
-
-        oDiv.scrollTop = oDiv.scrollHeight;
-    }
-
-    AddGreetingMessage();
-
-    var MainDiv    = document.getElementById("divIdMainRoom");
-    var MainDivTab = document.getElementById("divIdMainRoomTab");
-
-    PanelTabs = [];
-    PanelTabs.push({Div : MainDiv, Id : -1, TabDiv : MainDivTab});
-    CurrentTab = PanelTabs[0];
-
-	MainDivTab.onclick = function()
-	{
-		OnPanelTabClick(MainDiv);
-	};
-	MainDivTab.onselectstart = function()
-	{
-	    return false;
-	};
-
-    window.onresize = function()
-    {
-        if ("none" !== document.getElementById("divIdConnection").style.display)
-        {
-            // Расположим начальное окно с коннектом посередине
-            var ConnectionDiv = document.getElementById("divIdConnection");
-            ConnectionDiv.style.left = (document.body.clientWidth - 250) / 2 + "px";
-            ConnectionDiv.style.top  = (document.body.clientHeight - 100) / 2 + "px";
-        }
-
-        if ("none" !== document.getElementById("divIdConnectionError").style.display)
-        {
-            var ErrorDiv = document.getElementById("divIdConnectionError");
-            ErrorDiv.style.left = (document.body.clientWidth - 250) / 2 + "px";
-            ErrorDiv.style.top  = (document.body.clientHeight - 100) / 2 + 150 + "px";
-        }
-
-        if (oBody)
-        {
-            var W = oBody.HtmlElement.clientWidth;
-            var H = oBody.HtmlElement.clientHeight;
-            oBody.Resize(W, H);
-            PlayersListView.Update();
-            PlayersListView.Update_Size();
-
-            GamesListView.Update();
-            GamesListView.Update_Size();
-
-            for (var Pos in PanelTabs)
-            {
-                var Tab = PanelTabs[Pos];
-                if (Tab.Div.style.display === "block" && Tab.GameTree)
-                    GoBoardApi.Update_Size(Tab.GameTree);
-            }
-        }
-    };
-
-    document.getElementById("inputChatId").onkeydown = SendChatMessage;
-
-
-    // Основная Div
-    oBody = CreateControlContainer("divMainId");
-    oBody.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, -1);
-    oBody.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
-
-    // Панель табов
-    var oTabPanelControl = CreateControlContainer("divIdTabPanel");
-    oTabPanelControl.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, 50);
-    oTabPanelControl.Anchor = (g_anchor_top |g_anchor_left | g_anchor_right);
-    oBody.AddControl(oTabPanelControl);
-
-    var TabPanelDiv = oTabPanelControl.HtmlElement;
-    TabPanelDiv.style.fontSize        = "12px";
-    TabPanelDiv.style.backgroundColor = "#050708";
-    TabPanelDiv.style.fontFamily      = '"Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif';
-    TabPanelDiv.style.cursor          = "default";
-    TabPanelDiv.style["-webkit-font-smoothing"] = "antialiased";
-
-    // Основная комната
-    var oMainRoomControl = CreateControlContainer("divIdMainRoom");
-    oMainRoomControl.Bounds.SetParams(0, 50, 1000, 1000, false, true, false, false, -1, -1);
-    oMainRoomControl.Anchor = (g_anchor_bottom |g_anchor_left | g_anchor_right);
-    oBody.AddControl(oMainRoomControl);
-
-    // Список игроков
-    PlayersListControl = PlayersListView.Init("divPlayersListId", g_oPlayersList);
-    var oPlayersListDiv = PlayersListControl;
-    oPlayersListDiv.Bounds.SetParams(0, 0, 0, 1000, false, false, true, false, 200, -1);
-    oPlayersListDiv.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right);
-    oPlayersListDiv.HtmlElement.style.background = "#F3F3F3";
-    oMainRoomControl.AddControl(oPlayersListDiv);
-
-    // Левая часть
-    var oLeftPartControl = CreateControlContainer("divIdL");
-    oLeftPartControl.Bounds.SetParams(0, 0, 200, 1000, false, false, true, false, -1, -1);
-    oLeftPartControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
-    oMainRoomControl.AddControl(oLeftPartControl);
-
-    // Часть под чат
-    var oChatControl = CreateControlContainer("divIdLChat");
-    oChatControl.Bounds.SetParams(0, 500, 1000, 1000, false, false, false, false, -1, -1);
-    oChatControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
-    oLeftPartControl.AddControl(oChatControl);
-
-    // Табы чата
-    var oChatTabsBack = CreateControlContainer("divIdLChatTabsBack");
-    oChatTabsBack.Bounds.SetParams(0, 0, 2, 0, true, true, true, false, -1, 24);
-    oChatTabsBack.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left);
-    oChatControl.AddControl(oChatTabsBack);
-
-    var oChatTabs = CreateControlContainer("divIdLChatTabs");
-    oChatTabs.Bounds.SetParams(0, 0, 31, 0, true, true, true, false, -1, 25);
-    oChatTabs.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left);
-    oChatControl.AddControl(oChatTabs);
-
-	var oChatAddElement = document.getElementById("divIdLChatAdd");
-	var oChatAddControl = CreateControlContainer("divIdLChatAdd");
-	oChatAddControl.Bounds.SetParams(0, 0, 1, 0, false, true, true, false, 30, 24);
-	oChatAddControl.Anchor = (g_anchor_top | g_anchor_right);
-	oChatControl.AddControl(oChatAddControl);
-
-	oChatAddElement.title           = "Add a channel";
-	oChatAddElement.style.fontSize  = "24px";
-	oChatAddElement.style.textAlign = "center";
-	oChatAddElement.onselectstart   = function()
-	{
-		return false;
-	};
-	oChatAddElement.onclick         = function()
-	{
-		OpenRoomList();
-	};
-
-
-
-    // Все сообщения
-    var oChatTextAreaControl = CreateControlContainer("divIdLChatTextArea");
-    oChatTextAreaControl.Bounds.SetParams(0, 25, 2, 52, true, true, true, true, -1, -1);
-    oChatTextAreaControl.Anchor = (g_anchor_bottom | g_anchor_right | g_anchor_left);
-    oChatControl.AddControl(oChatTextAreaControl);
-
-    // Место для набора
-    var oChatInputControl = CreateControlContainer("divIdLChatInput");
-    oChatInputControl.Bounds.SetParams(0, 0, 2, 1, true, false, true, true, -1, 50);
-    oChatInputControl.Anchor = (g_anchor_bottom | g_anchor_right | g_anchor_left);
-    oChatControl.AddControl(oChatInputControl);
-
-    // Список игровых комнат
-    var oGamesListWrapperControl = CreateControlContainer("divIdLGamesWrapper");
-    oGamesListWrapperControl.Bounds.SetParams(0, 0, 1000, 500, false, false, false, false, -1, -1);
-    oGamesListWrapperControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
-    oLeftPartControl.AddControl(oGamesListWrapperControl);
-
-    GamesListControl = GamesListView.Init("divIdLGames", g_oGamesList);
-    GamesListControl.Bounds.SetParams(0, 0, 2, 1, true, false, true, true, -1, -1);
-    GamesListControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
-    GamesListControl.HtmlElement.style.background = "#F3F3F3";
-    oGamesListWrapperControl.AddControl(GamesListControl);
-
-    document.getElementById("divMainId").style.display            = "none";
-    document.getElementById("divIdConnection").style.display      = "block";
-
-    window.onresize();
-    document.getElementById("divIdConnectionError").style.display = "none";
-
-    // // TEST
-    // OnConnect();
-    // OpenRoomList();
-    //----------------------
+	oApp = new CGoUniverseApplication();
+	oApp.Init();
 }
 
 function OnDocumentClose()
 {
-    if (!oClient)
-        return;
-
-    oClient.Disconnect();
+	if (oApp)
+		oApp.Close();
 }
 
 function EnterGameRoom(GameRoomId)
@@ -477,52 +195,6 @@ function SplitTextToLines(sText)
     }
 
     return aLines;
-}
-
-function OnLogout(sText)
-{
-    if (sText)
-    {
-        document.getElementById("divIdConnectionError").style.display = "block";
-        document.getElementById("divIdConnectionErrorText").innerHTML = sText;
-    }
-
-    document.getElementById("divMainId").style.display       = "none";
-    document.getElementById("divIdConnection").style.display = "block";
-    document.getElementById("inputPasswordId").focus();
-
-    GamesListView.Clear();
-    PlayersListView.Clear();
-
-    // Очищаем табы
-
-    // for (var Pos in PanelTabs)
-    // {
-    //     var Tab = PanelTabs[Pos];
-    //     try
-    //     {
-    //         document.getElementById("divMainId").removeChild(Tab.Div);
-    //         document.getElementById("divIdTabPanel").removeChild(Tab.TabDiv);
-    //     }
-    //     catch (e)
-    //     {}
-    //     PanelTabs.splice(Pos, 1);
-    // }
-	//
-    // for (var Pos in ChatTabs)
-    // {
-		// var Tab = ChatTabs[Pos];
-		// try
-		// {
-		// 	document.getElementById("divIdLChatTabs").removeChild(Tab.TabDiv);
-		// }
-		// catch (e)
-		// {}
-		// ChatTabs.splice(Pos, 1);
-    // }
-
-
-    document.title = "KGS: Login";
 }
 
 function SendChatMessage(e)
@@ -1056,167 +728,59 @@ function GetTabByRoomId(RoomId)
     return null;
 }
 
-function OpenRoomList()
+function CGoUniverseApplication()
 {
-    CreateKGSWindow(EKGSWindowType.RoomList, {Client : oClient});
-}
-
-function CApplicationClient()
-{
-	this.m_oClientDiv          = null; // Основная дивка страницы с клиентом
 	this.m_oClientControl      = null;
 
-	this.m_oPlayersListControl = null;
+	this.m_oMainRoomControl    = null;
+
 	this.m_oPlayersListView    = new CListView();
 	this.m_oPlayersListView.Set_BGColor(243, 243, 243);
 
-	this.m_oGamesListControl   = null;
 	this.m_oGamesListView      = new CListView();
 	this.m_oGamesListView.Set_BGColor(243, 243, 243);
 
 	this.m_oClient             = null;
 
+	this.m_oGameRoomTabs       = new CVisualTabs();
+
 }
-CApplicationClient.prototype.Init = function()
+CGoUniverseApplication.prototype.Init = function()
 {
 	this.private_InitLoginPage();
-	this.private_InitExitButton();
-
-	var MainDiv    = document.getElementById("divIdMainRoom");
-	var MainDivTab = document.getElementById("divIdMainRoomTab");
-
-	PanelTabs = [];
-	PanelTabs.push({Div : MainDiv, Id : -1, TabDiv : MainDivTab});
-	CurrentTab = PanelTabs[0];
-
-	MainDivTab.onclick = function()
-	{
-		OnPanelTabClick(MainDiv);
-	};
-	MainDivTab.onselectstart = function()
-	{
-		return false;
-	};
-
-	document.getElementById("inputChatId").onkeydown = SendChatMessage;
-
-
-	// Основная Div
-	oBody = CreateControlContainer("divMainId");
-	oBody.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, -1);
-	oBody.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
-
-	// Панель табов
-	var oTabPanelControl = CreateControlContainer("divIdTabPanel");
-	oTabPanelControl.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, 50);
-	oTabPanelControl.Anchor = (g_anchor_top |g_anchor_left | g_anchor_right);
-	oBody.AddControl(oTabPanelControl);
-
-	var TabPanelDiv = oTabPanelControl.HtmlElement;
-	TabPanelDiv.style.fontSize        = "12px";
-	TabPanelDiv.style.backgroundColor = "#050708";
-	TabPanelDiv.style.fontFamily      = '"Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif';
-	TabPanelDiv.style.cursor          = "default";
-	TabPanelDiv.style["-webkit-font-smoothing"] = "antialiased";
-
-	// Основная комната
-	var oMainRoomControl = CreateControlContainer("divIdMainRoom");
-	oMainRoomControl.Bounds.SetParams(0, 50, 1000, 1000, false, true, false, false, -1, -1);
-	oMainRoomControl.Anchor = (g_anchor_bottom |g_anchor_left | g_anchor_right);
-	oBody.AddControl(oMainRoomControl);
-
-	// Список игроков
-	PlayersListControl = PlayersListView.Init("divPlayersListId", g_oPlayersList);
-	var oPlayersListDiv = PlayersListControl;
-	oPlayersListDiv.Bounds.SetParams(0, 0, 0, 1000, false, false, true, false, 200, -1);
-	oPlayersListDiv.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right);
-	oPlayersListDiv.HtmlElement.style.background = "#F3F3F3";
-	oMainRoomControl.AddControl(oPlayersListDiv);
-
-	// Левая часть
-	var oLeftPartControl = CreateControlContainer("divIdL");
-	oLeftPartControl.Bounds.SetParams(0, 0, 200, 1000, false, false, true, false, -1, -1);
-	oLeftPartControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
-	oMainRoomControl.AddControl(oLeftPartControl);
-
-	// Часть под чат
-	var oChatControl = CreateControlContainer("divIdLChat");
-	oChatControl.Bounds.SetParams(0, 500, 1000, 1000, false, false, false, false, -1, -1);
-	oChatControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
-	oLeftPartControl.AddControl(oChatControl);
-
-	// Табы чата
-	var oChatTabsBack = CreateControlContainer("divIdLChatTabsBack");
-	oChatTabsBack.Bounds.SetParams(0, 0, 2, 0, true, true, true, false, -1, 24);
-	oChatTabsBack.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left);
-	oChatControl.AddControl(oChatTabsBack);
-
-	var oChatTabs = CreateControlContainer("divIdLChatTabs");
-	oChatTabs.Bounds.SetParams(0, 0, 31, 0, true, true, true, false, -1, 25);
-	oChatTabs.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left);
-	oChatControl.AddControl(oChatTabs);
-
-	var oChatAddElement = document.getElementById("divIdLChatAdd");
-	var oChatAddControl = CreateControlContainer("divIdLChatAdd");
-	oChatAddControl.Bounds.SetParams(0, 0, 1, 0, false, true, true, false, 30, 24);
-	oChatAddControl.Anchor = (g_anchor_top | g_anchor_right);
-	oChatControl.AddControl(oChatAddControl);
-
-	oChatAddElement.title           = "Add a channel";
-	oChatAddElement.style.fontSize  = "24px";
-	oChatAddElement.style.textAlign = "center";
-	oChatAddElement.onselectstart   = function()
-	{
-		return false;
-	};
-	oChatAddElement.onclick         = function()
-	{
-		OpenRoomList();
-	};
-
-
-
-	// Все сообщения
-	var oChatTextAreaControl = CreateControlContainer("divIdLChatTextArea");
-	oChatTextAreaControl.Bounds.SetParams(0, 25, 2, 52, true, true, true, true, -1, -1);
-	oChatTextAreaControl.Anchor = (g_anchor_bottom | g_anchor_right | g_anchor_left);
-	oChatControl.AddControl(oChatTextAreaControl);
-
-	// Место для набора
-	var oChatInputControl = CreateControlContainer("divIdLChatInput");
-	oChatInputControl.Bounds.SetParams(0, 0, 2, 1, true, false, true, true, -1, 50);
-	oChatInputControl.Anchor = (g_anchor_bottom | g_anchor_right | g_anchor_left);
-	oChatControl.AddControl(oChatInputControl);
-
-	// Список игровых комнат
-	var oGamesListWrapperControl = CreateControlContainer("divIdLGamesWrapper");
-	oGamesListWrapperControl.Bounds.SetParams(0, 0, 1000, 500, false, false, false, false, -1, -1);
-	oGamesListWrapperControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
-	oLeftPartControl.AddControl(oGamesListWrapperControl);
-
-	GamesListControl = GamesListView.Init("divIdLGames", g_oGamesList);
-	GamesListControl.Bounds.SetParams(0, 0, 2, 1, true, false, true, true, -1, -1);
-	GamesListControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
-	GamesListControl.HtmlElement.style.background = "#F3F3F3";
-	oGamesListWrapperControl.AddControl(GamesListControl);
-
-	document.getElementById("divMainId").style.display            = "none";
-	document.getElementById("divIdConnection").style.display      = "block";
-
-	window.onresize();
-	document.getElementById("divIdConnectionError").style.display = "none";
-
-	// // TEST
-	// OnConnect();
-	// OpenRoomList();
-	//----------------------
+	this.private_InitClientPage();
+	this.private_GotoLoginPage(false);
+	this.OnResize();
 };
-CApplicationClient.prototype.ConnectToKGS = function()
+CGoUniverseApplication.prototype.Close = function()
 {
 	if (!this.m_oClient)
-		this.m_oClient = new CKGSClient();
+		return;
+
+	this.m_oClient.Disconnect();
 };
-CApplicationClient.prototype.OnResize = function()
+CGoUniverseApplication.prototype.ConnectToKGS = function()
+{
+	if (!this.m_oClient)
+		this.m_oClient = new CKGSClient(this);
+
+	var sLogin    = document.getElementById("inputLoginId").value;
+	var sPassword = document.getElementById("inputPasswordId").value;
+	document.getElementById("inputPasswordId").value = "";
+	this.m_oClient.Connect(sLogin, sPassword, "en_US");
+
+	$(document.getElementById("divIdConnection")).fadeOut(200);
+	$(document.getElementById("divIdConnectionError")).fadeOut(200);
+};
+CGoUniverseApplication.prototype.OnConnect = function()
+{
+	document.title = "KGS: " + this.m_oClient.GetUserName();
+	document.getElementById("divIdClientNameText").innerHTML = this.m_oClient.GetUserName();
+
+	$(document.getElementById("divMainId")).fadeIn(200);
+	this.OnResize();
+};
+CGoUniverseApplication.prototype.OnResize = function()
 {
 	if ("none" !== document.getElementById("divIdConnection").style.display)
 	{
@@ -1234,9 +798,9 @@ CApplicationClient.prototype.OnResize = function()
 
 	if (this.m_oClientControl)
 	{
-		var W = m_oClientControl.HtmlElement.clientWidth;
-		var H = m_oClientControl.HtmlElement.clientHeight;
-		m_oClientControl.Resize(W, H);
+		var W = this.m_oClientControl.HtmlElement.clientWidth;
+		var H = this.m_oClientControl.HtmlElement.clientHeight;
+		this.m_oClientControl.Resize(W, H);
 
 		this.m_oPlayersListView.Update();
 		this.m_oPlayersListView.Update_Size();
@@ -1244,16 +808,47 @@ CApplicationClient.prototype.OnResize = function()
 		this.m_oGamesListView.Update();
 		this.m_oGamesListView.Update_Size();
 
-		// for (var Pos in PanelTabs)
-		// {
-		// 	var Tab = PanelTabs[Pos];
-		// 	if (Tab.Div.style.display === "block" && Tab.GameTree)
-		// 		GoBoardApi.Update_Size(Tab.GameTree);
-		// }
+		this.m_oGameRoomTabs.UpdateSize();
 	}
 
 };
-CApplicationClient.prototype.private_InitLoginPage = function()
+CGoUniverseApplication.prototype.OpenRoomList = function()
+{
+	CreateKGSWindow(EKGSWindowType.RoomList, {Client : this.m_oClient});
+};
+CGoUniverseApplication.prototype.SendChatMessage = function()
+{
+
+};
+CGoUniverseApplication.prototype.Logout = function(sText)
+{
+	this.private_ClearClient();
+
+	if (sText)
+	{
+		document.getElementById("divIdConnectionError").style.display = "block";
+		document.getElementById("divIdConnectionErrorText").innerHTML = sText;
+	}
+
+	document.getElementById("divMainId").style.display       = "none";
+	document.getElementById("divIdConnection").style.display = "block";
+	document.getElementById("inputPasswordId").focus();
+
+	document.title = "KGS: Login";
+};
+CGoUniverseApplication.prototype.GetClient = function()
+{
+	return this.m_oClient;
+};
+CGoUniverseApplication.prototype.GetPlayersListView = function()
+{
+	return this.m_oPlayersListView;
+};
+CGoUniverseApplication.prototype.GetGamesListView = function()
+{
+	return this.m_oGamesListView;
+};
+CGoUniverseApplication.prototype.private_InitLoginPage = function()
 {
 	var oThis = this;
 
@@ -1304,7 +899,124 @@ CApplicationClient.prototype.private_InitLoginPage = function()
 	// 		event.stopPropagation();
 	// };
 };
-CApplicationClient.prototype.private_InitExitButton = function()
+CGoUniverseApplication.prototype.private_InitClientPage = function()
+{
+	// Растягиваем клиент на все окно, все остальные элементы будут лежать внутри данного класса
+	this.m_oClientControl = CreateControlContainer("divMainId");
+	this.m_oClientControl.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, -1);
+	this.m_oClientControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
+
+	this.private_InitExitButton();
+	this.private_InitGameTabs();
+	this.private_InitMainRoom();
+};
+CGoUniverseApplication.prototype.private_InitGameTabs = function()
+{
+	// Добавляем таб "MAIN ROOM"
+	var oMainRoomTab = new CVisualGameRoomTab();
+	oMainRoomTab.Init(-1, "divIdMainRoom", "divIdMainRoomTab");
+	this.m_oGameRoomTabs.AddTab(oMainRoomTab, true);
+
+	var oTabsControl = this.m_oGameRoomTabs.Init("divIdTabPanel");
+	oTabsControl.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, 50);
+	oTabsControl.Anchor = (g_anchor_top |g_anchor_left | g_anchor_right);
+	this.m_oClientControl.AddControl(oTabsControl);
+};
+CGoUniverseApplication.prototype.private_InitMainRoom = function()
+{
+	this.m_oMainRoomControl = CreateControlContainer("divIdMainRoom");
+	var oMainRoomControl = this.m_oMainRoomControl;
+	oMainRoomControl.Bounds.SetParams(0, 50, 1000, 1000, false, true, false, false, -1, -1);
+	oMainRoomControl.Anchor = (g_anchor_bottom |g_anchor_left | g_anchor_right);
+	this.m_oClientControl.AddControl(oMainRoomControl);
+
+	// Список игроков
+	var oPlayersListControl = this.m_oPlayersListView.Init("divPlayersListId", g_oPlayersList);
+	oPlayersListControl.Bounds.SetParams(0, 0, 0, 1000, false, false, true, false, 200, -1);
+	oPlayersListControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right);
+	oPlayersListControl.HtmlElement.style.background = "#F3F3F3";
+	oMainRoomControl.AddControl(oPlayersListControl);
+
+	// Левая часть
+	var oLeftPartControl = CreateControlContainer("divIdL");
+	oLeftPartControl.Bounds.SetParams(0, 0, 200, 1000, false, false, true, false, -1, -1);
+	oLeftPartControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
+	oMainRoomControl.AddControl(oLeftPartControl);
+
+	// Список игровых комнат
+	var oGamesListWrapperControl = CreateControlContainer("divIdLGamesWrapper");
+	oGamesListWrapperControl.Bounds.SetParams(0, 0, 1000, 500, false, false, false, false, -1, -1);
+	oGamesListWrapperControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
+	oLeftPartControl.AddControl(oGamesListWrapperControl);
+
+	var oGamesListControl = this.m_oGamesListView.Init("divIdLGames", g_oGamesList);
+	oGamesListControl.Bounds.SetParams(0, 0, 2, 1, true, false, true, true, -1, -1);
+	oGamesListControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
+	oGamesListControl.HtmlElement.style.background = "#F3F3F3";
+	oGamesListWrapperControl.AddControl(oGamesListControl);
+
+	// Часть под чат
+	var oChatControl = CreateControlContainer("divIdLChat");
+	oChatControl.Bounds.SetParams(0, 500, 1000, 1000, false, false, false, false, -1, -1);
+	oChatControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
+	oLeftPartControl.AddControl(oChatControl);
+	this.private_InitChats(oChatControl);
+};
+CGoUniverseApplication.prototype.private_InitChats = function(oChatControl)
+{
+	// Табы чата
+	var oChatTabsBack = CreateControlContainer("divIdLChatTabsBack");
+	oChatTabsBack.Bounds.SetParams(0, 0, 2, 0, true, true, true, false, -1, 24);
+	oChatTabsBack.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left);
+	oChatControl.AddControl(oChatTabsBack);
+
+	var oChatTabs = CreateControlContainer("divIdLChatTabs");
+	oChatTabs.Bounds.SetParams(0, 0, 31, 0, true, true, true, false, -1, 25);
+	oChatTabs.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left);
+	oChatControl.AddControl(oChatTabs);
+
+	// Кнопка добавления чата
+	var oChatAddControl = this.private_InitChannelAddButton("divIdLChatAdd");
+	oChatAddControl.Bounds.SetParams(0, 0, 1, 0, false, true, true, false, 30, 24);
+	oChatAddControl.Anchor = (g_anchor_top | g_anchor_right);
+	oChatControl.AddControl(oChatAddControl);
+
+	// Все сообщения
+	var oChatTextAreaControl = CreateControlContainer("divIdLChatTextArea");
+	oChatTextAreaControl.Bounds.SetParams(0, 25, 2, 52, true, true, true, true, -1, -1);
+	oChatTextAreaControl.Anchor = (g_anchor_bottom | g_anchor_right | g_anchor_left);
+	oChatControl.AddControl(oChatTextAreaControl);
+
+	// Место для набора
+	var oChatInputControl = CreateControlContainer("divIdLChatInput");
+	oChatInputControl.Bounds.SetParams(0, 0, 2, 1, true, false, true, true, -1, 50);
+	oChatInputControl.Anchor = (g_anchor_bottom | g_anchor_right | g_anchor_left);
+	oChatControl.AddControl(oChatInputControl);
+
+	document.getElementById("inputChatId").addEventListener("keydown", this.SendChatMessage);
+};
+CGoUniverseApplication.prototype.private_InitChannelAddButton = function(sDivId)
+{
+	var oThis = this;
+
+	var oElement = document.getElementById(sDivId);
+	var oControl = CreateControlContainer(sDivId);
+
+	oElement.title           = "Add a channel";
+	oElement.style.fontSize  = "24px";
+	oElement.style.textAlign = "center";
+	oElement.addEventListener("selectstart", function()
+	{
+		return false;
+	}, false);
+	oElement.addEventListener("click", function()
+	{
+		oThis.OpenRoomList();
+	});
+
+	return oControl;
+};
+CGoUniverseApplication.prototype.private_InitExitButton = function()
 {
 	var oThis = this;
 
@@ -1314,33 +1026,154 @@ CApplicationClient.prototype.private_InitExitButton = function()
 		if (oThis.m_oClient)
 		{
 			oThis.m_oClient.Disconnect();
-			oThis.private_ClearClient();
-			oThis.private_ReturnToMainMenu();
+			oThis.Logout();
 		}
 	});
 };
-CApplicationClient.prototype.private_ClearClient = function()
+CGoUniverseApplication.prototype.private_ClearClient = function()
 {
+	this.m_oClient = null;
+
 	this.m_oGamesListView.Clear();
 	this.m_oPlayersListView.Clear();
 };
-CApplicationClient.prototype.private_ReturnToMainMenu = function()
+CGoUniverseApplication.prototype.private_GotoLoginPage = function(bShowError)
 {
 	document.getElementById("divMainId").style.display       = "none";
 	document.getElementById("divIdConnection").style.display = "block";
+
+	if (true === bShowError)
+		document.getElementById("divIdConnectionError").style.display = "block";
+	else
+		document.getElementById("divIdConnectionError").style.display = "none";
+};
+CGoUniverseApplication.prototype.private_GotoClientPage = function()
+{
+	document.getElementById("divMainId").style.display            = "block";
+	$(document.getElementById("divIdConnection")).fadeOut(200);
+	$(document.getElementById("divIdConnectionError")).fadeOut(200);
 };
 
 function CVisualTabs()
 {
-	this.m_arrTabs = [];
+	this.m_arrTabs       = [];
+    this.m_oCurrentTab   = null;
+	this.m_oPanelElement = null; // Div, которая будет содержать все наши табы
+	this.m_oPanelControl = null;
 }
-CVisualTabs.prototype.AddTab = function()
+CVisualTabs.prototype.Init = function(sDivId, oPr)
 {
+	this.m_oPanelElement = document.getElementById(sDivId);
+	this.m_oPanelControl = CreateControlContainer(sDivId);
 
+
+	var oPanelElement = this.m_oPanelElement;
+
+	oPanelElement.style.fontSize                  = "12px";
+	oPanelElement.style.backgroundColor           = "#050708";
+	oPanelElement.style.fontFamily                = '"Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif';
+	oPanelElement.style.cursor                    = "default";
+	oPanelElement.style["-webkit-font-smoothing"] = "antialiased";
+
+	return this.m_oPanelControl;
+};
+CVisualTabs.prototype.AddTab = function(oTab, bMakeCurrent)
+{
+	this.m_arrTabs.push(oTab);
+	oTab.SetParent(this);
+
+	if (true === bMakeCurrent)
+		this.m_oCurrentTab = oTab;
 };
 CVisualTabs.prototype.RemoveTab = function()
 {
 
+};
+CVisualTabs.prototype.OnClick = function(oTab)
+{
+	var oCurTab = this.m_oCurrentTab;
+	var oNewTab = null;
+
+	for (var nIndex = 0, nCount = this.m_arrTabs.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.m_arrTabs[nIndex] === oTab)
+		{
+			oNewTab = Tab;
+			break;
+		}
+	}
+
+	if (!oNewTab || oNewTab === oCurTab)
+		return null;
+
+	this.m_oCurrentTab = oNewTab;
+	return oCurTab;
+};
+CVisualTabs.prototype.UpdateSize = function()
+{
+	if (this.m_oCurrentTab)
+		this.m_oCurrentTab.UpdateSize();
+};
+
+function CVisualTab()
+{
+	this.m_nId     = -1;
+	this.m_oTabDiv = null;
+}
+
+function CVisualGameRoomTab()
+{
+	this.m_oParent  = null;
+
+	this.m_nId      = -1;
+	this.m_oTabDiv  = null; // Дивка самого таба
+	this.m_oMainDiv = null; // Дивка того, что мы показываем по нажатию на таб
+
+	this.m_oGameTree = null;
+}
+CVisualGameRoomTab.prototype.Init = function(nId, sMainDivId, sTabDivId, oGameTree)
+{
+	this.m_nId       = nId;
+	this.m_oTabDiv   = document.getElementById(sMainDivId);
+	this.m_oMainDiv  = document.getElementById(sTabDivId);
+	this.m_oGameTree = oGameTree ? oGameTree : null;
+
+	this.m_oTabDiv.addEventListener("selectstart", function(){return false;}, false);
+	this.m_oTabDiv.addEventListener("click", this.private_OnClick, false);
+};
+CVisualGameRoomTab.prototype.GetId = function()
+{
+	return this.m_nId;
+};
+CVisualGameRoomTab.prototype.SetParent = function(oParent)
+{
+	this.m_oParent = oParent;
+};
+CVisualGameRoomTab.prototype.UpdateSize = function()
+{
+	if (this.m_oGameTree)
+		this.m_oGameTree.UpdateSize();
+};
+CVisualGameRoomTab.prototype.private_OnClick = function()
+{
+	if (!this.m_oParent)
+		return;
+
+	var oOldTab = this.m_oParent.OnClick(this);
+
+	if (oOldTab)
+	{
+		$(oOldTab.m_oMainDiv).fadeOut(500);
+		if (oOldTab.m_oGameTree)
+			oOldTab.m_oTabDiv.style.backgroundColor = "transparent";
+	}
+
+	$(this.m_oMainDiv).fadeIn(500);
+	if (this.m_oGameTree)
+	{
+		this.m_oTabDiv.style.backgroundColor = "#737373";
+		this.m_oGameTree.Update_Size();
+	}
 };
 
 
