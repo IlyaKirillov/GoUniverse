@@ -516,6 +516,11 @@ CGoUniverseApplication.prototype.private_ClearClient = function()
 
 	this.m_oGamesListView.Clear();
 	this.m_oPlayersListView.Clear();
+
+	this.m_oChatRoomTabs.Clear();
+	this.m_oGameRoomTabs.Clear();
+
+	this.private_ClearChat();
 };
 CGoUniverseApplication.prototype.private_GotoLoginPage = function(bShowError)
 {
@@ -533,6 +538,14 @@ CGoUniverseApplication.prototype.private_GotoClientPage = function()
 	$(document.getElementById("divIdConnection")).fadeOut(200);
 	$(document.getElementById("divIdConnectionError")).fadeOut(200);
 };
+CGoUniverseApplication.prototype.private_ClearChat = function()
+{
+	var oDiv = document.getElementById("textareaChatId");
+	while (oDiv.firstChild)
+	{
+		oDiv.removeChild(oDiv.firstChild);
+	}
+};
 
 function CVisualTabs()
 {
@@ -546,6 +559,15 @@ CVisualTabs.prototype.Init = function(sDivId)
 	this.m_oPanelElement = document.getElementById(sDivId);
 	this.m_oPanelControl = CreateControlContainer(sDivId);
 	return this.m_oPanelControl;
+};
+CVisualTabs.prototype.Clear = function()
+{
+	while (this.m_arrTabs.length > 0)
+	{
+		var oTab = this.m_arrTabs[0];
+		this.RemoveTab(oTab);
+		oTab.OnCloseTab();
+	}
 };
 CVisualTabs.prototype.AddTab = function(oTab, bMakeCurrent)
 {
@@ -684,6 +706,31 @@ CVisualGameRoomTabs.prototype.AddMainRoomTab = function(oTab, bMakeCurrent)
 
 	if (true === bMakeCurrent)
 		this.m_oCurrentTab = oTab;
+};
+CVisualGameRoomTabs.prototype.Clear = function()
+{
+	// Удаление здесь особенное, потому что таб Main мы не должны удалять
+
+	var oMainTab = null;
+	for (var nIndex = 0, nCount = this.m_arrTabs.length; nIndex < nCount; ++nIndex)
+	{
+		if (-1 === this.m_arrTabs[nIndex].GetId())
+		{
+			oMainTab = this.m_arrTabs[nIndex];
+			this.m_arrTabs.splice(nIndex, 1);
+			break;
+		}
+	}
+
+	if (!oMainTab)
+	{
+		console.log("GoUniverse Error: No main room tab on delete.");
+		return;
+	}
+
+	CVisualGameRoomTabs.superclass.Clear.call(this);
+
+	this.m_arrTabs.push(oMainTab);
 };
 
 
@@ -883,10 +930,14 @@ CVisualGameRoomTab.prototype.OnClickClose = function()
 	if (this.m_oGameTree && oClient)
 		oClient.LeaveGameRoom(this.GetId());
 
+	this.m_oParent.OnClickClose(this);
+
+	this.OnCloseTab();
+};
+CVisualGameRoomTab.prototype.OnCloseTab = function()
+{
 	if (this.m_oContainerDiv)
 		this.m_oContainerDiv.removeChild(this.m_oMainDiv);
-
-	this.m_oParent.OnClickClose(this);
 };
 
 function CVisualChatRoomTabs()
@@ -1123,6 +1174,9 @@ CVisualChatRoomTab.prototype.IncreaseMessagesCount = function()
 {
 	this.m_nNewMessagesCount++;
 	this.m_oMessagesDiv.innerHTML = "" +  Math.min(99, this.m_nNewMessagesCount);
+};
+CVisualChatRoomTab.prototype.OnCloseTab = function()
+{
 };
 
 
