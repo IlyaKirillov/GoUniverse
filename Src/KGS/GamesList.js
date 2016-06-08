@@ -274,7 +274,8 @@ var g_oGamesList =
 
     Handle_DoubleClick : function(Record)
     {
-        EnterGameRoom(Record.m_nGameId);
+        if (oApp)
+            oApp.SetCurrentGameRoomTab(Record.m_nGameId);
     }
 };
 

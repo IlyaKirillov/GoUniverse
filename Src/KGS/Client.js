@@ -578,16 +578,23 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 	sSGF += "BR[" + sBlackRank + "]";
 	sSGF += ")";
 
+	var oGameTree = new CGameTree();
+	oGameTree.Load_Sgf(sSGF);
+	oGameTree.Set_Black(sBlackName);
+	oGameTree.Set_White(sWhiteName);
+	oGameTree.Set_BlackRating(sBlackRank);
+	oGameTree.Set_WhiteRating(sWhiteRank);
+
+	this.m_oApp.AddGameRoom(GameRoomId, oGameTree);
+
+	// TODO: Сделать надпись для демонстраций по другому
 	if ("" === sBlackName && "" === sWhiteName && oMessage.gameSummary.players.owner)
-		EnterGameRoom2(GameRoomId, sSGF, null, "", "", oMessage.gameSummary.players.owner.name, "");
+	{
+	}
 	else
-		EnterGameRoom2(GameRoomId, sSGF, null, sBlackName, sBlackRank, sWhiteName, sWhiteRank);
+	{
+	}
 
-	var oTab = GetTabByRoomId(GameRoomId);
-	if (!oTab)
-		return;
-
-	var oGameTree = oTab.GameTree;
 	oGame.GameTree = oGameTree;
 
 	var oCurNode = this.private_ReadSgfEvents(oGame, oMessage.sgfEvents);

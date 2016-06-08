@@ -9,41 +9,6 @@ window.onload         = OnDocumentReady;
 window.onbeforeunload = OnDocumentClose;
 window.onresize       = OnDocumentResize;
 
-//var oClient     = new CKGSClient();
-
-var oBody = null;
-
-var PanelTabs = [];
-var CurrentTab = null;
-
-var ChatTabs = [];
-var CurrentChatTab = null;
-
-
-function RemoveCreatePanel()
-{
-    var Panel = document.getElementById("divIdCreatePanel");
-    $(Panel).fadeOut(0);
-}
-
-function CollapseCreatePanel()
-{
-    var Panel = document.getElementById("divIdCreatePanel");
-    Panel.style.top     = "30px";
-    Panel.style.opacity = "0";
-
-    Panel.addEventListener("transitionend", RemoveCreatePanel, false);
-}
-
-function OpenCreatePanel()
-{
-    var Panel = document.getElementById("divIdCreatePanel");
-    Panel.removeEventListener("transitionend", RemoveCreatePanel);
-    $(Panel).fadeIn(0);
-    Panel.style.top     = "50px";
-    Panel.style.opacity = "1";
-}
-
 var urlRegEx = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-]*)?\??(?:[\-\+=&;%@\.\w]*)#?(?:[\.\!\/\\\w]*))?)/g;
 function SplitTextToLines(sText)
 {
@@ -90,297 +55,6 @@ function OnDocumentResize()
 		oApp.OnResize();
 }
 
-function EnterGameRoom(GameRoomId)
-{
-    // Проверим, находимся ли мы уже в данной комнате
-    for (var TabPos in PanelTabs)
-    {
-        if (PanelTabs[TabPos].Id === GameRoomId)
-        {
-            OnPanelTabClick(PanelTabs[TabPos].Div);
-            return;
-        }
-    }
-
-    if (!oClient)
-        return;
-
-    oClient.EnterToGameRoom(GameRoomId);
-}
-
-function LeaveGameRoom(GameRoomId)
-{
-    if (!oClient)
-        return;
-
-    oClient.LeaveGameRoom(GameRoomId);
-}
-
-function EnterGameRoom2(GameRoomId, SGF, ManagerId, sBlackName, sBlackRank, sWhiteName, sWhiteRank)
-{
-    var DivId = "divMainId" + GameRoomId;
-
-    var GameRoom = {};
-    GameRoom.Id = GameRoomId;
-
-    var GameRoomDiv = document.createElement("div");
-    GameRoomDiv.style.position = "absolute";
-    GameRoomDiv.id  = DivId;
-    GameRoom.Div = GameRoomDiv;
-
-    var MainDiv = document.getElementById("divMainId");
-    MainDiv.appendChild(GameRoomDiv);
-
-    var GameRoomControl = CreateControlContainer(DivId);
-    GameRoomControl.Bounds.SetParams(0, 50, 1000, 1000, false, true, false, false, -1, -1);
-    GameRoomControl.Anchor = (g_anchor_bottom |g_anchor_left | g_anchor_right);
-    oBody.AddControl(GameRoomControl);
-
-    var BoardDiv = document.createElement("div");
-    BoardDiv.id = DivId + "B";
-    GameRoomDiv.appendChild(BoardDiv);
-
-    var GameRoomBoardControl = CreateControlContainer(DivId + "B");
-    GameRoomBoardControl.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, -1);
-    GameRoomBoardControl.Anchor = (g_anchor_top | g_anchor_bottom |g_anchor_left | g_anchor_right);
-    GameRoomControl.AddControl(GameRoomBoardControl);
-
-    var oGameTree = GoBoardApi.Create_GameTree();
-    GoBoardApi.Create_BoardCommentsButtonsNavigator(oGameTree, DivId + "B");
-    if (SGF)
-        GoBoardApi.Load_Sgf(oGameTree, SGF);
-
-    GoBoardApi.Update_Size(oGameTree);
-    GameRoom.GameTree = oGameTree;
-
-    GameRoom.ManagerId  = ManagerId;
-
-    window.onresize();
-
-    PanelTabs.push(GameRoom);
-
-    var TabPanel = document.getElementById("divIdTabPanelRooms");
-
-    var DivTab = document.createElement("div");
-    DivTab.style.transitionProperty = "width,height,background,margin,border,padding";
-    DivTab.style.transitionDuration = ".25s";
-
-    DivTab.style.float              = "left";
-    DivTab.style.height             = "100%";
-    DivTab.style.margin             = "0px";
-    DivTab.style.padding            = "0px";
-
-    var NewTab =  document.createElement("button");
-    NewTab.tabIndex = "0";
-
-
-    NewTab.style.background                = "none";
-    NewTab.style.outline                   = "none";
-    NewTab.style.cursor                    = "pointer";
-    NewTab.style["-webkit-appearance"]     = "none";
-    NewTab.style["-webkit-border-radius"]  = "0";
-    NewTab.style.overflow                  = "visible";
-    NewTab.style.fontFamily                = '"Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif';
-    NewTab.style["-webkit-font-smoothing"] = "antialiased";
-    NewTab.style.padding                   = "0px";
-    NewTab.style.border                    = "1px solid transparent";
-    NewTab.style.boxSizing                 = "border-box";
-
-    NewTab.style.fontSize           = "14px";
-    NewTab.style.height             = "100%";
-    NewTab.style.margin             = "0px";
-    NewTab.style.padding            = "0px 0px 0px 14px";
-    NewTab.style.color              = "#fff";
-    NewTab.style.maxWidth           = "100px";
-    NewTab.style.overflow           = "hidden";
-
-    NewTab.style.float              = "left";
-
-
-
-    var NewTabDiv = document.createElement("div");
-    NewTabDiv.style.textAlign = "left";
-    var oDiv = document.createElement("div");
-    oDiv.innerHTML = String.fromCharCode(0x2460) + "&nbsp;" + sWhiteName;
-    NewTabDiv.appendChild(oDiv);
-
-    oDiv = document.createElement("div");
-    oDiv.innerHTML = String.fromCharCode(0x2776) + "&nbsp;" + sBlackName;
-    NewTabDiv.appendChild(oDiv);
-
-    NewTabDiv.onselectstart = function(){return false;};
-    NewTab.appendChild(NewTabDiv);
-
-    DivTab.onmouseover = function()
-    {
-        DivTab.style.backgroundColor = "#505050";
-    };
-    DivTab.onmouseout = function()
-    {
-        if (CurrentTab.TabDiv !== DivTab)
-            DivTab.style.backgroundColor = "transparent";
-        else
-            DivTab.style.backgroundColor = "#737373";
-    };
-
-    NewTab.onclick = function()
-    {
-        OnPanelTabClick(GameRoomDiv);
-    };
-    NewTab.onmousedown = function()
-    {
-        DivTab.style.backgroundColor = "#969696";
-    };
-
-    DivTab.appendChild(NewTab)
-
-    var CloseButton = document.createElement("button");
-    CloseButton.tabIndex = "0";
-    CloseButton["aria-label"] = "Close room " + GameRoomId;
-    CloseButton.title         = "Close room " + GameRoomId;
-
-    CloseButton.style.fontFamily                = '"Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif';
-    CloseButton.style["-webkit-font-smoothing"] = "antialiased";
-    CloseButton.style.padding                   = "0px";
-    CloseButton.style.border                    = "1px solid transparent";
-    CloseButton.style.boxSizing                 = "border-box";
-    CloseButton.style["-moz-box-sizing"]        = "border-box";
-    CloseButton.style.background                = "none";
-    CloseButton.style.outline                   = "none";
-    CloseButton.style.cursor                    = "pointer";
-    CloseButton.style["-webkit-appearance"]     = "none";
-    CloseButton.style["-webkit-border-radius"]  = "0";
-    CloseButton.style.overflow                  = "visible";
-    CloseButton.style.color                     = "#fff";
-
-    CloseButton.style.float    = "left";
-    CloseButton.style.height   = "100%";
-    CloseButton.style.width    = "40px";
-
-    CloseButton.style.transitionProperty = "color";
-    CloseButton.style.transitionDuration = ".25s";
-
-
-    CloseButton.onmousedown = function()
-    {
-        CloseButton.style.color = "#008272";
-    };
-    CloseButton.onmouseout = function()
-    {
-        CloseButton.style.color = "#fff";
-    };
-    CloseButton.onmouseover = function()
-    {
-        CloseButton.style.color = "#009983";
-    };
-
-
-    var CBCenter = document.createElement("center");
-    var CBCDiv   = document.createElement("div");
-    CBCDiv.style.fontSize   = "12px";
-    CBCDiv.style.lineHeight = "16px";
-    CBCDiv.style.width      = "12px";
-    CBCDiv.style.height     = "16px";
-    CBCDiv.style.position   = "relative";
-    var CBCDSpan = document.createElement("span");
-
-    CBCDSpan.style.position = "absolute";
-    CBCDSpan.style.width    = "100%";
-    CBCDSpan.style.height   = "100%";
-    CBCDSpan.style.left     = "0px";
-    CBCDSpan.style.top      = "2px";
-
-    CBCDSpan.className += " " + "closeSpan";
-
-    CBCDiv.appendChild(CBCDSpan);
-    CBCenter.appendChild(CBCDiv);
-    CloseButton.appendChild(CBCenter);
-    DivTab.appendChild(CloseButton);
-
-    CloseButton.onclick = function()
-    {
-        LeaveGameRoom(GameRoomId);
-        OnRemoveTab(GameRoomDiv);
-        TabPanel.removeChild(DivTab);
-    };
-
-    TabPanel.appendChild(DivTab);
-    GameRoom.TabDiv = DivTab;
-
-    OnPanelTabClick(GameRoomDiv);
-}
-
-function OnPanelTabClick(Div)
-{
-    var CurTab = CurrentTab;
-    var NewTab = null;
-
-    for (var Pos in PanelTabs)
-    {
-        var Tab = PanelTabs[Pos];
-        if (Div !== Tab.Div)
-        {
-        }
-        else
-        {
-            NewTab = Tab;
-            break;
-        }
-    }
-
-    if (!NewTab || NewTab === CurTab)
-        return;
-
-    $(CurTab.Div).fadeOut(500);
-    $(NewTab.Div).fadeIn(500);
-
-    if (CurTab.GameTree)
-    {
-        CurTab.TabDiv.style.backgroundColor = "transparent";
-    }
-
-    if (NewTab.GameTree)
-    {
-        NewTab.TabDiv.style.backgroundColor = "#737373";
-    }
-    CurrentTab = NewTab;
-
-    if (NewTab.GameTree)
-        GoBoardApi.Update_Size(NewTab.GameTree);
-}
-
-function OnRemoveTab(Div)
-{
-    for (var Pos in PanelTabs)
-    {
-        var Tab = PanelTabs[Pos];
-        if (Div === Tab.Div)
-        {
-            try
-            {
-                document.getElementById("divMainId").removeChild(Tab.Div);
-                document.getElementById("divIdTabPanel").removeChild(Tab.TabDiv);
-            }
-            catch (e)
-            {}
-            PanelTabs.splice(Pos, 1);
-            OnPanelTabClick(PanelTabs[0].Div);
-            break;
-        }
-    }
-}
-
-function GetTabByRoomId(RoomId)
-{
-    for (var Pos = 0, Count = PanelTabs.length; Pos < Count; ++Pos)
-    {
-        if (PanelTabs[Pos].Id === RoomId)
-            return PanelTabs[Pos];
-    }
-
-    return null;
-}
-
 function CGoUniverseApplication()
 {
 	this.m_oClientControl      = null;
@@ -413,6 +87,11 @@ CGoUniverseApplication.prototype.Init = function()
 	// this.AddChatRoom(2, "Русская");
 	// this.AddChatRoom(3, "Тест");
 	// this.AddChatRoom(4, "Хахахах");
+	//
+	// this.AddGameRoom(1, new CGameTree());
+	// this.AddGameRoom(2, new CGameTree());
+	// this.AddGameRoom(3, new CGameTree());
+	// this.AddGameRoom(4, new CGameTree());
 	//
 	//
 	//
@@ -556,6 +235,8 @@ CGoUniverseApplication.prototype.SetCurrentChatRoomTab = function(nChatRoomId)
 	var oTab = this.m_oChatRoomTabs.GetTab(nChatRoomId);
 	if (oTab)
 		oTab.OnClick();
+	else if (this.m_oClient)
+		this.m_oClient.EnterChatRoom(nChatRoomId);
 };
 CGoUniverseApplication.prototype.AddRoomGreetingMessage = function(nChatRoomId, sGreetingMessage)
 {
@@ -614,7 +295,7 @@ CGoUniverseApplication.prototype.OnAddChatMessage = function(nChatRoomId, sUserN
 	oTextSpan.textContent      = sUserName + ": ";
 	oTextDiv.appendChild(oTextSpan);
 
-	sText = Text.replace(urlRegEx, "<a href='$1' target='_blank'>$1</a>");
+	sText = sText.replace(urlRegEx, "<a href='$1' target='_blank'>$1</a>");
 
 	oTextSpan                  = document.createElement("span");
 	oTextSpan.innerHTML        = sText;
@@ -635,6 +316,26 @@ CGoUniverseApplication.prototype.OnAddChatMessage = function(nChatRoomId, sUserN
 
 		oTextDiv.style.display = "none";
 	}
+};
+CGoUniverseApplication.prototype.AddGameRoom = function(nGameRoomId, oGameTree)
+{
+	var oTab = new CVisualGameRoomTab(this);
+	var oGameRoomControl = oTab.InitGameRoom(nGameRoomId, oGameTree, "divMainId");
+	this.m_oGameRoomTabs.AddTab(oTab, true);
+
+	oGameRoomControl.Bounds.SetParams(0, 50, 1000, 1000, false, true, false, false, -1, -1);
+	oGameRoomControl.Anchor = (g_anchor_bottom | g_anchor_left | g_anchor_right);
+	this.m_oClientControl.AddControl(oGameRoomControl);
+
+	this.OnResize();
+};
+CGoUniverseApplication.prototype.SetCurrentGameRoomTab = function(nGameRoomId)
+{
+	var oTab = this.m_oGameRoomTabs.GetTab(nGameRoomId);
+	if (oTab)
+		oTab.OnClick();
+	else if (this.m_oClient)
+		this.m_oClient.EnterToGameRoom(nGameRoomId);
 };
 CGoUniverseApplication.prototype.private_InitLoginPage = function()
 {
@@ -673,19 +374,6 @@ CGoUniverseApplication.prototype.private_InitLoginPage = function()
 		}
 	});
 	document.getElementById("connectDivId").addEventListener("mouseup", this.ConnectToKGS);
-
-	// document.getElementById("divMainId").onclick         = CollapseCreatePanel;
-	// document.getElementById("divIdCreateButton").onclick = function(e)
-	// {
-	// 	var Panel = document.getElementById("divIdCreatePanel");
-	// 	if (1 == Panel.style.opacity)
-	// 		CollapseCreatePanel();
-	// 	else
-	// 		OpenCreatePanel();
-	//
-	// 	if (event && event.stopPropagation())
-	// 		event.stopPropagation();
-	// };
 };
 CGoUniverseApplication.prototype.private_InitClientPage = function()
 {
@@ -700,14 +388,14 @@ CGoUniverseApplication.prototype.private_InitClientPage = function()
 };
 CGoUniverseApplication.prototype.private_InitGameTabs = function()
 {
-	var oTabsControl = this.m_oGameRoomTabs.Init("divIdTabPanel");
+	var oTabsControl = this.m_oGameRoomTabs.Init("divIdTabPanel", "divIdTabPanelRooms");
 	oTabsControl.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, 50);
 	oTabsControl.Anchor = (g_anchor_top |g_anchor_left | g_anchor_right);
 	this.m_oClientControl.AddControl(oTabsControl);
 
 	// Добавляем таб "MAIN ROOM"
 	var oMainRoomTab = new CVisualGameRoomTab(this);
-	oMainRoomTab.Init(-1, "divIdMainRoom", "divIdMainRoomTab");
+	oMainRoomTab.InitMainRoom(-1, "divIdMainRoom", "divIdMainRoomTab");
 	this.m_oGameRoomTabs.AddMainRoomTab(oMainRoomTab, true);
 };
 CGoUniverseApplication.prototype.private_InitMainRoom = function()
@@ -973,17 +661,19 @@ function CVisualGameRoomTabs()
 	CVisualGameRoomTabs.superclass.constructor.call(this);
 }
 CommonExtend(CVisualGameRoomTabs, CVisualTabs);
-CVisualGameRoomTabs.prototype.Init = function(sDivId)
+CVisualGameRoomTabs.prototype.Init = function(sDivId, sPanelDivId)
 {
 	var oControl = CVisualGameRoomTabs.superclass.Init.call(this, sDivId);
 
-	var oPanelElement = this.m_oPanelElement;
+	var oPanelElement = document.getElementById(sDivId);
 
 	oPanelElement.style.fontSize                  = "12px";
 	oPanelElement.style.backgroundColor           = "#050708";
 	oPanelElement.style.fontFamily                = '"Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif';
 	oPanelElement.style.cursor                    = "default";
 	oPanelElement.style["-webkit-font-smoothing"] = "antialiased";
+
+	this.m_oPanelElement = document.getElementById(sPanelDivId);
 
 	return oControl;
 };
@@ -1004,17 +694,18 @@ function CVisualGameRoomTab(oApp)
 	this.m_nId      = -1;
 	this.m_oTabDiv  = null; // Дивка самого таба
 
-	this.m_oMainDiv  = null; // Дивка того, что мы показываем по нажатию на таб
-	this.m_oGameTree = null;
+	this.m_oMainDiv      = null; // Дивка того, что мы показываем по нажатию на таб
+	this.m_oGameTree     = null;
+	this.m_oContainerDiv = null;
 }
-CVisualGameRoomTab.prototype.Init = function(nId, sMainDivId, sTabDivId, oGameTree)
+CVisualGameRoomTab.prototype.InitMainRoom = function(nId, sMainDivId, sTabDivId)
 {
 	var oThis = this;
 
 	this.m_nId       = nId;
-	this.m_oTabDiv   = document.getElementById(sMainDivId);
-	this.m_oMainDiv  = document.getElementById(sTabDivId);
-	this.m_oGameTree = oGameTree ? oGameTree : null;
+	this.m_oTabDiv   = document.getElementById(sTabDivId);
+	this.m_oMainDiv  = document.getElementById(sMainDivId);
+	this.m_oGameTree = null;
 
 	this.m_oTabDiv.addEventListener("selectstart", function()
 	{
@@ -1024,6 +715,130 @@ CVisualGameRoomTab.prototype.Init = function(nId, sMainDivId, sTabDivId, oGameTr
 	{
 		oThis.OnClick();
 	});
+};
+CVisualGameRoomTab.prototype.InitGameRoom = function(nId, oGameTree, sDivIdContainer)
+{
+	var oThis = this;
+
+	// Создаем дивку под комнату с доской
+	var sGameRoomDivId          = sDivIdContainer + nId;
+	var oGameRoomDiv            = document.createElement("div");
+	oGameRoomDiv.id             = sGameRoomDivId;
+	oGameRoomDiv.style.position = "absolute";
+
+	this.m_oContainerDiv = document.getElementById(sDivIdContainer);
+	this.m_oContainerDiv.appendChild(oGameRoomDiv);
+
+	var oBoardDiv = document.createElement("div");
+	oBoardDiv.id = sGameRoomDivId + "B";
+	oGameRoomDiv.appendChild(oBoardDiv);
+
+	var oGameRoomControl      = CreateControlContainer(sGameRoomDivId);
+	var oGameRoomBoardControl = CreateControlContainer(sGameRoomDivId + "B");
+	oGameRoomBoardControl.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, -1);
+	oGameRoomBoardControl.Anchor = (g_anchor_top | g_anchor_bottom |g_anchor_left | g_anchor_right);
+	oGameRoomControl.AddControl(oGameRoomBoardControl);
+
+	var oDrawing = new CDrawing(oGameTree);
+	oDrawing.Create_MixedFullTemplate(sGameRoomDivId + "B");
+	oDrawing.Update_Size(true);
+
+	// Создаем дивку под таб
+	var oDivTab                      = document.createElement("div");
+	oDivTab.style.transitionProperty = "width,height,background,margin,border,padding";
+	oDivTab.style.transitionDuration = ".25s";
+	oDivTab.style.float              = "left";
+	oDivTab.style.height             = "100%";
+	oDivTab.style.margin             = "0px";
+	oDivTab.style.padding            = "0px";
+
+	oDivTab.addEventListener("selectstart", function()
+	{
+		return false;
+	}, false);
+	oDivTab.addEventListener("mouseover", function()
+	{
+		oDivTab.style.backgroundColor = "#505050";
+	});
+	oDivTab.addEventListener("mouseout", function()
+	{
+		if (oThis.m_oParent && oThis.m_oParent.GetCurrent() !== oThis)
+			oDivTab.style.backgroundColor = "transparent";
+		else
+			oDivTab.style.backgroundColor = "#737373";
+	});
+
+	var oButton                             = document.createElement("button");
+	oButton.tabIndex                        = "0";
+	oButton.style.background                = "none";
+	oButton.style.outline                   = "none";
+	oButton.style.cursor                    = "pointer";
+	oButton.style["-webkit-appearance"]     = "none";
+	oButton.style["-webkit-border-radius"]  = "0";
+	oButton.style.overflow                  = "visible";
+	oButton.style.fontFamily                = '"Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif';
+	oButton.style["-webkit-font-smoothing"] = "antialiased";
+	oButton.style.padding                   = "0px";
+	oButton.style.border                    = "1px solid transparent";
+	oButton.style.boxSizing                 = "border-box";
+	oButton.style.fontSize                  = "14px";
+	oButton.style.height                    = "100%";
+	oButton.style.margin                    = "0px";
+	oButton.style.padding                   = "0px 0px 0px 14px";
+	oButton.style.color                     = "#fff";
+	oButton.style.maxWidth                  = "100px";
+	oButton.style.overflow                  = "hidden";
+	oButton.style.float                     = "left";
+	oButton.onclick = function()
+	{
+		oThis.OnClick();
+	};
+	oButton.onmousedown = function()
+	{
+		oDivTab.style.backgroundColor = "#969696";
+	};
+	oDivTab.appendChild(oButton);
+
+	// Заголовок в табе
+	var sWhiteName = oGameTree.Get_WhiteName();
+	var sBlackName = oGameTree.Get_BlackName();
+	var oCaptionDiv = document.createElement("div");
+	oCaptionDiv.style.textAlign = "left";
+	var oCaptionStringDiv = document.createElement("div");
+	oCaptionStringDiv.innerHTML = String.fromCharCode(0x2691) + "&nbsp;" + sWhiteName;
+	oCaptionDiv.appendChild(oCaptionStringDiv);
+	oCaptionStringDiv = document.createElement("div");
+	oCaptionStringDiv.innerHTML = String.fromCharCode(0x2690) + "&nbsp;" + sBlackName;
+	oCaptionDiv.appendChild(oCaptionStringDiv);
+	oButton.appendChild(oCaptionDiv);
+
+	// Кнопка для закрытия таба
+	var oCloseButton           = document.createElement("button");
+	oCloseButton.tabIndex      = "0";
+	oCloseButton["aria-label"] = "Close room";
+	oCloseButton.title         = "Close room";
+	oCloseButton.className += " " + "ButtonCloseGameRoom";
+	oCloseButton.addEventListener("click", function()
+	{
+		oThis.OnClickClose();
+	});
+	oDivTab.appendChild(oCloseButton);
+
+	// Добавим крестик к кнопке
+	var oCenter        = document.createElement("center");
+	var oCenterDiv     = document.createElement("div");
+	var oCenterDivSpan = document.createElement("span");
+	oCenterDivSpan.className += " " + "GameRoomCloseSpan";
+	oCenterDiv.appendChild(oCenterDivSpan);
+	oCenter.appendChild(oCenterDiv);
+	oCloseButton.appendChild(oCenter);
+
+	this.m_nId       = nId;
+	this.m_oGameTree = oGameTree;
+	this.m_oMainDiv  = oGameRoomDiv;
+	this.m_oTabDiv   = oDivTab;
+
+	return oGameRoomControl;
 };
 CVisualGameRoomTab.prototype.GetId = function()
 {
@@ -1040,7 +855,7 @@ CVisualGameRoomTab.prototype.SetParent = function(oParent)
 CVisualGameRoomTab.prototype.UpdateSize = function()
 {
 	if (this.m_oGameTree)
-		this.m_oGameTree.UpdateSize();
+		this.m_oGameTree.Update_Size();
 };
 CVisualGameRoomTab.prototype.OnClick = function()
 {
@@ -1061,6 +876,17 @@ CVisualGameRoomTab.prototype.OnClick = function()
 		this.m_oTabDiv.style.backgroundColor = "#737373";
 		this.m_oGameTree.Update_Size();
 	}
+};
+CVisualGameRoomTab.prototype.OnClickClose = function()
+{
+	var oClient = this.m_oApp.GetClient();
+	if (this.m_oGameTree && oClient)
+		oClient.LeaveGameRoom(this.GetId());
+
+	if (this.m_oContainerDiv)
+		this.m_oContainerDiv.removeChild(this.m_oMainDiv);
+
+	this.m_oParent.OnClickClose(this);
 };
 
 function CVisualChatRoomTabs()

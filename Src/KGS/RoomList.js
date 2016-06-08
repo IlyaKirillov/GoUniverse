@@ -106,10 +106,8 @@ var g_oKGSRoomList = {
 
 	Handle_DoubleClick : function(Record)
 	{
-		if (oApp && oApp.GetClient())
-		{
-			oApp && oApp.GetClient().EnterChatRoom(Record.m_nRoomId);
-		}
+		if (oApp)
+			oApp.SetCurrentChatRoomTab(Record.m_nRoomId);
 	}
 };
 
