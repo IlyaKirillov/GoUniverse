@@ -392,11 +392,8 @@ CKGSClient.prototype.private_HandleRoomJoin = function(oMessage)
 
 	this.m_oApp.AddChatRoom(oMessage.channelId, this.m_aAllRooms[oMessage.channelId].Name, false);
 
-	if (null === this.m_oApp.GetCurrentChatRoomTab())
-	{
-		this.m_nChatChannelId = oMessage.channelId;
-		this.m_oApp.SetCurrentChatRoomTab(oMessage.channelId);
-	}
+	this.m_nChatChannelId = oMessage.channelId;
+	this.m_oApp.SetCurrentChatRoomTab(oMessage.channelId);
 
 	var Games = oMessage.games;
 	if (Games && Games.length > 0)
@@ -586,6 +583,8 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 	oGameTree.Set_WhiteRating(sWhiteRank);
 
 	this.m_oApp.AddGameRoom(GameRoomId, oGameTree);
+	this.m_oApp.SetCurrentGameRoomTab(GameRoomId);
+
 
 	// TODO: Сделать надпись для демонстраций по другому
 	if ("" === sBlackName && "" === sWhiteName && oMessage.gameSummary.players.owner)
