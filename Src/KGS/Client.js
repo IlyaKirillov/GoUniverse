@@ -98,6 +98,9 @@ CKGSClient.prototype.SendChatMessage = function(sText)
 };
 CKGSClient.prototype.LoadUserInfo = function(sUserName)
 {
+	if (this.m_oUserInfo[sUserName])
+		return;
+
 	// TODO: Сделать обертку для КГС-клиента, и туда пихать все окна, а не в <body>
 	this.m_oUserInfo[sUserName] = {
 		Window         : CreateKGSWindow(EKGSWindowType.UserInfo, {UserName : sUserName, Client : this}),
@@ -720,13 +723,11 @@ CKGSClient.prototype.private_HandleDetailsJoin = function(oMessage)
 	}
 	else
 	{
-		if (-1 !== this.m_oUserInfo[sUserName].DetailsChannel)
-		{
-			this.private_SendMessage({
-				"type"      : "UNJOIN_REQUEST",
-				"channelId" : oMessage.channelId
-			});
-		}
+		// Окно закрыли до того, как пришла информация
+		this.private_SendMessage({
+			"type"      : "UNJOIN_REQUEST",
+			"channelId" : oMessage.channelId
+		});
 	}
 };
 CKGSClient.prototype.private_HandleUnjoin = function(oMessage)
@@ -800,13 +801,11 @@ CKGSClient.prototype.private_HandleArchiveJoin = function(oMessage)
 	}
 	else
 	{
-		if (-1 !== this.m_oUserInfo[sUserName].ArchiveChannel)
-		{
-			this.private_SendMessage({
-				"type"      : "UNJOIN_REQUEST",
-				"channelId" : oMessage.channelId
-			});
-		}
+		// Окно закрыли до того, как пришла информация
+		this.private_SendMessage({
+			"type"      : "UNJOIN_REQUEST",
+			"channelId" : oMessage.channelId
+		});
 	}
 };
 CKGSClient.prototype.private_HandleGameState = function(oMessage)

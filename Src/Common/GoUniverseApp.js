@@ -239,20 +239,50 @@ CGoUniverseApplication.prototype.AddConsoleMessage = function(sField, sText)
 };
 CGoUniverseApplication.prototype.OnAddChatMessage = function(nChatRoomId, sUserName, sText)
 {
+	var oThis = this;
+
 	var oDiv     = document.getElementById("textareaChatId");
 	var oTextDiv = document.createElement("div");
 
 	oTextDiv.chatRoomId = nChatRoomId;
 
+	var bMessageForMe = false;
+	var sCurUserName = (this.m_oClient ? this.m_oClient.GetUserName() : "");
+	if ("" !== sCurUserName && 0 === sText.indexOf(sCurUserName + ","))
+		bMessageForMe = true;
+
 	var oTextSpan              = document.createElement("span");
 	oTextSpan.style.fontWeight = "bold";
+	oTextSpan.style.cursor     = "pointer";
 	oTextSpan.textContent      = sUserName + ": ";
+	oTextSpan.addEventListener("click", function()
+	{
+		var oInputArea = document.getElementById("inputChatId");
+		oInputArea.value = sUserName + ", " + oInputArea.value;
+		oInputArea.focus();
+	});
+	oTextSpan.addEventListener("contextmenu", function(e)
+	{
+		var oClient = oThis.m_oClient;
+		if (oClient)
+		{
+			oClient.LoadUserInfo(sUserName);
+		}
+
+		e.preventDefault();
+		return false;
+	}, false);
 	oTextDiv.appendChild(oTextSpan);
+
+
 
 	sText = sText.replace(urlRegEx, "<a href='$1' target='_blank'>$1</a>");
 
 	oTextSpan                  = document.createElement("span");
 	oTextSpan.innerHTML        = sText;
+	if (true === bMessageForMe)
+		oTextSpan.style.fontStyle = "italic";
+
 	oTextDiv.appendChild(oTextSpan);
 
 	oDiv.appendChild(oTextDiv);
