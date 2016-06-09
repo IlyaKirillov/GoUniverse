@@ -33,7 +33,6 @@
     outline             : none;
     box-sizing          : border-box;
     color               : #FFFFFF;
-    font-weight         : bold;
     cursor              : pointer;
     transition-property : width, height, background, margin, border, padding;
     transition-duration : 0.25s;
@@ -143,8 +142,22 @@ html, body {
 	overflow-y : hidden;
 }
 
+#divIdGoUniverse {
+	user-select         : none;
+	-webkit-user-select : none;
+	-moz-user-select    : none;
+	-ms-user-select     : none;
+}
+
 .block_elem {
 	position : absolute;
 	padding  : 0;
 	margin   : 0;
+}
+
+div.Selectable {
+	user-select         : all;
+	-webkit-user-select : auto;
+	-moz-user-select    : all;
+	-ms-user-select     : all;
 }

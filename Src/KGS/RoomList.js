@@ -11,16 +11,18 @@
 
 var EKGSRoomListRecord = {
 	Name     : 1,
-	Category : 2
+	Category : 2,
+	Private  : 3
 };
 
 var g_oKGSRoomList = {
 
 	Headers : {
-		Sizes : [0, 245],
-		Count : 2,
+		Sizes : [0, 245, 365],
+		Count : 3,
 		1     : "Name",
-		2     : "Category"
+		2     : "Category",
+		3     : ""
 	},
 
 	SortType : EKGSRoomListRecord.Name,
@@ -66,6 +68,9 @@ var g_oKGSRoomList = {
 
 	Is_Sortable : function(nColNum)
 	{
+		if (2 === nColNum)
+			return false;
+
 		return true;
 	},
 
@@ -108,6 +113,11 @@ var g_oKGSRoomList = {
 	{
 		if (oApp)
 			oApp.SetCurrentChatRoomTab(Record.m_nRoomId);
+	},
+
+	Get_VerLines : function()
+	{
+		return [1, 2];
 	}
 };
 
@@ -116,15 +126,24 @@ function CKGSRoomListRecord()
 	this.m_nRoomId   = -1;
 	this.m_sName     = "";
 	this.m_sCategory = "";
+	this.m_bPrivate  = false;
 }
 
 CKGSRoomListRecord.prototype.Draw = function(oContext, dX, dY, eType)
 {
 	var sString = "";
-	switch(eType)
+	switch (eType)
 	{
-	case EKGSRoomListRecord.Name     : sString += this.m_sName; break;
-	case EKGSRoomListRecord.Category : sString += this.m_sCategory; break;
+		case EKGSRoomListRecord.Name:
+			sString += this.m_sName;
+			break;
+		case EKGSRoomListRecord.Category:
+			sString += this.m_sCategory;
+			break;
+		case EKGSRoomListRecord.Private:
+			if (this.m_bPrivate)
+				sString += "P";
+			break;
 	}
 
 	oContext.fillText(sString, dX, dY);
@@ -138,6 +157,7 @@ CKGSRoomListRecord.prototype.Update = function(aLine)
 	this.m_nRoomId   = aLine[1] | 0;
 	this.m_sName     = aLine[2];
 	this.m_sCategory = aLine[3];
+	this.m_bPrivate  = aLine[4];
 };
 CKGSRoomListRecord.prototype.Compare = function(nRoomId)
 {

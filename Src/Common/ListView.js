@@ -79,13 +79,16 @@ function CListView()
 
         this.HtmlElement.VerScroll = oVerScrollElement;
 
-        oMainElement.onmousemove  = this.private_OnMouseMove;
-        oMainElement.onmouseout   = this.private_OnMouseOut;
-        oMainElement.onmousedown  = this.private_OnMouseDown;
-        oMainElement.onmouseup    = this.private_OnMouseUp;
-        oMainElement["onmousewheel"] = this.private_OnMouseWheel;
         if (oMainElement.addEventListener)
+        {
+            oMainElement.addEventListener("mousemove", this.private_OnMouseMove, false);
+            oMainElement.addEventListener("mouseout", this.private_OnMouseOut, false);
+            oMainElement.addEventListener("mousedown", this.private_OnMouseDown, false);
+            oMainElement.addEventListener("mouseup", this.private_OnMouseUp, false);
+            oMainElement.addEventListener("mousewheel", this.private_OnMouseWheel, false);
             oMainElement.addEventListener("DOMMouseScroll", this.private_OnMouseWheel, false);
+            oMainElement.addEventListener("contextmenu", this.private_OnContextMenu, false);
+        }
 
         this.m_oListObject = oListObject;
         this.m_nColsCount  = oListObject.Headers.Count;
@@ -261,6 +264,12 @@ function CListView()
 
         oThis.private_UpdateMainContext();
         oThis.private_UpdateSelectionContext();
+    };
+
+    this.private_OnContextMenu = function(e)
+    {
+        e.preventDefault();
+        return false;
     };
 }
 CListView.prototype.Clear = function()
@@ -514,7 +523,7 @@ CListView.prototype.Start_ClipException = function(oContext, nStartColIndex, nEn
 	var dW = this.m_aX[nEndColIndex] - dX;
 
 	oContext.beginPath();
-	oContext.rect(dX, 0, dW, this.m_dYLimit);
+	oContext.rect(dX, this.m_aY[0], dW, this.m_dYLimit - this.m_aY[0]);
 	oContext.clip();
 };
 CListView.prototype.Restore_Clip = function(oContext, nColIndex)
@@ -597,7 +606,19 @@ CListView.prototype.private_DrawGrid = function(oContext)
     }
 
     oContext.putImageData(HorLine, this.m_aX[0], this.m_aY[0]);
-    oContext.putImageData(VerLine, this.m_aX[1], 0);
+
+    if (this.m_oListObject.Get_VerLines)
+    {
+        var oVerLines = this.m_oListObject.Get_VerLines();
+        for (var nIndex = 0, nCount = oVerLines.length; nIndex < nCount; ++nIndex)
+        {
+            oContext.putImageData(VerLine, this.m_aX[oVerLines[nIndex]], 0);
+        }
+    }
+    else
+    {
+        oContext.putImageData(VerLine, this.m_aX[1], 0);
+    }
 };
 
 CListView.prototype.private_UpdateCursorType = function(dX, dY)

@@ -26,7 +26,7 @@ CommonExtend(CKGSRoomListWindow, CKGSWindowBase);
 
 CKGSRoomListWindow.prototype.Init = function(sDivId, oPr)
 {
-	CKGSRoomListWindow.superclass.Init.call(this, sDivId);
+	CKGSRoomListWindow.superclass.Init.apply(this, arguments);
 
 	this.Set_Caption("Room list");
 
@@ -71,7 +71,7 @@ CKGSRoomListWindow.prototype.Show = function()
 		{
 			var oRoom = oRooms[nRoomId];
 			if (oRoom.Name && "" !== oRoom.Name)
-				this.m_oRoomListView.Handle_Record([0, oRoom.ChannelId, oRoom.Name, this.m_oClient.GetCategoryName(oRoom.Category)]);
+				this.m_oRoomListView.Handle_Record([0, oRoom.ChannelId, oRoom.Name, this.m_oClient.GetCategoryName(oRoom.Category), oRoom.Private]);
 		}
 
 	}
@@ -96,7 +96,7 @@ CKGSRoomListWindow.prototype.Update_Size = function(bForce)
 };
 CKGSRoomListWindow.prototype.Get_DefaultWindowSize = function()
 {
-	return {W : 385, H : 670};
+	return {W : 410, H : 670};
 };
 CKGSRoomListWindow.prototype.private_CreateFindInput = function(sInputId, oParentDiv, oParentControl)
 {
@@ -145,7 +145,7 @@ CKGSRoomListWindow.prototype.private_CreateFindInput = function(sInputId, oParen
 			{
 				var oRoom = oRooms[nRoomId];
 				if (oRoom.Name && "" !== oRoom.Name)
-					oRoomListView.Handle_Record([0, oRoom.ChannelId, oRoom.Name, oRoom.CategoryName]);
+					oRoomListView.Handle_Record([0, oRoom.ChannelId, oRoom.Name, oRoom.CategoryName, oRoom.Private]);
 			}
 		}
 		else
@@ -154,7 +154,7 @@ CKGSRoomListWindow.prototype.private_CreateFindInput = function(sInputId, oParen
 			{
 				var oRoom = oRooms[nRoomId];
 				if (oRoom.Name && "" !== oRoom.Name && -1 !== oRoom.Name.toLowerCase().indexOf(sValue.toLowerCase()))
-					oRoomListView.Handle_Record([0, oRoom.ChannelId, oRoom.Name, oRoom.CategoryName]);
+					oRoomListView.Handle_Record([0, oRoom.ChannelId, oRoom.Name, oRoom.CategoryName, oRoom.Private]);
 			}
 		}
 

@@ -101,9 +101,8 @@ CKGSClient.prototype.LoadUserInfo = function(sUserName)
 	if (this.m_oUserInfo[sUserName])
 		return;
 
-	// TODO: Сделать обертку для КГС-клиента, и туда пихать все окна, а не в <body>
 	this.m_oUserInfo[sUserName] = {
-		Window         : CreateKGSWindow(EKGSWindowType.UserInfo, {UserName : sUserName, Client : this}),
+		Window         : CreateKGSWindow(EKGSWindowType.UserInfo, {UserName : sUserName, Client : this, App: this.m_oApp}),
 		UserName       : sUserName,
 		DetailsChannel : -1,
 		ArchiveChannel : -1
@@ -251,7 +250,7 @@ CKGSClient.prototype.private_RecieveMessage = function()
 			{
 				console.log("Download failure: Status = " + req.status + ", response text = " + req.responseText);
 				oThis.m_bLoggedIn = false;
-				othis.m_oApp.Logout("Server is unavaliable. Try again later.");
+				oThis.m_oApp.Logout("Server is unavaliable. Try again later.");
 			}
 		}
 	};
@@ -790,6 +789,9 @@ CKGSClient.prototype.private_HandleConvoJoin = function(oMessage)
 	this.private_HandleUserRecord(oMessage.user, this.m_oPrivateChats[nChannelId]);
 
 	this.m_oApp.AddChatRoom(nChannelId, sUserName + "(P)", true);
+	this.m_nChatChannelId = nChannelId;
+	this.m_oApp.SetCurrentChatRoomTab(nChannelId);
+
 };
 CKGSClient.prototype.private_HandleArchiveJoin = function(oMessage)
 {

@@ -22,7 +22,7 @@ CommonExtend(CKGSUserInfoWindow, CKGSWindowBase);
 
 CKGSUserInfoWindow.prototype.Init = function(sDivId, oPr)
 {
-	CKGSUserInfoWindow.superclass.Init.call(this, sDivId);
+	CKGSUserInfoWindow.superclass.Init.apply(this, arguments);
 
 	if (oPr)
 	{
@@ -35,6 +35,7 @@ CKGSUserInfoWindow.prototype.Init = function(sDivId, oPr)
 	var oMainDiv     = this.HtmlElement.InnerDiv;
 	var oMainControl = this.HtmlElement.InnerControl;
 	oMainDiv.style.fontSize = "16px";
+	oMainDiv.className += " Selectable";
 
 	var sMainInfo  = sDivId + "M";
 	var sAvatar    = sDivId + "A";

@@ -11,8 +11,8 @@
 
 function CGoUniverseApplication()
 {
+	this.m_oMainDiv            = null;
 	this.m_oClientControl      = null;
-
 	this.m_oMainRoomControl    = null;
 
 	this.m_oPlayersListView    = new CListView();
@@ -28,6 +28,8 @@ function CGoUniverseApplication()
 }
 CGoUniverseApplication.prototype.Init = function()
 {
+	this.m_oMainDiv = document.getElementById("divIdGoUniverse");
+
 	this.private_InitLoginPage();
 	this.private_InitClientPage();
 	this.private_GotoLoginPage(false);
@@ -81,19 +83,13 @@ CGoUniverseApplication.prototype.OnConnect = function()
 };
 CGoUniverseApplication.prototype.OnResize = function()
 {
-	if ("none" !== document.getElementById("divIdConnection").style.display)
-	{
-		var ConnectionDiv = document.getElementById("divIdConnection");
-		ConnectionDiv.style.left = (document.body.clientWidth - 250) / 2 + "px";
-		ConnectionDiv.style.top  = (document.body.clientHeight - 100) / 2 + "px";
-	}
+	var ConnectionDiv        = document.getElementById("divIdConnection");
+	ConnectionDiv.style.left = (document.body.clientWidth - 250) / 2 + "px";
+	ConnectionDiv.style.top  = (document.body.clientHeight - 100) / 2 + "px";
 
-	if ("none" !== document.getElementById("divIdConnectionError").style.display)
-	{
-		var ErrorDiv = document.getElementById("divIdConnectionError");
-		ErrorDiv.style.left = (document.body.clientWidth - 250) / 2 + "px";
-		ErrorDiv.style.top  = (document.body.clientHeight - 100) / 2 + 150 + "px";
-	}
+	var ErrorDiv        = document.getElementById("divIdConnectionError");
+	ErrorDiv.style.left = (document.body.clientWidth - 250) / 2 + "px";
+	ErrorDiv.style.top  = (document.body.clientHeight - 100) / 2 + 150 + "px";
 
 	if (this.m_oClientControl)
 	{
@@ -113,7 +109,7 @@ CGoUniverseApplication.prototype.OnResize = function()
 };
 CGoUniverseApplication.prototype.OpenRoomList = function()
 {
-	CreateKGSWindow(EKGSWindowType.RoomList, {Client : this.m_oClient});
+	CreateKGSWindow(EKGSWindowType.RoomList, {Client : this.m_oClient, App : this});
 };
 CGoUniverseApplication.prototype.SendChatMessage = function(e)
 {
@@ -196,6 +192,7 @@ CGoUniverseApplication.prototype.AddRoomGreetingMessage = function(nChatRoomId, 
 {
 	var oTextDiv = this.AddConsoleMessage("", sGreetingMessage);
 	oTextDiv.chatRoomId = nChatRoomId;
+	oTextDiv.className += " Selectable";
 
 	if (nChatRoomId === this.m_oChatRoomTabs.GetCurrent().GetId())
 	{
@@ -244,6 +241,7 @@ CGoUniverseApplication.prototype.OnAddChatMessage = function(nChatRoomId, sUserN
 	var oDiv     = document.getElementById("textareaChatId");
 	var oTextDiv = document.createElement("div");
 
+	oTextDiv.className += " Selectable";
 	oTextDiv.chatRoomId = nChatRoomId;
 
 	var bMessageForMe = false;
@@ -290,7 +288,9 @@ CGoUniverseApplication.prototype.OnAddChatMessage = function(nChatRoomId, sUserN
 	if (nChatRoomId === this.m_oChatRoomTabs.GetCurrentId())
 	{
 		oTextDiv.style.display = "block";
-		oDiv.scrollTop = oDiv.scrollHeight;
+
+		if (Math.abs(oDiv.scrollHeight - oDiv.scrollTop - oDiv.clientHeight) < 50 || sUserName === sCurUserName)
+			oDiv.scrollTop = oDiv.scrollHeight;
 	}
 	else
 	{
@@ -320,6 +320,20 @@ CGoUniverseApplication.prototype.SetCurrentGameRoomTab = function(nGameRoomId)
 		oTab.OnClick();
 	else if (this.m_oClient)
 		this.m_oClient.EnterToGameRoom(nGameRoomId);
+};
+CGoUniverseApplication.prototype.GetWidth = function()
+{
+	if (this.m_oMainDiv)
+		return parseInt(this.m_oMainDiv.clientWidth);
+
+	return 0;
+};
+CGoUniverseApplication.prototype.GetHeight = function()
+{
+	if (this.m_oMainDiv)
+		return parseInt(this.m_oMainDiv.clientHeight);
+
+	return 0;
 };
 CGoUniverseApplication.prototype.private_InitLoginPage = function()
 {
@@ -357,7 +371,10 @@ CGoUniverseApplication.prototype.private_InitLoginPage = function()
 			return false;
 		}
 	});
-	document.getElementById("connectDivId").addEventListener("mouseup", this.ConnectToKGS);
+	document.getElementById("connectDivId").addEventListener("mouseup", function()
+	{
+		oThis.ConnectToKGS();
+	}, false);
 };
 CGoUniverseApplication.prototype.private_InitClientPage = function()
 {
@@ -505,6 +522,7 @@ CGoUniverseApplication.prototype.private_ClearClient = function()
 	this.m_oGameRoomTabs.Clear();
 
 	this.private_ClearChat();
+	this.private_CloseAllWindows();
 };
 CGoUniverseApplication.prototype.private_GotoLoginPage = function(bShowError)
 {
@@ -529,4 +547,8 @@ CGoUniverseApplication.prototype.private_ClearChat = function()
 	{
 		oDiv.removeChild(oDiv.firstChild);
 	}
+};
+CGoUniverseApplication.prototype.private_CloseAllWindows = function()
+{
+	RemoveAllWindows();
 };
