@@ -25,17 +25,18 @@ function CGoUniverseApplication()
 
 	this.m_oGameRoomTabs       = new CVisualGameRoomTabs();
 	this.m_oChatRoomTabs       = new CVisualChatRoomTabs();
+
+	this.m_arrInteractiveElements = [];
 }
 CGoUniverseApplication.prototype.Init = function()
 {
-	this.m_oMainDiv = document.getElementById("divIdGoUniverse");
-
+	this.private_InitMainDiv();
 	this.private_InitLoginPage();
 	this.private_InitClientPage();
 	this.private_GotoLoginPage(false);
 	this.OnResize();
 
-	// // TEST
+	// TEST
 	// this.m_oClient = new CKGSClient(this);
 	// this.OnConnect();
 	//
@@ -43,15 +44,15 @@ CGoUniverseApplication.prototype.Init = function()
 	// this.AddChatRoom(2, "Русская");
 	// this.AddChatRoom(3, "Тест");
 	// this.AddChatRoom(4, "Хахахах");
-	//
+
 	// this.AddGameRoom(1, new CGameTree());
 	// this.AddGameRoom(2, new CGameTree());
 	// this.AddGameRoom(3, new CGameTree());
 	// this.AddGameRoom(4, new CGameTree());
-	//
-	//
-	//
-	// //_____________
+
+
+
+	//_____________
 };
 CGoUniverseApplication.prototype.Close = function()
 {
@@ -335,6 +336,19 @@ CGoUniverseApplication.prototype.GetHeight = function()
 
 	return 0;
 };
+CGoUniverseApplication.prototype.GetMainDiv = function()
+{
+	return this.m_oMainDiv;
+};
+CGoUniverseApplication.prototype.private_InitMainDiv = function()
+{
+	var oThis = this;
+	this.m_oMainDiv = document.getElementById("divIdGoUniverse");
+	this.m_oMainDiv.addEventListener("click", function()
+	{
+		oThis.private_OnMainDivClick();
+	}, false);
+};
 CGoUniverseApplication.prototype.private_InitLoginPage = function()
 {
 	var oThis = this;
@@ -551,4 +565,8 @@ CGoUniverseApplication.prototype.private_ClearChat = function()
 CGoUniverseApplication.prototype.private_CloseAllWindows = function()
 {
 	RemoveAllWindows();
+};
+CGoUniverseApplication.prototype.private_CollapseInteractiveElements = function(bFast)
+{
+
 };

@@ -126,8 +126,12 @@ span.GameRoomCloseSpan:before {
 	content : '\274C';
 }
 
+/*.closeSpan:before {*/
+	/*content : '\274C';*/
+/*}*/
+
 .closeSpan:before {
-	content : '\274C';
+    content: 'V';
 }
 
 
@@ -161,3 +165,4 @@ div.Selectable {
 	-moz-user-select    : all;
 	-ms-user-select     : all;
 }
+
