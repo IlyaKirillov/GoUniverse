@@ -420,6 +420,7 @@ function CVisualChatRoomTab(oApp)
 	this.m_oCaptionDiv       = null;
 	this.m_oMessagesDiv      = null;
 
+	this.m_oPopup            = null;
 }
 CVisualChatRoomTab.prototype.Init = function(nId, sRoomName)
 {
@@ -569,12 +570,11 @@ CVisualChatRoomTab.prototype.Init = function(nId, sRoomName)
 	CloseButton.appendChild(CBCenter);
 	DivTab.appendChild(CloseButton);
 
-	this.private_InitMenu(sRoomName + nId);
+	this.private_CreatePopup();
 
 	CloseButton.addEventListener("click", function()
 	{
-		//oThis.OnClickClose();
-		oThis.private_TriggerContextMenu();
+		oThis.m_oPopup.Toggle();
 	});
 
 	DivTab.onmouseover = function()
@@ -644,94 +644,39 @@ CVisualChatRoomTab.prototype.IncreaseMessagesCount = function()
 CVisualChatRoomTab.prototype.OnCloseTab = function()
 {
 };
-CVisualChatRoomTab.prototype.private_InitMenu = function(sDivId)
+CVisualChatRoomTab.prototype.private_CreatePopup = function()
 {
-	var oMainDiv = this.m_oApp.GetMainDiv();
-
-	var oContextMenuElementWrapper              = document.createElement("div");
-	oContextMenuElementWrapper.id               = sDivId + "M";
-	oContextMenuElementWrapper.style.position   = "absolute";
-	oContextMenuElementWrapper.style.top        = "100px";
-	oContextMenuElementWrapper.style.left       = "100px";
-	oContextMenuElementWrapper.style.width      = "100px";
-	oContextMenuElementWrapper.style.height     = "30px";
-	oContextMenuElementWrapper.style.background = "rgb(243, 243, 243)";
-	oContextMenuElementWrapper.style.display    = "block";
-	oContextMenuElementWrapper.style.borderRight  = "1px solid rgb(190, 190, 190)";
-	oContextMenuElementWrapper.style.borderLeft   = "1px solid rgb(190, 190, 190)";
-	oContextMenuElementWrapper.style.borderBottom = "1px solid rgb(190, 190, 190)";
-	//oContextMenuElementWrapper.style.boxShadow  = "0px 3px 3px rgba(0,0,0,0.5)";
-	oContextMenuElementWrapper.style.overflowY  = "hidden";
-	oMainDiv.appendChild(oContextMenuElementWrapper);
-
-	oContextMenuElementWrapper.style.transitionProperty = "height";
-	oContextMenuElementWrapper.style.transitionDuration = "0.2s";
-	oContextMenuElementWrapper.style.transitionDelay    = "0s";
-	oContextMenuElementWrapper.style.display            = "none";
-
-	this.m_oContextMenuElement = oContextMenuElementWrapper;
-	this.m_nShowId             = null;
-	this.m_nTransitionId       = null;
+	this.m_oPopup = new CVisualPopup(this.m_oApp, this);
+	this.m_oPopup.Create();
 };
-
-CVisualChatRoomTab.prototype.private_TriggerContextMenu = function()
+CVisualChatRoomTab.prototype.StylizePopup = function(oPopup)
 {
-	if ("none" === this.m_oContextMenuElement.style.display)
-	{
-		if (null === this.m_nShowId)
-		{
-			// Рассчитаем положение контекстного меню
-			var oPos = Common_FindPosition(this.m_oTabDiv);
-			this.m_oContextMenuElement.style.left = (oPos.X - 1) + "px";
-			this.m_oContextMenuElement.style.top = (oPos.Y + 24) + "px";
-			this.m_oContextMenuElement.style.width = this.m_oTabDiv.clientWidth;
+	var oHtmlElement = oPopup.GetHtmlElement();
 
-
-			var oThis = this;
-			this.m_nShowId = setTimeout(function ()
-			{
-				if (null !== oThis.m_nTransitionId)
-				{
-					clearTimeout(oThis.m_nTransitionId);
-					oThis.m_nTransitionId = null;
-				}
-
-				oThis.m_oContextMenuElement.style.display = "block";
-				oThis.m_oContextMenuElement.style.height  = "0px";
-
-				oThis.m_nTransitionId = setTimeout(function ()
-				{
-					oThis.m_oContextMenuElement.style.height = "30px";
-					oThis.m_nTransitionId = null;
-					oThis.m_nShowId       = null;
-				}, 20);
-			}, 20);
-		}
-	}
-	else
-	{
-		this.private_HideContextMenu();
-	}
+	oHtmlElement.style.background         = "rgb(243, 243, 243)";
+	oHtmlElement.style.borderRight        = "1px solid rgb(190, 190, 190)";
+	oHtmlElement.style.borderLeft         = "1px solid rgb(190, 190, 190)";
+	oHtmlElement.style.borderBottom       = "1px solid rgb(190, 190, 190)";
+	//oHtmlElement.style.boxShadow  = "0px 3px 3px rgba(0,0,0,0.5)";
+	oHtmlElement.style.transitionProperty = "height";
+	oHtmlElement.style.transitionDuration = "0.2s";
+	oHtmlElement.style.transitionDelay    = "0s";
 };
-CVisualChatRoomTab.prototype.private_HideContextMenu = function(bFast)
+CVisualChatRoomTab.prototype.OnHidePopup = function(oPopup)
 {
-	if ("none" !== this.m_oContextMenuElement.style.display)
-	{
-		if (true === bFast)
-		{
-			this.m_oContextMenuElement.style.height  = "0px";
-			this.m_oContextMenuElement.style.display = "none";
-		}
-		else
-		{
-
-			this.m_oContextMenuElement.style.height = "0px";
-			var oThis                               = this;
-			this.m_nTransitionId                    = setTimeout(function()
-			{
-				oThis.m_oContextMenuElement.style.display = "none";
-				oThis.m_nTransitionId                     = null;
-			}, 200);
-		}
-	}
+	var oHtmlElement = oPopup.GetHtmlElement();
+	oHtmlElement.style.height = "0px";
+};
+CVisualChatRoomTab.prototype.OnShowPopup = function(oPopup)
+{
+	var oHtmlElement = oPopup.GetHtmlElement();
+	oHtmlElement.style.height = "30px";
+};
+CVisualChatRoomTab.prototype.UpdatePopupPosition = function(oPopup)
+{
+	var oPos = Common_FindPosition(this.m_oTabDiv);
+	var oHtmlElement = oPopup.GetHtmlElement();
+	oHtmlElement.style.left = (oPos.X - 1) + "px";
+	oHtmlElement.style.top = (oPos.Y + 24) + "px";
+	oHtmlElement.style.width = this.m_oTabDiv.clientWidth;
 };

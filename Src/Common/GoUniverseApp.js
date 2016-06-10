@@ -26,7 +26,7 @@ function CGoUniverseApplication()
 	this.m_oGameRoomTabs       = new CVisualGameRoomTabs();
 	this.m_oChatRoomTabs       = new CVisualChatRoomTabs();
 
-	this.m_arrInteractiveElements = [];
+	this.m_arrPopups           = [];
 }
 CGoUniverseApplication.prototype.Init = function()
 {
@@ -340,13 +340,28 @@ CGoUniverseApplication.prototype.GetMainDiv = function()
 {
 	return this.m_oMainDiv;
 };
+CGoUniverseApplication.prototype.RegisterPopup = function(oPopup)
+{
+	this.m_arrPopups.push(oPopup);
+};
+CGoUniverseApplication.prototype.UnregisterPopup = function(oPopup)
+{
+	for (var nIndex = 0, nCount = this.m_arrPopups.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.m_arrPopups[nIndex] === oPopup)
+		{
+			this.m_arrPopups.splice(nIndex, 1);
+			break;
+		}
+	}
+};
 CGoUniverseApplication.prototype.private_InitMainDiv = function()
 {
 	var oThis = this;
 	this.m_oMainDiv = document.getElementById("divIdGoUniverse");
 	this.m_oMainDiv.addEventListener("click", function()
 	{
-		oThis.private_OnMainDivClick();
+		oThis.private_CollapsePopups();
 	}, false);
 };
 CGoUniverseApplication.prototype.private_InitLoginPage = function()
@@ -537,6 +552,7 @@ CGoUniverseApplication.prototype.private_ClearClient = function()
 
 	this.private_ClearChat();
 	this.private_CloseAllWindows();
+	this.private_RemoveAllPopups();
 };
 CGoUniverseApplication.prototype.private_GotoLoginPage = function(bShowError)
 {
@@ -566,7 +582,17 @@ CGoUniverseApplication.prototype.private_CloseAllWindows = function()
 {
 	RemoveAllWindows();
 };
-CGoUniverseApplication.prototype.private_CollapseInteractiveElements = function(bFast)
+CGoUniverseApplication.prototype.private_CollapsePopups = function(bFast)
 {
-
+	for (var nIndex = 0, nCount = this.m_arrPopups.length; nIndex < nCount; ++nIndex)
+	{
+		this.m_arrPopups[nIndex].Hide(bFast);
+	}
+};
+CGoUniverseApplication.prototype.private_RemoveAllPopups = function()
+{
+	while (this.m_arrPopups.length > 0)
+	{
+		this.m_arrPopups[0].Destroy();
+	}
 };
