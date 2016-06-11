@@ -126,15 +126,6 @@ span.GameRoomCloseSpan:before {
 	content : '\274C';
 }
 
-/*.closeSpan:before {*/
-	/*content : '\274C';*/
-/*}*/
-
-.closeSpan:before {
-    content: '\3009';
-}
-
-
 html, body {
 	height : 100%;
 }
@@ -164,5 +155,68 @@ div.Selectable {
 	-webkit-user-select : auto;
 	-moz-user-select    : all;
 	-ms-user-select     : all;
+}
+
+.ChatMenuButton {
+	font-family            : "Segoe UI", Helvetica, Tahoma, Geneva, Verdana, sans-serif;
+	-webkit-font-smoothing : antialiased;
+	padding                : 0px;
+	border                 : 1px solid transparent;
+	box-sizing             : border-box;
+	-moz-box-sizing        : border-box;
+	background             : none;
+	outline                : none;
+	cursor                 : pointer;
+	-webkit-appearance     : none;
+	-webkit-border-radius : 0;
+	overflow              : visible;
+	color                 : #111111;
+	line-height           : 20px;
+	float                 : left;
+	height                : 100%;
+	width                 : 26px;
+	transition-property   : color;
+	transition-duration   : .25s;
+}
+
+.ChatMenuButton:active {
+	color : #008272;
+}
+
+.ChatMenuButton:hover {
+	color : #009983;
+}
+
+.ChatMenuButton center div {
+	font-size   : 14px;
+	line-height : 20px;
+	width       : 14px;
+	height      : 20px;
+	position    : relative;
+}
+
+.ChatMenuButton center div span {
+	position : absolute;
+	width    : 100%;
+	height   : 100%;
+	left     : 0px;
+	top      : 1px;
+}
+
+.ChatMenuSpan:before {
+	content: '\3009';
+}
+
+.ChatMenuSpanClose:before {
+	/*content : '\274C';*/
+	content : '\2715';
+}
+
+.ChatMenuSpanInfo:before {
+	content : '\003f';
+}
+
+.ChatMenuSpanSound:before {
+	content : '\260E';
 }
 

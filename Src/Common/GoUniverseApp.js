@@ -37,13 +37,13 @@ CGoUniverseApplication.prototype.Init = function()
 	this.OnResize();
 
 	// TEST
-	// this.m_oClient = new CKGSClient(this);
-	// this.OnConnect();
-	//
-	// this.AddChatRoom(1, "English");
-	// this.AddChatRoom(2, "Русская");
-	// this.AddChatRoom(3, "Тест");
-	// this.AddChatRoom(4, "Хахахах");
+	this.m_oClient = new CKGSClient(this);
+	this.OnConnect();
+
+	this.AddChatRoom(1, "English");
+	this.AddChatRoom(2, "Русская");
+	this.AddChatRoom(3, "Тест");
+	this.AddChatRoom(4, "Хахахах");
 
 	// this.AddGameRoom(1, new CGameTree());
 	// this.AddGameRoom(2, new CGameTree());
