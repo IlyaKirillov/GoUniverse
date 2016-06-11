@@ -363,6 +363,11 @@ CGoUniverseApplication.prototype.private_InitMainDiv = function()
 	{
 		oThis.private_CollapsePopups();
 	}, false);
+
+	this.m_oMainDiv.addEventListener("contextmenu", function()
+	{
+		oThis.private_CollapsePopups();
+	}, false);
 };
 CGoUniverseApplication.prototype.private_InitLoginPage = function()
 {

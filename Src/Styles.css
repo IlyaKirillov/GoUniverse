@@ -131,7 +131,7 @@ span.GameRoomCloseSpan:before {
 /*}*/
 
 .closeSpan:before {
-    content: 'V';
+    content: '\3009';
 }
 
 

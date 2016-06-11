@@ -39,9 +39,6 @@ CVisualPopup.prototype.Create = function()
 	this.m_oHtmlElement  = oElement;
 	this.m_nShowId       = null;
 	this.m_nTransitionId = null;
-
-	if (this.m_oHandler.StylizePopup)
-		this.m_oHandler.StylizePopup(this);
 };
 CVisualPopup.prototype.GetHtmlElement = function()
 {
@@ -121,4 +118,8 @@ CVisualPopup.prototype.Destroy = function()
 	catch(e)
 	{
 	}
+};
+CVisualPopup.prototype.IsVisible = function()
+{
+	return (this.m_oHtmlElement.style.display === "block" ? true : false);
 };
