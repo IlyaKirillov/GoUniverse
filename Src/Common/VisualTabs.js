@@ -384,6 +384,7 @@ CVisualGameRoomTab.prototype.OnClick = function()
 	{
 		this.m_oTabDiv.style.backgroundColor = "#737373";
 		this.m_oGameTree.Update_Size();
+		this.m_oGameTree.Focus();
 	}
 };
 CVisualGameRoomTab.prototype.OnClickClose = function()
