@@ -639,7 +639,7 @@ CVisualChatRoomTab.prototype.private_InitMenu = function()
 
 	this.private_AddMenuButton(oHtmlElement, "left", "ChatMenuSpanInfo",  function()
 	{
-		oThis.OnClickClose();
+		oThis.ShowRoomInfo();
 	}, "Info");
 
 	// this.private_AddMenuButton(oHtmlElement, "left", "ChatMenuSpanSound",  function()
@@ -671,7 +671,8 @@ CVisualChatRoomTab.prototype.private_AddMenuButton = function(oParentElement, sF
 
 	oButton.addEventListener("click", fOnClickHandler, false);
 };
-CVisualChatRoomTab.prototype.OnShowRoomInfo = function()
+CVisualChatRoomTab.prototype.ShowRoomInfo = function()
 {
-	
+	if (this.m_oApp)
+		this.m_oApp.ShowRoomInfo(this.GetId());
 };

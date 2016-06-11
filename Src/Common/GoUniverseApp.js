@@ -355,6 +355,10 @@ CGoUniverseApplication.prototype.UnregisterPopup = function(oPopup)
 		}
 	}
 };
+CGoUniverseApplication.prototype.ShowRoomInfo = function(nRoomId)
+{
+	CreateKGSWindow(EKGSWindowType.RoomInfo, {Client : this.m_oClient, App : this, RoomId : nRoomId});
+};
 CGoUniverseApplication.prototype.private_InitMainDiv = function()
 {
 	var oThis = this;

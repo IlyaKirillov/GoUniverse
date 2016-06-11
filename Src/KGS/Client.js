@@ -175,6 +175,20 @@ CKGSClient.prototype.GetCategoryName = function(nCategoryId)
 {
 	return this.m_oRoomCategory[nCategoryId];
 };
+CKGSClient.prototype.GetRoomGreetingMessage = function(nRoomId)
+{
+	if (this.m_aAllRooms[nRoomId] && "" !== this.m_aAllRooms[nRoomId].Name)
+		return this.m_aAllRooms[nRoomId].GreetingMessage;
+
+	return "";
+};
+CKGSClient.prototype.GetRoomOwners = function(nRoomId)
+{
+	if (this.m_aAllRooms[nRoomId] && "" !== this.m_aAllRooms[nRoomId].Name)
+		return this.m_aAllRooms[nRoomId].Owners;
+
+	return [];
+};
 CKGSClient.prototype.private_SendMessage = function(oMessage)
 {
 	// console.log("Send:");
@@ -743,7 +757,12 @@ CKGSClient.prototype.private_HandleRoomDesc = function(oMessage)
 
 		for (var nIndex = 0, nCount = oMessage.owners.length; nIndex < nCount; ++nIndex)
 		{
-			oRoom.Owners.push(oMessage.owners[nIndex].name);
+			oRoom.Owners.push({
+				Name  : oMessage.owners[nIndex].name,
+				Rank  : this.private_GetRank(oMessage.owners[nIndex].rank),
+				Flags : oMessage.owners[nIndex].flags,
+				Friend : this.private_IsFriend(oMessage.owners[nIndex].name)
+			});
 		}
 
 		if (this.m_aRooms[oMessage.channelId])

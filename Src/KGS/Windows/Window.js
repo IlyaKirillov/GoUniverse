@@ -11,7 +11,8 @@
 
 var EKGSWindowType = {
 	RoomList : 0,
-	UserInfo : 1
+	UserInfo : 1,
+	RoomInfo : 2
 };
 
 var g_aKGSWindows      = {};
@@ -32,6 +33,7 @@ function CreateKGSWindow(nWindowType, oPr)
 	{
 	case EKGSWindowType.RoomList : sApp = "RoomList"; break;
 	case EKGSWindowType.UserInfo : sApp = "UserInfo_" + oPr.UserName; break;
+	case EKGSWindowType.RoomInfo : sApp = "RoomInfo_" + oPr.RoomId; break;
 	}
 	var sId = sParentId + sApp;
 
@@ -57,6 +59,7 @@ function CreateKGSWindow(nWindowType, oPr)
 		{
 		case EKGSWindowType.RoomList : oWindow = new CKGSRoomListWindow(); break;
 		case EKGSWindowType.UserInfo : oWindow = new CKGSUserInfoWindow(); break;
+		case EKGSWindowType.RoomInfo : oWindow = new CKGSRoomInfoWindow(); break;
 		}
 
 		oWindows[sId] = oWindow;
@@ -131,7 +134,8 @@ CommonExtend(CKGSWindowBase, CDrawingWindow);
 CKGSWindowBase.prototype.Init = function(sDivId, oPr)
 {
 	CKGSWindowBase.superclass.Init.apply(this, arguments);
-	this.m_oApp = oPr.App;
+	this.m_oApp    = oPr.App;
+	this.m_oClient = oPr.Client;
 	this.private_UpdatePosition();
 	this.HtmlElement.Control.HtmlElement.style.zIndex = g_nKGSWindowsCount;
 };
