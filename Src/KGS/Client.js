@@ -189,6 +189,24 @@ CKGSClient.prototype.GetRoomOwners = function(nRoomId)
 
 	return [];
 };
+CKGSClient.prototype.IsPrivateChat = function(nRoomId)
+{
+	if (undefined !== this.m_oPrivateChats[nRoomId])
+		return true;
+
+	return false;
+};
+CKGSClient.prototype.GetPrivateChat = function(nRoomId)
+{
+	return this.m_oPrivateChats[nRoomId];
+};
+CKGSClient.prototype.IsChatRoom = function(nRoomId)
+{
+	if (undefined !== this.m_aAllRooms[nRoomId])
+		return true;
+
+	return false;
+};
 CKGSClient.prototype.private_SendMessage = function(oMessage)
 {
 	// console.log("Send:");

@@ -220,3 +220,42 @@ div.Selectable {
 	content : '\260E';
 }
 
+div.ContextMenu {
+	border              : 1px solid rgb(166, 166, 166);
+	box-shadow          : rgba(0, 0, 0, 0.8) 0px 1px 5px;
+	background          : rgb(255, 255, 255);
+
+	transition-property : height;
+	transition-duration : 0.2s;
+	transition-delay    : 0s;
+}
+
+div.ContextMenu ul {
+	padding     : 5px 0px;
+	margin      : 2px 0px 0px;
+	list-style  : none;
+	font-size   : 16px;
+	line-height : 20px;
+}
+
+div.ContextMenu ul li {
+	font-family : 'Times New Roman', Times, serif;
+	height      : 20px;
+	color       : rgb(68, 68, 68);
+	margin      : 0px 5px;
+	cursor      : pointer;
+	background  : transparent;
+}
+
+
+div.ContextMenu ul li:hover {
+	background  : rgb(216, 218, 220);
+}
+
+span.UserChatSpan {
+	text-decoration: none;
+}
+
+span.UserChatSpan:hover {
+	text-decoration: underline;
+}

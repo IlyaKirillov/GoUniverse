@@ -254,6 +254,7 @@ CGoUniverseApplication.prototype.OnAddChatMessage = function(nChatRoomId, sUserN
 	oTextSpan.style.fontWeight = "bold";
 	oTextSpan.style.cursor     = "pointer";
 	oTextSpan.textContent      = sUserName + ": ";
+	oTextSpan.className        = "UserChatSpan";
 	oTextSpan.addEventListener("click", function()
 	{
 		var oInputArea = document.getElementById("inputChatId");
@@ -262,12 +263,7 @@ CGoUniverseApplication.prototype.OnAddChatMessage = function(nChatRoomId, sUserN
 	});
 	oTextSpan.addEventListener("contextmenu", function(e)
 	{
-		var oClient = oThis.m_oClient;
-		if (oClient)
-		{
-			oClient.LoadUserInfo(sUserName);
-		}
-
+		oThis.ShowUserContextMenu(e.pageX - 2, e.pageY + 2, sUserName);
 		e.preventDefault();
 		return false;
 	}, false);
@@ -369,6 +365,16 @@ CGoUniverseApplication.prototype.private_InitMainDiv = function()
 	}, false);
 
 	this.m_oMainDiv.addEventListener("contextmenu", function()
+	{
+		oThis.private_CollapsePopups();
+	}, false);
+
+	this.m_oMainDiv.addEventListener("DOMMouseScroll", function()
+	{
+		oThis.private_CollapsePopups();
+	}, false);
+
+	this.m_oMainDiv.addEventListener("mousewheel", function()
 	{
 		oThis.private_CollapsePopups();
 	}, false);
@@ -604,4 +610,18 @@ CGoUniverseApplication.prototype.private_RemoveAllPopups = function()
 	{
 		this.m_arrPopups[0].Destroy();
 	}
+};
+CGoUniverseApplication.prototype.ShowUserContextMenu = function(nX, nY, sUserName)
+{
+	var oClient = this.m_oClient;
+	var oContextMenu = new CVisualContextMenu(this, nX, nY);
+	oContextMenu.AddListItem("Talk to...", function()
+	{
+		oClient.EnterPrivateChat(sUserName);
+	});
+	oContextMenu.AddListItem("View info", function()
+	{
+		oClient.LoadUserInfo(sUserName);
+	});
+	oContextMenu.Show();
 };

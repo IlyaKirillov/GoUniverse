@@ -14,13 +14,17 @@ function CVisualPopup(oApp, oHandler)
 	this.m_oApp     = oApp;
 	this.m_oHandler = oHandler;
 
-	this.m_oHtmlElement  = null;
-	this.m_nShowId       = null;
-	this.m_nTransitionId = null;
+	this.m_oHtmlElement   = null;
+	this.m_nShowId        = null;
+	this.m_nTransitionId  = null;
+	this.m_bDestroyOnHide = false;
 }
-CVisualPopup.prototype.Create = function()
+CVisualPopup.prototype.Create = function(bDestroyOnHide)
 {
 	this.m_oApp.RegisterPopup(this);
+
+	if (undefined !== bDestroyOnHide)
+		this.m_bDestroyOnHide = bDestroyOnHide;
 
 	var oMainDiv = this.m_oApp.GetMainDiv();
 
@@ -96,11 +100,17 @@ CVisualPopup.prototype.Hide = function(bFast)
 		if (true === bFast)
 		{
 			this.m_oHtmlElement.style.display = "none";
+
+			if (true === this.m_bDestroyOnHide)
+				this.Destroy();
 		}
 		else
 		{
 			this.m_nTransitionId = setTimeout(function()
 			{
+				if (true === oThis.m_bDestroyOnHide)
+					oThis.Destroy();
+
 				oThis.m_oHtmlElement.style.display = "none";
 				oThis.m_nTransitionId              = null;
 			}, 200);
@@ -123,3 +133,61 @@ CVisualPopup.prototype.IsVisible = function()
 {
 	return (this.m_oHtmlElement.style.display === "block" ? true : false);
 };
+
+function CVisualContextMenu(oApp, nX, nY)
+{
+	this.m_oApp = oApp;
+	this.m_nX   = nX;
+	this.m_nY   = nY;
+
+	this.m_oPopup = new CVisualPopup(oApp, this);
+	this.m_oPopup.Create(true);
+
+
+	var oHtmlElement            = this.m_oPopup.GetHtmlElement();
+	oHtmlElement.style.position = "absolute";
+	oHtmlElement.style.top      = "100px";
+	oHtmlElement.style.left     = "100px";
+	oHtmlElement.style.display  = "none";
+	oHtmlElement.className += "ContextMenu";
+
+	var oList = document.createElement("ul");
+	oHtmlElement.appendChild(oList);
+	this.m_oList = oList;
+
+	this.m_nHeight = 12;
+}
+CVisualContextMenu.prototype.AddListItem = function(sText, fAction)
+{
+	var oListEntry = document.createElement("li");
+	this.m_oList.appendChild(oListEntry);
+
+	if (sText)
+		oListEntry.innerHTML = sText;
+
+	if (fAction)
+		oListEntry.addEventListener("click", fAction, false);
+
+	this.m_nHeight += 20;
+};
+CVisualContextMenu.prototype.Show = function()
+{
+	this.m_oPopup.Toggle();
+};
+CVisualContextMenu.prototype.UpdatePopupPosition = function(oPopup)
+{
+	var oHtmlElement = this.m_oPopup.GetHtmlElement();
+	oHtmlElement.style.left = this.m_nX + "px";
+	oHtmlElement.style.top  = this.m_nY + "px";
+};
+CVisualContextMenu.prototype.OnHidePopup = function(oPopup)
+{
+	var oHtmlElement = oPopup.GetHtmlElement();
+	oHtmlElement.style.height = "0px";
+};
+CVisualContextMenu.prototype.OnShowPopup = function(oPopup)
+{
+	var oHtmlElement = oPopup.GetHtmlElement();
+	oHtmlElement.style.height = this.m_nHeight + "px";
+};
+

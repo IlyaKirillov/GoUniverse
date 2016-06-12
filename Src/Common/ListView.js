@@ -148,16 +148,10 @@ function CListView()
         }
         else
         {
-            if (2 == global_mouseEvent.ClickCount && oThis.m_oListObject && oThis.m_oListObject.Handle_DoubleClick)
+            if (2 == global_mouseEvent.ClickCount && oThis.m_oListObject && oThis.m_oListObject.Handle_DoubleClick && g_mouse_button_left === global_mouseEvent.Button)
             {
                 if (oThis.m_aList[oThis.m_nSelectedIndex])
-                    oThis.m_oListObject.Handle_DoubleClick(oThis.m_aList[oThis.m_nSelectedIndex]);
-            }
-            else if (1 == global_mouseEvent.ClickCount && g_mouse_button_right === global_mouseEvent.Button && oThis.m_oListObject && oThis.m_oListObject.Handle_RightClick)
-            {
-                if (oThis.m_aList[oThis.m_nSelectedIndex])
-                    oThis.m_oListObject.Handle_RightClick(oThis.m_aList[oThis.m_nSelectedIndex]);
-                bRet = false;
+                    oThis.m_oListObject.Handle_DoubleClick(oThis.m_aList[oThis.m_nSelectedIndex], e);
             }
         }
 
@@ -268,6 +262,26 @@ function CListView()
 
     this.private_OnContextMenu = function(e)
     {
+		var bRet = null;
+		check_MouseDownEvent(e, true);
+		var oPos = oThis.private_UpdateMousePos(global_mouseEvent.X, global_mouseEvent.Y);
+		oThis.m_nSelectedIndex = oThis.private_GetIndexByXY(oPos.X, oPos.Y);
+
+		if (-1 === oThis.private_CheckBorder(oPos.X, oPos.Y) && -1 === oThis.private_CheckHeader(oPos.X, oPos.Y))
+		{
+			if (oThis.m_oListObject && oThis.m_oListObject.Handle_RightClick)
+			{
+				if (oThis.m_aList[oThis.m_nSelectedIndex])
+					oThis.m_oListObject.Handle_RightClick(oThis.m_aList[oThis.m_nSelectedIndex], e);
+				bRet = false;
+			}
+		}
+
+		e.preventDefault();
+
+		if (null !== bRet)
+			return bRet;
+
         e.preventDefault();
         return false;
     };

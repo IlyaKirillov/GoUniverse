@@ -130,15 +130,15 @@ var g_oPlayersList =
     {
         if (oApp && oApp.GetClient())
         {
-            oApp.GetClient().LoadUserInfo(Record.m_sName);
+            oApp.GetClient().EnterPrivateChat(Record.m_sName);
         }
     },
 
-    Handle_RightClick : function(Record)
+    Handle_RightClick : function(Record, e)
     {
-        if (oApp && oApp.GetClient())
+        if (oApp)
         {
-            oApp && oApp.GetClient().EnterPrivateChat(Record.m_sName);
+            oApp.ShowUserContextMenu(e.pageX, e.pageY, Record.m_sName);
         }
     }
 };

@@ -674,6 +674,19 @@ CVisualChatRoomTab.prototype.private_AddMenuButton = function(oParentElement, sF
 };
 CVisualChatRoomTab.prototype.ShowRoomInfo = function()
 {
-	if (this.m_oApp)
-		this.m_oApp.ShowRoomInfo(this.GetId());
+	if (this.m_oApp && this.m_oApp.GetClient())
+	{
+		var oClient = this.m_oApp.GetClient();
+		var nRoomId = this.GetId();
+
+		if (oClient.IsPrivateChat(nRoomId))
+		{
+			var oPrivateChat = oClient.GetPrivateChat(nRoomId);
+			oClient.LoadUserInfo(oPrivateChat.Name);
+		}
+		else if (oClient.IsChatRoom(nRoomId))
+		{
+			this.m_oApp.ShowRoomInfo(this.GetId());
+		}
+	}
 };
