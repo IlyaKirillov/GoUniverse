@@ -416,6 +416,9 @@ function CVisualChatRoomTab(oApp)
 	this.m_nId     = -1;
 	this.m_oTabDiv = null;
 
+	this.m_oTabBackgroundDiv = null;
+	this.m_oTabForegroundDiv = null;
+
 	this.m_nNewMessagesCount = 0;
 	this.m_oMessagesDiv      = null;
 	this.m_oPopup            = null;
@@ -452,10 +455,19 @@ CVisualChatRoomTab.prototype.OnClick = function()
 	var oOldTab = this.m_oParent.OnClick(this);
 	if (oOldTab)
 	{
+		oOldTab.m_oBackDiv.style.borderTop          = "1px solid #BEBEBE";
+		oOldTab.m_oBackDiv.style.borderRight        = "1px solid #BEBEBE";
+		oOldTab.m_oBackDiv.style.borderLeft         = "1px solid transparent";
+
 		oOldTab.m_oTabDiv.style.borderBottom = "1px solid #BEBEBE";
 		oOldTab.m_oTabDiv.style.borderTop    = "3px solid #F3F3F3";
 		oOldTab.m_oMenuSpan.style.visibility = "hidden";
 	}
+
+	this.m_oBackDiv.style.borderTop          = "1px solid rgb(0, 130, 114)";
+	this.m_oBackDiv.style.borderRight        = "1px solid rgb(0, 130, 114)";
+	this.m_oBackDiv.style.borderLeft         = "1px solid rgb(0, 130, 114)";
+
 
 	this.m_oTabDiv.style.borderBottom = "1px solid #F3F3F3";
 	this.m_oTabDiv.style.borderTop    = "3px solid rgb(0, 130, 114)";
@@ -512,11 +524,14 @@ CVisualChatRoomTab.prototype.OnShowPopup = function(oPopup)
 };
 CVisualChatRoomTab.prototype.UpdatePopupPosition = function(oPopup)
 {
+	var nScrollOffset = this.m_oTabDiv.parentNode.scrollTop;
 	var oPos = Common_FindPosition(this.m_oTabDiv);
 	var oHtmlElement = oPopup.GetHtmlElement();
 	oHtmlElement.style.left = (oPos.X - 1) + "px";
-	oHtmlElement.style.top = (oPos.Y + 24) + "px";
+	oHtmlElement.style.top = (oPos.Y + 24 - nScrollOffset) + "px";
 	oHtmlElement.style.width = this.m_oTabDiv.clientWidth;
+
+	//oHtmlElement.parentNode.scrollTop
 };
 CVisualChatRoomTab.prototype.private_InitTab = function(sRoomName)
 {
@@ -524,7 +539,25 @@ CVisualChatRoomTab.prototype.private_InitTab = function(sRoomName)
 	this.m_oTabDiv = document.createElement("div");
 	var sHeight    = "21px";
 
-	var DivTab = this.m_oTabDiv;
+
+	var oBackDiv               = document.createElement("div");
+	oBackDiv.style.position    = "absolute";
+	oBackDiv.style.top         = "-4px";
+	oBackDiv.style.left        = "-1px";
+	oBackDiv.style.right       = "-1px";
+	oBackDiv.style.height      = "3px";
+	oBackDiv.style.borderTop   = "1px solid #BEBEBE";
+	oBackDiv.style.borderRight = "1px solid #BEBEBE";
+	oBackDiv.style.borderLeft  = "1px solid transparent";
+
+	this.m_oBackDiv = oBackDiv;
+
+	this.m_oTabDiv.appendChild(oBackDiv);
+
+
+	var DivTab                      = this.m_oTabDiv;
+	DivTab.style.overflow           = "visible";
+	DivTab.style.position           = "relative";
 	DivTab["aria-label"]            = sRoomName;
 	DivTab.title                    = sRoomName;
 	DivTab.style.transitionProperty = "width,height,background,margin,border,padding";
@@ -536,14 +569,13 @@ CVisualChatRoomTab.prototype.private_InitTab = function(sRoomName)
 	DivTab.style.color              = "#000";
 	DivTab.style.whiteSpace         = "nowrap";
 	DivTab.style.textOverflow       = "ellipsis";
-	DivTab.style.borderTop          = "3px solid #F3F3F3";
+	DivTab.style.borderTop          = "3px solid transparent";
 	DivTab.style.borderRight        = "1px solid #BEBEBE";
 	DivTab.style.borderBottom       = "1px solid #BEBEBE";
 	DivTab.addEventListener("selectstart", function()
 	{
 		return false;
 	}, false);
-
 
 	var NewTab                             = document.createElement("button");
 	NewTab.tabIndex                        = "0";

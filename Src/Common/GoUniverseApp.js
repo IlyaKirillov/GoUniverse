@@ -37,13 +37,30 @@ CGoUniverseApplication.prototype.Init = function()
 	this.OnResize();
 
 	// TEST
-	// this.m_oClient = new CKGSClient(this);
-	// this.OnConnect();
-	//
-	// this.AddChatRoom(1, "English");
-	// this.AddChatRoom(2, "Русская");
-	// this.AddChatRoom(3, "Тест");
-	// this.AddChatRoom(4, "Хахахах");
+	this.m_oClient = new CKGSClient(this);
+	this.OnConnect();
+
+	this.AddChatRoom(1, "English");
+	this.AddChatRoom(2, "Русская");
+	this.AddChatRoom(3, "Тест");
+	this.AddChatRoom(4, "Хахахах");
+	this.AddChatRoom(5, "English");
+	this.AddChatRoom(6, "Русская");
+	this.AddChatRoom(7, "Тест");
+	this.AddChatRoom(8, "Хахахах");
+	this.AddChatRoom(9, "English");
+	this.AddChatRoom(10, "Русская");
+	this.AddChatRoom(11, "Тест");
+	this.AddChatRoom(12, "Хахахах");
+	this.AddChatRoom(13, "English");
+	this.AddChatRoom(14, "Русская");
+	this.AddChatRoom(15, "Тест");
+	this.AddChatRoom(16, "Хахахах");
+	this.AddChatRoom(17, "English");
+	this.AddChatRoom(18, "Русская");
+	this.AddChatRoom(19, "Тест");
+	this.AddChatRoom(20, "Хахахах");
+
 
 	// this.AddGameRoom(1, new CGameTree());
 	// this.AddGameRoom(2, new CGameTree());
@@ -161,6 +178,21 @@ CGoUniverseApplication.prototype.SetCurrentChatRoom = function(nChatRoomId)
 {
 	if (this.m_oClient)
 		this.m_oClient.SetCurrentChatRoom(nChatRoomId);
+
+	//--------------
+
+	this.private_CollapseChatTabs();
+
+	var oTab = this.m_oChatRoomTabs.GetTab(nChatRoomId);
+	var oTabDiv = oTab.m_oTabDiv;
+	var nOffsetTop = oTabDiv.offsetTop;
+
+	var nLine = parseInt((nOffsetTop + 1) / 25);
+
+	var oTabs = document.getElementById("divIdLChatTabs");
+	oTabs.scrollTop = nLine * 25;
+
+	//--------------
 
 	var oDiv = document.getElementById("textareaChatId");
 	for (var nIndex = 0, nCount = oDiv.childNodes.length; nIndex < nCount; ++nIndex)
@@ -472,7 +504,7 @@ CGoUniverseApplication.prototype.private_InitMainRoom = function()
 	oLeftPartControl.AddControl(oGamesListWrapperControl);
 
 	var oGamesListControl = this.m_oGamesListView.Init("divIdLGames", g_oGamesList);
-	oGamesListControl.Bounds.SetParams(0, 0, 2, 1, true, false, true, true, -1, -1);
+	oGamesListControl.Bounds.SetParams(0, 0, 2, 0, true, false, true, true, -1, -1);
 	oGamesListControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
 	oGamesListControl.HtmlElement.style.background = "#F3F3F3";
 	oGamesListWrapperControl.AddControl(oGamesListControl);
@@ -493,19 +525,25 @@ CGoUniverseApplication.prototype.private_InitChats = function(oChatControl)
 	oChatControl.AddControl(oChatTabsBack);
 
 	var oChatTabs = this.m_oChatRoomTabs.Init("divIdLChatTabs");
-	oChatTabs.Bounds.SetParams(0, 0, 31, 0, true, true, true, false, -1, 25);
+	oChatTabs.Bounds.SetParams(0, 1, 31, 0, true, true, true, false, -1, 25);
 	oChatTabs.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left);
 	oChatControl.AddControl(oChatTabs);
 
 	// Кнопка добавления чата
 	var oChatAddControl = this.private_InitChannelAddButton("divIdLChatAdd");
-	oChatAddControl.Bounds.SetParams(0, 0, 1, 0, false, true, true, false, 30, 24);
+	oChatAddControl.Bounds.SetParams(0, 1, 1, 0, false, true, true, false, 30, 24);
 	oChatAddControl.Anchor = (g_anchor_top | g_anchor_right);
 	oChatControl.AddControl(oChatAddControl);
 
+	// Кнопка добавления чата
+	var oChaToggleControl = this.private_InitChannelToggleButton("divIdLChatTabsToggle");
+	oChaToggleControl.Bounds.SetParams(0, 1, 32, 0, false, true, true, false, 30, 24);
+	oChaToggleControl.Anchor = (g_anchor_top | g_anchor_right);
+	oChatControl.AddControl(oChaToggleControl);
+
 	// Все сообщения
 	var oChatTextAreaControl = CreateControlContainer("divIdLChatTextArea");
-	oChatTextAreaControl.Bounds.SetParams(0, 25, 2, 52, true, true, true, true, -1, -1);
+	oChatTextAreaControl.Bounds.SetParams(0, 26, 2, 52, true, true, true, true, -1, -1);
 	oChatTextAreaControl.Anchor = (g_anchor_bottom | g_anchor_right | g_anchor_left);
 	oChatControl.AddControl(oChatTextAreaControl);
 
@@ -538,6 +576,54 @@ CGoUniverseApplication.prototype.private_InitChannelAddButton = function(sDivId)
 	oElement.addEventListener("click", function()
 	{
 		oThis.OpenRoomList();
+	});
+
+	return oControl;
+};
+CGoUniverseApplication.prototype.private_InitChannelToggleButton = function(sDivId)
+{
+	var oThis = this;
+
+	var oElement = document.getElementById(sDivId);
+	var oControl = CreateControlContainer(sDivId);
+
+	oElement.title           = "Add a channel";
+	oElement.style.fontSize  = "24px";
+	oElement.style.textAlign = "center";
+	oElement.addEventListener("selectstart", function()
+	{
+		return false;
+	}, false);
+	oElement.addEventListener("click", function()
+	{
+		var oTabs = document.getElementById("divIdLChatTabs");
+
+		var sHeight = parseFloat(oTabs.style.height);
+
+
+		if (sHeight < 35)
+		{
+			oTabs.style.height    = "";
+			oTabs.style.minHeight = "25px";
+			oTabs.style.maxHeight = "125px";
+			oTabs.style.backgroundColor = "#F3F3F3";
+			oTabs.style.borderBottom = "1px solid #BEBEBE";
+			oTabs.style.borderRight = "1px solid #BEBEBE";
+			oTabs.style.overflowY    = "auto";
+			oTabs.style.boxShadow          = "0px 1px 2px rgba(0,0,0,0.2)";
+		}
+		else
+		{
+			oTabs.style.height    = "25px";
+			oTabs.style.minHeight = "";
+			oTabs.style.maxHeight = "";
+			oTabs.style.backgroundColor = "transparent";
+			oTabs.style.borderBottom = "1px none #BEBEBE";
+			oTabs.style.borderRight = "1px none #BEBEBE";
+			oTabs.style.overflowY    = "hidden";
+			oTabs.style.boxShadow          = "";
+		}
+
 	});
 
 	return oControl;
@@ -639,7 +725,7 @@ CGoUniverseApplication.prototype.ShowUserContextMenu = function(nX, nY, sUserNam
 		else
 			oClient.AddToBlackList(sUserName);
 	});
-	oContextMenu.AddCheckBoxItem(oClient.IsUserInFollowerList(sUserName), "Follower", function()
+	oContextMenu.AddCheckBoxItem(oClient.IsUserInFollowerList(sUserName), "Follow", function()
 	{
 		if (oClient.IsUserInFollowerList(sUserName))
 			oClient.RemoveFromFollowerList(sUserName);
@@ -647,4 +733,17 @@ CGoUniverseApplication.prototype.ShowUserContextMenu = function(nX, nY, sUserNam
 			oClient.AddToFollowerList(sUserName);
 	});
 	oContextMenu.Show();
+};
+
+CGoUniverseApplication.prototype.private_CollapseChatTabs = function()
+{
+	var oTabs = document.getElementById("divIdLChatTabs");
+	oTabs.style.height          = "25px";
+	oTabs.style.minHeight       = "";
+	oTabs.style.maxHeight       = "";
+	oTabs.style.backgroundColor = "transparent";
+	oTabs.style.borderBottom    = "1px none #BEBEBE";
+	oTabs.style.borderRight     = "1px none #BEBEBE";
+	oTabs.style.overflowY       = "hidden";
+	oTabs.style.boxShadow       = "";
 };
