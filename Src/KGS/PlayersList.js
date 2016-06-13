@@ -195,7 +195,7 @@ CPlayersListRecord.prototype.Draw = function(oContext, dX, dY, eType)
 
 			var dTextW = oContext.measureText(sString).width;
 			var dX0    = (dX | 0) + 0.5;
-			var dY0    = ((dY - 3) | 0) + 0.5;
+			var dY0    = ((dY - 4) | 0) + 0.5;
 			var dX1    = ((dX + dTextW) | 0) + 0.5;
 
 			oContext.beginPath();

@@ -262,7 +262,7 @@ var g_oGamesList =
 
     Get_Record : function(aLine)
     {
-        var oRecord = new CGameListRecord();
+        var oRecord = new CGameListRecord(oApp.GetClient());
         oRecord.Update(aLine);
         return oRecord;
     },
@@ -279,8 +279,10 @@ var g_oGamesList =
     }
 };
 
-function CGameListRecord()
+function CGameListRecord(oClient)
 {
+    this.m_oClient         = oClient;
+
     this.m_nGameId         = 0;
     this.m_sGameType       = "F";
     this.m_nObserversCount = 0;
@@ -299,10 +301,25 @@ function CGameListRecord()
 
 CGameListRecord.prototype.Draw = function(oContext, dX, dY, eType)
 {
-    if (true === this.m_bAdjourned) // Отложенная игра
-        oContext.fillStyle = "#CCCCCC";
-    else
-        oContext.fillStyle = "#000000";
+	var sFont = oContext.font;
+	var bResetFont = false;
+	if ((eType === EGameListRecord.WName && this.m_oClient.IsUserInFollowerList(this.m_sWhiteName)
+		|| (eType === EGameListRecord.BName && this.m_oClient.IsUserInFollowerList(this.m_sBlackName))))
+	{
+		oContext.font = "bold " + sFont;
+		bResetFont = true;
+		if (true === this.m_bAdjourned) // Отложенная игра
+			oContext.fillStyle = "#C3DDDA";
+		else
+			oContext.fillStyle = "#008272";
+	}
+	else
+	{
+		if (true === this.m_bAdjourned) // Отложенная игра
+			oContext.fillStyle = "#CCCCCC";
+		else
+			oContext.fillStyle = "#000000";
+	}
 
     var sString = "";
     switch(eType)
@@ -322,6 +339,9 @@ CGameListRecord.prototype.Draw = function(oContext, dX, dY, eType)
     }
 
     oContext.fillText(sString, dX, dY);
+
+	if (true === bResetFont)
+		oContext.font = sFont;
 };
 
 CGameListRecord.prototype.Compare = function(sKey)

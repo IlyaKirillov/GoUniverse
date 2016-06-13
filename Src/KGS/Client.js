@@ -793,6 +793,11 @@ CKGSClient.prototype.private_HandleGameUpdate = function(oMessage)
 };
 CKGSClient.prototype.private_HandleChat = function(oMessage)
 {
+	// TODO: Обычный клиент позволяет писать в приват, даже если пользователь в черном списке. Можно это изменить,
+	// но тогда нужно выдавать сообщение при попытке зайти в приватный чат.
+	if (true !== this.IsPrivateChat(oMessage.channelId) && true === this.IsUserInBlackList(oMessage.user.name))
+		return;
+
 	this.m_oApp.OnAddChatMessage(oMessage.channelId, oMessage.user.name, oMessage.text);
 };
 CKGSClient.prototype.private_HandleUserAdded = function(oMessage)
@@ -983,6 +988,9 @@ CKGSClient.prototype.private_HandleFriendAddSuccess = function(oMessage)
 		this.m_oFollowerList[sUserName] = {
 			Name : sUserName
 		};
+
+		this.m_oGamesListView.Update_Size();
+		this.m_oGamesListView.Update();
 	}
 
 	this.m_oPlayersListView.Update_Size();
@@ -1006,6 +1014,9 @@ CKGSClient.prototype.private_HandleFriendRemoveSuccess = function(oMessage)
 	{
 		if (undefined !== this.m_oFollowerList[sUserName])
 			delete this.m_oFollowerList[sUserName];
+
+		this.m_oGamesListView.Update_Size();
+		this.m_oGamesListView.Update();
 	}
 
 	this.m_oPlayersListView.Update_Size();
