@@ -238,7 +238,7 @@ div.ContextMenu ul {
 	line-height : 20px;
 }
 
-div.ContextMenu ul li {
+div.ContextMenu ul li.ContextMenuItem {
 	font-family : 'Times New Roman', Times, serif;
 	height      : 20px;
 	color       : rgb(68, 68, 68);
@@ -248,8 +248,14 @@ div.ContextMenu ul li {
 }
 
 
-div.ContextMenu ul li:hover {
+div.ContextMenu ul li.ContextMenuItem:hover {
 	background  : rgb(216, 218, 220);
+}
+
+div.ContextMenu ul li.ContextMenuLine {
+	height      : 0px;
+	margin      : 2px 5px;
+	border-top  : 1px solid rgb(190, 190, 190);
 }
 
 span.UserChatSpan {

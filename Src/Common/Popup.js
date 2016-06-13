@@ -160,11 +160,46 @@ function CVisualContextMenu(oApp, nX, nY)
 CVisualContextMenu.prototype.AddListItem = function(sText, fAction)
 {
 	var oListEntry = document.createElement("li");
+	oListEntry.className = "ContextMenuItem";
 	this.m_oList.appendChild(oListEntry);
 
 	if (sText)
 		oListEntry.innerHTML = sText;
 
+	if (fAction)
+		oListEntry.addEventListener("click", fAction, false);
+
+	this.m_nHeight += 20;
+};
+CVisualContextMenu.prototype.AddHorizontalLine = function()
+{
+	var oListEntry = document.createElement("li");
+	oListEntry.className = "ContextMenuLine";
+	this.m_oList.appendChild(oListEntry);
+
+	this.m_nHeight += 6;
+};
+CVisualContextMenu.prototype.AddCheckBoxItem = function(bChecked, sText, fAction)
+{
+	var oListEntry = document.createElement("li");
+	oListEntry.className = "ContextMenuItem";
+	this.m_oList.appendChild(oListEntry);
+
+	var oCheckItem               = document.createElement("div");
+	oCheckItem.style.paddingLeft = "3px";
+	oCheckItem.style.width       = "20px";
+	oCheckItem.style.height      = "20px";
+	oCheckItem.style['float']    = "left";
+	Common.Set_InnerTextToElement(oCheckItem, bChecked ? "✔" : "");
+	oListEntry.appendChild(oCheckItem);
+
+	var oTextItem               = document.createElement("div");
+	oTextItem.style.height      = "20px";
+	oTextItem.style['float']    = "left";
+	oTextItem.style.overflow    = "hidden";
+	Common.Set_InnerTextToElement(oTextItem, sText);
+	oListEntry.appendChild(oTextItem);
+	
 	if (fAction)
 		oListEntry.addEventListener("click", fAction, false);
 

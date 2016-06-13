@@ -37,13 +37,13 @@ CGoUniverseApplication.prototype.Init = function()
 	this.OnResize();
 
 	// TEST
-	this.m_oClient = new CKGSClient(this);
-	this.OnConnect();
-
-	this.AddChatRoom(1, "English");
-	this.AddChatRoom(2, "Русская");
-	this.AddChatRoom(3, "Тест");
-	this.AddChatRoom(4, "Хахахах");
+	// this.m_oClient = new CKGSClient(this);
+	// this.OnConnect();
+	//
+	// this.AddChatRoom(1, "English");
+	// this.AddChatRoom(2, "Русская");
+	// this.AddChatRoom(3, "Тест");
+	// this.AddChatRoom(4, "Хахахах");
 
 	// this.AddGameRoom(1, new CGameTree());
 	// this.AddGameRoom(2, new CGameTree());
@@ -107,6 +107,7 @@ CGoUniverseApplication.prototype.OnResize = function()
 		this.m_oGameRoomTabs.UpdateSize();
 	}
 
+	this.private_CollapsePopups(true);
 };
 CGoUniverseApplication.prototype.OpenRoomList = function()
 {
@@ -615,13 +616,35 @@ CGoUniverseApplication.prototype.ShowUserContextMenu = function(nX, nY, sUserNam
 {
 	var oClient = this.m_oClient;
 	var oContextMenu = new CVisualContextMenu(this, nX, nY);
-	oContextMenu.AddListItem("Talk to...", function()
+	oContextMenu.AddCheckBoxItem(false, "Talk to...", function()
 	{
 		oClient.EnterPrivateChat(sUserName);
 	});
-	oContextMenu.AddListItem("View info", function()
+	oContextMenu.AddCheckBoxItem(false, "View info", function()
 	{
 		oClient.LoadUserInfo(sUserName);
+	});
+	oContextMenu.AddHorizontalLine();
+	oContextMenu.AddCheckBoxItem(oClient.IsUserInFriendList(sUserName), "Buddy", function()
+	{
+		if (oClient.IsUserInFriendList(sUserName))
+			oClient.RemoveFromFriendList(sUserName);
+		else
+			oClient.AddToFriendList(sUserName);
+	});
+	oContextMenu.AddCheckBoxItem(oClient.IsUserInBlackList(sUserName), "Censored", function()
+	{
+		if (oClient.IsUserInBlackList(sUserName))
+			oClient.RemoveFromBlackList(sUserName);
+		else
+			oClient.AddToBlackList(sUserName);
+	});
+	oContextMenu.AddCheckBoxItem(oClient.IsUserInFollowerList(sUserName), "Follower", function()
+	{
+		if (oClient.IsUserInFollowerList(sUserName))
+			oClient.RemoveFromFollowerList(sUserName);
+		else
+			oClient.AddToFollowerList(sUserName);
 	});
 	oContextMenu.Show();
 };

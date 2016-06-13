@@ -14,7 +14,9 @@ function CKGSClient(oApp)
 	this.m_oApp           = oApp;
 	this.m_bLoggedIn      = false;
 	this.m_aGames         = {};
-	this.m_aFriends       = [];
+	this.m_oFriendList    = [];
+	this.m_oBlackList     = {};
+	this.m_oFollowerList  = {};
 	this.m_aRooms         = {};
 	this.m_sUserName      = "";
 	this.m_nChatChannelId = -1;
@@ -207,6 +209,84 @@ CKGSClient.prototype.IsChatRoom = function(nRoomId)
 
 	return false;
 };
+CKGSClient.prototype.IsUserInFriendList = function(sUserName)
+{
+	return this.private_IsFriend(sUserName);
+};
+CKGSClient.prototype.IsUserInBlackList = function(sUserName)
+{
+	if (undefined !== this.m_oBlackList[sUserName])
+		return true;
+
+	return false;
+};
+CKGSClient.prototype.IsUserInFollowerList = function(sUserName)
+{
+	if (undefined !== this.m_oFollowerList[sUserName])
+		return true;
+
+	return false;
+};
+CKGSClient.prototype.AddToFriendList = function(sUserName)
+{
+	this.private_SendMessage({
+		"type"        : "FRIEND_ADD",
+		"callbackKey" : 12345,
+		"friendType"  : "buddy",
+		"name"        : sUserName,
+		"text"        : ""
+	});
+};
+CKGSClient.prototype.RemoveFromFriendList = function(sUserName)
+{
+	this.private_SendMessage({
+		"type"        : "FRIEND_REMOVE",
+		"callbackKey" : 12345,
+		"friendType"  : "buddy",
+		"name"        : sUserName,
+		"text"        : ""
+	});
+};
+CKGSClient.prototype.AddToBlackList = function(sUserName)
+{
+	this.private_SendMessage({
+		"type"        : "FRIEND_ADD",
+		"callbackKey" : 12345,
+		"friendType"  : "censored",
+		"name"        : sUserName,
+		"text"        : ""
+	});
+};
+CKGSClient.prototype.RemoveFromBlackList = function(sUserName)
+{
+	this.private_SendMessage({
+		"type"        : "FRIEND_REMOVE",
+		"callbackKey" : 12345,
+		"friendType"  : "censored",
+		"name"        : sUserName,
+		"text"        : ""
+	});
+};
+CKGSClient.prototype.AddToFollowerList = function(sUserName)
+{
+	this.private_SendMessage({
+		"type"        : "FRIEND_ADD",
+		"callbackKey" : 12345,
+		"friendType"  : "fan",
+		"name"        : sUserName,
+		"text"        : ""
+	});
+};
+CKGSClient.prototype.RemoveFromFollowerList = function(sUserName)
+{
+	this.private_SendMessage({
+		"type"        : "FRIEND_REMOVE",
+		"callbackKey" : 12345,
+		"friendType"  : "fan",
+		"name"        : sUserName,
+		"text"        : ""
+	});
+};
 CKGSClient.prototype.private_SendMessage = function(oMessage)
 {
 	// console.log("Send:");
@@ -387,6 +467,18 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
 	{
 		this.private_HandleGameState(oMessage);
 	}
+	else if ("FRIEND_ADD_SUCCESS" === oMessage.type)
+	{
+		this.private_HandleFriendAddSuccess(oMessage);
+	}
+	else if ("FRIEND_REMOVE_SUCCESS" === oMessage.type)
+	{
+		this.private_HandleFriendRemoveSuccess(oMessage);
+	}
+	else if ("FRIEND_CHANGE_NO_USER" === oMessage.type)
+	{
+		this.private_HandleFriendChangeNoUser(oMessage);
+	}
 	else
 	{
 		console.log(oMessage);
@@ -468,7 +560,26 @@ CKGSClient.prototype.private_HandleLoginSuccess = function(oMessage)
 	{
 		for (var Pos = 0, Count = Friends.length; Pos < Count; ++Pos)
 		{
-			this.m_aFriends[Friends[Pos].user.name] = 1;
+			var oFriend   = Friends[Pos];
+			var sUserName = oFriend.user.name;
+			if ("buddy" === oFriend["friendType"])
+			{
+				this.m_oFriendList[sUserName] = {
+					Name : sUserName
+				};
+			}
+			else if ("censored" === oFriend["friendType"])
+			{
+				this.m_oBlackList[sUserName] = {
+					Name : sUserName
+				};
+			}
+			else if ("fan" === oFriend["friendType"])
+			{
+				this.m_oFollowerList[sUserName] = {
+					Name : sUserName
+				};
+			}
 		}
 	}
 
@@ -851,6 +962,59 @@ CKGSClient.prototype.private_HandleGameState = function(oMessage)
 {
 	// TODO: GAME_STATE
 };
+CKGSClient.prototype.private_HandleFriendAddSuccess = function(oMessage)
+{
+	var sUserName = oMessage["user"]["name"];
+	var sFriendType = oMessage["friendType"];
+	if ("buddy" === sFriendType)
+	{
+		this.m_oFriendList[sUserName] = {
+			Name : sUserName
+		};
+	}
+	else if ("censored" === sFriendType)
+	{
+		this.m_oBlackList[sUserName] = {
+			Name : sUserName
+		};
+	}
+	else if ("fan" === sFriendType)
+	{
+		this.m_oFollowerList[sUserName] = {
+			Name : sUserName
+		};
+	}
+
+	this.m_oPlayersListView.Update_Size();
+	this.m_oPlayersListView.Update();
+};
+CKGSClient.prototype.private_HandleFriendRemoveSuccess = function(oMessage)
+{
+	var sUserName = oMessage["user"]["name"];
+	var sFriendType = oMessage["friendType"];
+	if ("buddy" === sFriendType)
+	{
+		if (undefined !== this.m_oFriendList[sUserName])
+			delete this.m_oFriendList[sUserName];
+	}
+	else if ("censored" === sFriendType)
+	{
+		if (undefined !== this.m_oBlackList[sUserName])
+			delete this.m_oBlackList[sUserName];
+	}
+	else if ("fan" === sFriendType)
+	{
+		if (undefined !== this.m_oFollowerList[sUserName])
+			delete this.m_oFollowerList[sUserName];
+	}
+
+	this.m_oPlayersListView.Update_Size();
+	this.m_oPlayersListView.Update();
+};
+CKGSClient.prototype.private_HandleFriendChangeNoUser = function(oMessage)
+{
+	console.log("Bad user friend change request");
+};
 CKGSClient.prototype.private_GetRank = function(sRank)
 {
 	if (!sRank)
@@ -880,7 +1044,7 @@ CKGSClient.prototype.private_GetRank = function(sRank)
 };
 CKGSClient.prototype.private_IsFriend = function(sUserName)
 {
-	if (1 === this.m_aFriends[sUserName])
+	if (undefined !== this.m_oFriendList[sUserName])
 		return true;
 
 	return false;

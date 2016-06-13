@@ -33,10 +33,10 @@ var g_oPlayersList =
 
     SortFunction : function (oRecord1, oRecord2)
     {
-        if (true === oRecord1.m_bFriend && true !== oRecord2.m_bFriend)
+        if (true === oRecord1.IsFriend() && true !== oRecord2.IsFriend())
             return -1;
 
-        if (true !== oRecord1.m_bFriend && true === oRecord2.m_bFriend)
+        if (true !== oRecord1.IsFriend() && true === oRecord2.IsFriend())
             return 1;
 
         var SortType = g_oPlayersList.SortType;
@@ -116,7 +116,7 @@ var g_oPlayersList =
 
     Get_Record : function(aLine)
     {
-        var oRecord = new CPlayersListRecord();
+        var oRecord = new CPlayersListRecord(oApp.GetClient());
         oRecord.Update(aLine);
         return oRecord;
     },
@@ -143,20 +143,36 @@ var g_oPlayersList =
     }
 };
 
-function CPlayersListRecord(sName, nRank)
+function CPlayersListRecord(oClient)
 {
-    this.m_sName   = sName;
-    this.m_nRank   = nRank;
+	this.m_oClient = oClient;
+    this.m_sName   = "";
+    this.m_nRank   = 0;
     this.m_bFriend = false;
 }
 
 CPlayersListRecord.prototype.Draw = function(oContext, dX, dY, eType)
 {
+	var oClient = this.m_oClient;
     var sFont = oContext.font;
-    if (true === this.m_bFriend)
-        oContext.font = "bold " + sFont;
 
-    oContext.fillStyle = "#000000";
+	oContext.fillStyle = "#000000";
+
+	var bResetFont = false;
+	if (oClient)
+	{
+		if (true === oClient.IsUserInFollowerList(this.m_sName))
+		{
+			oContext.fillStyle = "#008272";
+			oContext.font      = "bold " + sFont;
+		}
+		else if (true === oClient.IsUserInFriendList(this.m_sName))
+		{
+			oContext.font = "bold " + sFont;
+		}
+
+		bResetFont = true;
+	}
 
     var sString = "";
     switch(eType)
@@ -167,7 +183,32 @@ CPlayersListRecord.prototype.Draw = function(oContext, dX, dY, eType)
 
     oContext.fillText(sString, dX, dY);
 
-    if (true === this.m_bFriend)
+	if (oClient)
+	{
+		if (true === oClient.IsUserInBlackList(this.m_sName) && eType === EPlayersListRecord.Name)
+		{
+			var dOldLineWidth   = oContext.lineWidth;
+			var sOldStrokeStyle = oContext.strokeStyle;
+
+			oContext.lineWidth   = 1;
+			oContext.strokeStyle = "#000";
+
+			var dTextW = oContext.measureText(sString).width;
+			var dX0    = (dX | 0) + 0.5;
+			var dY0    = ((dY - 3) | 0) + 0.5;
+			var dX1    = ((dX + dTextW) | 0) + 0.5;
+
+			oContext.beginPath();
+			oContext.moveTo(dX0, dY0);
+			oContext.lineTo(dX1, dY0);
+			oContext.stroke();
+
+			oContext.lineWidth   = dOldLineWidth;
+			oContext.strokeStyle = sOldStrokeStyle;
+		}
+	}
+
+    if (true === bResetFont)
         oContext.font = sFont;
 };
 
@@ -203,4 +244,12 @@ CPlayersListRecord.prototype.private_GetRank = function(nRank)
         return (nRank - 29) + "d";
     else
         return (nRank - 49) + "p";
+};
+
+CPlayersListRecord.prototype.IsFriend = function()
+{
+	if (oApp && oApp.GetClient())
+		return oApp.GetClient().IsUserInFriendList(this.m_sName);
+
+	return false;
 };
