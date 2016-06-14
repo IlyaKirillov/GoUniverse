@@ -36,7 +36,7 @@ CGoUniverseApplication.prototype.Init = function()
 	this.private_GotoLoginPage(false);
 	this.OnResize();
 
-	// TEST
+	// // TEST
 	// this.m_oClient = new CKGSClient(this);
 	// this.OnConnect();
 	//
@@ -526,7 +526,7 @@ CGoUniverseApplication.prototype.private_InitChats = function(oChatControl)
 	oChatControl.AddControl(oChatTabsBack);
 
 	var oChatTabs = this.m_oChatRoomTabs.Init("divIdLChatTabs");
-	oChatTabs.Bounds.SetParams(0, 1, 31, 0, true, true, true, false, -1, 25);
+	oChatTabs.Bounds.SetParams(0, 1, 63, 0, true, true, true, false, -1, 25);
 	oChatTabs.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left);
 	oChatControl.AddControl(oChatTabs);
 
@@ -718,7 +718,7 @@ CGoUniverseApplication.prototype.private_OpenChatTabs = function()
 {
 	var oTabs     = document.getElementById("divIdLChatTabs");
 	var nCount    = oTabs.childElementCount;
-	var oLastNode = oTabs.childNodes[nCount - 1];
+	var oLastNode = oTabs.children[nCount - 1];
 	var nOffset   = oLastNode.offsetTop;
 	var nLines    = (((nOffset + 1) / 25) | 0) + 1;
 
@@ -726,14 +726,49 @@ CGoUniverseApplication.prototype.private_OpenChatTabs = function()
 	if (1 === nMaxLines)
 		return;
 
-	oTabs.style.height          = (nMaxLines * 25) + "px";
+	var nClientHeight = (nMaxLines * 25 - 1);
+	oTabs.style.height          = nClientHeight + "px";
 	oTabs.style.backgroundColor = "#F3F3F3";
 	oTabs.style.borderBottom    = "1px solid #BEBEBE";
 	oTabs.style.borderRight     = "1px solid #BEBEBE";
-	oTabs.style.overflowY       = "auto";
 	oTabs.style.boxShadow       = "0px 1px 2px rgba(0,0,0,0.2)";
 
 	document.getElementById("divIdLChatTabsToggleInnerSpan").style.transform = "rotate(270deg)";
+
+	if (nLines > nMaxLines)
+	{
+
+		var nY             = 25;
+		var oVerScroll     = document.getElementById("divIdLChatTabsScroll");
+		var nVisibleH      = parseInt(nClientHeight);
+		var nOverallH      = parseInt(oTabs.scrollHeight);
+		var nScrollH       = Math.max(20, (nVisibleH) * (nVisibleH - nY) / nOverallH) | 0;
+		var nOverallOffset = parseInt(oTabs.scrollTop);
+		var nVisibleOffset = nOverallOffset * (nVisibleH - nY) / nOverallH;
+		var nX             = parseInt(oTabs.clientWidth) - 15; // nScrollW + 1 border
+
+
+		oVerScroll.style.display = "block";
+		oVerScroll.style.height  = nScrollH + "px";
+		oVerScroll.style.top     = nY + nVisibleOffset + "px";
+		oVerScroll.style.left    = nX + "px";
+		
+		Common_DragHandler.Init(oVerScroll, null, nX, nX, nY, nVisibleH - nScrollH);
+		oVerScroll.onDrag = function(dX, dY)
+		{
+			var dOffset = dY - nY;
+			var nScrollTop = dOffset * nOverallH / (nVisibleH - nY);
+			oTabs.scrollTop = nScrollTop;
+		};
+		oVerScroll.onDragStart = function()
+		{
+			oVerScroll.className = "VerScroll VerScrollActive";
+		};
+		oVerScroll.onDragEnd = function()
+		{
+			oVerScroll.className = "VerScroll";
+		};
+	}
 };
 CGoUniverseApplication.prototype.private_CollapseChatTabs = function()
 {
@@ -748,4 +783,5 @@ CGoUniverseApplication.prototype.private_CollapseChatTabs = function()
 	oTabs.style.boxShadow       = "";
 
 	document.getElementById("divIdLChatTabsToggleInnerSpan").style.transform = "rotate(90deg)";
+	document.getElementById("divIdLChatTabsScroll").style.display = "none";
 };
