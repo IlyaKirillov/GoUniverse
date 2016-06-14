@@ -40,189 +40,18 @@ CGoUniverseApplication.prototype.Init = function()
 	// this.m_oClient = new CKGSClient(this);
 	// this.OnConnect();
 	// //
-	// this.AddChatRoom(1, "English");
-	// this.AddChatRoom(2, "Русская");
-	// this.AddChatRoom(3, "Тест");
-	// this.AddChatRoom(4, "Хахахах");
-	// this.AddChatRoom(5, "English");
-	// this.AddChatRoom(6, "Русская");
-	// this.AddChatRoom(7, "Тест");
-	// this.AddChatRoom(8, "Хахахах");
-	// this.AddChatRoom(9, "English");
-	// this.AddChatRoom(10, "Русская");
-	// this.AddChatRoom(11, "Тест");
-	// this.AddChatRoom(12, "Хахахах");
-	// this.AddChatRoom(13, "English");
-	// this.AddChatRoom(14, "Русская");
-	// this.AddChatRoom(15, "Тест");
-	// this.AddChatRoom(16, "Хахахах");
-	// this.AddChatRoom(17, "English");
-	// this.AddChatRoom(18, "Русская");
-	// this.AddChatRoom(19, "Тест");
-	// this.AddChatRoom(20, "Хахахах");
-	// this.AddChatRoom(1, "English");
-	// this.AddChatRoom(2, "Русская");
-	// this.AddChatRoom(3, "Тест");
-	// this.AddChatRoom(4, "Хахахах");
-	// this.AddChatRoom(5, "English");
-	// this.AddChatRoom(6, "Русская");
-	// this.AddChatRoom(7, "Тест");
-	// this.AddChatRoom(8, "Хахахах");
-	// this.AddChatRoom(9, "English");
-	// this.AddChatRoom(10, "Русская");
-	// this.AddChatRoom(11, "Тест");
-	// this.AddChatRoom(12, "Хахахах");
-	// this.AddChatRoom(13, "English");
-	// this.AddChatRoom(14, "Русская");
-	// this.AddChatRoom(15, "Тест");
-	// this.AddChatRoom(16, "Хахахах");
-	// this.AddChatRoom(17, "English");
-	// this.AddChatRoom(18, "Русская");
-	// this.AddChatRoom(19, "Тест");
-	// this.AddChatRoom(20, "Хахахах");
-	// this.AddChatRoom(1, "English");
-	// this.AddChatRoom(2, "Русская");
-	// this.AddChatRoom(3, "Тест");
-	// this.AddChatRoom(4, "Хахахах");
-	// this.AddChatRoom(5, "English");
-	// this.AddChatRoom(6, "Русская");
-	// this.AddChatRoom(7, "Тест");
-	// this.AddChatRoom(8, "Хахахах");
-	// this.AddChatRoom(9, "English");
-	// this.AddChatRoom(10, "Русская");
-	// this.AddChatRoom(11, "Тест");
-	// this.AddChatRoom(12, "Хахахах");
-	// this.AddChatRoom(13, "English");
-	// this.AddChatRoom(14, "Русская");
-	// this.AddChatRoom(15, "Тест");
-	// this.AddChatRoom(16, "Хахахах");
-	// this.AddChatRoom(17, "English");
-	// this.AddChatRoom(18, "Русская");
-	// this.AddChatRoom(19, "Тест");
-	// this.AddChatRoom(20, "Хахахах");
-	// this.AddChatRoom(1, "English");
-	// this.AddChatRoom(2, "Русская");
-	// this.AddChatRoom(3, "Тест");
-	// this.AddChatRoom(4, "Хахахах");
-	// this.AddChatRoom(5, "English");
-	// this.AddChatRoom(6, "Русская");
-	// this.AddChatRoom(7, "Тест");
-	// this.AddChatRoom(8, "Хахахах");
-	// this.AddChatRoom(9, "English");
-	// this.AddChatRoom(10, "Русская");
-	// this.AddChatRoom(11, "Тест");
-	// this.AddChatRoom(12, "Хахахах");
-	// this.AddChatRoom(13, "English");
-	// this.AddChatRoom(14, "Русская");
-	// this.AddChatRoom(15, "Тест");
-	// this.AddChatRoom(16, "Хахахах");
-	// this.AddChatRoom(17, "English");
-	// this.AddChatRoom(18, "Русская");
-	// this.AddChatRoom(19, "Тест");
-	// this.AddChatRoom(20, "Хахахах");	this.AddChatRoom(1, "English");
-	// this.AddChatRoom(2, "Русская");
-	// this.AddChatRoom(3, "Тест");
-	// this.AddChatRoom(4, "Хахахах");
-	// this.AddChatRoom(5, "English");
-	// this.AddChatRoom(6, "Русская");
-	// this.AddChatRoom(7, "Тест");
-	// this.AddChatRoom(8, "Хахахах");
-	// this.AddChatRoom(9, "English");
-	// this.AddChatRoom(10, "Русская");
-	// this.AddChatRoom(11, "Тест");
-	// this.AddChatRoom(12, "Хахахах");
-	// this.AddChatRoom(13, "English");
-	// this.AddChatRoom(14, "Русская");
-	// this.AddChatRoom(15, "Тест");
-	// this.AddChatRoom(16, "Хахахах");
-	// this.AddChatRoom(17, "English");
-	// this.AddChatRoom(18, "Русская");
-	// this.AddChatRoom(19, "Тест");
-	// this.AddChatRoom(20, "Хахахах");	this.AddChatRoom(1, "English");
-	// this.AddChatRoom(2, "Русская");
-	// this.AddChatRoom(3, "Тест");
-	// this.AddChatRoom(4, "Хахахах");
-	// this.AddChatRoom(5, "English");
-	// this.AddChatRoom(6, "Русская");
-	// this.AddChatRoom(7, "Тест");
-	// this.AddChatRoom(8, "Хахахах");
-	// this.AddChatRoom(9, "English");
-	// this.AddChatRoom(10, "Русская");
-	// this.AddChatRoom(11, "Тест");
-	// this.AddChatRoom(12, "Хахахах");
-	// this.AddChatRoom(13, "English");
-	// this.AddChatRoom(14, "Русская");
-	// this.AddChatRoom(15, "Тест");
-	// this.AddChatRoom(16, "Хахахах");
-	// this.AddChatRoom(17, "English");
-	// this.AddChatRoom(18, "Русская");
-	// this.AddChatRoom(19, "Тест");
-	// this.AddChatRoom(20, "Хахахах");	this.AddChatRoom(1, "English");
-	// this.AddChatRoom(2, "Русская");
-	// this.AddChatRoom(3, "Тест");
-	// this.AddChatRoom(4, "Хахахах");
-	// this.AddChatRoom(5, "English");
-	// this.AddChatRoom(6, "Русская");
-	// this.AddChatRoom(7, "Тест");
-	// this.AddChatRoom(8, "Хахахах");
-	// this.AddChatRoom(9, "English");
-	// this.AddChatRoom(10, "Русская");
-	// this.AddChatRoom(11, "Тест");
-	// this.AddChatRoom(12, "Хахахах");
-	// this.AddChatRoom(13, "English");
-	// this.AddChatRoom(14, "Русская");
-	// this.AddChatRoom(15, "Тест");
-	// this.AddChatRoom(16, "Хахахах");
-	// this.AddChatRoom(17, "English");
-	// this.AddChatRoom(18, "Русская");
-	// this.AddChatRoom(19, "Тест");
-	// this.AddChatRoom(20, "Хахахах");
-	// this.AddChatRoom(1, "English");
-	// this.AddChatRoom(2, "Русская");
-	// this.AddChatRoom(3, "Тест");
-	// this.AddChatRoom(4, "Хахахах");
-	// this.AddChatRoom(5, "English");
-	// this.AddChatRoom(6, "Русская");
-	// this.AddChatRoom(7, "Тест");
-	// this.AddChatRoom(8, "Хахахах");
-	// this.AddChatRoom(9, "English");
-	// this.AddChatRoom(10, "Русская");
-	// this.AddChatRoom(11, "Тест");
-	// this.AddChatRoom(12, "Хахахах");
-	// this.AddChatRoom(13, "English");
-	// this.AddChatRoom(14, "Русская");
-	// this.AddChatRoom(15, "Тест");
-	// this.AddChatRoom(16, "Хахахах");
-	// this.AddChatRoom(17, "English");
-	// this.AddChatRoom(18, "Русская");
-	// this.AddChatRoom(19, "Тест");
-	// this.AddChatRoom(20, "Хахахах");	this.AddChatRoom(1, "English");
-	// this.AddChatRoom(2, "Русская");
-	// this.AddChatRoom(3, "Тест");
-	// this.AddChatRoom(4, "Хахахах");
-	// this.AddChatRoom(5, "English");
-	// this.AddChatRoom(6, "Русская");
-	// this.AddChatRoom(7, "Тест");
-	// this.AddChatRoom(8, "Хахахах");
-	// this.AddChatRoom(9, "English");
-	// this.AddChatRoom(10, "Русская");
-	// this.AddChatRoom(11, "Тест");
-	// this.AddChatRoom(12, "Хахахах");
-	// this.AddChatRoom(13, "English");
-	// this.AddChatRoom(14, "Русская");
-	// this.AddChatRoom(15, "Тест");
-	// this.AddChatRoom(16, "Хахахах");
-	// this.AddChatRoom(17, "English");
-	// this.AddChatRoom(18, "Русская");
-	// this.AddChatRoom(19, "Тест");
-	// this.AddChatRoom(20, "Хахахах");
 	//
-	// this.AddChatRoom(21, "Последняя");
-
-
-
-
-
+	// var nRoomId = 0;
+	// var oThis = this;
+	// function TEST_AddChatRoom()
+	// {
+	// 	oThis.AddChatRoom(nRoomId++, "Room " + nRoomId);
+	// }
+	//
+	// for (var nIndex = 0; nIndex < 100; nIndex++)
+	// {
+	// 	TEST_AddChatRoom();
+	// }
 
 	// this.AddGameRoom(1, new CGameTree());
 	// this.AddGameRoom(2, new CGameTree());
@@ -888,27 +717,28 @@ CGoUniverseApplication.prototype.private_OpenChatTabs = function()
 
 	if (nLines > nMaxLines)
 	{
-		var nY             = 25;
-		var oVerScroll     = document.getElementById("divIdLChatTabsScroll");
-		var nVisibleH      = parseInt(nClientHeight);
-		var nOverallH      = parseInt(oTabs.scrollHeight);
-		var nScrollH       = Math.max(20, (nVisibleH) * (nVisibleH - nY) / nOverallH) | 0;
-		var nScrollDiff    = nScrollH - (((nVisibleH) * (nVisibleH - nY) / nOverallH) | 0);
-		var nOverallOffset = parseInt(oTabs.scrollTop);
-		var nVisibleOffset = nOverallOffset * (nVisibleH - nY - nScrollDiff) / nOverallH;
-		var nX             = parseInt(oTabs.clientWidth) - 15; // nScrollW + 1 border
+		var oVerScroll = document.getElementById("divIdLChatTabsScroll");
+
+		// sa - scroll area, va - visible area, pa - physical area
+		var vaH = parseInt(nClientHeight);
+		var saY = 25;
+		var paH = parseInt(oTabs.scrollHeight);
+		var paY = parseInt(oTabs.scrollTop);
+		var saH = vaH - saY;
+
+		var sH = Math.max(20, ((vaH - saY) * vaH / paH)) | 0;
+		var sY = Math.max(saY, Math.min(saY + saH - sH + 1, saY + paY * (saH - sH) / (paH - vaH)));
+		var sX = parseInt(oTabs.clientWidth) - 15; // nScrollW + 1 border
 
 		oVerScroll.style.display = "block";
-		oVerScroll.style.height  = nScrollH + "px";
-		oVerScroll.style.top     = Math.max(nY, Math.min(nY + nVisibleOffset, nVisibleH - nScrollH)) + "px";
-		oVerScroll.style.left    = nX + "px";
-		
-		Common_DragHandler.Init(oVerScroll, null, nX, nX, nY, nVisibleH - nScrollH);
-		oVerScroll.onDrag = function(dX, dY)
+		oVerScroll.style.height  = sH + "px";
+		oVerScroll.style.top     = sY + "px";
+		oVerScroll.style.left    = sX + "px";
+
+		Common_DragHandler.Init(oVerScroll, null, sX, sX, saY, saY + saH - sH);
+		oVerScroll.onDrag = function(sX, sY)
 		{
-			var dOffset = dY - nY;
-			var nScrollTop = dOffset * nOverallH / (nVisibleH - nY - nScrollDiff);
-			oTabs.scrollTop = nScrollTop;
+			oTabs.scrollTop = (sY - saY) * (paH - vaH) / (saH - sH);
 		};
 		oVerScroll.onDragStart = function()
 		{
@@ -918,6 +748,9 @@ CGoUniverseApplication.prototype.private_OpenChatTabs = function()
 		{
 			oVerScroll.className = "VerScroll";
 		};
+
+		oTabs.addEventListener("DOMMouseScroll", private_TabsOnScroll, false);
+		oTabs.addEventListener("mousewheel", private_TabsOnScroll, false);
 	}
 };
 CGoUniverseApplication.prototype.private_CollapseChatTabs = function()
@@ -936,6 +769,10 @@ CGoUniverseApplication.prototype.private_CollapseChatTabs = function()
 	document.getElementById("divIdLChatTabsToggleInnerSpan").style.transform = "rotate(90deg)";
 	document.getElementById("divIdLChatTabsScroll").style.display = "none";
 
+	oTabs.removeEventListener("DOMMouseScroll", private_TabsOnScroll, false);
+	oTabs.removeEventListener("mousewheel", private_TabsOnScroll, false);
+
+
 	this.private_ScrollChatTabsToCurrent();
 };
 CGoUniverseApplication.prototype.private_ScrollChatTabsToCurrent = function()
@@ -953,3 +790,45 @@ CGoUniverseApplication.prototype.private_ScrollChatTabsToCurrent = function()
 	var oTabs = document.getElementById("divIdLChatTabs");
 	oTabs.scrollTop = nLine * 25;
 };
+
+function private_TabsOnScroll(e)
+{
+	var oTabs     = document.getElementById("divIdLChatTabs");
+	var oVerScroll = document.getElementById("divIdLChatTabsScroll");
+
+	var nCount    = oTabs.childElementCount;
+	var oLastNode = oTabs.children[nCount - 1];
+	var nOffset   = oLastNode.offsetTop;
+	var nLines    = (((nOffset + 1) / 25) | 0) + 1;
+
+	var nMaxLines = Math.max(Math.min(5, nLines), 1);
+	if (1 === nMaxLines)
+		return;
+
+	var nClientHeight = (nMaxLines * 25 - 1);
+
+
+	var delta = 0;
+
+	if (undefined != e.wheelDelta && e.wheelDelta != 0)
+	{
+		delta = -45 * e.wheelDelta / 120;
+	}
+	else if (undefined != e.detail && e.detail != 0)
+	{
+		delta = 45 * e.detail / 3;
+	}
+
+	oTabs.scrollTop += delta;
+
+	var vaH = parseInt(nClientHeight);
+	var saY = 25;
+	var paH = parseInt(oTabs.scrollHeight);
+	var paY = parseInt(oTabs.scrollTop);
+	var saH = vaH - saY;
+
+	var sH = Math.max(20, ((vaH - saY) * vaH / paH)) | 0;
+	var sY = Math.max(saY, Math.min(saY + saH - sH + 1, saY + paY * (saH - sH) / (paH - vaH)));
+
+	oVerScroll.style.top = sY + "px";
+}
