@@ -14,7 +14,7 @@
     font-style : italic;
 }
 
-#divIdLChatAddInner {
+#divIdLChatAddInner, #divIdLChatTabsToggleInner {
     position    : absolute;
     top         : 0;
     right       : 0;
@@ -23,6 +23,17 @@
     margin      : auto;
 
     line-height : 18px;
+}
+
+#divIdLChatTabsToggleInnerSpan {
+	position   : absolute;
+	top        : 3px;
+	left       : 6px;
+	font-size  : 16px;
+	width      : 16px;
+	height     : 16px;
+	transform  : rotate(90deg);
+	transition : all 0.3s ease;
 }
 
 .ButtonGreen {
@@ -264,4 +275,10 @@ span.UserChatSpan {
 
 span.UserChatSpan:hover {
 	text-decoration: underline;
+}
+
+#divIdLChatTabs {
+	transition-property : all;
+	transition-duration : 0.5s;
+	transition-delay    : 0s;
 }

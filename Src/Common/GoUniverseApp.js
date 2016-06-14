@@ -36,30 +36,30 @@ CGoUniverseApplication.prototype.Init = function()
 	this.private_GotoLoginPage(false);
 	this.OnResize();
 
-	// TEST
-	this.m_oClient = new CKGSClient(this);
-	this.OnConnect();
-
-	this.AddChatRoom(1, "English");
-	this.AddChatRoom(2, "Русская");
-	this.AddChatRoom(3, "Тест");
-	this.AddChatRoom(4, "Хахахах");
-	this.AddChatRoom(5, "English");
-	this.AddChatRoom(6, "Русская");
-	this.AddChatRoom(7, "Тест");
-	this.AddChatRoom(8, "Хахахах");
-	this.AddChatRoom(9, "English");
-	this.AddChatRoom(10, "Русская");
-	this.AddChatRoom(11, "Тест");
-	this.AddChatRoom(12, "Хахахах");
-	this.AddChatRoom(13, "English");
-	this.AddChatRoom(14, "Русская");
-	this.AddChatRoom(15, "Тест");
-	this.AddChatRoom(16, "Хахахах");
-	this.AddChatRoom(17, "English");
-	this.AddChatRoom(18, "Русская");
-	this.AddChatRoom(19, "Тест");
-	this.AddChatRoom(20, "Хахахах");
+	// // TEST
+	// this.m_oClient = new CKGSClient(this);
+	// this.OnConnect();
+	//
+	// this.AddChatRoom(1, "English");
+	// this.AddChatRoom(2, "Русская");
+	// this.AddChatRoom(3, "Тест");
+	// this.AddChatRoom(4, "Хахахах");
+	// this.AddChatRoom(5, "English");
+	// this.AddChatRoom(6, "Русская");
+	// this.AddChatRoom(7, "Тест");
+	// this.AddChatRoom(8, "Хахахах");
+	// this.AddChatRoom(9, "English");
+	// this.AddChatRoom(10, "Русская");
+	// this.AddChatRoom(11, "Тест");
+	// this.AddChatRoom(12, "Хахахах");
+	// this.AddChatRoom(13, "English");
+	// this.AddChatRoom(14, "Русская");
+	// this.AddChatRoom(15, "Тест");
+	// this.AddChatRoom(16, "Хахахах");
+	// this.AddChatRoom(17, "English");
+	// this.AddChatRoom(18, "Русская");
+	// this.AddChatRoom(19, "Тест");
+	// this.AddChatRoom(20, "Хахахах");
 
 
 	// this.AddGameRoom(1, new CGameTree());
@@ -587,7 +587,7 @@ CGoUniverseApplication.prototype.private_InitChannelToggleButton = function(sDiv
 	var oElement = document.getElementById(sDivId);
 	var oControl = CreateControlContainer(sDivId);
 
-	oElement.title           = "Add a channel";
+	oElement.title           = "Open tabs";
 	oElement.style.fontSize  = "24px";
 	oElement.style.textAlign = "center";
 	oElement.addEventListener("selectstart", function()
@@ -597,33 +597,12 @@ CGoUniverseApplication.prototype.private_InitChannelToggleButton = function(sDiv
 	oElement.addEventListener("click", function()
 	{
 		var oTabs = document.getElementById("divIdLChatTabs");
-
 		var sHeight = parseFloat(oTabs.style.height);
 
-
 		if (sHeight < 35)
-		{
-			oTabs.style.height    = "";
-			oTabs.style.minHeight = "25px";
-			oTabs.style.maxHeight = "125px";
-			oTabs.style.backgroundColor = "#F3F3F3";
-			oTabs.style.borderBottom = "1px solid #BEBEBE";
-			oTabs.style.borderRight = "1px solid #BEBEBE";
-			oTabs.style.overflowY    = "auto";
-			oTabs.style.boxShadow          = "0px 1px 2px rgba(0,0,0,0.2)";
-		}
+			oThis.private_OpenChatTabs();
 		else
-		{
-			oTabs.style.height    = "25px";
-			oTabs.style.minHeight = "";
-			oTabs.style.maxHeight = "";
-			oTabs.style.backgroundColor = "transparent";
-			oTabs.style.borderBottom = "1px none #BEBEBE";
-			oTabs.style.borderRight = "1px none #BEBEBE";
-			oTabs.style.overflowY    = "hidden";
-			oTabs.style.boxShadow          = "";
-		}
-
+			oThis.private_CollapseChatTabs();
 	});
 
 	return oControl;
@@ -734,7 +713,27 @@ CGoUniverseApplication.prototype.ShowUserContextMenu = function(nX, nY, sUserNam
 	});
 	oContextMenu.Show();
 };
+CGoUniverseApplication.prototype.private_OpenChatTabs = function()
+{
+	var oTabs     = document.getElementById("divIdLChatTabs");
+	var nCount    = oTabs.childElementCount;
+	var oLastNode = oTabs.childNodes[nCount - 1];
+	var nOffset   = oLastNode.offsetTop;
+	var nLines    = (((nOffset + 1) / 25) | 0) + 1;
 
+	var nMaxLines = Math.max(Math.min(5, nLines), 1);
+	if (1 === nMaxLines)
+		return;
+
+	oTabs.style.height          = (nMaxLines * 25) + "px";
+	oTabs.style.backgroundColor = "#F3F3F3";
+	oTabs.style.borderBottom    = "1px solid #BEBEBE";
+	oTabs.style.borderRight     = "1px solid #BEBEBE";
+	oTabs.style.overflowY       = "auto";
+	oTabs.style.boxShadow       = "0px 1px 2px rgba(0,0,0,0.2)";
+
+	document.getElementById("divIdLChatTabsToggleInnerSpan").style.transform = "rotate(270deg)";
+};
 CGoUniverseApplication.prototype.private_CollapseChatTabs = function()
 {
 	var oTabs = document.getElementById("divIdLChatTabs");
@@ -746,4 +745,6 @@ CGoUniverseApplication.prototype.private_CollapseChatTabs = function()
 	oTabs.style.borderRight     = "1px none #BEBEBE";
 	oTabs.style.overflowY       = "hidden";
 	oTabs.style.boxShadow       = "";
+
+	document.getElementById("divIdLChatTabsToggleInnerSpan").style.transform = "rotate(90deg)";
 };
