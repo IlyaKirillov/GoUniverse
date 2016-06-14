@@ -277,11 +277,6 @@ span.UserChatSpan:hover {
 	text-decoration: underline;
 }
 
-#divIdLChatTabs {
-	transition-property : all;
-	transition-duration : 0.5s;
-	transition-delay    : 0s;
-}
 
 div.VerScroll {
 	position   : absolute;
@@ -304,4 +299,10 @@ div.VerScroll:hover {
 div.VerScrollActive, div.VerScrollActive:hover {
 	border-color:  rgb(255, 255, 255);
 	background-color:  rgb(64, 64, 64);
+}
+
+div.ChatOpenPanel {
+	transition-property : all;
+	transition-duration : 0.5s;
+	transition-delay    : 0s;
 }
