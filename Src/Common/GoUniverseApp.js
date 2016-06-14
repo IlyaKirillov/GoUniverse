@@ -36,30 +36,30 @@ CGoUniverseApplication.prototype.Init = function()
 	this.private_GotoLoginPage(false);
 	this.OnResize();
 
-	// // TEST
-	// this.m_oClient = new CKGSClient(this);
-	// this.OnConnect();
-	//
-	// this.AddChatRoom(1, "English");
-	// this.AddChatRoom(2, "Русская");
-	// this.AddChatRoom(3, "Тест");
-	// this.AddChatRoom(4, "Хахахах");
-	// this.AddChatRoom(5, "English");
-	// this.AddChatRoom(6, "Русская");
-	// this.AddChatRoom(7, "Тест");
-	// this.AddChatRoom(8, "Хахахах");
-	// this.AddChatRoom(9, "English");
-	// this.AddChatRoom(10, "Русская");
-	// this.AddChatRoom(11, "Тест");
-	// this.AddChatRoom(12, "Хахахах");
-	// this.AddChatRoom(13, "English");
-	// this.AddChatRoom(14, "Русская");
-	// this.AddChatRoom(15, "Тест");
-	// this.AddChatRoom(16, "Хахахах");
-	// this.AddChatRoom(17, "English");
-	// this.AddChatRoom(18, "Русская");
-	// this.AddChatRoom(19, "Тест");
-	// this.AddChatRoom(20, "Хахахах");
+	// TEST
+	this.m_oClient = new CKGSClient(this);
+	this.OnConnect();
+
+	this.AddChatRoom(1, "English");
+	this.AddChatRoom(2, "Русская");
+	this.AddChatRoom(3, "Тест");
+	this.AddChatRoom(4, "Хахахах");
+	this.AddChatRoom(5, "English");
+	this.AddChatRoom(6, "Русская");
+	this.AddChatRoom(7, "Тест");
+	this.AddChatRoom(8, "Хахахах");
+	this.AddChatRoom(9, "English");
+	this.AddChatRoom(10, "Русская");
+	this.AddChatRoom(11, "Тест");
+	this.AddChatRoom(12, "Хахахах");
+	this.AddChatRoom(13, "English");
+	this.AddChatRoom(14, "Русская");
+	this.AddChatRoom(15, "Тест");
+	this.AddChatRoom(16, "Хахахах");
+	this.AddChatRoom(17, "English");
+	this.AddChatRoom(18, "Русская");
+	this.AddChatRoom(19, "Тест");
+	this.AddChatRoom(20, "Хахахах");
 
 
 	// this.AddGameRoom(1, new CGameTree());
@@ -125,6 +125,7 @@ CGoUniverseApplication.prototype.OnResize = function()
 	}
 
 	this.private_CollapsePopups(true);
+	this.private_CollapseChatTabs();
 };
 CGoUniverseApplication.prototype.OpenRoomList = function()
 {
