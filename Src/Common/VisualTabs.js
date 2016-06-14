@@ -530,8 +530,6 @@ CVisualChatRoomTab.prototype.UpdatePopupPosition = function(oPopup)
 	oHtmlElement.style.left = (oPos.X - 1) + "px";
 	oHtmlElement.style.top = (oPos.Y + 24 - nScrollOffset) + "px";
 	oHtmlElement.style.width = this.m_oTabDiv.clientWidth;
-
-	//oHtmlElement.parentNode.scrollTop
 };
 CVisualChatRoomTab.prototype.private_InitTab = function(sRoomName)
 {

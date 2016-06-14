@@ -145,6 +145,7 @@ function CVisualContextMenu(oApp, nX, nY)
 
 
 	var oHtmlElement            = this.m_oPopup.GetHtmlElement();
+	oHtmlElement.style.zIndex   = 0xFFFFFFFF;
 	oHtmlElement.style.position = "absolute";
 	oHtmlElement.style.top      = "100px";
 	oHtmlElement.style.left     = "100px";
@@ -199,7 +200,7 @@ CVisualContextMenu.prototype.AddCheckBoxItem = function(bChecked, sText, fAction
 	oTextItem.style.overflow    = "hidden";
 	Common.Set_InnerTextToElement(oTextItem, sText);
 	oListEntry.appendChild(oTextItem);
-	
+
 	if (fAction)
 		oListEntry.addEventListener("click", fAction, false);
 
