@@ -727,17 +727,16 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 	oGameTree.Set_BlackRating(sBlackRank);
 	oGameTree.Set_WhiteRating(sWhiteRank);
 
-	this.m_oApp.AddGameRoom(GameRoomId, oGameTree);
+	var bDemo = false;
+	if (oMessage.gameSummary.players.owner)
+	{
+		bDemo = true;
+		oGameTree.Set_GameTranscriber(oMessage.gameSummary.players.owner.name + (oMessage.gameSummary.players.owner.rank ? "[" + oMessage.gameSummary.players.owner.rank + "]" : ""));
+	}
+
+	this.m_oApp.AddGameRoom(GameRoomId, oGameTree, bDemo);
 	this.m_oApp.SetCurrentGameRoomTab(GameRoomId);
 
-
-	// TODO: Сделать надпись для демонстраций по другому
-	if ("" === sBlackName && "" === sWhiteName && oMessage.gameSummary.players.owner)
-	{
-	}
-	else
-	{
-	}
 
 	oGame.GameTree = oGameTree;
 

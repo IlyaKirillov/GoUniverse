@@ -310,10 +310,10 @@ CGoUniverseApplication.prototype.OnAddChatMessage = function(nChatRoomId, sUserN
 		oTextDiv.style.display = "none";
 	}
 };
-CGoUniverseApplication.prototype.AddGameRoom = function(nGameRoomId, oGameTree)
+CGoUniverseApplication.prototype.AddGameRoom = function(nGameRoomId, oGameTree, bDemonstration)
 {
 	var oTab = new CVisualGameRoomTab(this);
-	var oGameRoomControl = oTab.InitGameRoom(nGameRoomId, oGameTree, "divMainId");
+	var oGameRoomControl = oTab.InitGameRoom(nGameRoomId, oGameTree, "divMainId", bDemonstration);
 	this.m_oGameRoomTabs.AddTab(oTab, true);
 
 	oGameRoomControl.Bounds.SetParams(0, 50, 1000, 1000, false, true, false, false, -1, -1);

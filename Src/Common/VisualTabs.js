@@ -235,7 +235,7 @@ CVisualGameRoomTab.prototype.InitMainRoom = function(nId, sMainDivId, sTabDivId)
 		oThis.OnClick();
 	});
 };
-CVisualGameRoomTab.prototype.InitGameRoom = function(nId, oGameTree, sDivIdContainer)
+CVisualGameRoomTab.prototype.InitGameRoom = function(nId, oGameTree, sDivIdContainer, bDemonstration)
 {
 	var oThis = this;
 
@@ -323,12 +323,22 @@ CVisualGameRoomTab.prototype.InitGameRoom = function(nId, oGameTree, sDivIdConta
 	var sBlackName = oGameTree.Get_BlackName();
 	var oCaptionDiv = document.createElement("div");
 	oCaptionDiv.style.textAlign = "left";
-	var oCaptionStringDiv = document.createElement("div");
-	oCaptionStringDiv.innerHTML = String.fromCharCode(0x2691) + "&nbsp;" + sWhiteName;
-	oCaptionDiv.appendChild(oCaptionStringDiv);
-	oCaptionStringDiv = document.createElement("div");
-	oCaptionStringDiv.innerHTML = String.fromCharCode(0x2690) + "&nbsp;" + sBlackName;
-	oCaptionDiv.appendChild(oCaptionStringDiv);
+
+	if (true !== bDemonstration)
+	{
+		var oCaptionStringDiv       = document.createElement("div");
+		oCaptionStringDiv.innerHTML = String.fromCharCode(0x2691) + "&nbsp;" + sWhiteName + "[" + oGameTree.Get_WhiteRating() + "]";
+		oCaptionDiv.appendChild(oCaptionStringDiv);
+		oCaptionStringDiv           = document.createElement("div");
+		oCaptionStringDiv.innerHTML = String.fromCharCode(0x2690) + "&nbsp;" + sBlackName + "[" + oGameTree.Get_BlackRating() + "]";
+		oCaptionDiv.appendChild(oCaptionStringDiv);
+	}
+	else
+	{
+		var oCaptionStringDiv       = document.createElement("div");
+		oCaptionStringDiv.innerHTML = String.fromCharCode(0x2615) + "&nbsp;" + oGameTree.Get_GameTranscriber();
+		oCaptionDiv.appendChild(oCaptionStringDiv);
+	}
 	oButton.appendChild(oCaptionDiv);
 
 	// Кнопка для закрытия таба
@@ -688,6 +698,7 @@ CVisualChatRoomTab.prototype.private_InitMenuButton = function()
 	var oMenuButton      = document.createElement("button");
 	oMenuButton.tabIndex = "0";
 	oMenuButton.className += " ChatMenuButton";
+	oMenuButton.style["float"] = "right";
 
 	var oCenter    = document.createElement("center");
 	var oCenterDiv = document.createElement("div");
@@ -735,7 +746,7 @@ CVisualChatRoomTab.prototype.private_InitMenu = function()
 	this.private_AddMenuButton(oHtmlElement, "left", "ChatMenuSpanLeftArrow",  function()
 	{
 		oThis.MoveTabToStart();
-	}, "Move this tab upward");
+	}, "Move this tab to the start of the list");
 	this.private_AddMenuButton(oHtmlElement, "left", "ChatMenuSpanInfo",  function()
 	{
 		oThis.ShowRoomInfo();
