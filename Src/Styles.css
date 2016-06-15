@@ -227,6 +227,10 @@ div.Selectable {
 	content : '\003f';
 }
 
+.ChatMenuSpanLeftArrow:before {
+	content : '\21F1';
+}
+
 .ChatMenuSpanSound:before {
 	content : '\260E';
 }

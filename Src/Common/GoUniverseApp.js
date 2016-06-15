@@ -773,9 +773,9 @@ CGoUniverseApplication.prototype.private_CollapseChatTabs = function()
 	oTabs.removeEventListener("mousewheel", private_TabsOnScroll, false);
 
 
-	this.private_ScrollChatTabsToCurrent();
+	this.ScrollChatTabsToCurrent();
 };
-CGoUniverseApplication.prototype.private_ScrollChatTabsToCurrent = function()
+CGoUniverseApplication.prototype.ScrollChatTabsToCurrent = function()
 {
 	var nChatRoomId = this.m_oChatRoomTabs.GetCurrentId();
 	var oTab = this.m_oChatRoomTabs.GetTab(nChatRoomId);

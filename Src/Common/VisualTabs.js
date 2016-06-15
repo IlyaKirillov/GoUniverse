@@ -139,6 +139,16 @@ CVisualTabs.prototype.GetTabByIndex = function(nIndex)
 
 	return this.m_arrTabs[nIndex];
 };
+CVisualTabs.prototype.MoveTabToStart = function(oTab)
+{
+	var oTabDiv = oTab.GetDiv();
+
+	if (oTabDiv.parentNode === this.m_oPanelElement && oTabDiv !== this.m_oPanelElement.children[0])
+	{
+		this.m_oPanelElement.removeChild(oTabDiv);
+		this.m_oPanelElement.insertBefore(oTabDiv, this.m_oPanelElement.children[0]);
+	}
+};
 
 function CVisualGameRoomTabs()
 {
@@ -458,6 +468,8 @@ function CVisualChatRoomTab(oApp)
 	this.m_nNewMessagesCount = 0;
 	this.m_oMessagesDiv      = null;
 	this.m_oPopup            = null;
+
+	this.m_nMinWidth         = 3 * 26 + 2;
 }
 CVisualChatRoomTab.prototype.Init = function(nId, sRoomName, bPrivate)
 {
@@ -608,6 +620,7 @@ CVisualChatRoomTab.prototype.private_InitTab = function(sRoomName)
 	DivTab.style.transitionDuration = ".25s";
 	DivTab.style.float              = "left";
 	DivTab.style.height             = sHeight;
+	DivTab.style.minWidth           = this.m_nMinWidth + "px";
 	DivTab.style.margin             = "0px";
 	DivTab.style.padding            = "0px";
 	DivTab.style.color              = "#000";
@@ -719,7 +732,10 @@ CVisualChatRoomTab.prototype.private_InitMenu = function()
 	{
 		oThis.OnClickClose();
 	}, "Close");
-
+	this.private_AddMenuButton(oHtmlElement, "left", "ChatMenuSpanLeftArrow",  function()
+	{
+		oThis.MoveTabToStart();
+	}, "Move this tab upward");
 	this.private_AddMenuButton(oHtmlElement, "left", "ChatMenuSpanInfo",  function()
 	{
 		oThis.ShowRoomInfo();
@@ -771,4 +787,9 @@ CVisualChatRoomTab.prototype.ShowRoomInfo = function()
 			this.m_oApp.ShowRoomInfo(this.GetId());
 		}
 	}
+};
+CVisualChatRoomTab.prototype.MoveTabToStart = function()
+{
+	this.m_oParent.MoveTabToStart(this);
+	this.m_oApp.ScrollChatTabsToCurrent();
 };
