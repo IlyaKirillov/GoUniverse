@@ -36,22 +36,22 @@ CGoUniverseApplication.prototype.Init = function()
 	this.private_GotoLoginPage(false);
 	this.OnResize();
 
-	// // TEST
-	this.m_oClient = new CKGSClient(this);
-	this.OnConnect();
+	// // // TEST
+	// this.m_oClient = new CKGSClient(this);
+	// this.OnConnect();
+	// //
 	//
-
-	var nRoomId = 0;
-	var oThis = this;
-	function TEST_AddChatRoom()
-	{
-		oThis.AddChatRoom(nRoomId++, "Room " + nRoomId);
-	}
-
-	for (var nIndex = 0; nIndex < 100; nIndex++)
-	{
-		TEST_AddChatRoom();
-	}
+	// var nRoomId = 0;
+	// var oThis = this;
+	// function TEST_AddChatRoom()
+	// {
+	// 	oThis.AddChatRoom(nRoomId++, "Room " + nRoomId);
+	// }
+	//
+	// for (var nIndex = 0; nIndex < 100; nIndex++)
+	// {
+	// 	TEST_AddChatRoom();
+	// }
 
 	// this.AddGameRoom(1, new CGameTree());
 	// this.AddGameRoom(2, new CGameTree());
