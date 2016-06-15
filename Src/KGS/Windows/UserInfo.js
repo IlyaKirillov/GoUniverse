@@ -148,7 +148,7 @@ CKGSUserInfoWindow.prototype.OnUserGameArchive = function(oMessage)
 
 				if (nRecentGamesCount > 0)
 				{
-					sRecentGames = sRecentGames + "W";
+					sRecentGames += "W";
 					nRecentGamesCount--;
 				}
 			}
@@ -157,7 +157,7 @@ CKGSUserInfoWindow.prototype.OnUserGameArchive = function(oMessage)
 				nLoses++;
 				if (nRecentGamesCount > 0)
 				{
-					sRecentGames = sRecentGames + "L";
+					sRecentGames += "L";
 					nRecentGamesCount--;
 				}
 			}

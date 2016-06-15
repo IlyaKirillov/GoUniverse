@@ -36,22 +36,22 @@ CGoUniverseApplication.prototype.Init = function()
 	this.private_GotoLoginPage(false);
 	this.OnResize();
 
-	// // // TEST
-	// this.m_oClient = new CKGSClient(this);
-	// this.OnConnect();
-	// //
+	// // TEST
+	this.m_oClient = new CKGSClient(this);
+	this.OnConnect();
 	//
-	// var nRoomId = 0;
-	// var oThis = this;
-	// function TEST_AddChatRoom()
-	// {
-	// 	oThis.AddChatRoom(nRoomId++, "Room " + nRoomId);
-	// }
-	//
-	// for (var nIndex = 0; nIndex < 100; nIndex++)
-	// {
-	// 	TEST_AddChatRoom();
-	// }
+
+	var nRoomId = 0;
+	var oThis = this;
+	function TEST_AddChatRoom()
+	{
+		oThis.AddChatRoom(nRoomId++, "Room " + nRoomId);
+	}
+
+	for (var nIndex = 0; nIndex < 100; nIndex++)
+	{
+		TEST_AddChatRoom();
+	}
 
 	// this.AddGameRoom(1, new CGameTree());
 	// this.AddGameRoom(2, new CGameTree());
@@ -439,6 +439,7 @@ CGoUniverseApplication.prototype.private_InitClientPage = function()
 	this.m_oClientControl.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, -1);
 	this.m_oClientControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
 
+	this.private_InitOmnibox();
 	this.private_InitExitButton();
 	this.private_InitGameTabs();
 	this.private_InitMainRoom();
@@ -597,6 +598,22 @@ CGoUniverseApplication.prototype.private_InitExitButton = function()
 		{
 			oThis.m_oClient.Disconnect();
 			oThis.Logout();
+		}
+	});
+};
+CGoUniverseApplication.prototype.private_InitOmnibox = function()
+{
+	var oThis = this;
+
+	var oInput = document.getElementById("OmniboxInput");
+	oInput.addEventListener("keypress", function(e)
+	{
+		var event    = e || window.event;
+		var charCode = event.which || event.keyCode;
+		if (13 === charCode)
+		{
+			oThis.m_oClient.LoadUserInfo(this.value);
+			return false;
 		}
 	});
 };

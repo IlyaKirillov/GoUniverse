@@ -310,3 +310,25 @@ div.ChatOpenPanel {
 	transition-duration : 0.5s;
 	transition-delay    : 0s;
 }
+
+input.SearchInput {
+	background-color : #000000;
+	color            : #505050;
+	border           : 1px solid #505050;
+	font-family      : "Segoe UI", Helvetica, Tahoma, Geneva, Verdana, sans-serif;
+	height           : 28px;
+	width            : 150px;
+	font-size        : 13px;
+	padding          : 0px 6px 0px 6px;
+	outline          : none;
+}
+
+input.SearchInput:hover {
+	color            : #FFFFFF;
+	border           : 1px solid #969696;
+}
+
+input.SearchInput:focus {
+	color            : #FFFFFF;
+	border           : 1px solid #969696;
+}
