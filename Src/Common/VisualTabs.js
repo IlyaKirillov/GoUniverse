@@ -408,6 +408,40 @@ function CVisualChatRoomTabs()
 	CVisualChatRoomTabs.superclass.constructor.call(this);
 }
 CommonExtend(CVisualChatRoomTabs, CVisualTabs);
+CVisualChatRoomTabs.prototype.AddTab = function(oTab, bMakeCurrent)
+{
+	this.m_arrTabs.push(oTab);
+	oTab.SetParent(this);
+
+	if (true === bMakeCurrent)
+		this.m_oCurrentTab = oTab;
+
+	var sName   = oTab.GetRoomName();
+	var oTabDiv = oTab.GetDiv();
+
+	if (oTab.IsPrivate())
+	{
+		this.m_oPanelElement.appendChild(oTabDiv);
+	}
+	else
+	{
+		for (var nIndex = 0, nCount = this.m_oPanelElement.children.length; nIndex < nCount; ++nIndex)
+		{
+			var oTempTabDiv = this.m_oPanelElement.children[nIndex];
+			if (oTempTabDiv.visualTab)
+			{
+				var sRoomName = oTempTabDiv.visualTab.GetRoomName();
+				if (Common.Compare_Strings(sName, sRoomName) < 0)
+				{
+					this.m_oPanelElement.insertBefore(oTabDiv, oTempTabDiv);
+					return;
+				}
+			}
+		}
+
+		this.m_oPanelElement.appendChild(oTabDiv);
+	}
+};
 
 function CVisualChatRoomTab(oApp)
 {
@@ -416,6 +450,8 @@ function CVisualChatRoomTab(oApp)
 	this.m_nId     = -1;
 	this.m_oTabDiv = null;
 
+	this.m_bPrivateChat      = false;
+	this.m_sRoomName         = "";
 	this.m_oTabBackgroundDiv = null;
 	this.m_oTabForegroundDiv = null;
 
@@ -423,14 +459,24 @@ function CVisualChatRoomTab(oApp)
 	this.m_oMessagesDiv      = null;
 	this.m_oPopup            = null;
 }
-CVisualChatRoomTab.prototype.Init = function(nId, sRoomName)
+CVisualChatRoomTab.prototype.Init = function(nId, sRoomName, bPrivate)
 {
 	this.m_nId               = nId;
 	this.m_nNewMessagesCount = 0;
+	this.m_bPrivateChat      = bPrivate;
+	this.m_sRoomName         = sRoomName;
 
 	this.private_InitTab(sRoomName);
 	this.private_InitMenuButton(sRoomName);
 	this.private_InitMenu();
+};
+CVisualChatRoomTab.prototype.GetRoomName = function()
+{
+	return this.m_sRoomName;
+};
+CVisualChatRoomTab.prototype.IsPrivate = function()
+{
+	return this.m_bPrivateChat;
 };
 CVisualChatRoomTab.prototype.GetId = function()
 {
@@ -606,6 +652,11 @@ CVisualChatRoomTab.prototype.private_InitTab = function(sRoomName)
 	var NewTabDiv = document.createElement("div");
 	NewTabDiv.style.textAlign = "left";
 	var oCaptionDiv = document.createElement("div");
+	if (true === this.m_bPrivateChat)
+	{
+		oCaptionDiv.style.fontWeight = "bold";
+		oCaptionDiv.style.color      = "#008272";
+	}
 	oCaptionDiv.innerHTML = sRoomName;
 	NewTabDiv.appendChild(oCaptionDiv);
 	NewTabDiv.addEventListener("selectstart", function()
@@ -615,7 +666,8 @@ CVisualChatRoomTab.prototype.private_InitTab = function(sRoomName)
 	NewTab.appendChild(NewTabDiv);
 	DivTab.appendChild(NewTab);
 
-	this.m_oTabDiv     = DivTab;
+	DivTab.visualTab = this;
+	this.m_oTabDiv = DivTab;
 };
 CVisualChatRoomTab.prototype.private_InitMenuButton = function()
 {

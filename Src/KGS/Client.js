@@ -941,7 +941,7 @@ CKGSClient.prototype.private_HandleConvoJoin = function(oMessage)
 	this.private_HandleUserRecord({name : this.GetUserName(), rank : undefined}, this.m_oPrivateChats[nChannelId]);
 	this.private_HandleUserRecord(oMessage.user, this.m_oPrivateChats[nChannelId]);
 
-	this.m_oApp.AddChatRoom(nChannelId, sUserName + "(P)", true);
+	this.m_oApp.AddChatRoom(nChannelId, sUserName, true);
 	this.m_nChatChannelId = nChannelId;
 	this.m_oApp.SetCurrentChatRoomTab(nChannelId);
 

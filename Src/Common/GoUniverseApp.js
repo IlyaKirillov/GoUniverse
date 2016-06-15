@@ -37,21 +37,21 @@ CGoUniverseApplication.prototype.Init = function()
 	this.OnResize();
 
 	// // TEST
-	// this.m_oClient = new CKGSClient(this);
-	// this.OnConnect();
-	// //
+	this.m_oClient = new CKGSClient(this);
+	this.OnConnect();
 	//
-	// var nRoomId = 0;
-	// var oThis = this;
-	// function TEST_AddChatRoom()
-	// {
-	// 	oThis.AddChatRoom(nRoomId++, "Room " + nRoomId);
-	// }
-	//
-	// for (var nIndex = 0; nIndex < 100; nIndex++)
-	// {
-	// 	TEST_AddChatRoom();
-	// }
+
+	var nRoomId = 0;
+	var oThis = this;
+	function TEST_AddChatRoom()
+	{
+		oThis.AddChatRoom(nRoomId++, "Room " + nRoomId);
+	}
+
+	for (var nIndex = 0; nIndex < 100; nIndex++)
+	{
+		TEST_AddChatRoom();
+	}
 
 	// this.AddGameRoom(1, new CGameTree());
 	// this.AddGameRoom(2, new CGameTree());
@@ -160,10 +160,10 @@ CGoUniverseApplication.prototype.GetGamesListView = function()
 {
 	return this.m_oGamesListView;
 };
-CGoUniverseApplication.prototype.AddChatRoom = function(nChatRoomId, sRoomName)
+CGoUniverseApplication.prototype.AddChatRoom = function(nChatRoomId, sRoomName, bPrivate)
 {
 	var oTab = new CVisualChatRoomTab(this);
-	oTab.Init(nChatRoomId, sRoomName);
+	oTab.Init(nChatRoomId, sRoomName, bPrivate);
 	this.m_oChatRoomTabs.AddTab(oTab);
 };
 CGoUniverseApplication.prototype.SetCurrentChatRoom = function(nChatRoomId)
@@ -504,7 +504,7 @@ CGoUniverseApplication.prototype.private_InitChats = function(oChatControl)
 	oChatControl.AddControl(oChatTabsBack);
 
 	var oChatTabs = this.m_oChatRoomTabs.Init("divIdLChatTabs");
-	oChatTabs.Bounds.SetParams(0, 1, 63, 0, true, true, true, false, -1, 25);
+	oChatTabs.Bounds.SetParams(0, 1, 64, 0, true, true, true, false, -1, 25);
 	oChatTabs.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left);
 	oChatControl.AddControl(oChatTabs);
 
@@ -711,7 +711,7 @@ CGoUniverseApplication.prototype.private_OpenChatTabs = function()
 	oTabs.style.backgroundColor = "#F3F3F3";
 	oTabs.style.borderBottom    = "1px solid #BEBEBE";
 	oTabs.style.borderRight     = "1px solid #BEBEBE";
-	oTabs.style.boxShadow       = "0px 1px 2px rgba(0,0,0,0.2)";
+	oTabs.style.boxShadow       = "0px 1px 4px rgba(0,0,0,0.2)";
 
 	document.getElementById("divIdLChatTabsToggleInnerSpan").style.transform = "rotate(270deg)";
 
