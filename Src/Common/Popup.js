@@ -212,10 +212,14 @@ CVisualContextMenu.prototype.Show = function()
 };
 CVisualContextMenu.prototype.UpdatePopupPosition = function(oPopup)
 {
-	var oHtmlElement = this.m_oPopup.GetHtmlElement();
+	var nAppHeight = this.m_oApp.GetHeight();
+	if (this.m_nY + this.m_nHeight > nAppHeight)
+		this.m_nY = nAppHeight - this.m_nHeight;
+
+	var oHtmlElement        = this.m_oPopup.GetHtmlElement();
 	oHtmlElement.style.left = this.m_nX + "px";
 	oHtmlElement.style.top  = this.m_nY + "px";
-};
+}
 CVisualContextMenu.prototype.OnHidePopup = function(oPopup)
 {
 	var oHtmlElement = oPopup.GetHtmlElement();

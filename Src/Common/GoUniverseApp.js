@@ -637,6 +637,9 @@ CGoUniverseApplication.prototype.private_ClearChat = function()
 	{
 		oDiv.removeChild(oDiv.firstChild);
 	}
+
+	var oChatInput = document.getElementById("inputChatId");
+	oChatInput.value = "";
 };
 CGoUniverseApplication.prototype.private_CloseAllWindows = function()
 {
@@ -789,6 +792,14 @@ CGoUniverseApplication.prototype.ScrollChatTabsToCurrent = function()
 
 	var oTabs = document.getElementById("divIdLChatTabs");
 	oTabs.scrollTop = nLine * 25;
+};
+CGoUniverseApplication.prototype.IsTypingChatMessage = function()
+{
+	var oChatInput = document.getElementById("inputChatId");
+	if ("" === oChatInput.value)
+		return false;
+
+	return true;
 };
 
 function private_TabsOnScroll(e)

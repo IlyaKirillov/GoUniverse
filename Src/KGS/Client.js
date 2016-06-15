@@ -943,8 +943,9 @@ CKGSClient.prototype.private_HandleConvoJoin = function(oMessage)
 
 	this.m_oApp.AddChatRoom(nChannelId, sUserName, true);
 	this.m_nChatChannelId = nChannelId;
-	this.m_oApp.SetCurrentChatRoomTab(nChannelId);
 
+	if (true !== this.m_oApp.IsTypingChatMessage())
+		this.m_oApp.SetCurrentChatRoomTab(nChannelId);
 };
 CKGSClient.prototype.private_HandleArchiveJoin = function(oMessage)
 {
