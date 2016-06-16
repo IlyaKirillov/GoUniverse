@@ -100,11 +100,16 @@ CKGSClient.prototype.SendChatMessage = function(sText)
 };
 CKGSClient.prototype.LoadUserInfo = function(sUserName)
 {
+	var sUserName = sUserName.toLowerCase();
+
 	if (this.m_oUserInfo[sUserName])
 		return;
 
+	var oWindow = CreateKGSWindow(EKGSWindowType.UserInfo, {UserName : sUserName, Client : this, App: this.m_oApp});
+	oWindow.Hide();
+
 	this.m_oUserInfo[sUserName] = {
-		Window         : CreateKGSWindow(EKGSWindowType.UserInfo, {UserName : sUserName, Client : this, App: this.m_oApp}),
+		Window         : oWindow,
 		UserName       : sUserName,
 		DetailsChannel : -1,
 		ArchiveChannel : -1
@@ -122,6 +127,7 @@ CKGSClient.prototype.LoadUserInfo = function(sUserName)
 };
 CKGSClient.prototype.CloseUserInfo = function(sUserName)
 {
+	var sUserName = sUserName.toLowerCase();
 	if (this.m_oUserInfo[sUserName])
 	{
 
@@ -478,6 +484,14 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
 	else if ("FRIEND_CHANGE_NO_USER" === oMessage.type)
 	{
 		this.private_HandleFriendChangeNoUser(oMessage);
+	}
+	else if ("DETAILS_NONEXISTANT" === oMessage.type)
+	{
+		this.private_HandleDetailsNonExistant(oMessage);
+	}
+	else if ("ARCHIVE_NONEXISTANT" === oMessage.type)
+	{
+		this.private_HandleArchiveNonExistant(oMessage);
 	}
 	else
 	{
@@ -861,11 +875,12 @@ CKGSClient.prototype.private_HandleJoinComplete = function(oMessage)
 };
 CKGSClient.prototype.private_HandleDetailsJoin = function(oMessage)
 {
-	var sUserName = oMessage.user.name;
+	var sUserName = oMessage.user.name.toLowerCase();
 	if (this.m_oUserInfo[sUserName])
 	{
-		this.m_oUserInfo[sUserName].DetailsChannel = oMessage.channelId;
 		this.m_oUserInfo[sUserName].Window.OnUserDetails(oMessage);
+		this.m_oUserInfo[sUserName].Window.Show();
+		this.m_oUserInfo[sUserName].DetailsChannel = oMessage.channelId;
 	}
 	else
 	{
@@ -948,7 +963,7 @@ CKGSClient.prototype.private_HandleConvoJoin = function(oMessage)
 };
 CKGSClient.prototype.private_HandleArchiveJoin = function(oMessage)
 {
-	var sUserName = oMessage.user.name;
+	var sUserName = oMessage.user.name.toLowerCase();
 	if (this.m_oUserInfo[sUserName])
 	{
 		this.m_oUserInfo[sUserName].ArchiveChannel = oMessage.channelId;
@@ -1025,6 +1040,20 @@ CKGSClient.prototype.private_HandleFriendRemoveSuccess = function(oMessage)
 CKGSClient.prototype.private_HandleFriendChangeNoUser = function(oMessage)
 {
 	console.log("Bad user friend change request");
+};
+CKGSClient.prototype.private_HandleDetailsNonExistant = function(oMessage)
+{
+	// TODO: Error message
+};
+CKGSClient.prototype.private_HandleArchiveNonExistant = function(oMessage)
+{
+	var sUserName = oMessage.name.toLowerCase();
+	if (this.m_oUserInfo[sUserName])
+	{
+		var oUser = this.m_oUserInfo[sUserName];
+		if (oUser.Window)
+			oUser.Window.Close();
+	}
 };
 CKGSClient.prototype.private_GetRank = function(sRank)
 {

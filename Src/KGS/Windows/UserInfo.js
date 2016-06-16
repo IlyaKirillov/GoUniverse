@@ -73,10 +73,17 @@ CKGSUserInfoWindow.prototype.Close = function()
 	if (this.m_oClient)
 		this.m_oClient.CloseUserInfo(this.m_sUserName);
 };
+CKGSUserInfoWindow.prototype.Hide = function()
+{
+	CKGSUserInfoWindow.superclass.Close.call(this);
+};
 CKGSUserInfoWindow.prototype.OnUserDetails = function(oDetails)
 {
 	if (oDetails)
 	{
+		this.m_sUserName = oDetails.user.name;
+		this.Set_Caption(this.m_sUserName);
+
 		if (-1 !== oDetails.user.flags.indexOf("a"))
 			this.OnUserAvatar();
 
@@ -89,7 +96,7 @@ CKGSUserInfoWindow.prototype.OnUserDetails = function(oDetails)
 		this.private_AddInfo(oDetails.personalInfo);
 	}
 };
-CKGSUserInfoWindow.prototype.OnUserAvatar = function(oMessage)
+CKGSUserInfoWindow.prototype.OnUserAvatar = function()
 {
 	var oImg = document.createElement("img");
 	oImg.style.float  = "right";
