@@ -75,7 +75,7 @@
 	margin                 : 0px;
 	padding                : 0px 14px;
 	color                  : #FFFFFF;
-	float                  : left;
+	float                  : right;
 	transition-property    : width, height, background, margin, border, padding;
 	transition-duration    : .25s;
 }

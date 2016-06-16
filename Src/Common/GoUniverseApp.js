@@ -36,23 +36,23 @@ CGoUniverseApplication.prototype.Init = function()
 	this.private_GotoLoginPage(false);
 	this.OnResize();
 
-	// // TEST
-	this.m_oClient = new CKGSClient(this);
-	this.OnConnect();
+	// // // TEST
+	// this.m_oClient = new CKGSClient(this);
+	// this.OnConnect();
+	// //
 	//
-
-	var nRoomId = 0;
-	var oThis = this;
-	function TEST_AddChatRoom()
-	{
-		oThis.AddChatRoom(nRoomId++, "Room " + nRoomId);
-	}
-
-	for (var nIndex = 0; nIndex < 100; nIndex++)
-	{
-		TEST_AddChatRoom();
-	}
-
+	// var nRoomId = 0;
+	// var oThis = this;
+	// function TEST_AddChatRoom()
+	// {
+	// 	oThis.AddChatRoom(nRoomId++, "Room " + nRoomId);
+	// }
+	//
+	// for (var nIndex = 0; nIndex < 100; nIndex++)
+	// {
+	// 	TEST_AddChatRoom();
+	// }
+	//
 	// this.AddGameRoom(1, new CGameTree());
 	// this.AddGameRoom(2, new CGameTree());
 	// this.AddGameRoom(3, new CGameTree());
@@ -455,6 +455,29 @@ CGoUniverseApplication.prototype.private_InitGameTabs = function()
 	var oMainRoomTab = new CVisualGameRoomTab(this);
 	oMainRoomTab.InitMainRoom(-1, "divIdMainRoom", "divIdMainRoomTab");
 	this.m_oGameRoomTabs.AddMainRoomTab(oMainRoomTab, true);
+
+	this.private_InitTabPanel(oTabsControl);
+};
+CGoUniverseApplication.prototype.private_InitTabPanel = function(oTabsControl)
+{
+	// Кнопка HOME
+	var oHomeControl = CreateControlContainer("divIdHomeButton");
+	oHomeControl.Bounds.SetParams(0, 0, 0, 1000, false, false, false, false, 200, -1);
+	oHomeControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_bottom);
+	oTabsControl.AddControl(oHomeControl);
+
+	// Правая панелька с поиском, ником и кнопкой выхода
+	var oRightPanel = CreateControlContainer("divIdPanelRight");
+	oRightPanel.Bounds.SetParams(0, 0, 0, 1000, false, false, true, false, 300, -1);
+	oRightPanel.Anchor = (g_anchor_top | g_anchor_right | g_anchor_bottom);
+	oTabsControl.AddControl(oRightPanel);
+
+
+	// Панель под табы с игровыми комнатами
+	var oGameRoomTabs = CreateControlContainer("divIdTabPanelRooms");
+	oGameRoomTabs.Bounds.SetParams(200, 0, 300, 1000, true, false, true, false, -1, -1);
+	oGameRoomTabs.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right | g_anchor_bottom);
+	oTabsControl.AddControl(oGameRoomTabs);
 };
 CGoUniverseApplication.prototype.private_InitMainRoom = function()
 {
@@ -613,9 +636,14 @@ CGoUniverseApplication.prototype.private_InitOmnibox = function()
 		if (13 === charCode)
 		{
 			oThis.m_oClient.LoadUserInfo(this.value);
+			this.value = "";
 			return false;
 		}
 	});
+	oInput.addEventListener("blur", function(e)
+	{
+		this.value = "";
+	}, false);
 };
 CGoUniverseApplication.prototype.private_ClearClient = function()
 {
