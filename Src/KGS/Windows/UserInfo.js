@@ -116,6 +116,8 @@ CKGSUserInfoWindow.prototype.OnUserGameArchive = function(oMessage)
 	var nRecentGamesCount = 20;
 	var sRecentGames = "";
 
+	var sUserName = this.m_sUserName.toLocaleLowerCase();
+
 	for (var nIndex = arrGames.length - 1; nIndex >= 0; --nIndex)
 	{
 		var oGame  = arrGames[nIndex];
@@ -123,8 +125,8 @@ CKGSUserInfoWindow.prototype.OnUserGameArchive = function(oMessage)
 
 		if ("ranked" === sType || "free" === sType)
 		{
-			var sBlack = oGame.players.black.name;
-			var sWhite = oGame.players.white.name;
+			var sBlack = oGame.players.black.name.toLowerCase();
+			var sWhite = oGame.players.white.name.toLowerCase();
 			var sScore = "" + oGame.score;
 
 			var bBlackWon = false;
@@ -148,8 +150,8 @@ CKGSUserInfoWindow.prototype.OnUserGameArchive = function(oMessage)
 			{
 				nUnfinished++;
 			}
-			else if ((true === bBlackWon && sBlack === this.m_sUserName)
-				|| (true !== bBlackWon && sWhite === this.m_sUserName))
+			else if ((true === bBlackWon && sBlack === sUserName)
+				|| (true !== bBlackWon && sWhite === sUserName))
 			{
 				nWins++;
 

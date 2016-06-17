@@ -7,38 +7,34 @@
 
 var EGameListRecord =
 {
-    Id        : 1,
-    Type      : 2,
-    WRank     : 3,
-    WName     : 4,
-    Vs        : 5,
-    BRank     : 6,
-    BName     : 7,
-    Observers : 8,
-    Move      : 9,
-    Private   : 10,
-    Place     : 11,
-    Info      : 12
+    Type      : 1,
+    WRank     : 2,
+    WName     : 3,
+    Vs        : 4,
+    BRank     : 5,
+    BName     : 6,
+    Observers : 7,
+    Move      : 8,
+    Place     : 9,
+    Info      : 10
 };
 
 var g_oGamesList =
 {
     Headers :
     {
-        Sizes : [0, 62, 78, 118, 258, 283, 323, 448, 508, 558, 608, 763],
-        Count : 12,
-        1  : "Id",
-        2  : "Kind",
-        3  : "wr",
-        4  : "White",
-        5  : "",
-        6  : "br",
-        7  : "Black",
-        8  : "Observers",
-        9  : "Move",
-        10 : "",
-        11 : "Room",
-        12 : "Comment"
+        Sizes : [0, 16, 56, 196, 221, 261, 381, 446, 500, 675],
+        Count : 10,
+        1  : "Kind",
+        2  : "wr",
+        3  : "White",
+        4  : "",
+        5  : "br",
+        6  : "Black",
+        7  : "Observers",
+        8  : "Move",
+        9  : "Room",
+        10 : "Comment"
     },
 
     SortType : -EGameListRecord.WRank,
@@ -58,21 +54,7 @@ var g_oGamesList =
             return nPreSortResult;
 
         var SortType = g_oGamesList.SortType;
-        if (EGameListRecord.Id === SortType)
-        {
-            if (oRecord1.m_nGameId < oRecord2.m_nGameId)
-                return -1;
-            else if (oRecord1.m_nGameId > oRecord2.m_nGameId)
-                return 1;
-        }
-        else if (-EGameListRecord.Id === SortType)
-        {
-            if (oRecord1.m_nGameId < oRecord2.m_nGameId)
-                return 1;
-            else if (oRecord1.m_nGameId > oRecord2.m_nGameId)
-                return -1;
-        }
-        else if (EGameListRecord.WRank === SortType)
+        if (EGameListRecord.WRank === SortType)
         {
             if (oRecord1.m_nWhiteRank < oRecord2.m_nWhiteRank)
                 return -1;
@@ -88,16 +70,16 @@ var g_oGamesList =
         }
         else if (EGameListRecord.WName === SortType)
         {
-            if (oRecord1.m_sWhiteName < oRecord2.m_sWhiteName)
+            if (Common.Compare_Strings(oRecord1.m_sWhiteName, oRecord2.m_sWhiteName) < 0)
                 return -1;
-            else if (oRecord1.m_sWhiteName > oRecord2.m_sWhiteName)
+            else if (Common.Compare_Strings(oRecord1.m_sWhiteName, oRecord2.m_sWhiteName) > 0)
                 return 1;
         }
         else if (-EGameListRecord.WName === SortType)
         {
-            if (oRecord1.m_sWhiteName < oRecord2.m_sWhiteName)
+            if (Common.Compare_Strings(oRecord1.m_sWhiteName, oRecord2.m_sWhiteName) < 0)
                 return 1;
-            else if (oRecord1.m_sWhiteName > oRecord2.m_sWhiteName)
+            else if (Common.Compare_Strings(oRecord1.m_sWhiteName, oRecord2.m_sWhiteName) > 0)
                 return -1;
         }
         else if (EGameListRecord.BRank === SortType)
@@ -116,16 +98,16 @@ var g_oGamesList =
         }
         else if (EGameListRecord.BName === SortType)
         {
-            if (oRecord1.m_sBlackName < oRecord2.m_sBlackName)
+            if (Common.Compare_Strings(oRecord1.m_sBlackName, oRecord2.m_sBlackName) < 0)
                 return -1;
-            else if (oRecord1.m_sBlackName > oRecord2.m_sBlackName)
+            else if (Common.Compare_Strings(oRecord1.m_sBlackName, oRecord2.m_sBlackName) > 0)
                 return 1;
         }
         else if (-EGameListRecord.BName === SortType)
         {
-            if (oRecord1.m_sBlackName < oRecord2.m_sBlackName)
+            if (Common.Compare_Strings(oRecord1.m_sBlackName, oRecord2.m_sBlackName) < 0)
                 return 1;
-            else if (oRecord1.m_sBlackName > oRecord2.m_sBlackName)
+            else if (Common.Compare_Strings(oRecord1.m_sBlackName, oRecord2.m_sBlackName) > 0)
                 return -1;
         }
         else if (EGameListRecord.Observers === SortType)
@@ -144,16 +126,16 @@ var g_oGamesList =
         }
         else if (EGameListRecord.Place === SortType)
         {
-            if (oRecord1.m_sPlace < oRecord2.m_sPlace)
+            if (Common.Compare_Strings(oRecord1.GetPlace(), oRecord2.GetPlace()) < 0)
                 return -1;
-            else if (oRecord1.m_sPlace > oRecord2.m_sPlace)
+            else if (Common.Compare_Strings(oRecord1.GetPlace(), oRecord2.GetPlace()) > 0)
                 return 1;
         }
         else if (-EGameListRecord.Place === SortType)
         {
-            if (oRecord1.m_sPlace < oRecord2.m_sPlace)
+            if (Common.Compare_Strings(oRecord1.GetPlace(), oRecord2.GetPlace()) < 0)
                 return 1;
-            else if (oRecord1.m_sPlace > oRecord2.m_sPlace)
+            else if (Common.Compare_Strings(oRecord1.GetPlace(), oRecord2.GetPlace()) > 0)
                 return -1;
         }
 
@@ -210,7 +192,6 @@ var g_oGamesList =
         var eType = nColNum + 1;
         switch (eType)
         {
-            case EGameListRecord.Id       :
             case EGameListRecord.WRank    :
             case EGameListRecord.WName    :
             case EGameListRecord.BRank    :
@@ -324,7 +305,6 @@ CGameListRecord.prototype.Draw = function(oContext, dX, dY, eType)
     var sString = "";
     switch(eType)
     {
-        case EGameListRecord.Id       : sString += this.m_nGameId; break;
         case EGameListRecord.Type     : sString += this.m_sGameType; break;
         case EGameListRecord.WRank    : sString += this.private_GetRank(this.m_nWhiteRank); break;
         case EGameListRecord.WName    : sString += this.m_sWhiteName; break;
@@ -334,7 +314,6 @@ CGameListRecord.prototype.Draw = function(oContext, dX, dY, eType)
         case EGameListRecord.Observers: sString += this.m_nObserversCount; break;
         case EGameListRecord.Move     : sString += "" + this.m_nMove; break;
         case EGameListRecord.Info     : sString += this.m_sGameInfo; break;
-        case EGameListRecord.Private  : sString += this.m_bPrivate ? "private" : ""; break;
         case EGameListRecord.Place    : sString += this.private_GetRoomName(this.m_nRoomId); break;
     }
 
@@ -397,4 +376,9 @@ CGameListRecord.prototype.private_GetRoomName = function(nRoomId)
         return oApp.GetClient().GetRoomName(nRoomId);
 
     return "";
+};
+
+CGameListRecord.prototype.GetPlace = function()
+{
+	return this.private_GetRoomName(this.m_nRoomId);
 };
