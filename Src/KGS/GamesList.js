@@ -13,28 +13,30 @@ var EGameListRecord =
     Vs        : 4,
     BRank     : 5,
     BName     : 6,
-    Observers : 7,
-    Move      : 8,
-    Place     : 9,
-    Info      : 10
+	SizeHandi : 7,
+    Observers : 8,
+    Move      : 9,
+    Place     : 10,
+    Info      : 11
 };
 
 var g_oGamesList =
 {
     Headers :
     {
-        Sizes : [0, 16, 56, 196, 221, 261, 381, 446, 500, 675],
-        Count : 10,
+        Sizes : [0, 16, 56, 196, 221, 261, 381, 450, 515, 609, 784],
+        Count : 11,
         1  : "Kind",
         2  : "wr",
         3  : "White",
         4  : "",
         5  : "br",
         6  : "Black",
-        7  : "Observers",
-        8  : "Move",
-        9  : "Room",
-        10 : "Comment"
+		7  : "",
+        8  : "Observers",
+        9  : "Move",
+        10 : "Room",
+        11 : "Comment"
     },
 
     SortType : -EGameListRecord.WRank,
@@ -226,14 +228,14 @@ var g_oGamesList =
         var eType = nColNum + 1;
         if (true === oRecord.m_bDemo)
         {
-            if (true === oRecord.m_bDemo && 3 === nColNum)
-                oListView.Start_ClipException(oContext, 3, 7);
+            if (true === oRecord.m_bDemo && 2 === nColNum)
+                oListView.Start_ClipException(oContext, 2, 6);
 
-            if (4 !== nColNum && 5 !== nColNum && 6 !== nColNum)
+            if (3 !== nColNum && 4 !== nColNum && 5 !== nColNum)
                 oRecord.Draw(oContext, dX, dY, eType);
 
-            if (true === oRecord.m_bDemo && 3 === nColNum)
-                oListView.Restore_Clip(oContext, 3);
+            if (true === oRecord.m_bDemo && 2 === nColNum)
+                oListView.Restore_Clip(oContext, 2);
         }
         else
         {
@@ -278,6 +280,7 @@ function CGameListRecord(oClient)
     this.m_bAdjourned      = false;
     this.m_bEvent          = false;
     this.m_bDemo           = false;
+	this.m_sSizeHandi      = "";
 }
 
 CGameListRecord.prototype.Draw = function(oContext, dX, dY, eType)
@@ -312,9 +315,10 @@ CGameListRecord.prototype.Draw = function(oContext, dX, dY, eType)
         case EGameListRecord.BRank    : sString += this.private_GetRank(this.m_nBlackRank); break;
         case EGameListRecord.BName    : sString += this.m_sBlackName; break;
         case EGameListRecord.Observers: sString += this.m_nObserversCount; break;
-        case EGameListRecord.Move     : sString += "" + this.m_nMove; break;
-        case EGameListRecord.Info     : sString += this.m_sGameInfo; break;
+        case EGameListRecord.Move     : sString += this.m_sGameInfo ? this.m_sGameInfo : "" + this.m_nMove; break;
+        case EGameListRecord.Info     : sString += ""; break;
         case EGameListRecord.Place    : sString += this.private_GetRoomName(this.m_nRoomId); break;
+		case EGameListRecord.SizeHandi: sString += this.m_sSizeHandi; break;
     }
 
     oContext.fillText(sString, dX, dY);
@@ -352,6 +356,7 @@ CGameListRecord.prototype.Update = function(aLine)
     this.m_bAdjourned = aLine[14];
     this.m_bEvent     = aLine[15];
     this.m_bDemo      = aLine[16];
+	this.m_sSizeHandi = aLine[17];
 };
 
 CGameListRecord.prototype.private_GetRank = function(nRank)

@@ -650,6 +650,7 @@ CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
 	var nMoveNumber = oGameRecord.moveNum;
 	var nObservers  = undefined !== oGameRecord.observers ? oGameRecord.observers : 0;
 	var sComment    = oGameRecord.score ? oGameRecord.score : "";
+	var sScore      = oGameRecord.score ? "" + oGameRecord.score : "";
 	var nAdd        = true === bAdd ? 0 : 1;
 	var sBlack      = oGameRecord.players.black ? oGameRecord.players.black.name : "";
 	var nBlackR     = oGameRecord.players.black ? this.private_GetRank(oGameRecord.players.black.rank) : -3;
@@ -660,6 +661,7 @@ CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
 	var bAdjourned  = oGameRecord.adjourned ? oGameRecord.adjourned : false;
 	var bEvent      = oGameRecord.event ? oGameRecord.event : false;
 	var bDemo       = false;
+	var sSize       = oGameRecord.size ? "" + oGameRecord.size : "" + 19;
 
 	if ("demonstration" === oGameRecord.gameType)
 	{
@@ -695,10 +697,41 @@ CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
 	else if ("tournament" === oGameRecord.gameType)
 		sGameType = "*";
 
+	if ("" !== sScore)
+	{
+		if ("UNKNOWN" === sScore || "UNFINISHED" === sScore || "NO_RESULT" === sScore)
+			sScore = "-";
+		else if ("B+RESIGN" === sScore)
+			sScore = "B+Resign";
+		else if ("W+RESIGN" === sScore)
+			sScore = "W+Resign";
+		else if ("B+FORFEIT" === sScore)
+			sScore = "B+Forfeit";
+		else if ("W+FORFEIT" === sScore)
+			sScore = "W+Forfeit";
+		else if ("B+TIME" === sScore)
+			sScore = "B+Time";
+		else if ("W+TIME" === sScore)
+			sScore = "W+Time";
+		else
+		{
+			var dScore = parseFloat(sScore);
+			if (dScore < 0)
+				sScore = "W+" + Math.abs(dScore);
+			else
+				sScore = "B+" + Math.abs(dScore);
+		}
+
+		sComment = sScore;
+	}
+	
+	// TODO: Добавить информауцию о форе, как только она появится в этом объекте
+	var sSizeHandi = sSize + "x" + sSize;
+
 	if (true === bPrivate)
 		sGameType = "P";
 
-	this.m_oGamesListView.Handle_Record([nAdd, nGameId, sGameType, nObservers, "", sWhite, nWhiteR, "", sBlack, nBlackR, sComment, nMoveNumber, bPrivate, nRoomId, bAdjourned, bEvent, bDemo]);
+	this.m_oGamesListView.Handle_Record([nAdd, nGameId, sGameType, nObservers, "", sWhite, nWhiteR, "", sBlack, nBlackR, sComment, nMoveNumber, bPrivate, nRoomId, bAdjourned, bEvent, bDemo, sSizeHandi]);
 };
 CKGSClient.prototype.private_HandleUserRecord = function(oUserRecord, oRoom)
 {
@@ -963,6 +996,7 @@ CKGSClient.prototype.private_HandleConvoJoin = function(oMessage)
 };
 CKGSClient.prototype.private_HandleArchiveJoin = function(oMessage)
 {
+	console.log(oMessage);
 	var sUserName = oMessage.user.name.toLowerCase();
 	if (this.m_oUserInfo[sUserName])
 	{
