@@ -27,6 +27,9 @@ function CGoUniverseApplication()
 	this.m_oChatRoomTabs       = new CVisualChatRoomTabs();
 
 	this.m_arrPopups           = [];
+	
+	this.m_oSound              = new CBoardSound();
+	this.m_oSound.Init("http://webgoboard.com/Sound");
 }
 CGoUniverseApplication.prototype.Init = function()
 {
@@ -151,6 +154,10 @@ CGoUniverseApplication.prototype.Logout = function(sText)
 CGoUniverseApplication.prototype.GetClient = function()
 {
 	return this.m_oClient;
+};
+CGoUniverseApplication.prototype.GetSound = function()
+{
+	return this.m_oSound;
 };
 CGoUniverseApplication.prototype.GetPlayersListView = function()
 {
@@ -294,6 +301,7 @@ CGoUniverseApplication.prototype.OnAddChatMessage = function(nChatRoomId, sUserN
 
 	oDiv.appendChild(oTextDiv);
 
+	var oTab = this.m_oChatRoomTabs.GetTab(nChatRoomId);
 	if (nChatRoomId === this.m_oChatRoomTabs.GetCurrentId())
 	{
 		oTextDiv.style.display = "block";
@@ -303,12 +311,14 @@ CGoUniverseApplication.prototype.OnAddChatMessage = function(nChatRoomId, sUserN
 	}
 	else
 	{
-		var oTab = this.m_oChatRoomTabs.GetTab(nChatRoomId);
 		if (oTab)
 			oTab.IncreaseMessagesCount();
 
 		oTextDiv.style.display = "none";
 	}
+
+	if (oTab && oTab.IsPrivate() && (nChatRoomId !== this.m_oChatRoomTabs.GetCurrentId() || -1 !== this.m_oGameRoomTabs.GetCurrentId() || false === this.IsFocused()))
+		this.private_AddNotification(sUserName);
 };
 CGoUniverseApplication.prototype.AddGameRoom = function(nGameRoomId, oGameTree, bDemonstration)
 {
@@ -843,6 +853,17 @@ CGoUniverseApplication.prototype.IsTypingChatMessage = function()
 	var oChatInput = document.getElementById("inputChatId");
 	if ("" === oChatInput.value)
 		return false;
+
+	return true;
+};
+CGoUniverseApplication.prototype.private_AddNotification = function(sUserName)
+{
+	this.m_oSound.Play_NewMessage();
+};
+CGoUniverseApplication.prototype.IsFocused = function()
+{
+	if (document.visibilityState)
+		return document.visibilityState === "visible";
 
 	return true;
 };

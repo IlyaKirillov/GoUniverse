@@ -28,7 +28,3 @@ function OnDocumentResize()
 		oApp.OnResize();
 }
 
-
-
-
-

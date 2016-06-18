@@ -768,6 +768,7 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 	sSGF += ")";
 
 	var oGameTree = new CGameTree();
+	oGameTree.Set_SoundClass(this.m_oApp.GetSound());
 	oGameTree.Load_Sgf(sSGF);
 	oGameTree.Set_Black(sBlackName);
 	oGameTree.Set_White(sWhiteName);
