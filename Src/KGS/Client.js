@@ -662,6 +662,7 @@ CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
 	var bEvent      = oGameRecord.event ? oGameRecord.event : false;
 	var bDemo       = false;
 	var sSize       = oGameRecord.size ? "" + oGameRecord.size : "" + 19;
+	var nHandi      = oGameRecord.handicap ? parseInt(oGameRecord.handicap) : 0;
 
 	if ("demonstration" === oGameRecord.gameType)
 	{
@@ -725,8 +726,7 @@ CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
 		sComment = sScore;
 	}
 	
-	// TODO: Добавить информауцию о форе, как только она появится в этом объекте
-	var sSizeHandi = sSize + "x" + sSize;
+	var sSizeHandi = sSize + "x" + sSize + (0 !== nHandi ? " H" + nHandi : "");
 
 	if (true === bPrivate)
 		sGameType = "P";
