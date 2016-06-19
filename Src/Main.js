@@ -28,3 +28,14 @@ function OnDocumentResize()
 		oApp.OnResize();
 }
 
+window.addEventListener("focus", function()
+{
+	if (oApp)
+		oApp.Focus();
+});
+
+window.addEventListener("blur", function()
+{
+	if (oApp)
+		oApp.Blur();
+});

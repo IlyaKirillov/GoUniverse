@@ -30,6 +30,8 @@ function CGoUniverseApplication()
 	
 	this.m_oSound              = new CBoardSound();
 	this.m_oSound.Init("http://webgoboard.com/Sound");
+	this.m_bFocused            = true;
+
 }
 CGoUniverseApplication.prototype.Init = function()
 {
@@ -130,7 +132,9 @@ CGoUniverseApplication.prototype.SendChatMessage = function(e)
 	var oInputArea = document.getElementById("inputChatId");
 	if (13 === e.keyCode && true !== e.ctrlKey && true !== e.shiftKey && this.m_oClient)
 	{
-		this.m_oClient.SendChatMessage(oInputArea.value);
+		if ("" !== oInputArea.value)
+			this.m_oClient.SendChatMessage(oInputArea.value);
+
 		oInputArea.value = "";
 		e.preventDefault();
 	}
@@ -317,7 +321,8 @@ CGoUniverseApplication.prototype.OnAddChatMessage = function(nChatRoomId, sUserN
 		oTextDiv.style.display = "none";
 	}
 
-	if (oTab && oTab.IsPrivate() && (nChatRoomId !== this.m_oChatRoomTabs.GetCurrentId() || -1 !== this.m_oGameRoomTabs.GetCurrentId() || false === this.IsFocused()))
+	// TODO: Еще первое сообщение тоже нужно отлавливать
+	if (sUserName !== this.m_oClient.GetUserName() && oTab && oTab.IsPrivate() && (nChatRoomId !== this.m_oChatRoomTabs.GetCurrentId() || -1 !== this.m_oGameRoomTabs.GetCurrentId() || false === this.IsFocused()))
 		this.private_AddNotification(sUserName);
 };
 CGoUniverseApplication.prototype.AddGameRoom = function(nGameRoomId, oGameTree, bDemonstration)
@@ -862,10 +867,18 @@ CGoUniverseApplication.prototype.private_AddNotification = function(sUserName)
 };
 CGoUniverseApplication.prototype.IsFocused = function()
 {
-	if (document.visibilityState)
-		return document.visibilityState === "visible";
+	if (true === document.hidden || false === this.m_bFocused)
+		return false;
 
 	return true;
+};
+CGoUniverseApplication.prototype.Focus = function()
+{
+	this.m_bFocused = true;
+};
+CGoUniverseApplication.prototype.Blur = function()
+{
+	this.m_bFocused = false;
 };
 
 function private_TabsOnScroll(e)

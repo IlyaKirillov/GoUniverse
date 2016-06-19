@@ -1133,7 +1133,7 @@ CKGSClient.prototype.private_TranslateUnicodeMessage = function(sMessage)
 		if (nCharCode < 128)
 			sUnicode += sMessage.charAt(nCharIndex);
 		else
-			sUnicode += escape(sMessage.charAt(nCharIndex)).replace("%", "\\")
+			sUnicode += "\\u" + ("0000" + nCharCode.toString(16)).substr(-4);
 	}
 	return sUnicode;
 };
