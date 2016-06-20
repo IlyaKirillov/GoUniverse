@@ -231,8 +231,12 @@ div.Selectable {
 	content : '\21F1';
 }
 
-.ChatMenuSpanSound:before {
+.ChatMenuSpanSoundOn:before {
 	content : '\260E';
+}
+
+.ChatMenuSpanSoundOff:before {
+	content : '\260F';
 }
 
 div.ContextMenu {

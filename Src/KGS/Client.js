@@ -104,8 +104,6 @@ CKGSClient.prototype.SendChatMessage = function(sText)
 		"channelId" : this.m_nChatChannelId,
 		"text"      : sText
 	});
-
-	console.log("Chat :" + sText);
 };
 CKGSClient.prototype.LoadUserInfo = function(sUserName)
 {
@@ -1043,7 +1041,6 @@ CKGSClient.prototype.private_HandleLoginFailedNoSuchUser = function(oMessage)
 };
 CKGSClient.prototype.private_HandleConvoJoin = function(oMessage)
 {
-	console.log(oMessage);
 	var nChannelId = oMessage.channelId;
 	var sUserName  = oMessage.user.name;
 
@@ -1067,7 +1064,6 @@ CKGSClient.prototype.private_HandleConvoJoin = function(oMessage)
 };
 CKGSClient.prototype.private_HandleArchiveJoin = function(oMessage)
 {
-	console.log(oMessage);
 	var sUserName = oMessage.user.name.toLowerCase();
 	if (this.m_oUserInfo[sUserName])
 	{

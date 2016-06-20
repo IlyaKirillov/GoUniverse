@@ -471,15 +471,17 @@ function CVisualChatRoomTab(oApp)
 	this.m_oTabDiv = null;
 
 	this.m_bPrivateChat      = false;
+	this.m_bSound            = false;
 	this.m_sRoomName         = "";
 	this.m_oTabBackgroundDiv = null;
 	this.m_oTabForegroundDiv = null;
+	this.m_oMenuSoundButton  = null;
 
 	this.m_nNewMessagesCount = 0;
 	this.m_oMessagesDiv      = null;
 	this.m_oPopup            = null;
 
-	this.m_nMinWidth         = 3 * 26 + 2;
+	this.m_nMinWidth         = 4 * 26 + 2;
 }
 CVisualChatRoomTab.prototype.Init = function(nId, sRoomName, bPrivate)
 {
@@ -487,6 +489,7 @@ CVisualChatRoomTab.prototype.Init = function(nId, sRoomName, bPrivate)
 	this.m_nNewMessagesCount = 0;
 	this.m_bPrivateChat      = bPrivate;
 	this.m_sRoomName         = sRoomName;
+	this.m_bSound            = (true === bPrivate ? true : false);
 
 	this.private_InitTab(sRoomName);
 	this.private_InitMenuButton(sRoomName);
@@ -499,6 +502,10 @@ CVisualChatRoomTab.prototype.GetRoomName = function()
 CVisualChatRoomTab.prototype.IsPrivate = function()
 {
 	return this.m_bPrivateChat;
+};
+CVisualChatRoomTab.prototype.IsSoundOn = function()
+{
+	return this.m_bSound;
 };
 CVisualChatRoomTab.prototype.GetId = function()
 {
@@ -750,12 +757,12 @@ CVisualChatRoomTab.prototype.private_InitMenu = function()
 	this.private_AddMenuButton(oHtmlElement, "left", "ChatMenuSpanInfo",  function()
 	{
 		oThis.ShowRoomInfo();
-	}, "Room Info");
+	}, oThis.IsPrivate() ? "User Info" : "Room Info");
 
-	// this.private_AddMenuButton(oHtmlElement, "left", "ChatMenuSpanSound",  function()
-	// {
-	// 	oThis.OnClickClose();
-	// }, "Show all messages from this chat on other chats");
+	this.m_oMenuSoundButton = this.private_AddMenuButton(oHtmlElement, "left", this.IsSoundOn() ? "ChatMenuSpanSoundOn" : "ChatMenuSpanSoundOff" ,  function()
+	{
+		oThis.OnToggleSound();
+	}, this.IsSoundOn() ? "Sound is on" : "Sound is off");
 };
 CVisualChatRoomTab.prototype.private_AddMenuButton = function(oParentElement, sFloat, sSpanClass, fOnClickHandler, sHint)
 {
@@ -780,6 +787,8 @@ CVisualChatRoomTab.prototype.private_AddMenuButton = function(oParentElement, sF
 	oParentElement.appendChild(oButton);
 
 	oButton.addEventListener("click", fOnClickHandler, false);
+
+	return {Button : oButton, Span : oSpan};
 };
 CVisualChatRoomTab.prototype.ShowRoomInfo = function()
 {
@@ -803,4 +812,30 @@ CVisualChatRoomTab.prototype.MoveTabToStart = function()
 {
 	this.m_oParent.MoveTabToStart(this);
 	this.m_oApp.ScrollChatTabsToCurrent();
+};
+CVisualChatRoomTab.prototype.OnToggleSound = function()
+{
+	if (!this.m_oMenuSoundButton)
+		return;
+
+	var sHint, sSpanClass;
+	if (true === this.m_bSound)
+	{
+		this.m_bSound = false;
+
+		sHint      = "Sound is off";
+		sSpanClass = "ChatMenuSpanSoundOff";
+	}
+	else
+	{
+		this.m_bSound = true;
+
+		sHint      = "Sound is on";
+		sSpanClass = "ChatMenuSpanSoundOn";
+	}
+
+	this.m_oMenuSoundButton.Button["aria-label"] = sHint;
+	this.m_oMenuSoundButton.Button.title         = sHint;
+
+	this.m_oMenuSoundButton.Span.className = sSpanClass;
 };

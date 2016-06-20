@@ -341,7 +341,7 @@ CGoUniverseApplication.prototype.OnAddChatMessage = function(nChatRoomId, sUserN
 		oTextDiv.style.display = "none";
 	}
 
-	if (null !== sUserName && sUserName !== this.m_oClient.GetUserName() && oTab && oTab.IsPrivate() && (nChatRoomId !== this.m_oChatRoomTabs.GetCurrentId() || -1 !== this.m_oGameRoomTabs.GetCurrentId() || false === this.IsFocused()))
+	if (null !== sUserName && sUserName !== this.m_oClient.GetUserName() && oTab && oTab.IsSoundOn() && (nChatRoomId !== this.m_oChatRoomTabs.GetCurrentId() || -1 !== this.m_oGameRoomTabs.GetCurrentId() || false === this.IsFocused()))
 		this.private_AddNotification(sUserName);
 };
 CGoUniverseApplication.prototype.AddGameRoom = function(nGameRoomId, oGameTree, bDemonstration)
