@@ -335,14 +335,13 @@ CGoUniverseApplication.prototype.OnAddChatMessage = function(nChatRoomId, sUserN
 	}
 	else
 	{
-		if (oTab)
+		if (null !== sUserName && oTab)
 			oTab.IncreaseMessagesCount();
 
 		oTextDiv.style.display = "none";
 	}
 
-	// TODO: Еще первое сообщение тоже нужно отлавливать
-	if (sUserName !== this.m_oClient.GetUserName() && oTab && oTab.IsPrivate() && (nChatRoomId !== this.m_oChatRoomTabs.GetCurrentId() || -1 !== this.m_oGameRoomTabs.GetCurrentId() || false === this.IsFocused()))
+	if (null !== sUserName && sUserName !== this.m_oClient.GetUserName() && oTab && oTab.IsPrivate() && (nChatRoomId !== this.m_oChatRoomTabs.GetCurrentId() || -1 !== this.m_oGameRoomTabs.GetCurrentId() || false === this.IsFocused()))
 		this.private_AddNotification(sUserName);
 };
 CGoUniverseApplication.prototype.AddGameRoom = function(nGameRoomId, oGameTree, bDemonstration)

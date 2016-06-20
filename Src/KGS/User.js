@@ -73,63 +73,63 @@ CKGSUser.prototype.Update = function(oUserRecord)
 };
 CKGSUser.prototype.IsTeacher = function()
 {
-	return this.m_nLevel === KGSUSER_LEVEL_TEACHER;
+	return (this.m_nLevel === KGSUSER_LEVEL_TEACHER ? true : false);
 };
 CKGSUser.prototype.IsAdmin = function()
 {
-	return (this.m_nLevel === KGSUSER_LEVEL_JR_ADMIN || this.m_nLevel === KGSUSER_LEVEL_SR_ADMIN || this.m_nLevel === KGSUSER_LEVEL_SUPER_ADMIN);
+	return ((this.m_nLevel === KGSUSER_LEVEL_JR_ADMIN || this.m_nLevel === KGSUSER_LEVEL_SR_ADMIN || this.m_nLevel === KGSUSER_LEVEL_SUPER_ADMIN) ? true : false);
 };
 CKGSUser.prototype.IsGuest = function()
 {
-	return (this.m_nFlags & KGSUSER_FLAGS_GUEST);
+	return (this.m_nFlags & KGSUSER_FLAGS_GUEST ? true : false);
 };
 CKGSUser.prototype.IsOnline = function()
 {
-	return (this.m_nFlags & KGSUSER_FLAGS_ONLINE);
+	return (this.m_nFlags & KGSUSER_FLAGS_ONLINE? true : false);
 };
 CKGSUser.prototype.IsDeleted = function()
 {
-	return (this.m_nFlags & KGSUSER_FLAGS_DELETED);
+	return (this.m_nFlags & KGSUSER_FLAGS_DELETED? true : false);
 };
 CKGSUser.prototype.IsSleeping = function()
 {
-	return (this.m_nFlags & KGSUSER_FLAGS_SLEEPING);
+	return (this.m_nFlags & KGSUSER_FLAGS_SLEEPING ? true : false);
 };
 CKGSUser.prototype.HasAvatar = function()
 {
-	return (this.m_nFlags & KGSUSER_FLAGS_AVATAR);
+	return (this.m_nFlags & KGSUSER_FLAGS_AVATAR ? true : false);
 };
 CKGSUser.prototype.IsRobot = function()
 {
-	return (this.m_nFlags & KGSUSER_FLAGS_ROBOT);
+	return (this.m_nFlags & KGSUSER_FLAGS_ROBOT ? true : false);
 };
 CKGSUser.prototype.IsTournamentWinner = function()
 {
-	return (this.m_nFlags & KGSUSER_FLAGS_WINNER);
+	return (this.m_nFlags & KGSUSER_FLAGS_WINNER ? true : false);
 };
 CKGSUser.prototype.IsTournamentRunnerup = function()
 {
-	return (this.m_nFlags & KGSUSER_FLAGS_RUNNERUP);
+	return (this.m_nFlags & KGSUSER_FLAGS_RUNNERUP ? true : false);
 };
 CKGSUser.prototype.IsPlaying = function()
 {
-	return ((this.m_nFlags & KGSUSER_FLAGS_PLAYING) || (this.m_nFlags & KGSUSER_FLAGS_PLAYING_T));
+	return (((this.m_nFlags & KGSUSER_FLAGS_PLAYING) || (this.m_nFlags & KGSUSER_FLAGS_PLAYING_T)) ? true : false);
 };
 CKGSUser.prototype.IsKgsPlusSubscriber = function()
 {
-	return (this.m_nFlags & KGSUSER_FLAGS_KGSPLUS);
+	return (this.m_nFlags & KGSUSER_FLAGS_KGSPLUS ? true : false);
 };
 CKGSUser.prototype.IsMeijin = function()
 {
-	return (this.m_nFlags & KGSUSER_FLAGS_MEIJIN);
+	return (this.m_nFlags & KGSUSER_FLAGS_MEIJIN ? true : false);
 };
 CKGSUser.prototype.CanPlayRanked = function()
 {
-	return (this.m_nFlags & KGSUSER_FLAGS_RANKED);
+	return (this.m_nFlags & KGSUSER_FLAGS_RANKED ? true : false);
 };
 CKGSUser.prototype.IsTilde = function()
 {
-	return (this.m_nFlags & KGSUSER_FLAGS_TILDE);
+	return (this.m_nFlags & KGSUSER_FLAGS_TILDE ? true : false);
 };
 CKGSUser.prototype.private_ParseFlags = function(sFlags)
 {
