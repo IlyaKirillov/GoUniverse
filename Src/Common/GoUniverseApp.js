@@ -133,7 +133,11 @@ CGoUniverseApplication.prototype.SendChatMessage = function(e)
 	if (13 === e.keyCode && true !== e.ctrlKey && true !== e.shiftKey && this.m_oClient)
 	{
 		if ("" !== oInputArea.value)
-			this.m_oClient.SendChatMessage(oInputArea.value);
+		{
+			var sMessage = oInputArea.value;
+			sMessage = sMessage.replace(/\u000A/g, String.fromCharCode(0xFF0A));
+			this.m_oClient.SendChatMessage(sMessage);
+		}
 
 		oInputArea.value = "";
 		e.preventDefault();
@@ -293,15 +297,18 @@ CGoUniverseApplication.prototype.OnAddChatMessage = function(nChatRoomId, sUserN
 	oTextDiv.appendChild(oTextSpan);
 
 
+	var aLines = SplitTextToLines(sText);
+	for (var nIndex = 0, nCount = aLines.length; nIndex < nCount; ++nIndex)
+	{
+		oTextSpan            = document.createElement("span");
+		oTextSpan.innerHTML  = aLines[nIndex];
 
-	sText = sText.replace(urlRegEx, "<a href='$1' target='_blank'>$1</a>");
+		if (true === bMessageForMe)
+			oTextSpan.style.fontStyle = "italic";
 
-	oTextSpan                  = document.createElement("span");
-	oTextSpan.innerHTML        = sText;
-	if (true === bMessageForMe)
-		oTextSpan.style.fontStyle = "italic";
-
-	oTextDiv.appendChild(oTextSpan);
+		oTextDiv.appendChild(oTextSpan);
+		oTextDiv.appendChild(document.createElement("br"));
+	}
 
 	oDiv.appendChild(oTextDiv);
 

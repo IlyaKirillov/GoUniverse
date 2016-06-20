@@ -727,7 +727,6 @@ CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
 	}
 	
 	var sSizeHandi = sSize + "x" + sSize + (0 !== nHandi ? " H" + nHandi : "");
-
 	if (true === bPrivate)
 		sGameType = "P";
 
@@ -1089,6 +1088,10 @@ CKGSClient.prototype.private_HandleArchiveNonExistant = function(oMessage)
 		if (oUser.Window)
 			oUser.Window.Close();
 	}
+};
+CKGSClient.prototype.GetRank = function(sRank)
+{
+	return this.private_GetRank(sRank);
 };
 CKGSClient.prototype.private_GetRank = function(sRank)
 {

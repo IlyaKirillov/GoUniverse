@@ -16,13 +16,15 @@ function SplitTextToLines(sText)
 
 	var nBreakPos = -1;
 	var nCurPos   = 0;
-	while (-1 !== (nBreakPos = sText.indexOf(String.fromCharCode(10), nCurPos)))
-	{
-		aLines.push(sText.substr(nCurPos, nBreakPos - nCurPos));
 
-		nCurPos = nBreakPos + 1;
-		if (nCurPos >= sText.length)
-			break;
+	for (var nCount = sText.length; nBreakPos < nCount; ++nBreakPos)
+	{
+		var nCharCode = sText.charCodeAt(nBreakPos);
+		if (0x000A === nCharCode || 0xFF0A === nCharCode)
+		{
+			aLines.push(sText.substr(nCurPos, nBreakPos - nCurPos));
+			nCurPos = nBreakPos + 1;
+		}
 	}
 
 	if (nCurPos < sText.length)
