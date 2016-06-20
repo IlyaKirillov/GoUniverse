@@ -83,7 +83,7 @@ CKGSUserInfoWindow.prototype.OnUserDetails = function(oDetails)
 	{
 		var oUser = this.m_oClient.private_HandleUserRecord(oDetails.user, true);
 		this.m_sUserName = oUser.GetName();
-		this.Set_Caption(this.m_sUserName);
+		this.private_SetCaption(this.m_sUserName, oUser.IsOnline());
 
 		if (oUser.HasAvatar())
 			this.OnUserAvatar();
@@ -239,4 +239,11 @@ CKGSUserInfoWindow.prototype.private_AddInfo = function(sText)
 	oTextDiv.appendChild(oInfoDiv);
 	oDiv.appendChild(oTextDiv);
 	return oTextDiv;
+};
+CKGSUserInfoWindow.prototype.private_SetCaption = function(sCaption, bOnline)
+{
+	if (bOnline)
+		this.HtmlElement.CaptionText.innerHTML = "\<span\>" + sCaption + "\<\/span\>" + "\<span style='position:absolute;left:0px;color:rgb(0,130,57)'\>&#x2600;\<\/span\>";
+	else
+		this.HtmlElement.CaptionText.innerHTML = "\<span\>" + sCaption + "\<\/span\>" + "\<span style='position:absolute;left:0px;color:rgb(199,40,40)'\>&#x26C5;\<\/span\>";
 };
