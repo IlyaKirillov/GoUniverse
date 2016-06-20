@@ -81,15 +81,16 @@ CKGSUserInfoWindow.prototype.OnUserDetails = function(oDetails)
 {
 	if (oDetails)
 	{
-		this.m_sUserName = oDetails.user.name;
+		var oUser = this.m_oClient.private_HandleUserRecord(oDetails.user, true);
+		this.m_sUserName = oUser.GetName();
 		this.Set_Caption(this.m_sUserName);
 
-		if (-1 !== oDetails.user.flags.indexOf("a"))
+		if (oUser.HasAvatar())
 			this.OnUserAvatar();
 
-		this.private_AddConsoleMessage("UserName", oDetails.user.name);
-		this.private_AddConsoleMessage("Rank", oDetails.user.rank ? oDetails.user.rank : "-");
-		this.private_AddConsoleMessage("Last on", oDetails.lastOn);
+		this.private_AddConsoleMessage("UserName", oUser.GetName());
+		this.private_AddConsoleMessage("Rank", oUser.GetStringRank());
+		this.private_AddConsoleMessage("Last on", oUser.IsOnline() ? "online" : oDetails.lastOn);
 		this.private_AddConsoleMessage("Locale", oDetails.locale);
 		this.private_AddConsoleMessage("Name", oDetails.personalName);
 

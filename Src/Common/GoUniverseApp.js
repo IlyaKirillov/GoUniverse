@@ -273,28 +273,34 @@ CGoUniverseApplication.prototype.OnAddChatMessage = function(nChatRoomId, sUserN
 	oTextDiv.chatRoomId = nChatRoomId;
 
 	var bMessageForMe = false;
-	var sCurUserName = (this.m_oClient ? this.m_oClient.GetUserName() : "");
-	if ("" !== sCurUserName && 0 === sText.indexOf(sCurUserName + ","))
-		bMessageForMe = true;
+	var sCurUserName  = false;
+	var oTextSpan;
 
-	var oTextSpan              = document.createElement("span");
-	oTextSpan.style.fontWeight = "bold";
-	oTextSpan.style.cursor     = "pointer";
-	oTextSpan.textContent      = sUserName + ": ";
-	oTextSpan.className        = "UserChatSpan";
-	oTextSpan.addEventListener("click", function()
+	if (null !== sUserName)
 	{
-		var oInputArea = document.getElementById("inputChatId");
-		oInputArea.value = sUserName + ", " + oInputArea.value;
-		oInputArea.focus();
-	});
-	oTextSpan.addEventListener("contextmenu", function(e)
-	{
-		oThis.ShowUserContextMenu(e.pageX - 2, e.pageY + 2, sUserName);
-		e.preventDefault();
-		return false;
-	}, false);
-	oTextDiv.appendChild(oTextSpan);
+		sCurUserName = (this.m_oClient ? this.m_oClient.GetUserName() : "");
+		if ("" !== sCurUserName && 0 === sText.indexOf(sCurUserName + ","))
+			bMessageForMe = true;
+
+		oTextSpan                  = document.createElement("span");
+		oTextSpan.style.fontWeight = "bold";
+		oTextSpan.style.cursor     = "pointer";
+		oTextSpan.textContent      = sUserName + ": ";
+		oTextSpan.className        = "UserChatSpan";
+		oTextSpan.addEventListener("click", function()
+		{
+			var oInputArea   = document.getElementById("inputChatId");
+			oInputArea.value = sUserName + ", " + oInputArea.value;
+			oInputArea.focus();
+		});
+		oTextSpan.addEventListener("contextmenu", function(e)
+		{
+			oThis.ShowUserContextMenu(e.pageX - 2, e.pageY + 2, sUserName);
+			e.preventDefault();
+			return false;
+		}, false);
+		oTextDiv.appendChild(oTextSpan);
+	}
 
 
 	var aLines = SplitTextToLines(sText);
@@ -304,7 +310,14 @@ CGoUniverseApplication.prototype.OnAddChatMessage = function(nChatRoomId, sUserN
 		oTextSpan.innerHTML  = aLines[nIndex];
 
 		if (true === bMessageForMe)
+		{
 			oTextSpan.style.fontStyle = "italic";
+		}
+		else if (null === sUserName)
+		{
+			oTextSpan.style.fontStyle = "italic";
+			oTextSpan.style.color     = "rgb(0, 0, 0)";
+		}
 
 		oTextDiv.appendChild(oTextSpan);
 		oTextDiv.appendChild(document.createElement("br"));

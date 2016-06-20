@@ -18,19 +18,20 @@ function CKGSClient(oApp)
 	this.m_oBlackList     = {};
 	this.m_oFollowerList  = {};
 	this.m_aRooms         = {};
-	this.m_sUserName      = "";
 	this.m_nChatChannelId = -1;
 	this.m_aAllRooms      = {};
+	this.m_oAllUsers      = {};
 	this.m_oRoomCategory  = {};
 	this.m_oPrivateChats  = {};
 	this.m_oUserInfo      = {}; // Список открытых окон с информацией пользователя
+	this.m_oCurrentUser   = new CKGSUser(this);
 
 	this.m_oPlayersListView = oApp.GetPlayersListView();
 	this.m_oGamesListView   = oApp.GetGamesListView();
 }
 CKGSClient.prototype.GetUserName = function()
 {
-	return this.m_sUserName;
+	return this.m_oCurrentUser.GetName();
 };
 CKGSClient.prototype.Connect = function(sLogin, sPassword, sLocale)
 {
@@ -558,7 +559,7 @@ CKGSClient.prototype.private_HandleRoomJoin = function(oMessage)
 			for (var Pos = 0, Count = oMessage.users.length; Pos < Count; ++Pos)
 			{
 				var oUserRecord = Users[Pos];
-				this.private_HandleUserRecord(oUserRecord, oRoom);
+				this.private_AddUserToRoom(this.private_HandleUserRecord(oUserRecord, true), oRoom);
 			}
 		}
 	}
@@ -567,7 +568,7 @@ CKGSClient.prototype.private_HandleRoomJoin = function(oMessage)
 };
 CKGSClient.prototype.private_HandleLoginSuccess = function(oMessage)
 {
-	this.m_sUserName = oMessage.you.name;
+	this.m_oCurrentUser = this.private_HandleUserRecord(oMessage.you, true)
 
 	var Friends = oMessage.friends;
 	if (Friends)
@@ -732,13 +733,25 @@ CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
 
 	this.m_oGamesListView.Handle_Record([nAdd, nGameId, sGameType, nObservers, "", sWhite, nWhiteR, "", sBlack, nBlackR, sComment, nMoveNumber, bPrivate, nRoomId, bAdjourned, bEvent, bDemo, sSizeHandi]);
 };
-CKGSClient.prototype.private_HandleUserRecord = function(oUserRecord, oRoom)
+CKGSClient.prototype.private_HandleUserRecord = function(oUserRecord, bUpdateUserInfo)
 {
-	oRoom.Users[oUserRecord.name] = {
-		Name   : oUserRecord.name,
-		Rank   : this.private_GetRank(oUserRecord.rank),
-		Friend : this.private_IsFriend(oUserRecord.name)
-	};
+	var sName = oUserRecord.name.toLowerCase();
+
+	var oUser = null;
+	if (this.m_oAllUsers[sName])
+	{
+		oUser = this.m_oAllUsers[sName];
+		if (true === bUpdateUserInfo)
+			oUser.Update(oUserRecord);
+	}
+	else
+	{
+		oUser = new CKGSUser(this);
+		oUser.Update(oUserRecord);
+		this.m_oAllUsers[sName] = oUser;
+	}
+
+	return oUser;
 };
 CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 {
@@ -839,40 +852,42 @@ CKGSClient.prototype.private_HandleGameUpdate = function(oMessage)
 };
 CKGSClient.prototype.private_HandleChat = function(oMessage)
 {
+	var oUser = this.private_HandleUserRecord(oMessage.user, false);
+
 	// TODO: Обычный клиент позволяет писать в приват, даже если пользователь в черном списке. Можно это изменить,
 	// но тогда нужно выдавать сообщение при попытке зайти в приватный чат.
-	if (true !== this.IsPrivateChat(oMessage.channelId) && true === this.IsUserInBlackList(oMessage.user.name))
+	if (true !== this.IsPrivateChat(oMessage.channelId) && true === this.IsUserInBlackList(oUser.GetName()))
 		return;
 
-	this.m_oApp.OnAddChatMessage(oMessage.channelId, oMessage.user.name, oMessage.text);
+	this.m_oApp.OnAddChatMessage(oMessage.channelId, oUser.GetName(), oMessage.text);
 };
 CKGSClient.prototype.private_HandleUserAdded = function(oMessage)
 {
+	var oUser = this.private_HandleUserRecord(oMessage.user, true);
 	var oRoom = this.m_aAllRooms[oMessage.channelId];
 	if (oRoom)
-		this.private_HandleUserRecord(oMessage.user, oRoom);
+		this.private_AddUserToRoom(oUser, oRoom);
 
 	if (oMessage.channelId === this.m_nChatChannelId)
 	{
-		var oUser = oRoom.Users[oMessage.user.name];
-		this.m_oPlayersListView.Handle_Record([0, oUser.Name, oUser.Rank, oUser.Friend]);
+		this.m_oPlayersListView.Handle_Record([0, oUser.GetName(), oUser.GetRank(), oUser.IsFriend()]);
 		this.m_oPlayersListView.Update_Size();
 		this.m_oPlayersListView.Update();
 	}
 };
 CKGSClient.prototype.private_HandleUserRemoved = function(oMessage)
 {
-	if (!oMessage || !oMessage.user || !oMessage.user.name)
+	if (!oMessage || !oMessage.user)
 		return;
 
+	var oUser = this.private_HandleUserRecord(oMessage.user, false);
 	var oRoom = this.m_aAllRooms[oMessage.channelId];
 	if (oRoom)
-		delete oRoom.Users[oMessage.user.name];
-
-
+		delete oRoom.Users[oUser.GetName()];
+	
 	if (oMessage.channelId === this.m_nChatChannelId)
 	{
-		this.m_oPlayersListView.Handle_Record([1, oMessage.user.name]);
+		this.m_oPlayersListView.Handle_Record([1, oUser.GetName()]);
 		this.m_oPlayersListView.Update_Size();
 		this.m_oPlayersListView.Update();
 	}
@@ -896,7 +911,30 @@ CKGSClient.prototype.private_HandleGameContainerRemoveGame = function(oMessage)
 };
 CKGSClient.prototype.private_HandleUserUpdate = function(oMessage)
 {
-	// TODO: Реализовать
+	var oUser = this.private_HandleUserRecord(oMessage.user, true);
+
+	// Если у нас есть приватный чат с пользователем, который ушел с сервера, сообщаем об этом.
+	if (false === oUser.IsOnline())
+	{
+		for (var nChannelId in this.m_oPrivateChats)
+		{
+			if (this.m_oPrivateChats[nChannelId].Name === oUser.GetName())
+			{
+				this.m_oApp.OnAddChatMessage(nChannelId, null, oUser.GetName() + " have left the server");
+				delete this.m_oPrivateChats[nChannelId].Users[oUser.GetName()];
+
+				if (nChannelId === this.m_nChatChannelId)
+				{
+					this.m_oPlayersListView.Handle_Record([1, oUser.GetName()]);
+					this.m_oPlayersListView.Update_Size();
+					this.m_oPlayersListView.Update();
+				}
+
+				break;
+			}
+		}
+	}
+
 };
 CKGSClient.prototype.private_HandleJoinComplete = function(oMessage)
 {
@@ -985,8 +1023,8 @@ CKGSClient.prototype.private_HandleConvoJoin = function(oMessage)
 		Users           : {}
 	};
 
-	this.private_HandleUserRecord({name : this.GetUserName(), rank : undefined}, this.m_oPrivateChats[nChannelId]);
-	this.private_HandleUserRecord(oMessage.user, this.m_oPrivateChats[nChannelId]);
+	this.private_AddUserToRoom(this.private_GetCurrentUser(), this.m_oPrivateChats[nChannelId]);
+	this.private_AddUserToRoom(this.private_HandleUserRecord(oMessage.user, true), this.m_oPrivateChats[nChannelId]);
 
 	this.m_oApp.AddChatRoom(nChannelId, sUserName, true);
 	this.m_nChatChannelId = nChannelId;
@@ -1089,6 +1127,10 @@ CKGSClient.prototype.private_HandleArchiveNonExistant = function(oMessage)
 			oUser.Window.Close();
 	}
 };
+CKGSClient.prototype.private_AddUserToRoom = function(oUser, oRoom)
+{
+	oRoom.Users[oUser.GetName()] = oUser;
+};
 CKGSClient.prototype.GetRank = function(sRank)
 {
 	return this.private_GetRank(sRank);
@@ -1119,6 +1161,19 @@ CKGSClient.prototype.private_GetRank = function(sRank)
 	}
 
 	return -2;
+};
+CKGSClient.prototype.GetStringRank = function(nRank)
+{
+	if (nRank <= -2)
+		return "?";
+	else if (nRank === -1)
+		return "-";
+	else if (nRank <= 29)
+		return (30 - nRank) + "k";
+	else if (nRank <= 49)
+		return (nRank - 29) + "d";
+	else
+		return (nRank - 49) + "p";
 };
 CKGSClient.prototype.private_IsFriend = function(sUserName)
 {
@@ -1425,10 +1480,14 @@ CKGSClient.prototype.private_UpdatePlayersList = function()
 		for (var sUserName in oRoom.Users)
 		{
 			var oUser = oRoom.Users[sUserName];
-			this.m_oPlayersListView.Handle_Record([0, oUser.Name, oUser.Rank, oUser.Friend]);
+			this.m_oPlayersListView.Handle_Record([0, oUser.GetName(), oUser.GetRank(), oUser.IsFriend()]);
 		}
 	}
 
 	this.m_oPlayersListView.Update_Size();
 	this.m_oPlayersListView.Update();
+};
+CKGSClient.prototype.private_GetCurrentUser = function()
+{
+	return this.m_oCurrentUser;
 };

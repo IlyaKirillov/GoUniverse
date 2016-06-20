@@ -49,6 +49,10 @@ CKGSUser.prototype.GetRank = function()
 {
 	return this.m_nRank;
 };
+CKGSUser.prototype.GetStringRank = function()
+{
+	return this.m_oClient.GetStringRank(this.m_nRank);
+};
 CKGSUser.prototype.IsFriend = function()
 {
 	return this.m_oClient.IsUserInFriendList(this.m_sName);
@@ -146,7 +150,7 @@ CKGSUser.prototype.private_ParseFlags = function(sFlags)
 	//  ~  User plays stronger players far more often that weaker ones.
 
 	this.m_nFlags = 0x00000000;
-	for (var nPos = 0, nLength = sFlags; nPos < nLength; ++nPos)
+	for (var nPos = 0, nLength = sFlags.length; nPos < nLength; ++nPos)
 	{
 		var nChar = sFlags.charAt(nPos);
 		if ('g' === nChar)
