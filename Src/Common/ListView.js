@@ -62,6 +62,7 @@ function CListView()
 
         var oVerScrollElement = document.createElement("div");
         oVerScrollElement.setAttribute("id", sName + "_VerScroll");
+        oVerScrollElement.className = "VerScroll";
         oElement.appendChild(oVerScrollElement);
 
         var oControl = this.HtmlElement.Control;
@@ -373,21 +374,25 @@ CListView.prototype.private_UpdateScrollSize = function()
 
     oVerScroll.style.display  = "block";
     oVerScroll.style.height   = dScrollH;
-    oVerScroll.style.position = "absolute";
-
+    
     if (Math.abs(this.m_dYOffset + (dOverallH - dLogicH)) < 2)
         oVerScroll.style.top = (this.m_dTopOffset + dLogicH - dScrollH) + "px";
     else
         oVerScroll.style.top = (this.m_dTopOffset + -this.m_dYOffset * (dLogicH - dScrollH) / (dOverallH - dLogicH)) + "px";
 
     oVerScroll.style.left       = this.m_dXLimit;
-    oVerScroll.style.width      = 14;
-    oVerScroll.style.background = "rgb(255,255,255)";
-    oVerScroll.style.border     = "1px solid rgb(190, 193, 196)";
 
     Common_DragHandler.Init(oVerScroll, null, this.m_dXLimit, this.m_dXLimit, this.m_dTopOffset, this.m_dTopOffset + dLogicH - dScrollH);
 
     oVerScroll.onDrag = this.private_OnDragVerScroll;
+    oVerScroll.onDragStart = function()
+    {
+        oVerScroll.className = "VerScroll VerScrollActive";
+    };
+    oVerScroll.onDragEnd = function()
+    {
+        oVerScroll.className = "VerScroll";
+    };
 };
 
 CListView.prototype.private_UpdateScroll = function ()
