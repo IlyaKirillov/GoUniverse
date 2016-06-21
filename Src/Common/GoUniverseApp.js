@@ -122,6 +122,7 @@ CGoUniverseApplication.prototype.OnResize = function()
 
 	this.private_CollapsePopups(true);
 	this.private_CollapseChatTabs();
+	this.UpdateDropDownChatTabsButton();
 };
 CGoUniverseApplication.prototype.OpenRoomList = function()
 {
@@ -180,6 +181,7 @@ CGoUniverseApplication.prototype.AddChatRoom = function(nChatRoomId, sRoomName, 
 	var oTab = new CVisualChatRoomTab(this);
 	oTab.Init(nChatRoomId, sRoomName, bPrivate);
 	this.m_oChatRoomTabs.AddTab(oTab);
+	this.UpdateDropDownChatTabsButton();
 };
 CGoUniverseApplication.prototype.SetCurrentChatRoom = function(nChatRoomId)
 {
@@ -898,6 +900,29 @@ CGoUniverseApplication.prototype.Focus = function()
 CGoUniverseApplication.prototype.Blur = function()
 {
 	this.m_bFocused = false;
+};
+CGoUniverseApplication.prototype.UpdateDropDownChatTabsButton = function()
+{
+	// Проверяем, нужна ли нам кнопка
+
+	var oTabs     = document.getElementById("divIdLChatTabs");
+	var nCount    = oTabs.childElementCount;
+
+	if (nCount <= 0)
+		return;
+
+	var oLastNode = oTabs.children[nCount - 1];
+	var nOffset   = oLastNode.offsetTop;
+	var nLines    = (((nOffset + 1) / 25) | 0) + 1;
+
+	if (nLines > 1)
+	{
+		document.getElementById("divIdLChatTabsToggle").style.display = "block";
+	}
+	else
+	{
+		document.getElementById("divIdLChatTabsToggle").style.display = "none";
+	}
 };
 
 function private_TabsOnScroll(e)

@@ -560,6 +560,8 @@ CVisualChatRoomTab.prototype.OnClickClose = function()
 
 	if (false === this.m_oParent.OnClickClose(this))
 		this.m_oApp.SetCurrentChatRoom(-1);
+
+	this.m_oApp.UpdateDropDownChatTabsButton();
 };
 CVisualChatRoomTab.prototype.IncreaseMessagesCount = function()
 {
@@ -568,6 +570,7 @@ CVisualChatRoomTab.prototype.IncreaseMessagesCount = function()
 };
 CVisualChatRoomTab.prototype.OnCloseTab = function()
 {
+	this.m_oApp.UpdateDropDownChatTabsButton();
 };
 CVisualChatRoomTab.prototype.private_CreatePopup = function()
 {
