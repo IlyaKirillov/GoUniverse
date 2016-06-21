@@ -41,27 +41,27 @@ CGoUniverseApplication.prototype.Init = function()
 	this.private_GotoLoginPage(false);
 	this.OnResize();
 
-	// // // TEST
-	// this.m_oClient = new CKGSClient(this);
-	// this.OnConnect();
-	// //
+	// TEST
+	this.m_oClient = new CKGSClient(this);
+	this.OnConnect();
 	//
-	// var nRoomId = 0;
-	// var oThis = this;
-	// function TEST_AddChatRoom()
-	// {
-	// 	oThis.AddChatRoom(nRoomId++, "Room " + nRoomId);
-	// }
-	//
-	// for (var nIndex = 0; nIndex < 100; nIndex++)
-	// {
-	// 	TEST_AddChatRoom();
-	// }
-	//
-	// this.AddGameRoom(1, new CGameTree());
-	// this.AddGameRoom(2, new CGameTree());
-	// this.AddGameRoom(3, new CGameTree());
-	// this.AddGameRoom(4, new CGameTree());
+
+	var nRoomId = 0;
+	var oThis = this;
+	function TEST_AddChatRoom()
+	{
+		oThis.AddChatRoom(nRoomId++, "Room " + nRoomId);
+	}
+
+	for (var nIndex = 0; nIndex < 100; nIndex++)
+	{
+		TEST_AddChatRoom();
+	}
+
+	this.AddGameRoom(1, new CGameTree());
+	this.AddGameRoom(2, new CGameTree());
+	this.AddGameRoom(3, new CGameTree());
+	this.AddGameRoom(4, new CGameTree());
 
 
 
@@ -511,9 +511,15 @@ CGoUniverseApplication.prototype.private_InitTabPanel = function(oTabsControl)
 
 	// Панель под табы с игровыми комнатами
 	var oGameRoomTabs = CreateControlContainer("divIdTabPanelRooms");
-	oGameRoomTabs.Bounds.SetParams(200, 0, 300, 1000, true, false, true, false, -1, -1);
+	oGameRoomTabs.Bounds.SetParams(200, 0, 355, 1000, true, false, true, false, -1, -1);
 	oGameRoomTabs.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right | g_anchor_bottom);
 	oTabsControl.AddControl(oGameRoomTabs);
+
+	// Кнопка для раскрытия панели со всеми играми
+	var oToggleButton = this.private_InitGameTabsToggleButton("divIdGameTabsToggle");
+	oToggleButton.Bounds.SetParams(0, 0, 305, 1000, false, false, true, false, 50, -1);
+	oToggleButton.Anchor = (g_anchor_top | g_anchor_bottom | g_anchor_right);
+	oTabsControl.AddControl(oToggleButton);
 };
 CGoUniverseApplication.prototype.private_InitMainRoom = function()
 {
@@ -643,6 +649,33 @@ CGoUniverseApplication.prototype.private_InitChannelToggleButton = function(sDiv
 		else
 			oThis.private_CollapseChatTabs();
 	});
+
+	return oControl;
+};
+CGoUniverseApplication.prototype.private_InitGameTabsToggleButton = function(sDivId)
+{
+	var oThis = this;
+
+	var oElement = document.getElementById(sDivId);
+	var oControl = CreateControlContainer(sDivId);
+
+	oElement.title           = "Open game list";
+	// oElement.style.fontSize  = "24px";
+	// oElement.style.textAlign = "center";
+	oElement.addEventListener("selectstart", function()
+	{
+		return false;
+	}, false);
+	// oElement.addEventListener("click", function()
+	// {
+	// 	var oTabs = document.getElementById("divIdLChatTabs");
+	// 	var sHeight = parseFloat(oTabs.style.height);
+	//
+	// 	if (sHeight < 35)
+	// 		oThis.private_OpenChatTabs();
+	// 	else
+	// 		oThis.private_CollapseChatTabs();
+	// });
 
 	return oControl;
 };

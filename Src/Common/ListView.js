@@ -374,7 +374,7 @@ CListView.prototype.private_UpdateScrollSize = function()
 
     oVerScroll.style.display  = "block";
     oVerScroll.style.height   = dScrollH;
-    
+
     if (Math.abs(this.m_dYOffset + (dOverallH - dLogicH)) < 2)
         oVerScroll.style.top = (this.m_dTopOffset + dLogicH - dScrollH) + "px";
     else
