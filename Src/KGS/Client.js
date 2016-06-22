@@ -1057,10 +1057,12 @@ CKGSClient.prototype.private_HandleConvoJoin = function(oMessage)
 	this.private_AddUserToRoom(this.private_HandleUserRecord(oMessage.user, true), this.m_oPrivateChats[nChannelId]);
 
 	this.m_oApp.AddChatRoom(nChannelId, sUserName, true);
-	this.m_nChatChannelId = nChannelId;
 
 	if (true !== this.m_oApp.IsTypingChatMessage())
+	{
+		this.m_nChatChannelId = nChannelId;
 		this.m_oApp.SetCurrentChatRoomTab(nChannelId);
+	}
 };
 CKGSClient.prototype.private_HandleArchiveJoin = function(oMessage)
 {
