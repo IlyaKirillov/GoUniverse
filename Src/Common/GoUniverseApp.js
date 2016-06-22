@@ -41,28 +41,41 @@ CGoUniverseApplication.prototype.Init = function()
 	this.private_GotoLoginPage(false);
 	this.OnResize();
 
-	// TEST
-	this.m_oClient = new CKGSClient(this);
-	this.OnConnect();
+	// // TEST
+	// this.m_oClient = new CKGSClient(this);
+	// //this.OnConnect();
+	// //
 	//
-
-	var nRoomId = 0;
-	var oThis = this;
-	function TEST_AddChatRoom()
-	{
-		oThis.AddChatRoom(nRoomId++, "Room " + nRoomId);
-	}
-
-	for (var nIndex = 0; nIndex < 100; nIndex++)
-	{
-		TEST_AddChatRoom();
-	}
-
-	this.AddGameRoom(1, new CGameTree());
-	this.AddGameRoom(2, new CGameTree());
-	this.AddGameRoom(3, new CGameTree());
-	this.AddGameRoom(4, new CGameTree());
-
+	// document.getElementById("divMainId").style.display = "block";
+	// this.OnResize();
+	//
+	// var nRoomId = 0;
+	// var oThis = this;
+	// function TEST_AddChatRoom()
+	// {
+	// 	oThis.AddChatRoom(nRoomId++, "Room " + nRoomId);
+	// }
+	//
+	// for (var nIndex = 0; nIndex < 100; nIndex++)
+	// {
+	// 	TEST_AddChatRoom();
+	// }
+	//
+	// // this.AddGameRoom(1, new CGameTree());
+	// // this.AddGameRoom(2, new CGameTree());
+	// // this.AddGameRoom(3, new CGameTree());
+	// // this.AddGameRoom(4, new CGameTree());
+	//
+	// var nGameRoomId = 0;
+	// function TEST_AddGameRoom()
+	// {
+	// 	oThis.AddGameRoom(nGameRoomId++, null);
+	// }
+	//
+	// for (var nIndex = 0; nIndex < 100; nIndex++)
+	// {
+	// 	TEST_AddGameRoom();
+	// }
 
 
 	//_____________
@@ -666,16 +679,16 @@ CGoUniverseApplication.prototype.private_InitGameTabsToggleButton = function(sDi
 	{
 		return false;
 	}, false);
-	// oElement.addEventListener("click", function()
-	// {
-	// 	var oTabs = document.getElementById("divIdLChatTabs");
-	// 	var sHeight = parseFloat(oTabs.style.height);
-	//
-	// 	if (sHeight < 35)
-	// 		oThis.private_OpenChatTabs();
-	// 	else
-	// 		oThis.private_CollapseChatTabs();
-	// });
+	oElement.addEventListener("click", function()
+	{
+		var oTabs = document.getElementById("divIdTabPanelRooms");
+		var sHeight = parseFloat(oTabs.style.height);
+
+		if (sHeight < 55)
+			oThis.private_OpenGameTabs();
+		else
+			oThis.private_CollapseGameTabs();
+	});
 
 	return oControl;
 };
@@ -957,6 +970,103 @@ CGoUniverseApplication.prototype.UpdateDropDownChatTabsButton = function()
 		document.getElementById("divIdLChatTabsToggle").style.display = "none";
 	}
 };
+CGoUniverseApplication.prototype.private_OpenGameTabs = function()
+{
+	var oTabs     = document.getElementById("divIdTabPanelRooms");
+	var nCount    = oTabs.childElementCount;
+	var oLastNode = oTabs.children[nCount - 1];
+	var nOffset   = oLastNode.offsetTop;
+	var nLines    = (((nOffset + 1) / 50) | 0) + 1;
+
+	var nMaxLines = Math.max(Math.min(3, nLines), 1);
+	if (1 === nMaxLines)
+		return;
+
+	oTabs.className = "ChatOpenPanel";
+
+	var nClientHeight = (nMaxLines * 50 - 1);
+	document.getElementById("divIdTabPanel").style.height = nClientHeight + 5 + "px";
+	oTabs.style.height          = nClientHeight + "px";
+	oTabs.style.backgroundColor = "#050708";
+	oTabs.style.boxShadow       = "0px 1px 5px rgba(0,0,0,0.8)";
+
+	document.getElementById("divIdGameTabsToggleInner").style.transform = "rotate(270deg)";
+
+	if (nLines > nMaxLines)
+	{
+		var oVerScroll = document.getElementById("divIdGameTabsScroll");
+
+		// sa - scroll area, va - visible area, pa - physical area
+		var vaH = parseInt(nClientHeight);
+		var saY = 0;
+		var paH = parseInt(oTabs.scrollHeight);
+		var paY = parseInt(oTabs.scrollTop);
+		var saH = vaH - saY - 3;
+
+		var sH = Math.max(20, ((vaH - saY) * vaH / paH)) | 0;
+		var sY = Math.max(saY, Math.min(saY + saH - sH + 1, saY + paY * (saH - sH) / (paH - vaH)));
+		var sX = parseInt(oTabs.clientWidth + oTabs.offsetLeft) - 15 - 2; // nScrollW + 1 border
+
+		oVerScroll.style.display = "block";
+		oVerScroll.style.height  = sH + "px";
+		oVerScroll.style.top     = sY + "px";
+		oVerScroll.style.left    = sX + "px";
+
+		Common_DragHandler.Init(oVerScroll, null, sX, sX, saY, saY + saH - sH);
+		oVerScroll.onDrag = function(sX, sY)
+		{
+			oTabs.scrollTop = (sY - saY) * (paH - vaH) / (saH - sH);
+		};
+		oVerScroll.onDragStart = function()
+		{
+			oVerScroll.className = "VerScrollBlack VerScrollBlackActive";
+		};
+		oVerScroll.onDragEnd = function()
+		{
+			oVerScroll.className = "VerScrollBlack";
+		};
+
+		oTabs.addEventListener("DOMMouseScroll", private_GameTabsOnScroll, false);
+		oTabs.addEventListener("mousewheel", private_GameTabsOnScroll, false);
+	}
+};
+CGoUniverseApplication.prototype.private_CollapseGameTabs = function()
+{
+	var oTabs = document.getElementById("divIdTabPanelRooms");
+	oTabs.className = "";
+	oTabs.style.height          = "50px";
+	oTabs.style.backgroundColor = "transparent";
+	oTabs.style.boxShadow       = "";
+
+	document.getElementById("divIdTabPanel").style.height = "50px";
+	document.getElementById("divIdGameTabsToggleInner").style.transform = "rotate(90deg)";
+	document.getElementById("divIdGameTabsScroll").style.display = "none";
+
+	oTabs.removeEventListener("DOMMouseScroll", private_GameTabsOnScroll, false);
+	oTabs.removeEventListener("mousewheel", private_GameTabsOnScroll, false);
+
+	this.ScrollGameTabsToCurrent();
+};
+CGoUniverseApplication.prototype.ScrollGameTabsToCurrent = function()
+{
+	var nChatRoomId = this.m_oChatRoomTabs.GetCurrentId();
+	var oTab = this.m_oChatRoomTabs.GetTab(nChatRoomId);
+	if (!oTab)
+		return;
+
+	var oTabDiv = oTab.m_oTabDiv;
+	var nOffsetTop = oTabDiv.offsetTop;
+
+	var nLine = parseInt((nOffsetTop + 1) / 50);
+
+	var oTabs = document.getElementById("divIdTabPanelRooms");
+	oTabs.scrollTop = nLine * 50;
+};
+
+function private_GameTabsOnScroll(e)
+{
+
+}
 
 function private_TabsOnScroll(e)
 {

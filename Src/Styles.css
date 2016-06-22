@@ -309,6 +309,28 @@ div.VerScrollActive, div.VerScrollActive:hover {
 	background-color:  rgb(64, 64, 64);
 }
 
+div.VerScrollBlack {
+	position            : absolute;
+	top                 : 0px;
+	left                : 0px;
+	width               : 14px;
+	height              : 50px;
+	background          : rgb(0, 0, 0);
+	border              : 1px solid #505050;
+
+	transition-property : background, border;
+	transition-duration : 0.2s;
+	transition-delay    : 0s;
+}
+
+div.VerScrollBlack:hover {
+	border-color : #969696;
+}
+
+div.VerScrollBlackActive, div.VerScrollBlackActive:hover {
+	border-color     : #969696;
+}
+
 div.ChatOpenPanel {
 	transition-property : all;
 	transition-duration : 0.5s;
@@ -335,4 +357,22 @@ input.SearchInput:hover {
 input.SearchInput:focus {
 	color            : #FFFFFF;
 	border           : 1px solid #969696;
+}
+
+#divIdGameTabsToggleInner {
+	position   : absolute;
+	top        : 10px;
+	left       : 10px;
+	width      : 30px;
+	height     : 30px;
+	color      : #FFFFFF;
+	font-size  : 16px;
+	transform  : rotate(90deg);
+	transition : all 0.3s ease;
+}
+
+#divIdGameTabsToggleInner span {
+	position   : absolute;
+	top        : 4px;
+	left       : 10px;
 }

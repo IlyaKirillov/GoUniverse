@@ -95,37 +95,6 @@
 
 	<div id="divMainId" style="display:none; position:absolute; top: 0px; left:0px;width:100vw;height:100vh">
 
-		<div id="divIdTabPanel" style="position:absolute; top: 0px; left:0px;">
-			<div id="divIdHomeButton" style="position: absolute; top: 0px; left: 0px; height: 50px;">
-				<div style="float: left; border-left: 1px solid #FFFFFF; height: 100%; opacity: 0.7;"></div>
-				<div id="divIdMainRoomTab" class="ButtonGreen"
-					 style="position: relative; padding: 0px 20px; height: 50px; float: left; font-size: 24px; margin-right: 14px; font-weight: lighter; -webkit-font-smoothing: antialiased;">
-					<span style="float: left; padding-top: 7px;">Main Room</span>
-				</div>
-			</div>
-			<div id="divIdTabPanelRooms" style="position: absolute; top: 0px; left: 0px; height: 50px;">
-
-			</div>
-			<button id="divIdGameTabsToggle" class="ButtonExit" style="position:absolute; top: 0px; left:0px;">
-				<div>
-					<span class="ChatMenuSpan"></span>
-				</div>
-			</button>
-			<div id="divIdPanelRight" style="position: absolute; top: 0px; left: 0px; height: 50px;">
-
-				<input id="OmniboxInput" placeholder="find a player" type="text" class="SearchInput" style="float:left;margin-top: 11px;"/>
-
-				<button id="divIdExitButton" class="ButtonExit">
-					<div>Exit</div>
-				</button>
-
-				<button id="divIdClientName" style="background:none;outline: none;cursor:default;--webkit-appearance:none;-webkit-border-radius:0;overflow: visible;font-family: 'Segoe UI',Helvetica,Tahoma,Geneva,Verdana,sans-serif;
-            -webkit-font-smoothing:antialiased; padding: 0px; border: 1px solid transparent; box-sizing: border-box; font-size: 14px; height: 50px; margin: 0px; padding: 0px 14px; color: #FFFFFF; float:right">
-					<div id="divIdClientNameText">Guest</div>
-				</button>
-
-			</div>
-		</div>
 		<div id="divIdMainRoom" style="position:absolute; top: 0px; left:0px;">
 
 			<div id="divIdL" style="position:absolute; top: 0px; left:0px;">
@@ -169,6 +138,40 @@
 			</div>
 			<div id="divPlayersListId" tabindex="0"
 				 style="position:absolute; top: 0px; left:0px; background-color: #F3F3F3"></div>
+		</div>
+		<div id="divIdTabPanel" style="position:absolute; top: 0px; left:0px;">
+			<div style="position: absolute; top: 0px; left: 0px; height: 50px; width:100%;background-color:#050708;"></div>
+			<div id="divIdHomeButton" style="position: absolute; top: 0px; left: 0px; height: 50px;">
+				<div style="float: left; border-left: 1px solid #FFFFFF; height: 100%; opacity: 0.7;"></div>
+				<div id="divIdMainRoomTab" class="ButtonGreen"
+					 style="position: relative; padding: 0px 20px; height: 50px; float: left; font-size: 24px; margin-right: 14px; font-weight: lighter; -webkit-font-smoothing: antialiased;">
+					<span style="float: left; padding-top: 7px;">Main Room</span>
+				</div>
+			</div>
+			<div id="divIdTabPanelRooms" style="position: absolute; top: 0px; left: 0px; height: 50px">
+
+			</div>
+			<div id="divIdGameTabsScroll" class="VerScrollBlack">
+			</div>
+			<button id="divIdGameTabsToggle" class="ButtonExit" style="position:absolute; top: 0px; left:0px;">
+				<div id="divIdGameTabsToggleInner">
+					<span class="ChatMenuSpan"></span>
+				</div>
+			</button>
+			<div id="divIdPanelRight" style="position: absolute; top: 0px; left: 0px; height: 50px;">
+
+				<input id="OmniboxInput" placeholder="find a player" type="text" class="SearchInput" style="float:left;margin-top: 11px;"/>
+
+				<button id="divIdExitButton" class="ButtonExit">
+					<div>Exit</div>
+				</button>
+
+				<button id="divIdClientName" style="background:none;outline: none;cursor:default;--webkit-appearance:none;-webkit-border-radius:0;overflow: visible;font-family: 'Segoe UI',Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+            -webkit-font-smoothing:antialiased; padding: 0px; border: 1px solid transparent; box-sizing: border-box; font-size: 14px; height: 50px; margin: 0px; padding: 0px 14px; color: #FFFFFF; float:right">
+					<div id="divIdClientNameText">Guest</div>
+				</button>
+
+			</div>
 		</div>
 	</div>
 
