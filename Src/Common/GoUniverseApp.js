@@ -32,6 +32,8 @@ function CGoUniverseApplication()
 	this.m_oSound.Init("http://webgoboard.com/Sound");
 	this.m_bFocused            = true;
 
+	this.m_oGameTabsScroll = null;
+	this.m_oChatTabsScroll = null;
 }
 CGoUniverseApplication.prototype.Init = function()
 {
@@ -41,41 +43,41 @@ CGoUniverseApplication.prototype.Init = function()
 	this.private_GotoLoginPage(false);
 	this.OnResize();
 
-	// // TEST
-	// this.m_oClient = new CKGSClient(this);
-	// //this.OnConnect();
-	// //
+	// TEST
+	this.m_oClient = new CKGSClient(this);
+	//this.OnConnect();
 	//
-	// document.getElementById("divMainId").style.display = "block";
-	// this.OnResize();
-	//
-	// var nRoomId = 0;
-	// var oThis = this;
-	// function TEST_AddChatRoom()
-	// {
-	// 	oThis.AddChatRoom(nRoomId++, "Room " + nRoomId);
-	// }
-	//
-	// for (var nIndex = 0; nIndex < 100; nIndex++)
-	// {
-	// 	TEST_AddChatRoom();
-	// }
-	//
-	// // this.AddGameRoom(1, new CGameTree());
-	// // this.AddGameRoom(2, new CGameTree());
-	// // this.AddGameRoom(3, new CGameTree());
-	// // this.AddGameRoom(4, new CGameTree());
-	//
-	// var nGameRoomId = 0;
-	// function TEST_AddGameRoom()
-	// {
-	// 	oThis.AddGameRoom(nGameRoomId++, null);
-	// }
-	//
-	// for (var nIndex = 0; nIndex < 100; nIndex++)
-	// {
-	// 	TEST_AddGameRoom();
-	// }
+
+	document.getElementById("divMainId").style.display = "block";
+	this.OnResize();
+
+	var nRoomId = 0;
+	var oThis = this;
+	function TEST_AddChatRoom()
+	{
+		oThis.AddChatRoom(nRoomId++, "Room " + nRoomId);
+	}
+
+	for (var nIndex = 0; nIndex < 100; nIndex++)
+	{
+		TEST_AddChatRoom();
+	}
+
+	// this.AddGameRoom(1, new CGameTree());
+	// this.AddGameRoom(2, new CGameTree());
+	// this.AddGameRoom(3, new CGameTree());
+	// this.AddGameRoom(4, new CGameTree());
+
+	var nGameRoomId = 0;
+	function TEST_AddGameRoom()
+	{
+		oThis.AddGameRoom(nGameRoomId++, null);
+	}
+
+	for (var nIndex = 0; nIndex < 100; nIndex++)
+	{
+		TEST_AddGameRoom();
+	}
 
 
 	//_____________
@@ -528,6 +530,10 @@ CGoUniverseApplication.prototype.private_InitTabPanel = function(oTabsControl)
 	oGameRoomTabs.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right | g_anchor_bottom);
 	oTabsControl.AddControl(oGameRoomTabs);
 
+	this.m_oGameTabsScroll = new CVerticalScroll();
+	this.m_oGameTabsScroll.Init(oGameRoomTabs.HtmlElement, "VerScrollBlack", "VerScrollBlackActive");
+	this.m_oGameTabsScroll.SetPaddings(0, 2, 3);
+
 	// Кнопка для раскрытия панели со всеми играми
 	var oToggleButton = this.private_InitGameTabsToggleButton("divIdGameTabsToggle");
 	oToggleButton.Bounds.SetParams(0, 0, 305, 1000, false, false, true, false, 50, -1);
@@ -586,6 +592,10 @@ CGoUniverseApplication.prototype.private_InitChats = function(oChatControl)
 	oChatTabs.Bounds.SetParams(0, 1, 64, 0, true, true, true, false, -1, 25);
 	oChatTabs.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left);
 	oChatControl.AddControl(oChatTabs);
+
+	this.m_oChatTabsScroll = new CVerticalScroll();
+	this.m_oChatTabsScroll.Init(oChatTabs.HtmlElement, "VerScroll", "VerScrollActive");
+	this.m_oChatTabsScroll.SetPaddings(25, 1, 0);
 
 	// Кнопка добавления чата
 	var oChatAddControl = this.private_InitChannelAddButton("divIdLChatAdd");
@@ -846,42 +856,7 @@ CGoUniverseApplication.prototype.private_OpenChatTabs = function()
 	document.getElementById("divIdLChatTabsToggleInnerSpan").style.transform = "rotate(270deg)";
 
 	if (nLines > nMaxLines)
-	{
-		var oVerScroll = document.getElementById("divIdLChatTabsScroll");
-
-		// sa - scroll area, va - visible area, pa - physical area
-		var vaH = parseInt(nClientHeight);
-		var saY = 25;
-		var paH = parseInt(oTabs.scrollHeight);
-		var paY = parseInt(oTabs.scrollTop);
-		var saH = vaH - saY;
-
-		var sH = Math.max(20, ((vaH - saY) * vaH / paH)) | 0;
-		var sY = Math.max(saY, Math.min(saY + saH - sH + 1, saY + paY * (saH - sH) / (paH - vaH)));
-		var sX = parseInt(oTabs.clientWidth) - 15; // nScrollW + 1 border
-
-		oVerScroll.style.display = "block";
-		oVerScroll.style.height  = sH + "px";
-		oVerScroll.style.top     = sY + "px";
-		oVerScroll.style.left    = sX + "px";
-
-		Common_DragHandler.Init(oVerScroll, null, sX, sX, saY, saY + saH - sH);
-		oVerScroll.onDrag = function(sX, sY)
-		{
-			oTabs.scrollTop = (sY - saY) * (paH - vaH) / (saH - sH);
-		};
-		oVerScroll.onDragStart = function()
-		{
-			oVerScroll.className = "VerScroll VerScrollActive";
-		};
-		oVerScroll.onDragEnd = function()
-		{
-			oVerScroll.className = "VerScroll";
-		};
-
-		oTabs.addEventListener("DOMMouseScroll", private_TabsOnScroll, false);
-		oTabs.addEventListener("mousewheel", private_TabsOnScroll, false);
-	}
+		this.m_oChatTabsScroll.Show(nClientHeight);
 };
 CGoUniverseApplication.prototype.private_CollapseChatTabs = function()
 {
@@ -897,12 +872,8 @@ CGoUniverseApplication.prototype.private_CollapseChatTabs = function()
 	oTabs.style.boxShadow       = "";
 
 	document.getElementById("divIdLChatTabsToggleInnerSpan").style.transform = "rotate(90deg)";
-	document.getElementById("divIdLChatTabsScroll").style.display = "none";
 
-	oTabs.removeEventListener("DOMMouseScroll", private_TabsOnScroll, false);
-	oTabs.removeEventListener("mousewheel", private_TabsOnScroll, false);
-
-
+	this.m_oChatTabsScroll.Hide();
 	this.ScrollChatTabsToCurrent();
 };
 CGoUniverseApplication.prototype.ScrollChatTabsToCurrent = function()
@@ -993,42 +964,7 @@ CGoUniverseApplication.prototype.private_OpenGameTabs = function()
 	document.getElementById("divIdGameTabsToggleInner").style.transform = "rotate(270deg)";
 
 	if (nLines > nMaxLines)
-	{
-		var oVerScroll = document.getElementById("divIdGameTabsScroll");
-
-		// sa - scroll area, va - visible area, pa - physical area
-		var vaH = parseInt(nClientHeight);
-		var saY = 0;
-		var paH = parseInt(oTabs.scrollHeight);
-		var paY = parseInt(oTabs.scrollTop);
-		var saH = vaH - saY - 3;
-
-		var sH = Math.max(20, ((vaH - saY) * vaH / paH)) | 0;
-		var sY = Math.max(saY, Math.min(saY + saH - sH + 1, saY + paY * (saH - sH) / (paH - vaH)));
-		var sX = parseInt(oTabs.clientWidth + oTabs.offsetLeft) - 15 - 2; // nScrollW + 1 border
-
-		oVerScroll.style.display = "block";
-		oVerScroll.style.height  = sH + "px";
-		oVerScroll.style.top     = sY + "px";
-		oVerScroll.style.left    = sX + "px";
-
-		Common_DragHandler.Init(oVerScroll, null, sX, sX, saY, saY + saH - sH);
-		oVerScroll.onDrag = function(sX, sY)
-		{
-			oTabs.scrollTop = (sY - saY) * (paH - vaH) / (saH - sH);
-		};
-		oVerScroll.onDragStart = function()
-		{
-			oVerScroll.className = "VerScrollBlack VerScrollBlackActive";
-		};
-		oVerScroll.onDragEnd = function()
-		{
-			oVerScroll.className = "VerScrollBlack";
-		};
-
-		oTabs.addEventListener("DOMMouseScroll", private_GameTabsOnScroll, false);
-		oTabs.addEventListener("mousewheel", private_GameTabsOnScroll, false);
-	}
+		this.m_oGameTabsScroll.Show(nClientHeight);
 };
 CGoUniverseApplication.prototype.private_CollapseGameTabs = function()
 {
@@ -1040,11 +976,8 @@ CGoUniverseApplication.prototype.private_CollapseGameTabs = function()
 
 	document.getElementById("divIdTabPanel").style.height = "50px";
 	document.getElementById("divIdGameTabsToggleInner").style.transform = "rotate(90deg)";
-	document.getElementById("divIdGameTabsScroll").style.display = "none";
 
-	oTabs.removeEventListener("DOMMouseScroll", private_GameTabsOnScroll, false);
-	oTabs.removeEventListener("mousewheel", private_GameTabsOnScroll, false);
-
+	this.m_oGameTabsScroll.Hide();
 	this.ScrollGameTabsToCurrent();
 };
 CGoUniverseApplication.prototype.ScrollGameTabsToCurrent = function()
@@ -1063,30 +996,117 @@ CGoUniverseApplication.prototype.ScrollGameTabsToCurrent = function()
 	oTabs.scrollTop = nLine * 50;
 };
 
-function private_GameTabsOnScroll(e)
+function CVerticalScroll()
 {
+	this.m_oDiv       = null;
+	this.m_oScrollDiv = null;
 
+	this.m_sNormalClass = "";
+	this.m_sActiveClass = "";
+
+	this.m_nScrollW     = 15; // 14 + Border (1)
+
+	this.m_nTop    = 0;
+	this.m_nBottom = 0;
+	this.m_nRight  = 0;
+
+	var oThis = this;
+	this.m_fOnScroll = function(e)
+	{
+		oThis.private_OnScroll(e);
+	};
+
+	this.m_nElementHeight = 0;
 }
-
-function private_TabsOnScroll(e)
+CVerticalScroll.prototype.Init = function(oDiv, sNormalClass, sActiveClass)
 {
-	var oTabs     = document.getElementById("divIdLChatTabs");
-	var oVerScroll = document.getElementById("divIdLChatTabsScroll");
+	this.m_sNormalClass = sNormalClass;
+	this.m_sActiveClass = sActiveClass;
+	this.m_oDiv = oDiv;
 
-	var nCount    = oTabs.childElementCount;
-	var oLastNode = oTabs.children[nCount - 1];
-	var nOffset   = oLastNode.offsetTop;
-	var nLines    = (((nOffset + 1) / 25) | 0) + 1;
-
-	var nMaxLines = Math.max(Math.min(5, nLines), 1);
-	if (1 === nMaxLines)
+	var oParent = oDiv.parentNode;
+	if (!oParent)
 		return;
 
-	var nClientHeight = (nMaxLines * 25 - 1);
+	var oScroll = document.createElement("div");
+	oParent.insertBefore(oScroll, oDiv.nextSibling);
 
+	oScroll.style.display  = "block";
+	oScroll.style.position = "absolute";
+	oScroll.style.top      = "0px";
+	oScroll.style.left     = "0px";
+	oScroll.style.width    = "14px";
+	oScroll.style.height   = "50px";
+	oScroll.className      = sNormalClass;
+
+	this.m_oScrollDiv = oScroll;
+
+	oScroll.style.display  = "none";
+};
+CVerticalScroll.prototype.SetPaddings = function(nTop, nBottom, nRight)
+{
+	this.m_nTop    = nTop;
+	this.m_nBottom = nBottom;
+	this.m_nRight  = nRight;
+};
+CVerticalScroll.prototype.Show = function(nElementHeight)
+{
+	this.m_nElementHeight = nElementHeight;
+
+	var oDiv       = this.m_oDiv;
+	var oVerScroll = this.m_oScrollDiv;
+
+	// sa - scroll area, va - visible area, pa - physical area
+	var vaH = parseInt(nElementHeight);
+	var saY = this.m_nTop;
+	var paH = parseInt(oDiv.scrollHeight);
+	var paY = parseInt(oDiv.scrollTop);
+	var saH = vaH - saY - this.m_nBottom;
+
+	var sH = Math.max(20, ((vaH - saY) * vaH / paH)) | 0;
+	var sY = Math.max(saY, Math.min(saY + saH - sH + 1, saY + paY * (saH - sH) / (paH - vaH)));
+	var sX = parseInt(oDiv.clientWidth + oDiv.offsetLeft) - this.m_nScrollW - this.m_nRight;
+
+	oVerScroll.style.display = "block";
+	oVerScroll.style.height  = sH + "px";
+	oVerScroll.style.top     = sY + "px";
+	oVerScroll.style.left    = sX + "px";
+
+	var oThis = this;
+	Common_DragHandler.Init(oVerScroll, null, sX, sX, saY, saY + saH - sH);
+	oVerScroll.onDrag = function(sX, sY)
+	{
+		oDiv.scrollTop = (sY - saY) * (paH - vaH) / (saH - sH);
+	};
+	oVerScroll.onDragStart = function()
+	{
+		oVerScroll.className = oThis.m_sNormalClass + " " + oThis.m_sActiveClass;
+	};
+	oVerScroll.onDragEnd = function()
+	{
+		oVerScroll.className = oThis.m_sNormalClass;
+	};
+
+	oDiv.addEventListener("DOMMouseScroll", this.m_fOnScroll, false);
+	oDiv.addEventListener("mousewheel", this.m_fOnScroll, false);
+};
+CVerticalScroll.prototype.Hide = function()
+{
+	this.m_nElementHeight = 0;
+	this.m_oScrollDiv.style.display = "none";
+
+	this.m_oDiv.removeEventListener("DOMMouseScroll", this.m_fOnScroll, false);
+	this.m_oDiv.removeEventListener("mousewheel", this.m_fOnScroll, false);
+};
+CVerticalScroll.prototype.private_OnScroll = function(e)
+{
+	if (this.m_nElementHeight <= 1)
+		return;
+
+	var oDiv       = this.m_oDiv;
+	var oVerScroll = this.m_oScrollDiv;
 
 	var delta = 0;
-
 	if (undefined != e.wheelDelta && e.wheelDelta != 0)
 	{
 		delta = -45 * e.wheelDelta / 120;
@@ -1096,16 +1116,16 @@ function private_TabsOnScroll(e)
 		delta = 45 * e.detail / 3;
 	}
 
-	oTabs.scrollTop += delta;
+	oDiv.scrollTop += delta;
 
-	var vaH = parseInt(nClientHeight);
-	var saY = 25;
-	var paH = parseInt(oTabs.scrollHeight);
-	var paY = parseInt(oTabs.scrollTop);
-	var saH = vaH - saY;
+	var vaH = parseInt(this.m_nElementHeight);
+	var saY = this.m_nTop;
+	var paH = parseInt(oDiv.scrollHeight);
+	var paY = parseInt(oDiv.scrollTop);
+	var saH = vaH - saY - this.m_nBottom;
 
 	var sH = Math.max(20, ((vaH - saY) * vaH / paH)) | 0;
 	var sY = Math.max(saY, Math.min(saY + saH - sH + 1, saY + paY * (saH - sH) / (paH - vaH)));
 
 	oVerScroll.style.top = sY + "px";
-}
+};
