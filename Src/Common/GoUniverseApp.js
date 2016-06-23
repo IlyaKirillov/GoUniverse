@@ -310,7 +310,7 @@ CGoUniverseApplication.prototype.AddConsoleMessage = function(sField, sText)
 
 	return oTextDiv;
 };
-CGoUniverseApplication.prototype.OnAddChatMessage = function(nChatRoomId, sUserName, sText)
+CGoUniverseApplication.prototype.OnAddChatMessage = function(nChatRoomId, sUserName, sText, oPr)
 {
 	var oThis = this;
 
@@ -322,6 +322,11 @@ CGoUniverseApplication.prototype.OnAddChatMessage = function(nChatRoomId, sUserN
 
 	var bMessageForMe = false;
 	var sCurUserName  = false;
+	var bAnnounce     = false;
+
+	if (oPr && true === oPr.Announce)
+		bAnnounce = true;
+
 	var oTextSpan;
 
 	if (null !== sUserName)
@@ -356,6 +361,9 @@ CGoUniverseApplication.prototype.OnAddChatMessage = function(nChatRoomId, sUserN
 	{
 		oTextSpan            = document.createElement("span");
 		oTextSpan.innerHTML  = aLines[nIndex];
+
+		if (bAnnounce)
+			oTextSpan.style.fontWeight = "bold";
 
 		if (true === bMessageForMe)
 		{

@@ -504,6 +504,10 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
 	{
 		this.private_HandleConvoNoChats(oMessage);
 	}
+	else if ("ANNOUNCE" === oMessage.type)
+	{
+		this.private_HandleAnnounce(oMessage);
+	}
 	else
 	{
 		console.log(oMessage);
@@ -1175,6 +1179,11 @@ CKGSClient.prototype.private_HandleConvoNoChats = function(oMessage)
 			oPrivateChat.Disabled = true;
 		}
 	}
+};
+CKGSClient.prototype.private_HandleAnnounce = function(oMessage)
+{
+	var oUser = this.private_HandleUserRecord(oMessage.user, false);
+	this.m_oApp.OnAddChatMessage(oMessage.channelId, oUser.GetName(), oMessage.text, {Announce : true});
 };
 CKGSClient.prototype.private_AddUserToRoom = function(oUser, oRoom)
 {
