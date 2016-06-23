@@ -31,16 +31,13 @@ CVisualTabs.prototype.Clear = function()
 		oTab.OnCloseTab();
 	}
 };
-CVisualTabs.prototype.AddTab = function(oTab, bMakeCurrent)
+CVisualTabs.prototype.AddTab = function(oTab)
 {
 	this.m_arrTabs.push(oTab);
 	oTab.SetParent(this);
 
 	var oTabDiv = oTab.GetDiv();
 	this.m_oPanelElement.appendChild(oTabDiv);
-
-	if (true === bMakeCurrent)
-		this.m_oCurrentTab = oTab;
 };
 CVisualTabs.prototype.RemoveTab = function(oTab)
 {
@@ -408,6 +405,8 @@ CVisualGameRoomTab.prototype.OnClick = function()
 		this.m_oGameTree.Update_Size();
 		this.m_oGameTree.Focus();
 	}
+
+	this.m_oApp.private_CollapseGameTabs();
 };
 CVisualGameRoomTab.prototype.OnClickClose = function()
 {
@@ -423,6 +422,8 @@ CVisualGameRoomTab.prototype.OnCloseTab = function()
 {
 	if (this.m_oContainerDiv)
 		this.m_oContainerDiv.removeChild(this.m_oMainDiv);
+
+	this.m_oApp.UpdateDropDownGameTabsButton();
 };
 
 function CVisualChatRoomTabs()
@@ -430,13 +431,10 @@ function CVisualChatRoomTabs()
 	CVisualChatRoomTabs.superclass.constructor.call(this);
 }
 CommonExtend(CVisualChatRoomTabs, CVisualTabs);
-CVisualChatRoomTabs.prototype.AddTab = function(oTab, bMakeCurrent)
+CVisualChatRoomTabs.prototype.AddTab = function(oTab)
 {
 	this.m_arrTabs.push(oTab);
 	oTab.SetParent(this);
-
-	if (true === bMakeCurrent)
-		this.m_oCurrentTab = oTab;
 
 	var sName   = oTab.GetRoomName();
 	var oTabDiv = oTab.GetDiv();
