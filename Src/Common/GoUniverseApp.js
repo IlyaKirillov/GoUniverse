@@ -34,6 +34,7 @@ function CGoUniverseApplication()
 
 	this.m_oGameTabsScroll = null;
 	this.m_oChatTabsScroll = null;
+	this.m_oChatScroll     = null;
 }
 CGoUniverseApplication.prototype.Init = function()
 {
@@ -43,44 +44,69 @@ CGoUniverseApplication.prototype.Init = function()
 	this.private_GotoLoginPage(false);
 	this.OnResize();
 
-	// TEST
-	this.m_oClient = new CKGSClient(this);
-	//this.OnConnect();
+	// // TEST
+	// this.m_oClient = new CKGSClient(this);
+	// //this.OnConnect();
+	// //
 	//
-
-	document.getElementById("divMainId").style.display = "block";
-	this.OnResize();
-
-	var nRoomId = 0;
-	var oThis = this;
-	function TEST_AddChatRoom()
-	{
-		oThis.AddChatRoom(nRoomId++, "Room " + nRoomId);
-	}
-
-	for (var nIndex = 0; nIndex < 100; nIndex++)
-	{
-		TEST_AddChatRoom();
-	}
-
-	// this.AddGameRoom(1, new CGameTree());
-	// this.AddGameRoom(2, new CGameTree());
-	// this.AddGameRoom(3, new CGameTree());
-	// this.AddGameRoom(4, new CGameTree());
-
-	var nGameRoomId = 0;
-	function TEST_AddGameRoom()
-	{
-		oThis.AddGameRoom(nGameRoomId++, null);
-	}
-
-	for (var nIndex = 0; nIndex < 100; nIndex++)
-	{
-		TEST_AddGameRoom();
-	}
-
-
-	//_____________
+	// document.getElementById("divMainId").style.display = "block";
+	// this.OnResize();
+	//
+	// var nRoomId = 0;
+	// var oThis = this;
+	// function TEST_AddChatRoom()
+	// {
+	// 	oThis.AddChatRoom(nRoomId++, "Room " + nRoomId);
+	// }
+	//
+	// for (var nIndex = 0; nIndex < 100; nIndex++)
+	// {
+	// 	TEST_AddChatRoom();
+	// }
+	//
+	// // this.AddGameRoom(1, new CGameTree());
+	// // this.AddGameRoom(2, new CGameTree());
+	// // this.AddGameRoom(3, new CGameTree());
+	// // this.AddGameRoom(4, new CGameTree());
+	//
+	// var nGameRoomId = 0;
+	// function TEST_AddGameRoom()
+	// {
+	// 	oThis.AddGameRoom(nGameRoomId++, null);
+	// }
+	//
+	// for (var nIndex = 0; nIndex < 100; nIndex++)
+	// {
+	// 	TEST_AddGameRoom();
+	// }
+	//
+	// this.SetCurrentChatRoom(0);
+	//
+	// function TEST_AddChatMessage(nIndex)
+	// {
+	// 	oThis.OnAddChatMessage(0, "Test", "Test message " + nIndex);
+	// }
+	//
+	// for (var nIndex = 0; nIndex < 100; nIndex++)
+	// {
+	// 	TEST_AddChatMessage(nIndex);
+	// }
+	//
+	// function TEST_AddGameRecord(nGameId)
+	// {
+	// 	oThis.m_oGamesListView.Handle_Record([0, nGameId, "R", 0, "", "White " + nGameId, 30, "", "Black", 25, "", 15, false, 15, false, false, false, "19x19"]);
+	// }
+	//
+	// for (var nIndex = 0; nIndex < 100; nIndex++)
+	// {
+	// 	TEST_AddGameRecord(nIndex);
+	// }
+	//
+	// this.m_oGamesListView.Update();
+	// this.m_oGamesListView.Update_Size();
+	//
+	//
+	// //_____________
 };
 CGoUniverseApplication.prototype.Close = function()
 {
@@ -135,8 +161,10 @@ CGoUniverseApplication.prototype.OnResize = function()
 		this.m_oGameRoomTabs.UpdateSize();
 	}
 
+	this.private_UpdateChatScroll();
 	this.private_CollapsePopups(true);
 	this.private_CollapseChatTabs();
+	this.private_CollapseGameTabs();
 	this.UpdateDropDownChatTabsButton();
 };
 CGoUniverseApplication.prototype.OpenRoomList = function()
@@ -219,7 +247,9 @@ CGoUniverseApplication.prototype.SetCurrentChatRoom = function(nChatRoomId)
 		}
 	}
 
-	document.getElementById("textareaChatId").scrollTop = document.getElementById("textareaChatId").scrollHeight;
+	oDiv.scrollTop = oDiv.scrollHeight;
+
+	this.private_UpdateChatScroll();
 };
 CGoUniverseApplication.prototype.GetCurrentChatRoomTab = function()
 {
@@ -349,6 +379,8 @@ CGoUniverseApplication.prototype.OnAddChatMessage = function(nChatRoomId, sUserN
 
 		if (Math.abs(oDiv.scrollHeight - oDiv.scrollTop - oDiv.clientHeight) < 50 || sUserName === sCurUserName)
 			oDiv.scrollTop = oDiv.scrollHeight;
+
+		this.private_UpdateChatScroll();
 	}
 	else
 	{
@@ -526,12 +558,12 @@ CGoUniverseApplication.prototype.private_InitTabPanel = function(oTabsControl)
 
 	// Панель под табы с игровыми комнатами
 	var oGameRoomTabs = CreateControlContainer("divIdTabPanelRooms");
-	oGameRoomTabs.Bounds.SetParams(200, 0, 355, 1000, true, false, true, false, -1, -1);
+	oGameRoomTabs.Bounds.SetParams(200, 0, 375, 1000, true, false, true, false, -1, -1); // 300(правая часть) + 5(отступ) + 50(кнопка) + 20(скролл)
 	oGameRoomTabs.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right | g_anchor_bottom);
 	oTabsControl.AddControl(oGameRoomTabs);
 
 	this.m_oGameTabsScroll = new CVerticalScroll();
-	this.m_oGameTabsScroll.Init(oGameRoomTabs.HtmlElement, "VerScrollBlack", "VerScrollBlackActive");
+	this.m_oGameTabsScroll.Init(oGameRoomTabs.HtmlElement, "VerScrollBlack", "VerScrollBlackActive", false);
 	this.m_oGameTabsScroll.SetPaddings(0, 2, 3);
 
 	// Кнопка для раскрытия панели со всеми играми
@@ -594,8 +626,8 @@ CGoUniverseApplication.prototype.private_InitChats = function(oChatControl)
 	oChatControl.AddControl(oChatTabs);
 
 	this.m_oChatTabsScroll = new CVerticalScroll();
-	this.m_oChatTabsScroll.Init(oChatTabs.HtmlElement, "VerScroll", "VerScrollActive");
-	this.m_oChatTabsScroll.SetPaddings(25, 1, 0);
+	this.m_oChatTabsScroll.Init(oChatTabs.HtmlElement, "VerScroll", "VerScrollActive", false);
+	this.m_oChatTabsScroll.SetPaddings(24, 1, 0);
 
 	// Кнопка добавления чата
 	var oChatAddControl = this.private_InitChannelAddButton("divIdLChatAdd");
@@ -614,6 +646,12 @@ CGoUniverseApplication.prototype.private_InitChats = function(oChatControl)
 	oChatTextAreaControl.Bounds.SetParams(0, 26, 2, 52, true, true, true, true, -1, -1);
 	oChatTextAreaControl.Anchor = (g_anchor_bottom | g_anchor_right | g_anchor_left);
 	oChatControl.AddControl(oChatTextAreaControl);
+
+	this.m_oChatScroll = new CVerticalScroll();
+	this.m_oChatScroll.Init(document.getElementById("textareaChatId"), "VerScroll", "VerScrollActive", true);
+	this.m_oChatScroll.SetPaddings(-1, 1, 0);
+
+	this.m_oChatScroll.Show();
 
 	// Место для набора
 	var oChatInputControl = CreateControlContainer("divIdLChatInput");
@@ -995,6 +1033,10 @@ CGoUniverseApplication.prototype.ScrollGameTabsToCurrent = function()
 	var oTabs = document.getElementById("divIdTabPanelRooms");
 	oTabs.scrollTop = nLine * 50;
 };
+CGoUniverseApplication.prototype.private_UpdateChatScroll = function()
+{
+	this.m_oChatScroll.CheckVisibility();
+};
 
 function CVerticalScroll()
 {
@@ -1010,6 +1052,8 @@ function CVerticalScroll()
 	this.m_nBottom = 0;
 	this.m_nRight  = 0;
 
+	this.m_bAddPadding = false;
+
 	var oThis = this;
 	this.m_fOnScroll = function(e)
 	{
@@ -1018,11 +1062,12 @@ function CVerticalScroll()
 
 	this.m_nElementHeight = 0;
 }
-CVerticalScroll.prototype.Init = function(oDiv, sNormalClass, sActiveClass)
+CVerticalScroll.prototype.Init = function(oDiv, sNormalClass, sActiveClass, bAddPaddingsOnShow)
 {
 	this.m_sNormalClass = sNormalClass;
 	this.m_sActiveClass = sActiveClass;
-	this.m_oDiv = oDiv;
+	this.m_oDiv         = oDiv;
+	this.m_bAddPadding  = bAddPaddingsOnShow;
 
 	var oParent = oDiv.parentNode;
 	if (!oParent)
@@ -1056,26 +1101,30 @@ CVerticalScroll.prototype.Show = function(nElementHeight)
 	var oDiv       = this.m_oDiv;
 	var oVerScroll = this.m_oScrollDiv;
 
+	if (true === this.m_bAddPadding)
+		oDiv.style.paddingRight = this.m_nScrollW + 2;
+
 	// sa - scroll area, va - visible area, pa - physical area
-	var vaH = parseInt(nElementHeight);
+	var vaH = parseFloat(nElementHeight);
 	var saY = this.m_nTop;
-	var paH = parseInt(oDiv.scrollHeight);
-	var paY = parseInt(oDiv.scrollTop);
+	var paH = parseFloat(oDiv.scrollHeight);
+	var paY = parseFloat(oDiv.scrollTop);
 	var saH = vaH - saY - this.m_nBottom;
 
 	var sH = Math.max(20, ((vaH - saY) * vaH / paH)) | 0;
 	var sY = Math.max(saY, Math.min(saY + saH - sH + 1, saY + paY * (saH - sH) / (paH - vaH)));
-	var sX = parseInt(oDiv.clientWidth + oDiv.offsetLeft) - this.m_nScrollW - this.m_nRight;
+	var sX = parseFloat(oDiv.clientWidth + oDiv.offsetLeft) - this.m_nScrollW - this.m_nRight;
 
 	oVerScroll.style.display = "block";
 	oVerScroll.style.height  = sH + "px";
-	oVerScroll.style.top     = sY + "px";
+	oVerScroll.style.top     = (sY + oDiv.offsetTop) + "px";
 	oVerScroll.style.left    = sX + "px";
 
 	var oThis = this;
-	Common_DragHandler.Init(oVerScroll, null, sX, sX, saY, saY + saH - sH);
+	Common_DragHandler.Init(oVerScroll, null, sX, sX, saY + oDiv.offsetTop, saY + saH - sH + oDiv.offsetTop);
 	oVerScroll.onDrag = function(sX, sY)
 	{
+		sY -= oDiv.offsetTop;
 		oDiv.scrollTop = (sY - saY) * (paH - vaH) / (saH - sH);
 	};
 	oVerScroll.onDragStart = function()
@@ -1095,8 +1144,19 @@ CVerticalScroll.prototype.Hide = function()
 	this.m_nElementHeight = 0;
 	this.m_oScrollDiv.style.display = "none";
 
+	if (true === this.m_bAddPadding)
+		this.m_oDiv.style.paddingRight = 0;
+
 	this.m_oDiv.removeEventListener("DOMMouseScroll", this.m_fOnScroll, false);
 	this.m_oDiv.removeEventListener("mousewheel", this.m_fOnScroll, false);
+};
+CVerticalScroll.prototype.CheckVisibility = function()
+{
+	var oDiv = this.m_oDiv;
+	if (oDiv.scrollHeight > oDiv.clientHeight)
+		this.Show(oDiv.clientHeight);
+	else
+		this.Hide();
 };
 CVerticalScroll.prototype.private_OnScroll = function(e)
 {
@@ -1118,14 +1178,14 @@ CVerticalScroll.prototype.private_OnScroll = function(e)
 
 	oDiv.scrollTop += delta;
 
-	var vaH = parseInt(this.m_nElementHeight);
+	var vaH = parseFloat(this.m_nElementHeight);
 	var saY = this.m_nTop;
-	var paH = parseInt(oDiv.scrollHeight);
-	var paY = parseInt(oDiv.scrollTop);
+	var paH = parseFloat(oDiv.scrollHeight);
+	var paY = parseFloat(oDiv.scrollTop);
 	var saH = vaH - saY - this.m_nBottom;
 
 	var sH = Math.max(20, ((vaH - saY) * vaH / paH)) | 0;
 	var sY = Math.max(saY, Math.min(saY + saH - sH + 1, saY + paY * (saH - sH) / (paH - vaH)));
 
-	oVerScroll.style.top = sY + "px";
+	oVerScroll.style.top = (sY + oDiv.offsetTop) + "px";
 };

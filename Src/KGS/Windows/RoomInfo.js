@@ -21,6 +21,8 @@ function CKGSRoomInfoWindow()
 	this.m_nInnerW = -1;
 
 	this.m_oFindInputElement = null;
+
+	this.m_oInfoScroll = null;
 }
 CommonExtend(CKGSRoomInfoWindow, CKGSWindowBase);
 
@@ -64,6 +66,9 @@ CKGSRoomInfoWindow.prototype.Update_Size = function(bForce)
 		this.m_oOwnerListView.Update();
 		this.m_oOwnerListView.Update_Size();
 	}
+
+	if (this.m_oInfoScroll)
+		this.m_oInfoScroll.CheckVisibility();
 };
 CKGSRoomInfoWindow.prototype.Get_DefaultWindowSize = function()
 {
@@ -82,7 +87,6 @@ CKGSRoomInfoWindow.prototype.private_CreateInfoArea = function(oParentDiv)
 	oInfoArea.id               = oElement.id + "I";
 	oInfoArea.style.position   = "absolute";
 	oInfoArea.style.fontFamily = "'Segoe UI',Helvetica,Tahoma,Geneva,Verdana,sans-serif";
-	oInfoArea.style.overflowY  = "auto";
 	oElement.appendChild(oInfoArea);
 	oParentDiv.appendChild(oElement);
 
@@ -99,6 +103,7 @@ CKGSRoomInfoWindow.prototype.private_CreateInfoArea = function(oParentDiv)
 
 		var oDiv     = oInfoArea;
 		var oTextDiv = document.createElement("div");
+		oTextDiv.style.height = "100%";
 		var oTextSpan;
 
 		var aLines = SplitTextToLines(sRoomMessage);
@@ -112,6 +117,10 @@ CKGSRoomInfoWindow.prototype.private_CreateInfoArea = function(oParentDiv)
 		}
 
 		oDiv.appendChild(oTextDiv);
+
+		this.m_oInfoScroll = new CVerticalScroll();
+		this.m_oInfoScroll.Init(oTextDiv, "VerScroll", "VerScrollActive", true);
+		this.m_oInfoScroll.SetPaddings(-1, 0, 0);
 	}
 
 	return oControl;

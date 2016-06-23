@@ -31,14 +31,15 @@ function CListView()
         VerScroll       : null
     };
 
+
     this.m_oListObject    = null;
 
     this.m_dFontSize      = 14;// * 4 /3;
     this.m_dAscentHeight  = this.m_dFontSize;
-    this.m_dRowHeight     = this.m_dAscentHeight * 4 / 3; // чтобы 1/4 ушла в descent
+    this.m_dRowHeight     = (this.m_dAscentHeight * 4 / 3) | 0; // чтобы 1/4 ушла в descent
     this.m_dDescentHeight = this.m_dRowHeight - this.m_dAscentHeight;
 
-    this.m_dTopOffset     = this.m_dRowHeight - 1;
+    this.m_dTopOffset     = this.m_dRowHeight;
 
     this.m_sFontHeader   = "14px bold 'Segoe UI',Helvetica,Tahoma,Geneva,Verdana,sans-serif";
     this.m_sFontRecord   = "14px      'Segoe UI',Helvetica,Tahoma,Geneva,Verdana,sans-serif";
@@ -79,6 +80,12 @@ function CListView()
         oControl.AddControl(SelectionCanvas);
 
         this.HtmlElement.VerScroll = oVerScrollElement;
+        oVerScrollElement.style.display  = "block";
+        oVerScrollElement.style.position = "absolute";
+        oVerScrollElement.style.top      = "0px";
+        oVerScrollElement.style.left     = "0px";
+        oVerScrollElement.style.width    = "14px";
+        oVerScrollElement.style.height   = "50px";
 
         if (oMainElement.addEventListener)
         {
@@ -223,7 +230,7 @@ function CListView()
             }
         }
 
-        oThis.private_ScrollByY(-deltaY);
+        oThis.private_ScrollByY(deltaY);
         oThis.private_UpdateMainContext();
         oThis.private_UpdateSelectionContext();
 
@@ -247,15 +254,16 @@ function CListView()
 
     this.private_OnDragVerScroll = function(X, Y)
     {
-        var dOverallH = oThis.m_aY[oThis.m_aY.length - 1];
-        var dLogicH   = oThis.m_dYLimit - oThis.m_dTopOffset;
+        // sa - scroll area, va - visible area, pa - physical area
+        var vaH = oThis.m_dYLimit - oThis.m_dRowHeight; // Визуальная высота = вся высота - высота заголовка
+        var saY = oThis.m_dTopOffset;
+        var paH = oThis.m_aY[oThis.m_aY.length - 1] - oThis.m_aY[0]; // Физическая высота - высота всех строк - минус высота одной строки
+        var saH = vaH;
+        var sY = Y;
+        var sH = Math.max(20, ((vaH - saY) * vaH / paH)) | 0;
 
-        var dScrollH = Math.max(20, dLogicH * dLogicH / dOverallH);
-
-        if (Math.abs(Y - oThis.m_dRowHeight - (dLogicH - dScrollH)) < 2)
-            oThis.m_dYOffset = oThis.m_dTopOffset + -(dOverallH - dLogicH);
-        else
-            oThis.m_dYOffset = -(Y - oThis.m_dTopOffset) * (dOverallH - dLogicH) / (dLogicH - dScrollH);
+        oThis.m_dYOffset = (sY - saY) * (paH - vaH) / (saH - sH);
+        oThis.m_dYOffset = Math.max(0, Math.min(oThis.m_dYOffset, paH - vaH));
 
         oThis.private_UpdateMainContext();
         oThis.private_UpdateSelectionContext();
@@ -361,28 +369,29 @@ CListView.prototype.private_UpdateScrollSize = function()
 {
     var oVerScroll = this.HtmlElement.VerScroll;
 
-    var dOverallH = this.m_aY[this.m_aY.length - 1];
-    var dLogicH   = this.m_dYLimit - this.m_dTopOffset;
+    // sa - scroll area, va - visible area, pa - physical area
+    var vaH = this.m_dYLimit - this.m_dRowHeight; // Визуальная высота = вся высота - высота заголовка
+    var saY = this.m_dTopOffset;
+    var paH = this.m_aY[this.m_aY.length - 1] - this.m_aY[0]; // Физическая высота - высота всех строк - минус высота одной строки
+    var paY = this.m_dYOffset;
+    var saH = vaH;
 
-    if (dOverallH < dLogicH)
+    if (paH < vaH)
     {
         oVerScroll.style.display = "none";
         return;
     }
 
-    var dScrollH = Math.min(dLogicH, Math.max(20, dLogicH * dLogicH / dOverallH));
+    var sH = Math.max(20, ((vaH - saY) * vaH / paH)) | 0;
+    var sY = Math.max(saY, Math.min(saY + saH - sH + 1, saY + paY * (saH - sH) / (paH - vaH)));
+    var sX = this.m_dXLimit - 1;
 
-    oVerScroll.style.display  = "block";
-    oVerScroll.style.height   = dScrollH;
+    oVerScroll.style.display = "block";
+    oVerScroll.style.height  = sH + "px";
+    oVerScroll.style.top     = sY + "px";
+    oVerScroll.style.left    = sX + "px";
 
-    if (Math.abs(this.m_dYOffset + (dOverallH - dLogicH)) < 2)
-        oVerScroll.style.top = (this.m_dTopOffset + dLogicH - dScrollH) + "px";
-    else
-        oVerScroll.style.top = (this.m_dTopOffset + -this.m_dYOffset * (dLogicH - dScrollH) / (dOverallH - dLogicH)) + "px";
-
-    oVerScroll.style.left       = this.m_dXLimit;
-
-    Common_DragHandler.Init(oVerScroll, null, this.m_dXLimit, this.m_dXLimit, this.m_dTopOffset, this.m_dTopOffset + dLogicH - dScrollH);
+    Common_DragHandler.Init(oVerScroll, null, sX, sX, saY, saY + saH - sH);
 
     oVerScroll.onDrag = this.private_OnDragVerScroll;
     oVerScroll.onDragStart = function()
@@ -399,15 +408,17 @@ CListView.prototype.private_UpdateScroll = function ()
 {
     var oVerScroll = this.HtmlElement.VerScroll;
 
-    var dOverallH = this.m_aY[this.m_aY.length - 1] - this.m_aY[0];
-    var dLogicH   = this.m_dYLimit - this.m_dTopOffset;
+    // sa - scroll area, va - visible area, pa - physical area
+    var vaH = this.m_dYLimit - this.m_dRowHeight; // Визуальная высота = вся высота - высота заголовка
+    var saY = this.m_dTopOffset;
+    var paH = this.m_aY[this.m_aY.length - 1] - this.m_aY[0]; // Физическая высота - высота всех строк - минус высота одной строки
+    var paY = this.m_dYOffset;
+    var saH = vaH;
 
-    var dScrollH = Math.max(20, dLogicH * dLogicH / dOverallH);
+    var sH = Math.max(20, ((vaH - saY) * vaH / paH)) | 0;
+    var sY = Math.max(saY, Math.min(saY + saH - sH + 1, saY + paY * (saH - sH) / (paH - vaH)));
 
-    if (Math.abs(this.m_dYOffset + (dOverallH - dLogicH)) < 2)
-        oVerScroll.style.top = (this.m_dTopOffset + dLogicH - dScrollH) + "px";
-    else
-        oVerScroll.style.top = (this.m_dTopOffset + -this.m_dYOffset * (dLogicH - dScrollH) / (dOverallH - dLogicH)) + "px";
+    oVerScroll.style.top = sY + "px";
 };
 
 CListView.prototype.private_IsValid = function()
@@ -464,7 +475,7 @@ CListView.prototype.private_UpdateSelectionContext = function()
         var dX0 = this.m_aX[0];
         var dX1 = this.m_aX[this.m_aX.length - 1];
 
-        var dY0 = this.m_aY[this.m_nSelectedIndex] + this.m_dYOffset;
+        var dY0 = this.m_aY[this.m_nSelectedIndex] - this.m_dYOffset;
         var dY1 = dY0 + this.m_dRowHeight;
 
         oContext.save();
@@ -517,12 +528,12 @@ CListView.prototype.private_Draw = function(oContext, dYOffset, dXLimit, dYLimit
         // Чтобы не рисовать лишнее контролируем вехнюю границу через nStartIndex и нижнюю границу через
         // сравнение dY > dYLimit.
         var nStartIndex = 0;
-        if (this.m_dYOffset < 0)
-            nStartIndex = (-this.m_dYOffset / this.m_dRowHeight) | 0;
+        if (this.m_dYOffset > 0)
+            nStartIndex = (this.m_dYOffset / this.m_dRowHeight) | 0;
 
         for (var nRecordIndex = nStartIndex; nRecordIndex < nRecordsCount; nRecordIndex++)
         {
-            var dY = this.m_aY[nRecordIndex + 1] + this.m_dYOffset;
+            var dY = this.m_aY[nRecordIndex + 1] - this.m_dYOffset;
             if (dY - this.m_dRowHeight > dYLimit)
                 break;
 
@@ -650,7 +661,7 @@ CListView.prototype.private_UpdateCursorType = function(dX, dY)
 
 CListView.prototype.private_GetIndexByXY = function(dX, _dY)
 {
-    var dY = _dY - this.m_dYOffset;
+    var dY = _dY + this.m_dYOffset;
     var nRecordNum = -1;
     var nRecordsCount = this.m_aList.length;
     for (var nRecordIndex = 0; nRecordIndex < nRecordsCount; nRecordIndex++)
@@ -699,15 +710,10 @@ CListView.prototype.private_CheckHeader = function(dX, dY)
 
 CListView.prototype.private_ScrollByY = function(dDeltaY)
 {
-    this.m_dYOffset += dDeltaY;
-    this.m_dYOffset = Math.min(0, this.m_dYOffset);
+    var vaH = this.m_dYLimit - this.m_dRowHeight; // Визуальная высота = вся высота - высота заголовка
+    var paH = this.m_aY[this.m_aY.length - 1] - this.m_aY[0]; // Физическая высота - высота всех строк - минус высота одной строки
 
-    var dHeight = this.m_aList.length * this.m_dRowHeight;
-    if (dHeight < this.m_dYLimit - this.m_dRowHeight)
-        this.m_dYOffset = 0;
-    else if (dHeight + this.m_dYOffset < this.m_dYLimit - this.m_dRowHeight)
-        this.m_dYOffset = this.m_dYLimit - this.m_dRowHeight - dHeight;
-
+    this.m_dYOffset = Math.max(0, Math.min(this.m_dYOffset + dDeltaY, paH - vaH));
     this.private_UpdateScroll();
 };
 

@@ -17,6 +17,7 @@ function CKGSUserInfoWindow()
 	this.m_oClient   = null;
 
 	this.m_oContainerDiv = null;
+	this.m_oInfoScroll   = null;
 }
 CommonExtend(CKGSUserInfoWindow, CKGSWindowBase);
 
@@ -76,6 +77,13 @@ CKGSUserInfoWindow.prototype.Close = function()
 CKGSUserInfoWindow.prototype.Hide = function()
 {
 	CKGSUserInfoWindow.superclass.Close.call(this);
+};
+CKGSUserInfoWindow.prototype.Update_Size = function(bForce)
+{
+	CKGSUserInfoWindow.superclass.Update_Size.call(this, bForce);
+
+	if (this.m_oInfoScroll)
+		this.m_oInfoScroll.CheckVisibility();
 };
 CKGSUserInfoWindow.prototype.OnUserDetails = function(oDetails)
 {
@@ -177,6 +185,13 @@ CKGSUserInfoWindow.prototype.OnUserGameArchive = function(oMessage)
 	this.private_AddConsoleMessage("Games", "" + nWins + "-" + nLoses + "-" + nUnfinished);
 	this.private_AddConsoleMessage("Recent games", sRecentGames);
 };
+CKGSUserInfoWindow.prototype.Show = function(oPr)
+{
+	CKGSUserInfoWindow.superclass.Show.call(this, oPr);
+
+	if (this.m_oInfoScroll)
+		this.m_oInfoScroll.CheckVisibility();
+};
 CKGSUserInfoWindow.prototype.private_AddMainInfo = function(oDetails)
 {
 	var oDiv = this.m_oMainInfoDiv;
@@ -212,10 +227,10 @@ CKGSUserInfoWindow.prototype.private_AddConsoleMessage = function(sField, sText)
 };
 CKGSUserInfoWindow.prototype.private_AddInfo = function(sText)
 {
-	var oDiv     = this.m_oExtensionDiv;
-	oDiv.style.overflowY = "scroll";
+	var oDiv = this.m_oExtensionDiv;
 
 	var oTextDiv = document.createElement("div");
+	oTextDiv.style.height = "100%";
 
 	var oTextSpan;
 
@@ -238,6 +253,11 @@ CKGSUserInfoWindow.prototype.private_AddInfo = function(sText)
 
 	oTextDiv.appendChild(oInfoDiv);
 	oDiv.appendChild(oTextDiv);
+
+	this.m_oInfoScroll = new CVerticalScroll();
+	this.m_oInfoScroll.Init(oTextDiv, "VerScroll", "VerScrollActive", true);
+	this.m_oInfoScroll.SetPaddings(0, 2, 1);
+
 	return oTextDiv;
 };
 CKGSUserInfoWindow.prototype.private_SetCaption = function(sCaption, bOnline)

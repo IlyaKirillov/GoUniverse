@@ -62,8 +62,7 @@ CKGSUser.prototype.Update = function(oUserRecord)
 	if (oUserRecord.name)
 		this.m_sName = oUserRecord.name;
 
-	if (oUserRecord.rank)
-		this.m_nRank = this.m_oClient.GetRank(oUserRecord.rank);
+	this.m_nRank = this.m_oClient.GetRank(oUserRecord.rank);
 
 	if (oUserRecord.flags)
 		this.private_ParseFlags(oUserRecord.flags);
