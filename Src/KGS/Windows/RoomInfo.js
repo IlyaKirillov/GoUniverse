@@ -139,7 +139,7 @@ CKGSRoomInfoWindow.prototype.private_CreateOwnerList = function(oParentDiv)
 		for (var nIndex = 0, nCount = arrOwners.length; nIndex < nCount; ++nIndex)
 		{
 			var oUser = arrOwners[nIndex];
-			this.m_oOwnerListView.Handle_Record([0, oUser.Name, oUser.Rank, oUser.Friend]);
+			this.m_oOwnerListView.Handle_Record([0, oUser.GetName(), oUser.GetStringRank(), oUser.IsFriend()]);
 		}
 	}
 

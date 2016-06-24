@@ -99,8 +99,27 @@ CKGSClient.prototype.LeaveChatRoom = function(nChatRoomId)
 };
 CKGSClient.prototype.SendChatMessage = function(sText)
 {
+	var bAnnounce = false;
+	if (sText && sText.length > 1 && '!' === sText.charAt(0))
+	{
+
+		var sUserName = this.GetUserName();
+		var arrOwners = this.GetRoomOwners(this.m_nChatChannelId);
+
+		for (var nIndex = 0, nCount = arrOwners.length; nIndex < nCount; ++nIndex)
+		{
+			var oUser = arrOwners[nIndex];
+			if (sUserName === oUser.GetName())
+			{
+				bAnnounce = true;
+				sText     = sText.substr(1);
+				break;
+			}
+		}
+	}
+
 	this.private_SendMessage({
-		"type"      : "CHAT",
+		"type"      : true === bAnnounce ? "ANNOUNCE" : "CHAT",
 		"channelId" : this.m_nChatChannelId,
 		"text"      : sText
 	});
@@ -1007,12 +1026,7 @@ CKGSClient.prototype.private_HandleRoomDesc = function(oMessage)
 
 		for (var nIndex = 0, nCount = oMessage.owners.length; nIndex < nCount; ++nIndex)
 		{
-			oRoom.Owners.push({
-				Name  : oMessage.owners[nIndex].name,
-				Rank  : this.private_GetRank(oMessage.owners[nIndex].rank),
-				Flags : oMessage.owners[nIndex].flags,
-				Friend : this.private_IsFriend(oMessage.owners[nIndex].name)
-			});
+			oRoom.Owners.push(this.private_HandleUserRecord(oMessage.owners[nIndex], true));
 		}
 
 		if (this.m_aRooms[oMessage.channelId])
