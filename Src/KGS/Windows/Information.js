@@ -57,7 +57,7 @@ CKGSInformationWindow.prototype.Init = function(sDivId, oPr)
 		oInnerImage.appendChild(oSpan);
 
 		var oTextControl = CreateControlContainer(oMainDiv.id + "T");
-		oTextControl.Bounds.SetParams(70, 0, 0, 0, true, true, true, true, -1, -1);
+		oTextControl.Bounds.SetParams(70, 0, 5, 0, true, true, true, true, -1, -1);
 		oTextControl.Anchor = (g_anchor_left | g_anchor_top | g_anchor_bottom  | g_anchor_right);
 		oMainControl.AddControl(oTextControl);
 
@@ -91,4 +91,27 @@ CKGSInformationWindow.prototype.Close = function()
 {
 	CKGSInformationWindow.superclass.Close.call(this);
 	RemoveWindow(this);
+};
+
+function CKGSInformationIdleWindow()
+{
+	CKGSInformationIdleWindow.superclass.constructor.call(this);
+
+	this.m_nDefW = 412;
+	this.m_nDefH = 220;
+}
+CommonExtend(CKGSInformationIdleWindow, CKGSInformationWindow);
+
+CKGSInformationIdleWindow.prototype.Init = function(sDivId, oPr)
+{
+	oPr.Text    = "It has been a long time since you used this client. In 10 minutes, the server will assume that you are gone and log you out. If you want to stay logged in, then just press the \"OK\" button in this window to let the server know that you want to stay.";
+	oPr.Image   = "WarningSpanWarning";
+	oPr.Caption = "Warning";
+
+	CKGSInformationIdleWindow.superclass.Init.call(this, sDivId, oPr);
+};
+CKGSInformationIdleWindow.prototype.Close = function()
+{
+	CKGSInformationIdleWindow.superclass.Close.call(this);
+	this.m_oClient.WakeUp();
 };

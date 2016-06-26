@@ -319,6 +319,18 @@ CKGSClient.prototype.RemoveFromFollowerList = function(sUserName)
 		"text"        : ""
 	});
 };
+CKGSClient.prototype.WakeUp = function()
+{
+	this.private_SendMessage({
+		"type" : "WAKE_UP"
+	});
+};
+CKGSClient.prototype.SleepOn = function()
+{
+	this.private_SendMessage({
+		"type" : "IDLE_ON"
+	});
+};
 CKGSClient.prototype.private_SendMessage = function(oMessage)
 {
 	// console.log("Send:");
@@ -530,6 +542,10 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
 	else if ("PRIVATE_KEEP_OUT" === oMessage.type)
 	{
 		this.private_HandlePrivateKeepOut(oMessage);
+	}
+	else if ("IDLE_WARNING" === oMessage.type)
+	{
+		this.private_HandleIdleWarning(oMessage);
 	}
 	else
 	{
@@ -1216,6 +1232,10 @@ CKGSClient.prototype.private_HandlePrivateKeepOut = function(oMessage)
 		sRoomName = "\"" + oRecord.m_sWhiteName + (oRecord.m_sBlackName ? oRecord.m_sBlackName : "") + "\"";
 
 	CreateKGSWindow(EKGSWindowType.Information, {Client : this, App : this.m_oApp, Caption : "Error", Text : "Sorry, " + sRoomName + " is private. You cannot enter.", Image : "WarningSpanNoEntry", W : 485, H : 144});
+};
+CKGSClient.prototype.private_HandleIdleWarning = function(oMessage)
+{
+	CreateKGSWindow(EKGSWindowType.Idle, {Client : this, App : this.m_oApp});
 };
 CKGSClient.prototype.private_AddUserToRoom = function(oUser, oRoom)
 {

@@ -106,7 +106,12 @@ CGoUniverseApplication.prototype.Init = function()
 	// this.m_oGamesListView.Update_Size();
 	//
 	//
-	// //_____________
+	// this.m_oClient.private_HandleDetailsNonExistant({name : "WWWWWWWW"});
+	// this.m_oClient.private_HandlePrivateKeepOut({channelId : -1});
+	// this.m_oClient.private_HandleIdleWarning({});
+
+
+	//_____________
 };
 CGoUniverseApplication.prototype.Close = function()
 {
@@ -274,6 +279,7 @@ CGoUniverseApplication.prototype.AddRoomGreetingMessage = function(nChatRoomId, 
 	{
 		oTextDiv.style.display = "block";
 		document.getElementById("textareaChatId").scrollTop = document.getElementById("textareaChatId").scrollHeight;
+		this.private_UpdateChatScroll();
 	}
 	else
 	{

@@ -13,7 +13,8 @@ var EKGSWindowType = {
 	RoomList    : 0,
 	UserInfo    : 1,
 	RoomInfo    : 2,
-	Information : 3
+	Information : 3,
+	Idle        : 4
 };
 
 var g_aKGSWindows      = {};
@@ -36,6 +37,7 @@ function CreateKGSWindow(nWindowType, oPr)
 	case EKGSWindowType.UserInfo    : sApp = "UserInfo_" + oPr.UserName; break;
 	case EKGSWindowType.RoomInfo    : sApp = "RoomInfo_" + oPr.RoomId; break;
 	case EKGSWindowType.Information : sApp = "Information" + (new Date()).getTime(); break;
+	case EKGSWindowType.Idle        : sApp = "Idle"; break;
 	}
 	var sId = sParentId + sApp;
 
@@ -63,6 +65,7 @@ function CreateKGSWindow(nWindowType, oPr)
 		case EKGSWindowType.UserInfo    : oWindow = new CKGSUserInfoWindow(); break;
 		case EKGSWindowType.RoomInfo    : oWindow = new CKGSRoomInfoWindow(); break;
 		case EKGSWindowType.Information : oWindow = new CKGSInformationWindow(); break;
+		case EKGSWindowType.Idle        : oWindow = new CKGSInformationIdleWindow(); break;
 		}
 
 		oWindows[sId] = oWindow;
@@ -213,7 +216,7 @@ function CKGSWindowOKBase()
 CommonExtend(CKGSWindowOKBase, CDrawingConfirmWindow);
 CKGSWindowOKBase.prototype.Init = function(sDivId, oPr)
 {
-	CKGSWindowOKBase.superclass.Init.call(this, sDivId, false);
+	CKGSWindowOKBase.superclass.Init.call(this, sDivId, true);
 	this.m_oApp    = oPr.App;
 	this.m_oClient = oPr.Client;
 	this.private_UpdatePosition();
