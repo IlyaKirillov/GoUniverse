@@ -10,9 +10,10 @@
  */
 
 var EKGSWindowType = {
-	RoomList : 0,
-	UserInfo : 1,
-	RoomInfo : 2
+	RoomList    : 0,
+	UserInfo    : 1,
+	RoomInfo    : 2,
+	Information : 3
 };
 
 var g_aKGSWindows      = {};
@@ -31,9 +32,10 @@ function CreateKGSWindow(nWindowType, oPr)
 	var sApp = "unknownwindow";
 	switch (nWindowType)
 	{
-	case EKGSWindowType.RoomList : sApp = "RoomList"; break;
-	case EKGSWindowType.UserInfo : sApp = "UserInfo_" + oPr.UserName; break;
-	case EKGSWindowType.RoomInfo : sApp = "RoomInfo_" + oPr.RoomId; break;
+	case EKGSWindowType.RoomList    : sApp = "RoomList"; break;
+	case EKGSWindowType.UserInfo    : sApp = "UserInfo_" + oPr.UserName; break;
+	case EKGSWindowType.RoomInfo    : sApp = "RoomInfo_" + oPr.RoomId; break;
+	case EKGSWindowType.Information : sApp = "Information" + (new Date()).getTime(); break;
 	}
 	var sId = sParentId + sApp;
 
@@ -57,9 +59,10 @@ function CreateKGSWindow(nWindowType, oPr)
 
 		switch (nWindowType)
 		{
-		case EKGSWindowType.RoomList : oWindow = new CKGSRoomListWindow(); break;
-		case EKGSWindowType.UserInfo : oWindow = new CKGSUserInfoWindow(); break;
-		case EKGSWindowType.RoomInfo : oWindow = new CKGSRoomInfoWindow(); break;
+		case EKGSWindowType.RoomList    : oWindow = new CKGSRoomListWindow(); break;
+		case EKGSWindowType.UserInfo    : oWindow = new CKGSUserInfoWindow(); break;
+		case EKGSWindowType.RoomInfo    : oWindow = new CKGSRoomInfoWindow(); break;
+		case EKGSWindowType.Information : oWindow = new CKGSInformationWindow(); break;
 		}
 
 		oWindows[sId] = oWindow;
@@ -200,3 +203,48 @@ CKGSWindowBase.prototype.private_OnFocus = function()
 		this.HtmlElement.Control.HtmlElement.style.zIndex = g_nKGSWindowsCount;
 	}
 };
+
+function CKGSWindowOKBase()
+{
+	CKGSWindowBase.superclass.constructor.call(this);
+
+	this.m_oApp = null;
+}
+CommonExtend(CKGSWindowOKBase, CDrawingConfirmWindow);
+CKGSWindowOKBase.prototype.Init = function(sDivId, oPr)
+{
+	CKGSWindowOKBase.superclass.Init.call(this, sDivId, false);
+	this.m_oApp    = oPr.App;
+	this.m_oClient = oPr.Client;
+	this.private_UpdatePosition();
+	this.HtmlElement.Control.HtmlElement.style.zIndex = g_nKGSWindowsCount;
+
+	this.HtmlElement.CancelButton.HtmlElement.Control.HtmlElement.style.display = "none";
+	this.HtmlElement.OkButtonControl.Bounds.SetParams(0, 9, 11, 1000, false, true, true, false, 66, 21);
+};
+CKGSWindowOKBase.prototype.Update_Size = function(bForce)
+{
+	CKGSWindowOKBase.superclass.Update_Size.call(this, bForce);
+
+	// Проверяем, чтобы окно не вышло за пределы родительского окна
+	if (this.m_oApp)
+	{
+		var nWidth  = this.m_oApp.GetWidth();
+		var nHeight = this.m_oApp.GetHeight();
+
+		var nLeft = parseInt(this.HtmlElement.Control.HtmlElement.style.left);
+		var nTop  = parseInt(this.HtmlElement.Control.HtmlElement.style.top);
+
+		if (nLeft <= 0)
+			this.HtmlElement.Control.HtmlElement.style.left = "0px";
+		else if (nLeft >= nWidth - 20)
+			this.HtmlElement.Control.HtmlElement.style.left = (nLeft - 20) + "px";
+
+		if (nTop <= 0)
+			this.HtmlElement.Control.HtmlElement.style.top = "0px";
+		else if (nTop >= nHeight - 20)
+			this.HtmlElement.Control.HtmlElement.style.top = (nHeight - 20) + "px";
+	}
+};
+CKGSWindowOKBase.prototype.private_UpdatePosition = CKGSWindowBase.prototype.private_UpdatePosition;
+CKGSWindowOKBase.prototype.private_OnFocus        = CKGSWindowBase.prototype.private_OnFocus;

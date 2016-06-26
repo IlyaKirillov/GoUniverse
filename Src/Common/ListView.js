@@ -346,6 +346,18 @@ CListView.prototype.Update_Size = function()
     this.private_UpdateScrollSize();
 };
 
+CListView.prototype.Get_RecordById = function(sId)
+{
+    for (var nIndex = 0, nCount = this.m_aList.length; nIndex < nCount; ++nIndex)
+    {
+        var oRecord = this.m_aList[nIndex];
+        if (oRecord.Get_Key() === sId)
+            return oRecord
+    }
+
+    return null;
+};
+
 CListView.prototype.Update = function()
 {
     if (true !== this.private_IsValid())

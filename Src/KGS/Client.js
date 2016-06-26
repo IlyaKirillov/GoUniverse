@@ -527,6 +527,10 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
 	{
 		this.private_HandleAnnounce(oMessage);
 	}
+	else if ("PRIVATE_KEEP_OUT" === oMessage.type)
+	{
+		this.private_HandlePrivateKeepOut(oMessage);
+	}
 	else
 	{
 		console.log(oMessage);
@@ -601,7 +605,7 @@ CKGSClient.prototype.private_HandleRoomJoin = function(oMessage)
 };
 CKGSClient.prototype.private_HandleLoginSuccess = function(oMessage)
 {
-	this.m_oCurrentUser = this.private_HandleUserRecord(oMessage.you, true)
+	this.m_oCurrentUser = this.private_HandleUserRecord(oMessage.you, true);
 
 	var Friends = oMessage.friends;
 	if (Friends)
@@ -1171,6 +1175,8 @@ CKGSClient.prototype.private_HandleDetailsNonExistant = function(oMessage)
 		if (oUser.Window)
 			oUser.Window.Close();
 	}
+	
+	CreateKGSWindow(EKGSWindowType.Information, {Client : this, App : this.m_oApp, Caption : "Error", Text : "There is no user account named \"" + oMessage.name + "\" on this system.", Image : "WarningSpanWarning", W : 347, H : 144});
 };
 CKGSClient.prototype.private_HandleArchiveNonExistant = function(oMessage)
 {
@@ -1198,6 +1204,18 @@ CKGSClient.prototype.private_HandleAnnounce = function(oMessage)
 {
 	var oUser = this.private_HandleUserRecord(oMessage.user, false);
 	this.m_oApp.OnAddChatMessage(oMessage.channelId, oUser.GetName(), oMessage.text, {Announce : true});
+};
+CKGSClient.prototype.private_HandlePrivateKeepOut = function(oMessage)
+{
+	var nChannelId = oMessage.channelId;
+
+	var sRoomName = "this room", oRecord;
+	if (undefined !== this.m_aAllRooms[nChannelId])
+		sRoomName = "\"" + this.m_aAllRooms[nChannelId].Name + "\"";
+	else if (null !== (oRecord = this.m_oGamesListView.Get_RecordById(nChannelId)))
+		sRoomName = "\"" + oRecord.m_sWhiteName + (oRecord.m_sBlackName ? oRecord.m_sBlackName : "") + "\"";
+
+	CreateKGSWindow(EKGSWindowType.Information, {Client : this, App : this.m_oApp, Caption : "Error", Text : "Sorry, " + sRoomName + " is private. You cannot enter.", Image : "WarningSpanNoEntry", W : 485, H : 144});
 };
 CKGSClient.prototype.private_AddUserToRoom = function(oUser, oRoom)
 {

@@ -239,6 +239,35 @@ div.Selectable {
 	content : '\260F';
 }
 
+.WarningSpanNoEntry {
+	font-size : 40px;
+	color     : rgb(199, 40, 40);
+}
+
+.WarningSpanNoEntry:before {
+	content : '\26D4';
+}
+
+.WarningSpanWarning {
+	font-size : 50px;
+	color     : rgb(202, 162, 0);
+}
+
+.WarningSpanWarning:before {
+	content : '\26A0';
+}
+
+div.WarningText {
+	font-family    : "Segoe UI", Helvetica, Tahoma, Geneva, Verdana, sans-serif;
+	color          : #000000;
+	line-height    : 20px;
+	font-size      : 16px;
+	display        : table-cell;
+	vertical-align : middle;
+	margin         : 0 auto;
+	text-align: center;
+}
+
 div.ContextMenu {
 	border              : 1px solid rgb(166, 166, 166);
 	box-shadow          : rgba(0, 0, 0, 0.8) 0px 1px 5px;
