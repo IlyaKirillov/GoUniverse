@@ -212,6 +212,8 @@ function CVisualGameRoomTab(oApp)
 	this.m_oMainDiv      = null; // Дивка того, что мы показываем по нажатию на таб
 	this.m_oGameTree     = null;
 	this.m_oContainerDiv = null;
+
+	this.m_oCaptionDiv   = null;
 }
 CVisualGameRoomTab.prototype.InitMainRoom = function(nId, sMainDivId, sTabDivId)
 {
@@ -318,26 +320,9 @@ CVisualGameRoomTab.prototype.InitGameRoom = function(nId, oGameTree, sDivIdConta
 	oDivTab.appendChild(oButton);
 
 	// Заголовок в табе
-	var sWhiteName = oGameTree ? oGameTree.Get_WhiteName() : "White";
-	var sBlackName = oGameTree ? oGameTree.Get_BlackName() : "Black";
 	var oCaptionDiv = document.createElement("div");
 	oCaptionDiv.style.textAlign = "left";
-
-	if (true !== bDemonstration)
-	{
-		var oCaptionStringDiv       = document.createElement("div");
-		oCaptionStringDiv.innerHTML = String.fromCharCode(0x2691) + "&nbsp;" + sWhiteName + "[" + (oGameTree ? oGameTree.Get_WhiteRating() : "-") + "]";
-		oCaptionDiv.appendChild(oCaptionStringDiv);
-		oCaptionStringDiv           = document.createElement("div");
-		oCaptionStringDiv.innerHTML = String.fromCharCode(0x2690) + "&nbsp;" + sBlackName + "[" + (oGameTree ? oGameTree.Get_BlackRating() : "-") + "]";
-		oCaptionDiv.appendChild(oCaptionStringDiv);
-	}
-	else
-	{
-		var oCaptionStringDiv       = document.createElement("div");
-		oCaptionStringDiv.innerHTML = String.fromCharCode(0x2615) + "&nbsp;" + (oGameTree ? oGameTree.Get_GameTranscriber() : "");
-		oCaptionDiv.appendChild(oCaptionStringDiv);
-	}
+	this.m_oCaptionDiv = oCaptionDiv;
 	oButton.appendChild(oCaptionDiv);
 
 	// Кнопка для закрытия таба
@@ -361,12 +346,44 @@ CVisualGameRoomTab.prototype.InitGameRoom = function(nId, oGameTree, sDivIdConta
 	oCenter.appendChild(oCenterDiv);
 	oCloseButton.appendChild(oCenter);
 
-	this.m_nId       = nId;
-	this.m_oGameTree = oGameTree;
-	this.m_oMainDiv  = oGameRoomDiv;
-	this.m_oTabDiv   = oDivTab;
+	this.m_nId         = nId;
+	this.m_oGameTree   = oGameTree;
+	this.m_oMainDiv    = oGameRoomDiv;
+	this.m_oTabDiv     = oDivTab;
+	this.m_oCaptionDiv = oCaptionDiv;
+
+	this.private_FillCaption(bDemonstration);
 
 	return oGameRoomControl;
+};
+CVisualGameRoomTab.prototype.ModifyGameRoom = function(nNewId, bDemonstration)
+{
+	this.m_nId = nNewId;
+	this.private_FillCaption(bDemonstration);
+};
+CVisualGameRoomTab.prototype.private_FillCaption = function(bDemonstration)
+{
+	var oGameTree         = this.m_oGameTree;
+	var oCaptionDiv       = this.m_oCaptionDiv;
+	oCaptionDiv.innerHTML = "";
+
+	if (true !== bDemonstration)
+	{
+		var sWhiteName = oGameTree ? oGameTree.Get_WhiteName() : "White";
+		var sBlackName = oGameTree ? oGameTree.Get_BlackName() : "Black";
+		var oCaptionStringDiv       = document.createElement("div");
+		oCaptionStringDiv.innerHTML = String.fromCharCode(0x2691) + "&nbsp;" + sWhiteName + "[" + (oGameTree ? oGameTree.Get_WhiteRating() : "-") + "]";
+		oCaptionDiv.appendChild(oCaptionStringDiv);
+		oCaptionStringDiv           = document.createElement("div");
+		oCaptionStringDiv.innerHTML = String.fromCharCode(0x2690) + "&nbsp;" + sBlackName + "[" + (oGameTree ? oGameTree.Get_BlackRating() : "-") + "]";
+		oCaptionDiv.appendChild(oCaptionStringDiv);
+	}
+	else
+	{
+		var oCaptionStringDiv       = document.createElement("div");
+		oCaptionStringDiv.innerHTML = String.fromCharCode(0x2615) + "&nbsp;" + (oGameTree ? oGameTree.Get_GameTranscriber() : "");
+		oCaptionDiv.appendChild(oCaptionStringDiv);
+	}
 };
 CVisualGameRoomTab.prototype.GetId = function()
 {

@@ -420,6 +420,16 @@ CGoUniverseApplication.prototype.AddGameRoom = function(nGameRoomId, oGameTree, 
 
 	this.OnResize();
 };
+CGoUniverseApplication.prototype.ModifyGameRoom = function(nGameRoomId, nNewGameRoomId, bDemonstration)
+{
+	var oTab = this.m_oGameRoomTabs.GetTab(nGameRoomId);
+	if (!oTab)
+		return;
+	
+	oTab.ModifyGameRoom(nNewGameRoomId, bDemonstration);
+
+	this.OnResize();
+};
 CGoUniverseApplication.prototype.SetCurrentGameRoomTab = function(nGameRoomId)
 {
 	var oTab = this.m_oGameRoomTabs.GetTab(nGameRoomId);

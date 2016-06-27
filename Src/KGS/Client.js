@@ -63,6 +63,9 @@ CKGSClient.prototype.EnterToGameRoom = function(nGameRoomId)
 };
 CKGSClient.prototype.LeaveGameRoom = function(nGameRoomId)
 {
+	if (this.m_aGames[nGameRoomId])
+		delete this.m_aGames[nGameRoomId];
+
 	this.private_SendMessage({
 		"type"      : "UNJOIN_REQUEST",
 		"channelId" : nGameRoomId
@@ -550,6 +553,14 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
 	{
 		this.private_HandleIdleWarning(oMessage);
 	}
+	else if ("GAME_REVIEW" === oMessage.type)
+	{
+		this.private_HandleGameReview(oMessage);
+	}
+	else if ("CLOSE" === oMessage.type)
+	{
+		this.private_HandleClose(oMessage);
+	}
 	else
 	{
 		console.log(oMessage);
@@ -813,6 +824,10 @@ CKGSClient.prototype.private_HandleUserRecord = function(oUserRecord, bUpdateUse
 CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 {
 	var GameRoomId = oMessage.channelId;
+
+	if (this.m_aGames[GameRoomId])
+		return;
+
 	var oGame = {
 		GameRoomId : GameRoomId,
 		GameTree   : null,
@@ -1241,6 +1256,36 @@ CKGSClient.prototype.private_HandleIdleWarning = function(oMessage)
 {
 	CreateKGSWindow(EKGSWindowType.Idle, {Client : this, App : this.m_oApp});
 };
+CKGSClient.prototype.private_HandleGameReview = function(oMessage)
+{
+	var nChannelId = oMessage.originalId;
+	var oGame = this.m_aGames[nChannelId];
+	if (undefined === oGame)
+		return;
+
+	var nNewChannelId = oMessage.review.channelId;
+	var oGameTree = oGame.GameTree;
+	oGame.GameRoomId = nNewChannelId;
+
+	if (oMessage.review.players.owner)
+	{
+		oGameTree.Set_GameTranscriber(oMessage.review.players.owner.name + (oMessage.review.players.owner.rank ? "[" + oMessage.review.players.owner.rank + "]" : ""));
+	}
+	else
+	{
+		// Такого не должно быть
+		oGameTree.Set_GameTranscriber("unknown");
+	}
+
+	this.m_aGames[nNewChannelId] = oGame;
+	delete this.m_aGames[nChannelId];
+
+	this.m_oApp.ModifyGameRoom(nChannelId, nNewChannelId, true);
+};
+CKGSClient.prototype.private_HandleClose = function(oMessage)
+{
+	// Ничего не делаем. Пока известно, что данное сообщение приходит после GAME_REVIEW, вся обработка происходит там
+};
 CKGSClient.prototype.private_AddUserToRoom = function(oUser, oRoom)
 {
 	oRoom.Users[oUser.GetName()] = oUser;
@@ -1520,6 +1565,10 @@ CKGSClient.prototype.private_ReadSgfEvents = function(oGame, arrSgfEvents)
 		else if ("ARROW" === oProp.name || "LINE" === oProp.name)
 		{
 			// Ничего не делаем
+		}
+		else if ("RESULT" === oProp.name)
+		{
+			oGameTree.Set_Result(oProp.text);
 		}
 		else
 		{
