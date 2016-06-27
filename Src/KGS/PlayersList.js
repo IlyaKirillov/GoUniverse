@@ -33,26 +33,24 @@ var g_oPlayersList =
 
     SortFunction : function (oRecord1, oRecord2)
     {
-        if (true === oRecord1.IsFriend() && true !== oRecord2.IsFriend())
-            return -1;
-
-        if (true !== oRecord1.IsFriend() && true === oRecord2.IsFriend())
-            return 1;
+		var nPreSortResult = g_oPlayersList.private_PreSort(oRecord1, oRecord2);
+		if (0 !== nPreSortResult)
+			return nPreSortResult;
 
         var SortType = g_oPlayersList.SortType;
         if (EPlayersListRecord.Name === SortType)
         {
-            if (oRecord1.m_sName < oRecord2.m_sName)
-                return -1;
-            else if (oRecord1.m_sName > oRecord2.m_sName)
-                return 1;
+			if (Common.Compare_Strings(oRecord1.m_sName, oRecord2.m_sName) < 0)
+				return -1;
+			else if (Common.Compare_Strings(oRecord1.m_sName, oRecord2.m_sName) > 0)
+				return 1;
         }
         else if (-EPlayersListRecord.Name === SortType)
         {
-            if (oRecord1.m_sName < oRecord2.m_sName)
-                return 1;
-            else if (oRecord1.m_sName > oRecord2.m_sName)
-                return -1;
+			if (Common.Compare_Strings(oRecord1.m_sName, oRecord2.m_sName) < 0)
+				return 1;
+			else if (Common.Compare_Strings(oRecord1.m_sName, oRecord2.m_sName) > 0)
+				return -1;
         }
         else if (EPlayersListRecord.Rank === SortType)
         {
@@ -73,7 +71,7 @@ var g_oPlayersList =
             return g_oPlayersList.private_SortByName(oRecord1, oRecord2);
         }
 
-        return 0;
+		return g_oPlayersList.private_PostSort(oRecord1, oRecord2);
     },
 
     Is_Sortable : function (nColNum)
@@ -103,6 +101,34 @@ var g_oPlayersList =
         var eType = nColNum + 1;
         oRecord.Draw(oContext, dX, dY, eType);
     },
+
+	private_PreSort : function(oRecord1, oRecord2)
+	{
+		if (true === oRecord1.IsFriend() && true !== oRecord2.IsFriend())
+			return -1;
+
+		if (true !== oRecord1.IsFriend() && true === oRecord2.IsFriend())
+			return 1;
+
+		return 0;
+	},
+
+	private_PostSort : function(oRecord1, oRecord2)
+	{
+		// Сортируем по рейтингу, потом по имени
+		if (oRecord1.m_nRank < oRecord2.m_nRank)
+			return 1;
+		else if (oRecord1.m_nRank > oRecord2.m_nRank)
+			return -1;
+
+		if (Common.Compare_Strings(oRecord1.m_sName, oRecord2.m_sName) < 0)
+			return -1;
+		else if (Common.Compare_Strings(oRecord1.m_sName, oRecord2.m_sName) > 0)
+			return 1;
+
+		// Сюда мы уже не должны попадать, потому что имена игроков не должны совпадать
+		return 0;
+	},
 
     private_SortByName : function(oRecord1, oRecord2)
     {
@@ -148,7 +174,7 @@ function CPlayersListRecord(oClient)
 	this.m_oClient = oClient;
     this.m_sName   = "";
     this.m_nRank   = 0;
-    this.m_bFriend = false;
+	this.m_oUser   = null;
 }
 
 CPlayersListRecord.prototype.Draw = function(oContext, dX, dY, eType)
@@ -156,17 +182,25 @@ CPlayersListRecord.prototype.Draw = function(oContext, dX, dY, eType)
 	var oClient = this.m_oClient;
     var sFont = oContext.font;
 
-	oContext.fillStyle = "#000000";
+
+	if (true !== this.m_oUser.IsSleeping())
+		oContext.fillStyle = "#000000";
+	else
+		oContext.fillStyle = "#AAAAAA";
 
 	var bResetFont = false;
 	if (oClient)
 	{
 		if (true === oClient.IsUserInFollowerList(this.m_sName))
 		{
-			oContext.fillStyle = "#008272";
-			oContext.font      = "bold " + sFont;
+			if (true !== this.m_oUser.IsSleeping())
+				oContext.fillStyle = "#008272";
+			else
+				oContext.fillStyle = "#99C9C3";
+
+			oContext.font = "bold " + sFont;
 		}
-		else if (true === oClient.IsUserInFriendList(this.m_sName))
+		else if (true === this.m_oUser.IsFriend())
 		{
 			oContext.font = "bold " + sFont;
 		}
@@ -221,7 +255,7 @@ CPlayersListRecord.prototype.Update = function(aLine)
 {
     this.m_sName   = aLine[1];
     this.m_nRank   = aLine[2] | 0;
-    this.m_bFriend = aLine[3];
+	this.m_oUser   = aLine[4];
 };
 
 CPlayersListRecord.prototype.Compare = function(sName)

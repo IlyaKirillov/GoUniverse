@@ -293,14 +293,14 @@ CGameListRecord.prototype.Draw = function(oContext, dX, dY, eType)
 		oContext.font = "bold " + sFont;
 		bResetFont = true;
 		if (true === this.m_bAdjourned) // Отложенная игра
-			oContext.fillStyle = "#C3DDDA";
+			oContext.fillStyle = "#99C9C3";
 		else
 			oContext.fillStyle = "#008272";
 	}
 	else
 	{
 		if (true === this.m_bAdjourned) // Отложенная игра
-			oContext.fillStyle = "#CCCCCC";
+			oContext.fillStyle = "#AAAAAA";
 		else
 			oContext.fillStyle = "#000000";
 	}

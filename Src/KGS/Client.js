@@ -118,6 +118,9 @@ CKGSClient.prototype.SendChatMessage = function(sText)
 		}
 	}
 
+	if (sText.length >= 1000)
+		sText = sText.substr(0, 999);
+
 	this.private_SendMessage({
 		"type"      : true === bAnnounce ? "ANNOUNCE" : "CHAT",
 		"channelId" : this.m_nChatChannelId,
@@ -556,6 +559,7 @@ CKGSClient.prototype.private_HandleLogout = function(oMessage)
 {
 	this.m_bLoggedIn = false;
 	this.m_oApp.Logout(oMessage.text);
+	console.log(oMessage);
 };
 CKGSClient.prototype.private_HandleHello = function(oMessage)
 {
@@ -932,7 +936,7 @@ CKGSClient.prototype.private_HandleUserAdded = function(oMessage)
 
 	if (oMessage.channelId === this.m_nChatChannelId)
 	{
-		this.m_oPlayersListView.Handle_Record([0, oUser.GetName(), oUser.GetRank(), oUser.IsFriend()]);
+		this.m_oPlayersListView.Handle_Record([0, oUser.GetName(), oUser.GetRank(), oUser.IsFriend(), oUser]);
 		this.m_oPlayersListView.Update_Size();
 		this.m_oPlayersListView.Update();
 	}
@@ -949,7 +953,7 @@ CKGSClient.prototype.private_HandleUserRemoved = function(oMessage)
 	
 	if (oMessage.channelId === this.m_nChatChannelId)
 	{
-		this.m_oPlayersListView.Handle_Record([1, oUser.GetName()]);
+		this.m_oPlayersListView.Handle_Record([1, oUser.GetName(), -2, false, oUser]);
 		this.m_oPlayersListView.Update_Size();
 		this.m_oPlayersListView.Update();
 	}
@@ -988,7 +992,7 @@ CKGSClient.prototype.private_HandleUserUpdate = function(oMessage)
 
 			if (nChannelId === this.m_nChatChannelId)
 			{
-				this.m_oPlayersListView.Handle_Record([1, oUser.GetName()]);
+				this.m_oPlayersListView.Handle_Record([1, oUser.GetName(), -2, false, oUser]);
 				this.m_oPlayersListView.Update_Size();
 				this.m_oPlayersListView.Update();
 			}
@@ -999,7 +1003,7 @@ CKGSClient.prototype.private_HandleUserUpdate = function(oMessage)
 			oPrivateChat.Users[sUserName] = oUser;
 			if (nChannelId === this.m_nChatChannelId)
 			{
-				this.m_oPlayersListView.Handle_Record([0, oUser.GetName(), oUser.GetRank(), oUser.IsFriend()]);
+				this.m_oPlayersListView.Handle_Record([0, oUser.GetName(), oUser.GetRank(), oUser.IsFriend(), oUser]);
 				this.m_oPlayersListView.Update_Size();
 				this.m_oPlayersListView.Update();
 			}
@@ -1590,7 +1594,7 @@ CKGSClient.prototype.private_UpdatePlayersList = function()
 		for (var sUserName in oRoom.Users)
 		{
 			var oUser = oRoom.Users[sUserName];
-			this.m_oPlayersListView.Handle_Record([0, oUser.GetName(), oUser.GetRank(), oUser.IsFriend()]);
+			this.m_oPlayersListView.Handle_Record([0, oUser.GetName(), oUser.GetRank(), oUser.IsFriend(), oUser]);
 		}
 	}
 
