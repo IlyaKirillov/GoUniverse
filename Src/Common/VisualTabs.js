@@ -259,7 +259,7 @@ CVisualGameRoomTab.prototype.InitGameRoom = function(nId, oGameTree, sDivIdConta
 	if (null !== oGameTree)
 	{
 		var oDrawing = new CDrawing(oGameTree);
-		oDrawing.Create_GoUniverseViewerTemplate(sGameRoomDivId + "B", this.m_oApp, nId);
+		oDrawing.Create_GoUniverseViewerTemplate(sGameRoomDivId + "B", this.m_oApp, this);
 		//oDrawing.Create_MixedFullTemplate(sGameRoomDivId + "B");
 		oDrawing.Update_Size(true);
 	}
@@ -422,6 +422,12 @@ CVisualGameRoomTab.prototype.OnClick = function()
 		this.m_oTabDiv.style.backgroundColor = "#737373";
 		this.m_oGameTree.Update_Size();
 		this.m_oGameTree.Focus();
+	}
+	else if (null === this.m_oGameTree)
+	{
+		this.m_oApp.UpdateDropDownChatTabsButton();
+		this.m_oApp.ScrollChatTabsToCurrent();
+		this.m_oApp.UpdateChatScroll();
 	}
 
 	this.m_oApp.private_CollapseGameTabs();

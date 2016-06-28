@@ -1257,9 +1257,16 @@ CKGSClient.prototype.private_HandlePrivateKeepOut = function(oMessage)
 
 	var sRoomName = "this room", oRecord;
 	if (undefined !== this.m_aAllRooms[nChannelId])
+	{
 		sRoomName = "\"" + this.m_aAllRooms[nChannelId].Name + "\"";
+	}
 	else if (null !== (oRecord = this.m_oGamesListView.Get_RecordById(nChannelId)))
-		sRoomName = "\"" + oRecord.m_sWhiteName + (oRecord.m_sBlackName ? oRecord.m_sBlackName : "") + "\"";
+	{
+		if (true === oRecord.m_bDemo)
+			sRoomName = "\"" + oRecord.m_sWhiteName + "\"";
+		else
+			sRoomName = "\"" + oRecord.m_sWhiteName + " vs. " + oRecord.m_sBlackName + "\"";
+	}
 
 	CreateKGSWindow(EKGSWindowType.Information, {Client : this, App : this.m_oApp, Caption : "Error", Text : "Sorry, " + sRoomName + " is private. You cannot enter.", Image : "WarningSpanNoEntry", W : 485, H : 144});
 };

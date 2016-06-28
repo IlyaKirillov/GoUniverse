@@ -1073,6 +1073,10 @@ CGoUniverseApplication.prototype.private_UpdateChatScroll = function()
 {
 	this.m_oChatScroll.CheckVisibility();
 };
+CGoUniverseApplication.prototype.UpdateChatScroll = function()
+{
+	this.private_UpdateChatScroll();
+};
 CGoUniverseApplication.prototype.UpdateDropDownGameTabsButton = function()
 {
 	// Проверяем, нужна ли нам кнопка
