@@ -394,3 +394,13 @@ input.SearchInput:focus {
 	top        : 4px;
 	left       : 10px;
 }
+
+textarea.ChatInput {
+	width           : 100%;
+	height          : 100%;
+	border          : none;
+	outline         : none;
+	-moz-appearance : none;
+	resize          : none;
+	font-family     : 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif;
+}

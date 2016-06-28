@@ -37,3 +37,5 @@ function SplitTextToLines(sText)
 
 	return aLines;
 }
+
+

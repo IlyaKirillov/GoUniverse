@@ -259,7 +259,8 @@ CVisualGameRoomTab.prototype.InitGameRoom = function(nId, oGameTree, sDivIdConta
 	if (null !== oGameTree)
 	{
 		var oDrawing = new CDrawing(oGameTree);
-		oDrawing.Create_MixedFullTemplate(sGameRoomDivId + "B");
+		oDrawing.Create_GoUniverseViewerTemplate(sGameRoomDivId + "B", this.m_oApp, nId);
+		//oDrawing.Create_MixedFullTemplate(sGameRoomDivId + "B");
 		oDrawing.Update_Size(true);
 	}
 

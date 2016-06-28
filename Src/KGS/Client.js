@@ -130,6 +130,17 @@ CKGSClient.prototype.SendChatMessage = function(sText)
 		"text"      : sText
 	});
 };
+CKGSClient.prototype.SendChatMessageInGameRoom = function(nGameRoomId, sText)
+{
+	if (sText.length >= 1000)
+		sText = sText.substr(0, 999);
+
+	this.private_SendMessage({
+		"type"      : "CHAT",
+		"channelId" : nGameRoomId,
+		"text"      : sText
+	});
+};
 CKGSClient.prototype.LoadUserInfo = function(sUserName)
 {
 	var sUserName = sUserName.toLowerCase();
