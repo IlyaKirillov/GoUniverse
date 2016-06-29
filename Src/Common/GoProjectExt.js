@@ -54,28 +54,49 @@ CDrawing.prototype.private_GoUniverseCreateHorFullTemplate = function()
 	this.m_aElements.push(oDrawingBoard);
 	oPanelControl.HtmlElement.style.backgroundColor = "rgb(217, 217, 217)";
 	//------------------------------------------------------------------------------------------------------------------
-	// Заполняем правую панель. Делим ее на три части:
-	//  1. Информация об игроках
-	//  2. Навигатор + панель управления
-	//  3. Чат + ввод для чата
+	// Заполняем правую панель. Делим ее на четыре части:
+	//  1. Информация о текущем состоянии партии
+	//  2. Информация об игроках
+	//  3. Навигатор + панель управления
+	//  4. Чат + ввод для чата
 	//------------------------------------------------------------------------------------------------------------------
+	var GameInfoH  = 37;
 	var InfoH      = 200;
 	var ManagerH   = 200;
 	var ChatInputH = 30;
 
-	var sInfoDivId    = sPanelDivId + "I";
-	var sManagerDivId = sPanelDivId + "M";
-	var sChatsDivId   = sPanelDivId + "C";
+	var sGameInfoDivId = sPanelDivId + "G";
+	var sInfoDivId     = sPanelDivId + "I";
+	var sManagerDivId  = sPanelDivId + "M";
+	var sChatsDivId    = sPanelDivId + "C";
 
 
+	this.private_CreateDiv(oPanelControl.HtmlElement, sGameInfoDivId);
 	this.private_CreateDiv(oPanelControl.HtmlElement, sInfoDivId);
 	this.private_CreateDiv(oPanelControl.HtmlElement, sManagerDivId);
 	this.private_CreateDiv(oPanelControl.HtmlElement, sChatsDivId);
 	//------------------------------------------------------------------------------------------------------------------
+	// Информация об партии
+	//------------------------------------------------------------------------------------------------------------------
+	var oGameInfoControl = CreateControlContainer(sGameInfoDivId);
+	oGameInfoControl.Bounds.SetParams(0, 0, 1000, 0, true, false, false, false, -1, GameInfoH - 1);
+	oGameInfoControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right);
+	oPanelControl.AddControl(oGameInfoControl);
+	oGameInfoControl.HtmlElement.style.borderBottom = "1px solid rgb(172, 172, 172)";
+	oGameInfoControl.HtmlElement.className = "HorVerAlignCenter";
+
+	var oGameInfoTextDiv = document.createElement("div");
+	oGameInfoControl.HtmlElement.appendChild(oGameInfoTextDiv);
+	oGameInfoTextDiv.style.whiteSpace = "no wrap";
+	oGameInfoTextDiv.style.fontSize   = "14pt";
+	oGameInfoTextDiv.style.fontFamily = '"Segoe UI", Helvetica, Tahoma, Geneva, Verdana, sans-serif';
+	oGameInfoTextDiv.innerHTML = "Black C4 (1 move)";
+
+	//------------------------------------------------------------------------------------------------------------------
 	// Информация об игроках
 	//------------------------------------------------------------------------------------------------------------------
 	var oInfoControl = CreateControlContainer(sInfoDivId);
-	oInfoControl.Bounds.SetParams(7 + 36, 0, 1000, 0, true, false, false, false, -1, InfoH);
+	oInfoControl.Bounds.SetParams(0, GameInfoH, 1000, 0, true, true, false, false, -1, InfoH);
 	oInfoControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right);
 	oPanelControl.AddControl(oInfoControl);
 
@@ -107,7 +128,7 @@ CDrawing.prototype.private_GoUniverseCreateHorFullTemplate = function()
 	var sMenuButton = sPanelDivId + "D";
 	this.private_CreateDiv(oPanelControl.HtmlElement, sMenuButton);
 	var oMenuButtonControl = CreateControlContainer(sMenuButton);
-	oMenuButtonControl.Bounds.SetParams(7, 7, 1000, 7, true, true, false, true, 36, 36);
+	oMenuButtonControl.Bounds.SetParams(7, 0, 1000, 7, true, true, false, true, 36, 36);
 	oMenuButtonControl.Anchor = (g_anchor_top | g_anchor_left);
 	oPanelControl.AddControl(oMenuButtonControl);
 
@@ -119,7 +140,7 @@ CDrawing.prototype.private_GoUniverseCreateHorFullTemplate = function()
 	// Навигатор и панель управления
 	//------------------------------------------------------------------------------------------------------------------
 	var oManagerControl = CreateControlContainer(sManagerDivId);
-	oManagerControl.Bounds.SetParams(0, InfoH, 0, 0, true, true, true, false, -1, ManagerH);
+	oManagerControl.Bounds.SetParams(0, GameInfoH + InfoH, 0, 0, true, true, true, false, -1, ManagerH);
 	oManagerControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right);
 	oPanelControl.AddControl(oManagerControl);
 
@@ -165,7 +186,7 @@ CDrawing.prototype.private_GoUniverseCreateHorFullTemplate = function()
 	// Чат + ввод для чата
 	//------------------------------------------------------------------------------------------------------------------
 	var oChatsControl = CreateControlContainer(sChatsDivId);
-	oChatsControl.Bounds.SetParams(0, InfoH + ManagerH, 0, 1000, true, true, true, false, -1, -1);
+	oChatsControl.Bounds.SetParams(0, GameInfoH + InfoH + ManagerH, 0, 1000, true, true, true, false, -1, -1);
 	oChatsControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right | g_anchor_bottom);
 	oPanelControl.AddControl(oChatsControl);
 
@@ -431,6 +452,75 @@ CGoUniverseDrawingPlayerInfo.prototype.Init = function(sDivId, oGameTree, nPlaye
 	oTimeDiv.style["float"] = "left";
 	oTimeDiv.style.fontSize = "12pt";
 	oTimeDiv.innerHTML      = "00:15:00";
+
+	function CGoUniverseTime()
+	{
+		this.m_nHours   = 0;
+		this.m_nMinutes = 0;
+		this.m_nSeconds = 0;
+
+		this.m_nCurHours   = 0;
+		this.m_nCurMinutes = 0;
+		this.m_nCurSeconds = 0;
+
+		this.m_nStartTime = 0;
+		this.m_nTimerId   = null;
+
+		this.m_fHandler   = null;
+	}
+	CGoUniverseTime.prototype.SetHandler = function(fHandler)
+	{
+		this.m_fHandler = fHandler;
+	};
+	CGoUniverseTime.prototype.Start = function(h, m, s)
+	{
+		this.m_nHours   = h;
+		this.m_nMinutes = m;
+		this.m_nSeconds = s;
+
+		if (null !== this.m_nTimerId)
+			clearTimeout(this.m_nTimerId);
+
+		this.m_nStartTime = new Date().getTime();
+
+		var oThis = this;
+		this.m_nTimerId = setTimeout(function(){oThis.private_Tick();}, 50);
+	};
+	CGoUniverseTime.prototype.private_Tick = function()
+	{
+		if (null === this.m_nTimerId)
+			return;
+
+		var oThis = this;
+		this.m_nTimerId = setTimeout(function(){oThis.private_Tick();}, 50);
+
+		var nCurTime = new Date().getTime();
+
+		var nDiffTime = (nCurTime - this.m_nStartTime) / 1000;
+
+		this.m_nCurSeconds = (((this.m_nSeconds - nDiffTime) * 10) | 0) / 10;
+
+
+		if (this.m_fHandler)
+			this.m_fHandler(this.m_nCurHours, this.m_nCurMinutes, this.m_nCurSeconds);
+	};
+	CGoUniverseTime.prototype.Stop = function()
+	{
+		if (null !== this.m_nTimerId)
+			clearTimeout(this.m_nTimerId);
+
+		this.m_nTimerId = null;
+	};
+
+	var oTimer = new CGoUniverseTime();
+	oTimer.SetHandler(function(h, m, s)
+	{
+		oTimeDiv.innerHTML = h + ":" + m + ":" + s;
+
+		if (s <= 0)
+			oTimer.Stop();
+	});
+	oTimer.Start(0, 0, 20);
 
 	if (this.m_oDrawing)
 	{

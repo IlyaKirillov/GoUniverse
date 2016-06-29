@@ -891,7 +891,7 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 		if (oMessage.gameSummary.players.owner)
 		{
 			var oWhiteUser = this.private_HandleUserRecord2(oMessage.gameSummary.players.owner);
-			if (oWhiteUser.HasAvatar())
+			//if (oWhiteUser.HasAvatar())
 				sWhiteAvatar = "http://goserver.gokgs.com/avatars/" + oWhiteUser.GetName() + ".jpg";
 		}
 	}
@@ -900,14 +900,14 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 		if (oMessage.gameSummary.players.black)
 		{
 			var oBlackUser = this.private_HandleUserRecord2(oMessage.gameSummary.players.black);
-			if (oBlackUser.HasAvatar())
+			//if (oBlackUser.HasAvatar())
 				sBlackAvatar = "http://goserver.gokgs.com/avatars/" + oBlackUser.GetName() + ".jpg";
 		}
 
 		if (oMessage.gameSummary.players.white)
 		{
 			var oWhiteUser = this.private_HandleUserRecord2(oMessage.gameSummary.players.white);
-			if (oWhiteUser.HasAvatar())
+			//if (oWhiteUser.HasAvatar())
 				sWhiteAvatar = "http://goserver.gokgs.com/avatars/" + oWhiteUser.GetName() + ".jpg";
 		}
 	}
@@ -1517,6 +1517,21 @@ CKGSClient.prototype.private_ReadSgfEvents = function(oGame, arrSgfEvents)
 			if (oProp.handicap)
 				oGameTree.Set_Handicap(oProp.handicap);
 
+			if (oProp.timeSystem)
+				console.log("timeSystem" + oProp.timeSystem);
+
+			if (oProp.mainTime)
+				console.log("mainTime " + oProp.mainTime);
+
+			if (oProp.byoYomiTime)
+				console.log("byoYomiTime " + oProp.byoYomiTime);
+
+			if (oProp.byoYomiPeriods)
+				console.log("byoYomiPeriods " + oProp.byoYomiPeriods);
+
+			if (oProp.byoYomiStones)
+				console.log("byoYomiStones " + oProp.byoYomiStones);
+
 			// TODO: РЕализовать TimeSystem
 		}
 		else if ("PLAYERNAME" === oProp.name)
@@ -1555,6 +1570,7 @@ CKGSClient.prototype.private_ReadSgfEvents = function(oGame, arrSgfEvents)
 		}
 		else if ("TIMELEFT" === oProp.name)
 		{
+			console.log(oProp);
 			// TODO: Реализовать TimeSystem
 		}
 		else if ("TRIANGLE" === oProp.name)
