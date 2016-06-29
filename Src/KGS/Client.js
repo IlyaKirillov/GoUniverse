@@ -832,6 +832,12 @@ CKGSClient.prototype.private_HandleUserRecord = function(oUserRecord, bUpdateUse
 
 	return oUser;
 };
+CKGSClient.prototype.private_HandleUserRecord2 = function(oUserRecord)
+{
+	var oUser = new CKGSUser(this);
+	oUser.Update(oUserRecord);
+	return oUser;
+};
 CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 {
 	var GameRoomId = oMessage.channelId;
@@ -877,7 +883,36 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 		oGameTree.Set_GameTranscriber(oMessage.gameSummary.players.owner.name + (oMessage.gameSummary.players.owner.rank ? "[" + oMessage.gameSummary.players.owner.rank + "]" : ""));
 	}
 
-	this.m_oApp.AddGameRoom(GameRoomId, oGameTree, bDemo);
+	var sWhiteAvatar = null;
+	var sBlackAvatar = null;
+
+	if (true === bDemo)
+	{
+		if (oMessage.gameSummary.players.owner)
+		{
+			var oWhiteUser = this.private_HandleUserRecord2(oMessage.gameSummary.players.owner);
+			if (oWhiteUser.HasAvatar())
+				sWhiteAvatar = "http://goserver.gokgs.com/avatars/" + oWhiteUser.GetName() + ".jpg";
+		}
+	}
+	else
+	{
+		if (oMessage.gameSummary.players.black)
+		{
+			var oBlackUser = this.private_HandleUserRecord2(oMessage.gameSummary.players.black);
+			if (oBlackUser.HasAvatar())
+				sBlackAvatar = "http://goserver.gokgs.com/avatars/" + oBlackUser.GetName() + ".jpg";
+		}
+
+		if (oMessage.gameSummary.players.white)
+		{
+			var oWhiteUser = this.private_HandleUserRecord2(oMessage.gameSummary.players.white);
+			if (oWhiteUser.HasAvatar())
+				sWhiteAvatar = "http://goserver.gokgs.com/avatars/" + oWhiteUser.GetName() + ".jpg";
+		}
+	}
+
+	this.m_oApp.AddGameRoom(GameRoomId, oGameTree, bDemo, sWhiteAvatar, sBlackAvatar);
 	this.m_oApp.SetCurrentGameRoomTab(GameRoomId);
 
 
@@ -903,6 +938,9 @@ CKGSClient.prototype.private_HandleGameUpdate = function(oMessage)
 {
 	var GameRoomId = oMessage.channelId;
 	var oGame = this.m_aGames[GameRoomId];
+	if (!oGame)
+		return;
+
 	var oGameTree = oGame.GameTree;
 
 	var oCurNode = oGame.CurNode;
