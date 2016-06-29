@@ -328,46 +328,50 @@ CGoUniverseDrawingPlayerInfo.prototype.Init = function(sDivId, oGameTree, nPlaye
 	var oDivElement                   = this.HtmlElement.Control.HtmlElement;
 	oDivElement.style.backgroundColor = new CColor(217, 217, 217, 255).ToString();
 
-	this.HtmlElement.NameDiv   = document.createElement("div");
-	this.HtmlElement.ScoresDiv = document.createElement("div");
-	this.HtmlElement.Image     = document.createElement("canvas");
-	this.HtmlElement.Avatar    = document.createElement("img");
+	var nAvatarH = 110;
+	var nAvatarW = (nAvatarH * 141 / 200);
+	var nNameH   = 30;
+	var nScoresH = 30;
+	var nTimeH   = 30;
 
-	var oImage     = this.HtmlElement.Image;
-	var oNameDiv   = this.HtmlElement.NameDiv;
-	var oScoresDiv = this.HtmlElement.ScoresDiv;
-	var oAvatar    = this.HtmlElement.Avatar;
+	// Аватарка
+	var oAvatarDiv = document.createElement("div");
+	oDivElement.appendChild(oAvatarDiv);
+	oAvatarDiv.style.width  = "100%";
+	oAvatarDiv.style.height = nAvatarH;
+	oAvatarDiv.className    = "HorAlignCenter";
 
-	oDivElement.appendChild(oImage);
-	oDivElement.appendChild(oNameDiv);
-	oDivElement.appendChild(oScoresDiv);
-	oDivElement.appendChild(oAvatar);
+	var oAvatarImg = document.createElement("img");
+	oAvatarDiv.appendChild(oAvatarImg);
+	oAvatarImg.src    = sAvatarSrc;
+	oAvatarImg.width  = nAvatarW;
+	oAvatarImg.height = nAvatarH;
 
-	oNameDiv.style.paddingLeft   = "25px";
-	oScoresDiv.style.paddingLeft = "25px";
-	oNameDiv.style.fontSize      = "14pt";
-	oScoresDiv.style.fontSize    = "10pt";
+	// Имя и цвет
+	var oNameWrapperDiv = document.createElement("div");
+	oDivElement.appendChild(oNameWrapperDiv);
+	oNameWrapperDiv.style.width  = "100%";
+	oNameWrapperDiv.style.height = nNameH;
+	oNameWrapperDiv.className    = "HorAlignCenter";
 
-	oImage.setAttribute("id", sDivId + "_Image");
-	oImage.setAttribute("style", "position:absolute;padding:0;margin:0;");
-	oImage.setAttribute("oncontextmenu", "return false;");
-	oImage.style.left            = "0px";
-	oImage.style.top             = "0px";
-	oImage.style.width           = 25 + "px";
-	oImage.style.height          = 25 + "px";
-	oImage.width                 = 25;
-	oImage.height                = 25;
+	var oCenterDiv          = document.createElement("div");
+	oCenterDiv.style.margin = "0 auto";
+	oNameWrapperDiv.appendChild(oCenterDiv);
 
-	oAvatar.width  = 141;
-	oAvatar.height = 200;
-	oAvatar.src    = sAvatarSrc;
+	// Цвет
+	var oColorDiv = document.createElement("canvas");
+	oCenterDiv.appendChild(oColorDiv);
 
-	var Canvas = oImage.getContext("2d");
+	oColorDiv.setAttribute("id", sDivId + "_Image");
+	oColorDiv.style["float"] = "left";
+	oColorDiv.style.width    = 25 + "px";
+	oColorDiv.style.height   = 25 + "px";
+	oColorDiv.width          = 25;
+	oColorDiv.height         = 25;
 
-	var Size = 25;
-
+	var Canvas = oColorDiv.getContext("2d");
+	var Size   = 25;
 	Canvas.clearRect(0, 0, 25, 25);
-
 	var X = Math.ceil(0.5 * Size + 0.5);
 	var Y = Math.ceil(0.5 * Size + 0.5);
 	var R = Math.ceil(0.25 * Size + 0.5);
@@ -386,6 +390,48 @@ CGoUniverseDrawingPlayerInfo.prototype.Init = function(sDivId, oGameTree, nPlaye
 	Canvas.fill();
 	Canvas.stroke();
 
+	// Имя
+	var oNameDiv = document.createElement("div");
+	oCenterDiv.appendChild(oNameDiv);
+
+	oNameDiv.style["float"] = "left";
+	oNameDiv.style.fontSize = "14pt";
+
+	// Захваченные
+	var oScoresWrapperDiv = document.createElement("div");
+	oDivElement.appendChild(oScoresWrapperDiv);
+	oScoresWrapperDiv.style.width  = "100%";
+	oScoresWrapperDiv.style.height = nScoresH;
+	oScoresWrapperDiv.className    = "HorAlignCenter";
+
+	var oCenterDiv          = document.createElement("div");
+	oCenterDiv.style.margin = "0 auto";
+	oScoresWrapperDiv.appendChild(oCenterDiv);
+
+	var oScoresDiv = document.createElement("div");
+	oCenterDiv.appendChild(oScoresDiv);
+
+	oScoresDiv.style["float"] = "left";
+	oScoresDiv.style.fontSize = "12pt";
+
+	// Время
+	var oTimeWrapperDiv = document.createElement("div");
+	oDivElement.appendChild(oTimeWrapperDiv);
+	oTimeWrapperDiv.style.width  = "100%";
+	oTimeWrapperDiv.style.height = nTimeH;
+	oTimeWrapperDiv.className    = "HorAlignCenter";
+
+	var oCenterDiv          = document.createElement("div");
+	oCenterDiv.style.margin = "0 auto";
+	oTimeWrapperDiv.appendChild(oCenterDiv);
+
+	var oTimeDiv = document.createElement("div");
+	oCenterDiv.appendChild(oTimeDiv);
+
+	oTimeDiv.style["float"] = "left";
+	oTimeDiv.style.fontSize = "12pt";
+	oTimeDiv.innerHTML      = "00:15:00";
+
 	if (this.m_oDrawing)
 	{
 		if (BOARD_BLACK === nPlayer)
@@ -394,39 +440,14 @@ CGoUniverseDrawingPlayerInfo.prototype.Init = function(sDivId, oGameTree, nPlaye
 			this.m_oDrawing.Register_WhiteInfo(this);
 	}
 
+	this.m_oNameDiv   = oNameDiv;
+	this.m_oScoresDiv = oScoresDiv;
+
 	this.private_Update();
 };
 CGoUniverseDrawingPlayerInfo.prototype.Update_Size = function()
 {
 	this.private_Update();
-
-	var TextWidth = this.m_dTextWidth;
-	var RealWidth = this.HtmlElement.Control.HtmlElement.clientWidth - 25;
-
-	var nOffset = 0;
-	if (RealWidth < TextWidth)
-		nOffset = 0;
-	else
-		nOffset = (RealWidth - TextWidth) / 2;
-
-	this.HtmlElement.Image.style.left            = nOffset + "px";
-	nOffset += 25;
-	this.HtmlElement.NameDiv.style.paddingLeft   = nOffset + "px";
-	this.HtmlElement.ScoresDiv.style.paddingLeft = nOffset + "px";
-
-	this.HtmlElement.NameDiv.style.overflow            = "hidden";
-	this.HtmlElement.NameDiv.style.textOverflow        = "ellipsis";
-	this.HtmlElement.NameDiv.style['-o-text-overflow'] = "ellipsis";
-	this.HtmlElement.NameDiv.style.height              = 25 + "px";
-	this.HtmlElement.NameDiv.style.lineHeight          = 25 + "px";
-	this.HtmlElement.NameDiv.style.fontFamily          = '"Times New Roman", Times, serif';
-
-	this.HtmlElement.ScoresDiv.style.overflow            = "hidden";
-	this.HtmlElement.ScoresDiv.style.textOverflow        = "ellipsis";
-	this.HtmlElement.ScoresDiv.style['-o-text-overflow'] = "ellipsis";
-	this.HtmlElement.ScoresDiv.style.height              = 25 + "px";
-	this.HtmlElement.ScoresDiv.style.lineHeight          = 25 + "px";
-	this.HtmlElement.ScoresDiv.style.fontFamily          = '"Times New Roman", Times, serif';
 };
 CGoUniverseDrawingPlayerInfo.prototype.Update_Name = function(sName)
 {
@@ -452,16 +473,12 @@ CGoUniverseDrawingPlayerInfo.prototype.Update_Scores = function(dScores)
 };
 CGoUniverseDrawingPlayerInfo.prototype.private_Update = function()
 {
-	var oNameDiv   = this.HtmlElement.NameDiv;
-	var oScoresDiv = this.HtmlElement.ScoresDiv;
+	var oNameDiv   = this.m_oNameDiv;
+	var oScoresDiv = this.m_oScoresDiv;
 
 	var sNameText   = ("" === this.m_sName ? (BOARD_BLACK === this.m_nPlayer ? "Black " : "White ") : this.m_sName) + ("" === this.m_sRank ? "" : "[" + this.m_sRank +  "]");
-	var sScoresText = (true === this.m_bScores ? "Scores " : "Captured ") + this.m_dScores;
+	var sScoresText = this.m_dScores + (true === this.m_bScores ? " points" : " captures");
 
 	Common.Set_InnerTextToElement(oNameDiv, sNameText);
 	Common.Set_InnerTextToElement(oScoresDiv, sScoresText);
-
-	var Canvas = document.createElement("canvas").getContext("2d");
-	Canvas.font = "14pt Times New Roman";
-	this.m_dTextWidth = Canvas.measureText(sNameText).width;
 };

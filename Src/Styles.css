@@ -404,3 +404,9 @@ textarea.ChatInput {
 	resize          : none;
 	font-family     : 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif;
 }
+
+div.HorAlignCenter {
+	display: flex;           /* establish flex container */
+	flex-direction: column;  /* make main axis vertical */
+	align-items: center;     /* center items horizontally, in this case */
+}
