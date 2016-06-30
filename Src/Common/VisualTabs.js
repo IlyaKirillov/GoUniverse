@@ -233,7 +233,7 @@ CVisualGameRoomTab.prototype.InitMainRoom = function(nId, sMainDivId, sTabDivId)
 		oThis.OnClick();
 	});
 };
-CVisualGameRoomTab.prototype.InitGameRoom = function(nId, oGameTree, sDivIdContainer, bDemonstration, sWhiteAvatar, sBlackAvatar)
+CVisualGameRoomTab.prototype.InitGameRoom = function(nId, oGameTree, sDivIdContainer, bDemonstration, sWhiteAvatar, sBlackAvatar, oWhiteTime, oBlackTime)
 {
 	var oThis = this;
 
@@ -259,7 +259,7 @@ CVisualGameRoomTab.prototype.InitGameRoom = function(nId, oGameTree, sDivIdConta
 	if (null !== oGameTree)
 	{
 		var oDrawing = new CDrawing(oGameTree);
-		oDrawing.Create_GoUniverseViewerTemplate(sGameRoomDivId + "B", this.m_oApp, this, sWhiteAvatar, sBlackAvatar);
+		oDrawing.Create_GoUniverseViewerTemplate(sGameRoomDivId + "B", this.m_oApp, this, sWhiteAvatar, sBlackAvatar, oWhiteTime, oBlackTime);
 		//oDrawing.Create_MixedFullTemplate(sGameRoomDivId + "B");
 		oDrawing.Update_Size(true);
 	}

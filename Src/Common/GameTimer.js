@@ -49,7 +49,7 @@ CGoUniverseTime.prototype.private_Tick = function()
 
 	var nDiffTime = (nCurTime - this.m_nStartTime) / 1000;
 
-	this.m_nCurSeconds = (((this.m_nSeconds - nDiffTime) * 10) | 0) / 10;
+	this.m_nCurSeconds = this.m_nSeconds - nDiffTime;
 
 	if (this.m_nCurSeconds < 0.1)
 	{
@@ -67,7 +67,10 @@ CGoUniverseTime.prototype.Stop = function()
 
 	this.m_nTimerId = null;
 };
-
+CGoUniverseTime.prototype.IsTick = function()
+{
+	return (this.m_nTimerId === null ? false : true);
+};
 
 var ETimeSettings = {
 	None     : 0,
@@ -83,7 +86,8 @@ function CTimeSettings()
 	this.m_nOverTimeCur  = 0;
 	this.m_nOverCount    = 1;
 	this.m_nOverCountCur = 1;
-	this.m_oTimer        = new CGoUniverseTimer();
+	this.m_oTimer        = new CGoUniverseTime();
+	this.m_bEnd          = false;
 
 	this.m_fOnTick = null;
 
@@ -96,6 +100,14 @@ function CTimeSettings()
 		oThis.private_OnStopTimer();
 	});
 }
+CTimeSettings.prototype.SetOnTick = function(fOnTick)
+{
+	this.m_fOnTick = fOnTick;
+};
+CTimeSettings.prototype.SetOnStop = function(fOnStop)
+{
+	this.m_fOnStop = fOnStop;
+};
 CTimeSettings.prototype.SetNone = function()
 {
 	this.m_nType      = ETimeSettings.None;
@@ -106,22 +118,22 @@ CTimeSettings.prototype.SetNone = function()
 CTimeSettings.prototype.SetAbsolute = function(nTime)
 {
 	this.m_nType     = ETimeSettings.Absolute;
-	this.m_nMainTime = nTime;
+	this.m_nMainTime = nTime ? nTime : 0;
 };
 CTimeSettings.prototype.SetByoYomi = function(nMainTime, nByoyomiTime, nByoyomiCount)
 {
 	this.m_nType         = ETimeSettings.ByoYomi;
-	this.m_nMainTime     = nMainTime;
-	this.m_nOverTime     = nByoyomiTime;
-	this.m_nOverCount    = nByoyomiCount;
-	this.m_nOverCountCur = m_nOverCount;
+	this.m_nMainTime     = nMainTime ? nMainTime : 0;
+	this.m_nOverTime     = nByoyomiTime ? nByoyomiTime : 0;
+	this.m_nOverCount    = nByoyomiCount ? nByoyomiCount : 1;
+	this.m_nOverCountCur = this.m_nOverCount;
 };
 CTimeSettings.prototype.SetCanadian = function(nMainTime, nOverTime, nMovesCount)
 {
 	this.m_nType        = ETimeSettings.Canadian;
-	this.m_nMainTime    = nMainTime;
-	this.m_nOverTime    = nOverTime;
-	this.m_nOverCount   = nMovesCount;
+	this.m_nMainTime    = nMainTime ? nMainTime : 0;
+	this.m_nOverTime    = nOverTime ? nOverTime : 0;
+	this.m_nOverCount   = nMovesCount ? nMovesCount : 1;
 	this.m_nOverTimeCur = this.m_nOverTime;
 };
 CTimeSettings.prototype.CorrectMainTime = function(nTime)
@@ -133,8 +145,11 @@ CTimeSettings.prototype.CorrectOverTime = function(nOverTime, nOverCount)
 	this.m_nOverTimeCur  = nOverTime;
 	this.m_nOverCountCur = nOverCount;
 };
-CTimeSettings.Start = function()
+CTimeSettings.prototype.Start = function()
 {
+	if (true === this.m_bEnd || this.m_oTimer.IsTick())
+		return;
+
 	switch (this.m_nType)
 	{
 	case ETimeSettings.None:
@@ -157,11 +172,17 @@ CTimeSettings.Start = function()
 	}
 	}
 };
-CTimeSettings.prototype.Stop = function()
+CTimeSettings.prototype.Stop = function(bEnd)
 {
+	if (true === this.m_bEnd)
+		return;
+
 	this.m_oTimer.Stop();
+
+	if (true === bEnd)
+		this.m_bEnd = true;
 };
-CTimeSettings.private_OnTimerTick = function(nSecondsLeft)
+CTimeSettings.prototype.private_OnTickTimer = function(nSecondsLeft)
 {
 	switch (this.m_nType)
 	{
@@ -170,7 +191,7 @@ CTimeSettings.private_OnTimerTick = function(nSecondsLeft)
 		this.m_nMainTime = Math.max(0, nSecondsLeft);
 
 		if (this.m_fOnTick)
-			this.m_fOnTick(this.m_nMainTime);
+			this.m_fOnTick(this.private_SecondsToString(this.m_nMainTime) + " SD");
 
 		break;
 	}
@@ -181,12 +202,12 @@ CTimeSettings.private_OnTimerTick = function(nSecondsLeft)
 		{
 			this.m_nMainTime = Math.max(0, nSecondsLeft);
 			if (this.m_fOnTick)
-				this.m_fOnTick(this.m_nMainTime);
+				this.m_fOnTick(this.private_SecondsToString(this.m_nMainTime));
 		}
 		else
 		{
 			if (this.m_fOnTick)
-				this.m_fOnTick(nSecondsLeft + " (" + this.m_nOverCount + ")");
+				this.m_fOnTick(this.private_SecondsToString(nSecondsLeft) + " (" + this.m_nOverCountCur + ")");
 		}
 
 		break;
@@ -197,12 +218,12 @@ CTimeSettings.private_OnTimerTick = function(nSecondsLeft)
 		{
 			this.m_nMainTime = Math.max(0, nSecondsLeft);
 			if (this.m_fOnTick)
-				this.m_fOnTick(this.m_nMainTime);
+				this.m_fOnTick(this.private_SecondsToString(this.m_nMainTime));
 		}
 		else
 		{
 			if (this.m_fOnTick)
-				this.m_fOnTick(nSecondsLeft + "/" + this.m_nOverCount);
+				this.m_fOnTick(this.private_SecondsToString(nSecondsLeft) + "/" + this.m_nOverCountCur);
 		}
 		break;
 	}
@@ -263,4 +284,37 @@ CTimeSettings.prototype.private_OnStopTimer = function()
 		break;
 	}
 	}
+};
+CTimeSettings.prototype.IsAbsolute = function()
+{
+	return (this.m_nType === ETimeSettings.Absolute ? true : false);
+};
+CTimeSettings.prototype.IsByoYomi = function()
+{
+	return (this.m_nType === ETimeSettings.ByoYomi ? true : false);
+};
+CTimeSettings.prototype.IsCanadian = function()
+{
+	return (this.m_nType === ETimeSettings.Canadian ? true : false);
+};
+CTimeSettings.prototype.private_SecondsToString = function(_seconds)
+{
+	var nHours    = Math.floor(_seconds / 3600);
+	var nMinutes  = Math.floor((_seconds - (nHours * 3600)) / 60);
+	var nSeconds  = Math.floor(_seconds - (nHours * 3600) - (nMinutes * 60));
+	var nMSeconds = (_seconds - (nSeconds + (nHours * 3600) + (nMinutes * 60))) * 10 | 0;
+
+	var sHours    = "" + nHours;
+	var sMinutes  = (nHours > 0 && nMinutes < 10 ? "0" + nMinutes : "" + nMinutes);
+	var sSeconds  = ((nHours > 0 || nMinutes > 0) && nSeconds < 10 ? "0" + nSeconds : "" + nSeconds);
+	var sMSeconds = "" + nMSeconds;
+
+	//console.log(_seconds + "    " + nHours + ":" + nMinutes + ":" + nSeconds + ":" + nMSeconds );
+
+	if (nHours > 0)
+		return sHours + ':' + sMinutes + ':' + sSeconds + "." + sMSeconds;
+	else if (nMinutes > 0)
+		return sMinutes + ':' + sSeconds + "." + sMSeconds;
+	else
+		return sSeconds + "." + sMSeconds;
 };

@@ -44,71 +44,71 @@ CGoUniverseApplication.prototype.Init = function()
 	this.private_GotoLoginPage(false);
 	this.OnResize();
 
-	// TEST
-	this.m_oClient = new CKGSClient(this);
-	//this.OnConnect();
+	// // TEST
+	// this.m_oClient = new CKGSClient(this);
+	// //this.OnConnect();
+	// //
 	//
-
-	document.getElementById("divMainId").style.display = "block";
-	this.OnResize();
-
-	var nRoomId = 0;
-	var oThis = this;
-	function TEST_AddChatRoom()
-	{
-		oThis.AddChatRoom(nRoomId++, "Room " + nRoomId);
-	}
-
-	for (var nIndex = 0; nIndex < 100; nIndex++)
-	{
-		TEST_AddChatRoom();
-	}
-
-	this.AddGameRoom(1, new CGameTree());
-	// this.AddGameRoom(2, new CGameTree());
-	// this.AddGameRoom(3, new CGameTree());
-	// this.AddGameRoom(4, new CGameTree());
-
-	var nGameRoomId = 0;
-	function TEST_AddGameRoom()
-	{
-		oThis.AddGameRoom(nGameRoomId++, null);
-	}
-
-	for (var nIndex = 0; nIndex < 100; nIndex++)
-	{
-		TEST_AddGameRoom();
-	}
-
-	this.SetCurrentChatRoom(0);
-
-	function TEST_AddChatMessage(nIndex)
-	{
-		oThis.OnAddChatMessage(0, "Test", "Test message " + nIndex);
-	}
-
-	for (var nIndex = 0; nIndex < 100; nIndex++)
-	{
-		TEST_AddChatMessage(nIndex);
-	}
-
-	function TEST_AddGameRecord(nGameId)
-	{
-		oThis.m_oGamesListView.Handle_Record([0, nGameId, "R", 0, "", "White " + nGameId, 30, "", "Black", 25, "", 15, false, 15, false, false, false, "19x19"]);
-	}
-
-	for (var nIndex = 0; nIndex < 100; nIndex++)
-	{
-		TEST_AddGameRecord(nIndex);
-	}
-
-	this.m_oGamesListView.Update();
-	this.m_oGamesListView.Update_Size();
-
-
-	// this.m_oClient.private_HandleDetailsNonExistant({name : "WWWWWWWW"});
-	// this.m_oClient.private_HandlePrivateKeepOut({channelId : -1});
-	// this.m_oClient.private_HandleIdleWarning({});
+	// document.getElementById("divMainId").style.display = "block";
+	// this.OnResize();
+	//
+	// var nRoomId = 0;
+	// var oThis = this;
+	// function TEST_AddChatRoom()
+	// {
+	// 	oThis.AddChatRoom(nRoomId++, "Room " + nRoomId);
+	// }
+	//
+	// for (var nIndex = 0; nIndex < 100; nIndex++)
+	// {
+	// 	TEST_AddChatRoom();
+	// }
+	//
+	// this.AddGameRoom(1, new CGameTree());
+	// // this.AddGameRoom(2, new CGameTree());
+	// // this.AddGameRoom(3, new CGameTree());
+	// // this.AddGameRoom(4, new CGameTree());
+	//
+	// var nGameRoomId = 0;
+	// function TEST_AddGameRoom()
+	// {
+	// 	oThis.AddGameRoom(nGameRoomId++, null);
+	// }
+	//
+	// for (var nIndex = 0; nIndex < 100; nIndex++)
+	// {
+	// 	TEST_AddGameRoom();
+	// }
+	//
+	// this.SetCurrentChatRoom(0);
+	//
+	// function TEST_AddChatMessage(nIndex)
+	// {
+	// 	oThis.OnAddChatMessage(0, "Test", "Test message " + nIndex);
+	// }
+	//
+	// for (var nIndex = 0; nIndex < 100; nIndex++)
+	// {
+	// 	TEST_AddChatMessage(nIndex);
+	// }
+	//
+	// function TEST_AddGameRecord(nGameId)
+	// {
+	// 	oThis.m_oGamesListView.Handle_Record([0, nGameId, "R", 0, "", "White " + nGameId, 30, "", "Black", 25, "", 15, false, 15, false, false, false, "19x19"]);
+	// }
+	//
+	// for (var nIndex = 0; nIndex < 100; nIndex++)
+	// {
+	// 	TEST_AddGameRecord(nIndex);
+	// }
+	//
+	// this.m_oGamesListView.Update();
+	// this.m_oGamesListView.Update_Size();
+	//
+	//
+	// // this.m_oClient.private_HandleDetailsNonExistant({name : "WWWWWWWW"});
+	// // this.m_oClient.private_HandlePrivateKeepOut({channelId : -1});
+	// // this.m_oClient.private_HandleIdleWarning({});
 
 
 
@@ -413,10 +413,10 @@ CGoUniverseApplication.prototype.OnAddChatMessage = function(nChatRoomId, sUserN
 	if (null !== sUserName && sUserName !== this.m_oClient.GetUserName() && oTab && oTab.IsSoundOn() && (nChatRoomId !== this.m_oChatRoomTabs.GetCurrentId() || -1 !== this.m_oGameRoomTabs.GetCurrentId() || false === this.IsFocused()))
 		this.private_AddNotification(sUserName);
 };
-CGoUniverseApplication.prototype.AddGameRoom = function(nGameRoomId, oGameTree, bDemonstration, sWhiteAvatar, sBlackAvatar)
+CGoUniverseApplication.prototype.AddGameRoom = function(nGameRoomId, oGameTree, bDemonstration, sWhiteAvatar, sBlackAvatar, oWhiteTime, oBlackTime)
 {
 	var oTab = new CVisualGameRoomTab(this);
-	var oGameRoomControl = oTab.InitGameRoom(nGameRoomId, oGameTree, "divMainId", bDemonstration, sWhiteAvatar, sBlackAvatar);
+	var oGameRoomControl = oTab.InitGameRoom(nGameRoomId, oGameTree, "divMainId", bDemonstration, sWhiteAvatar, sBlackAvatar, oWhiteTime, oBlackTime);
 	this.m_oGameRoomTabs.AddTab(oTab);
 
 	oGameRoomControl.Bounds.SetParams(0, 50, 1000, 1000, false, true, false, false, -1, -1);

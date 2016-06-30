@@ -12,12 +12,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Дополнение к классу CDrawing
 //----------------------------------------------------------------------------------------------------------------------
-CDrawing.prototype.Create_GoUniverseViewerTemplate = function(sDivId, oApp, oTab, sWhiteAvatar, sBlackAvatar)
+CDrawing.prototype.Create_GoUniverseViewerTemplate = function(sDivId, oApp, oTab, sWhiteAvatar, sBlackAvatar, oWhiteTime, oBlackTime)
 {
 	this.m_oGoUniverseApp = oApp;
 	this.m_oVisualTab     = oTab;
 	this.m_sBlackAvatar   = sBlackAvatar;
 	this.m_sWhiteAvatar   = sWhiteAvatar;
+	this.m_oBlackTime     = oBlackTime;
+	this.m_oWhiteTime     = oWhiteTime;
 
 	this.private_CreateWrappingMainDiv(sDivId);
 	this.private_GoUniverseCreateHorFullTemplate();
@@ -116,9 +118,9 @@ CDrawing.prototype.private_GoUniverseCreateHorFullTemplate = function()
 	oInfoControl.AddControl(oInfoBlackControl);
 
 	var oDrawingWhiteInfo = new CGoUniverseDrawingPlayerInfo(this);
-	oDrawingWhiteInfo.Init(sWhiteInfo, oGameTree, BOARD_WHITE, this.m_sWhiteAvatar);
+	oDrawingWhiteInfo.Init(sWhiteInfo, oGameTree, BOARD_WHITE, this.m_sWhiteAvatar, this.m_oWhiteTime);
 	var oDrawingBlackInfo = new CGoUniverseDrawingPlayerInfo(this);
-	oDrawingBlackInfo.Init(sBlackInfo, oGameTree, BOARD_BLACK, this.m_sBlackAvatar);
+	oDrawingBlackInfo.Init(sBlackInfo, oGameTree, BOARD_BLACK, this.m_sBlackAvatar, this.m_oBlackTime);
 
 	this.m_aElements.push(oDrawingBlackInfo);
 	this.m_aElements.push(oDrawingWhiteInfo);
@@ -340,7 +342,7 @@ function CGoUniverseDrawingPlayerInfo(oDrawing)
 	this.m_dScores = 0;
 	this.m_bScores = false;
 }
-CGoUniverseDrawingPlayerInfo.prototype.Init = function(sDivId, oGameTree, nPlayer, sAvatarSrc)
+CGoUniverseDrawingPlayerInfo.prototype.Init = function(sDivId, oGameTree, nPlayer, sAvatarSrc, oTimeSettings)
 {
 	this.m_nPlayer   = nPlayer;
 	this.m_oGameTree = oGameTree;
@@ -451,76 +453,20 @@ CGoUniverseDrawingPlayerInfo.prototype.Init = function(sDivId, oGameTree, nPlaye
 
 	oTimeDiv.style["float"] = "left";
 	oTimeDiv.style.fontSize = "12pt";
-	oTimeDiv.innerHTML      = "00:15:00";
+	oTimeDiv.innerHTML      = "00:00";
 
-	function CGoUniverseTime()
+	if (oTimeSettings)
 	{
-		this.m_nHours   = 0;
-		this.m_nMinutes = 0;
-		this.m_nSeconds = 0;
+		if (oTimeSettings.IsAbsolute())
+		{
+			Common.Set_InnerTextToElement(oTimeDiv, "--:--");
+		}
 
-		this.m_nCurHours   = 0;
-		this.m_nCurMinutes = 0;
-		this.m_nCurSeconds = 0;
-
-		this.m_nStartTime = 0;
-		this.m_nTimerId   = null;
-
-		this.m_fHandler   = null;
+		oTimeSettings.SetOnTick(function(sTime)
+		{
+			Common.Set_InnerTextToElement(oTimeDiv, sTime);
+		});
 	}
-	CGoUniverseTime.prototype.SetHandler = function(fHandler)
-	{
-		this.m_fHandler = fHandler;
-	};
-	CGoUniverseTime.prototype.Start = function(h, m, s)
-	{
-		this.m_nHours   = h;
-		this.m_nMinutes = m;
-		this.m_nSeconds = s;
-
-		if (null !== this.m_nTimerId)
-			clearTimeout(this.m_nTimerId);
-
-		this.m_nStartTime = new Date().getTime();
-
-		var oThis = this;
-		this.m_nTimerId = setTimeout(function(){oThis.private_Tick();}, 50);
-	};
-	CGoUniverseTime.prototype.private_Tick = function()
-	{
-		if (null === this.m_nTimerId)
-			return;
-
-		var oThis = this;
-		this.m_nTimerId = setTimeout(function(){oThis.private_Tick();}, 50);
-
-		var nCurTime = new Date().getTime();
-
-		var nDiffTime = (nCurTime - this.m_nStartTime) / 1000;
-
-		this.m_nCurSeconds = (((this.m_nSeconds - nDiffTime) * 10) | 0) / 10;
-
-
-		if (this.m_fHandler)
-			this.m_fHandler(this.m_nCurHours, this.m_nCurMinutes, this.m_nCurSeconds);
-	};
-	CGoUniverseTime.prototype.Stop = function()
-	{
-		if (null !== this.m_nTimerId)
-			clearTimeout(this.m_nTimerId);
-
-		this.m_nTimerId = null;
-	};
-
-	var oTimer = new CGoUniverseTime();
-	oTimer.SetHandler(function(h, m, s)
-	{
-		oTimeDiv.innerHTML = h + ":" + m + ":" + s;
-
-		if (s <= 0)
-			oTimer.Stop();
-	});
-	oTimer.Start(0, 0, 20);
 
 	if (this.m_oDrawing)
 	{

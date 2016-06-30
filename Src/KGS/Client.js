@@ -849,7 +849,9 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 		GameRoomId : GameRoomId,
 		GameTree   : null,
 		Nodes      : {},
-		CurNode    : null
+		CurNode    : null,
+		BlackTime  : new CTimeSettings(),
+		WhiteTime  : new CTimeSettings()
 	};
 
 	this.m_aGames[GameRoomId] = oGame;
@@ -912,7 +914,7 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 		}
 	}
 
-	this.m_oApp.AddGameRoom(GameRoomId, oGameTree, bDemo, sWhiteAvatar, sBlackAvatar);
+	this.m_oApp.AddGameRoom(GameRoomId, oGameTree, bDemo, sWhiteAvatar, sBlackAvatar, oGame.WhiteTime, oGame.BlackTime);
 	this.m_oApp.SetCurrentGameRoomTab(GameRoomId);
 
 
@@ -921,6 +923,18 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 	var oCurNode = this.private_ReadSgfEvents(oGame, oMessage.sgfEvents);
 	if (!oCurNode)
 		oCurNode = oGameTree.Get_FirstNode();
+
+	var nNextMove = oGameTree.Get_NextMove();
+	if (BOARD_BLACK === nNextMove)
+	{
+		oGame.BlackTime.Start();
+		oGame.WhiteTime.Stop();
+	}
+	else if (BOARD_WHITE === nNextMove)
+	{
+		oGame.BlackTime.Stop();
+		oGame.WhiteTime.Start();
+	}
 
 	oGameTree.GoTo_Node(oCurNode);
 	oGame.CurNode  = oCurNode;
@@ -962,6 +976,19 @@ CKGSClient.prototype.private_HandleGameUpdate = function(oMessage)
 		if (bGoToNode)
 			oGameTree.Execute_CurNodeCommands();
 	}
+
+	var nNextMove = oGameTree.Get_NextMove();
+	if (BOARD_BLACK === nNextMove)
+	{
+		oGame.BlackTime.Start();
+		oGame.WhiteTime.Stop();
+	}
+	else if (BOARD_WHITE === nNextMove)
+	{
+		oGame.BlackTime.Stop();
+		oGame.WhiteTime.Start();
+	}
+
 
 	if (oGameTree.m_oDrawingNavigator)
 	{
@@ -1518,21 +1545,24 @@ CKGSClient.prototype.private_ReadSgfEvents = function(oGame, arrSgfEvents)
 				oGameTree.Set_Handicap(oProp.handicap);
 
 			if (oProp.timeSystem)
-				console.log("timeSystem" + oProp.timeSystem);
-
-			if (oProp.mainTime)
-				console.log("mainTime " + oProp.mainTime);
-
-			if (oProp.byoYomiTime)
-				console.log("byoYomiTime " + oProp.byoYomiTime);
-
-			if (oProp.byoYomiPeriods)
-				console.log("byoYomiPeriods " + oProp.byoYomiPeriods);
-
-			if (oProp.byoYomiStones)
-				console.log("byoYomiStones " + oProp.byoYomiStones);
-
-			// TODO: РЕализовать TimeSystem
+			{
+				var sTimeType = oProp.timeSystem;
+				if ("absolute" === sTimeType)
+				{
+					oGame.BlackTime.SetAbsolute(oProp.mainTime);
+					oGame.WhiteTime.SetAbsolute(oProp.mainTime);
+				}
+				else if ("byo_yomi" === sTimeType)
+				{
+					oGame.BlackTime.SetByoYomi(oProp.mainTime, oProp.byoYomiTime, oProp.byoYomiPeriods);
+					oGame.WhiteTime.SetByoYomi(oProp.mainTime, oProp.byoYomiTime, oProp.byoYomiPeriods);
+				}
+				else if ("canadian" === sTimeType)
+				{
+					oGame.BlackTime.SetByoYomi(oProp.mainTime, oProp.byoYomiTime, oProp.byoYomiStones);
+					oGame.WhiteTime.SetByoYomi(oProp.mainTime, oProp.byoYomiTime, oProp.byoYomiStones);
+				}
+			}
 		}
 		else if ("PLAYERNAME" === oProp.name)
 		{
@@ -1570,8 +1600,23 @@ CKGSClient.prototype.private_ReadSgfEvents = function(oGame, arrSgfEvents)
 		}
 		else if ("TIMELEFT" === oProp.name)
 		{
-			console.log(oProp);
-			// TODO: Реализовать TimeSystem
+			var oTime = null;
+			if ("black" === oProp.color)
+				oTime = oGame.BlackTime;
+			else if ("white" === oProp.color)
+				oTime = oGame.WhiteTime;
+
+			if (oTime.IsAbsolute())
+			{
+				oTime.CorrectMainTime(oProp.float);
+			}
+			else if (oTime.IsByoYomi() || oTime.IsCanadian())
+			{
+				if (0 === oProp.int)
+					oTime.CorrectMainTime(oProp.float);
+				else
+					oTime.CorrectOverTime(oProp.float, oProp.int);
+			}
 		}
 		else if ("TRIANGLE" === oProp.name)
 		{
