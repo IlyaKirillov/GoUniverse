@@ -222,6 +222,7 @@ CTimeSettings.prototype.private_OnTickTimer = function(nSecondsLeft)
 		}
 		else
 		{
+			this.m_nOverTimeCur = Math.max(0, nSecondsLeft);
 			if (this.m_fOnTick)
 				this.m_fOnTick(this.private_SecondsToString(nSecondsLeft) + "/" + this.m_nOverCountCur);
 		}
@@ -285,6 +286,10 @@ CTimeSettings.prototype.private_OnStopTimer = function()
 	}
 	}
 };
+CTimeSettings.prototype.IsNone = function()
+{
+	return (this.m_nType === ETimeSettings.None ? true : false);
+};
 CTimeSettings.prototype.IsAbsolute = function()
 {
 	return (this.m_nType === ETimeSettings.Absolute ? true : false);
@@ -309,7 +314,7 @@ CTimeSettings.prototype.private_SecondsToString = function(_seconds)
 	var sSeconds  = ((nHours > 0 || nMinutes > 0) && nSeconds < 10 ? "0" + nSeconds : "" + nSeconds);
 	var sMSeconds = "" + nMSeconds;
 
-	//console.log(_seconds + "    " + nHours + ":" + nMinutes + ":" + nSeconds + ":" + nMSeconds );
+	console.log(_seconds + "    " + nHours + ":" + nMinutes + ":" + nSeconds + ":" + nMSeconds );
 
 	if (nHours > 0)
 		return sHours + ':' + sMinutes + ':' + sSeconds + "." + sMSeconds;
@@ -317,4 +322,47 @@ CTimeSettings.prototype.private_SecondsToString = function(_seconds)
 		return sMinutes + ':' + sSeconds + "." + sMSeconds;
 	else
 		return sSeconds + "." + sMSeconds;
+};
+CTimeSettings.prototype.ToString = function()
+{
+	switch (this.m_nType)
+	{
+	case ETimeSettings.None:
+	{
+		return "--:--";
+		break;
+	}
+	case ETimeSettings.Absolute:
+	{
+		return (this.private_SecondsToString(this.m_nMainTime) + " SD");
+		break;
+	}
+	case ETimeSettings.ByoYomi:
+	{
+		if (this.m_nMainTime > 0)
+		{
+			return this.private_SecondsToString(this.m_nMainTime);
+		}
+		else
+		{
+			return (this.private_SecondsToString(this.m_nOverTimeCur) + " (" + this.m_nOverCountCur + ")");
+		}
+
+		break;
+	}
+	case ETimeSettings.Canadian:
+	{
+		if (this.m_nMainTime > 0)
+		{
+			return this.private_SecondsToString(this.m_nMainTime);
+		}
+		else
+		{
+			return (this.private_SecondsToString(this.m_nOverTimeCur) + "/" + this.m_nOverCountCur);
+		}
+		break;
+	}
+	}
+
+	return "--:--";
 };

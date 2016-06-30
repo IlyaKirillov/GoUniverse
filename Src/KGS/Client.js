@@ -64,7 +64,11 @@ CKGSClient.prototype.EnterToGameRoom = function(nGameRoomId)
 CKGSClient.prototype.LeaveGameRoom = function(nGameRoomId)
 {
 	if (this.m_aGames[nGameRoomId])
+	{
+		this.m_aGames[nGameRoomId].BlackTime.Stop(true);
+		this.m_aGames[nGameRoomId].WhiteTime.Stop(true);
 		delete this.m_aGames[nGameRoomId];
+	}
 
 	this.private_SendMessage({
 		"type"      : "UNJOIN_REQUEST",
@@ -851,7 +855,8 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 		Nodes      : {},
 		CurNode    : null,
 		BlackTime  : new CTimeSettings(),
-		WhiteTime  : new CTimeSettings()
+		WhiteTime  : new CTimeSettings(),
+		Demo       : false
 	};
 
 	this.m_aGames[GameRoomId] = oGame;
@@ -914,26 +919,44 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 		}
 	}
 
-	this.m_oApp.AddGameRoom(GameRoomId, oGameTree, bDemo, sWhiteAvatar, sBlackAvatar, oGame.WhiteTime, oGame.BlackTime);
-	this.m_oApp.SetCurrentGameRoomTab(GameRoomId);
-
-
 	oGame.GameTree = oGameTree;
 
 	var oCurNode = this.private_ReadSgfEvents(oGame, oMessage.sgfEvents);
 	if (!oCurNode)
 		oCurNode = oGameTree.Get_FirstNode();
 
-	var nNextMove = oGameTree.Get_NextMove();
-	if (BOARD_BLACK === nNextMove)
+	oGame.Demo = bDemo;
+	this.m_oApp.AddGameRoom(GameRoomId, oGameTree, bDemo, sWhiteAvatar, sBlackAvatar, oGame.WhiteTime, oGame.BlackTime);
+	this.m_oApp.SetCurrentGameRoomTab(GameRoomId);
+
+	if (true !== bDemo)
 	{
-		oGame.BlackTime.Start();
-		oGame.WhiteTime.Stop();
+		if (oMessage.clocks)
+		{
+
+
+
+
+		}
+		else
+		{
+			var nNextMove = oGameTree.Get_NextMove();
+			if (BOARD_BLACK === nNextMove)
+			{
+				oGame.BlackTime.Start();
+				oGame.WhiteTime.Stop();
+			}
+			else if (BOARD_WHITE === nNextMove)
+			{
+				oGame.BlackTime.Stop();
+				oGame.WhiteTime.Start();
+			}
+		}
 	}
-	else if (BOARD_WHITE === nNextMove)
+	else
 	{
 		oGame.BlackTime.Stop();
-		oGame.WhiteTime.Start();
+		oGame.WhiteTime.Stop();
 	}
 
 	oGameTree.GoTo_Node(oCurNode);
@@ -977,16 +1000,19 @@ CKGSClient.prototype.private_HandleGameUpdate = function(oMessage)
 			oGameTree.Execute_CurNodeCommands();
 	}
 
-	var nNextMove = oGameTree.Get_NextMove();
-	if (BOARD_BLACK === nNextMove)
+	if (true !== oGame.Demo)
 	{
-		oGame.BlackTime.Start();
-		oGame.WhiteTime.Stop();
-	}
-	else if (BOARD_WHITE === nNextMove)
-	{
-		oGame.BlackTime.Stop();
-		oGame.WhiteTime.Start();
+		var nNextMove = oGameTree.Get_NextMove();
+		if (BOARD_BLACK === nNextMove)
+		{
+			oGame.BlackTime.Start();
+			oGame.WhiteTime.Stop();
+		}
+		else if (BOARD_WHITE === nNextMove)
+		{
+			oGame.BlackTime.Stop();
+			oGame.WhiteTime.Start();
+		}
 	}
 
 
@@ -1349,6 +1375,9 @@ CKGSClient.prototype.private_HandleGameReview = function(oMessage)
 	var nNewChannelId = oMessage.review.channelId;
 	var oGameTree = oGame.GameTree;
 	oGame.GameRoomId = nNewChannelId;
+	oGame.Demo       = true;
+	oGame.BlackTime.Stop();
+	oGame.WhiteTime.Stop();
 
 	if (oMessage.review.players.owner)
 	{
@@ -1559,8 +1588,8 @@ CKGSClient.prototype.private_ReadSgfEvents = function(oGame, arrSgfEvents)
 				}
 				else if ("canadian" === sTimeType)
 				{
-					oGame.BlackTime.SetByoYomi(oProp.mainTime, oProp.byoYomiTime, oProp.byoYomiStones);
-					oGame.WhiteTime.SetByoYomi(oProp.mainTime, oProp.byoYomiTime, oProp.byoYomiStones);
+					oGame.BlackTime.SetCanadian(oProp.mainTime, oProp.byoYomiTime, oProp.byoYomiStones);
+					oGame.WhiteTime.SetCanadian(oProp.mainTime, oProp.byoYomiTime, oProp.byoYomiStones);
 				}
 			}
 		}

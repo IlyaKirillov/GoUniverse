@@ -453,14 +453,11 @@ CGoUniverseDrawingPlayerInfo.prototype.Init = function(sDivId, oGameTree, nPlaye
 
 	oTimeDiv.style["float"] = "left";
 	oTimeDiv.style.fontSize = "12pt";
-	oTimeDiv.innerHTML      = "00:00";
+	oTimeDiv.innerHTML      = "--:--";
 
 	if (oTimeSettings)
 	{
-		if (oTimeSettings.IsAbsolute())
-		{
-			Common.Set_InnerTextToElement(oTimeDiv, "--:--");
-		}
+		Common.Set_InnerTextToElement(oTimeDiv, oTimeSettings.ToString());
 
 		oTimeSettings.SetOnTick(function(sTime)
 		{
