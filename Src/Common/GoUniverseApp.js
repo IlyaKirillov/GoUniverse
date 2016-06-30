@@ -1112,3 +1112,8 @@ CGoUniverseApplication.prototype.UpdateDropDownGameTabsButton = function()
 		document.getElementById("divIdGameTabsToggle").style.display = "none";
 	}
 };
+CGoUniverseApplication.prototype.ScrollChatAreaToBottom = function()
+{
+	var oDiv = document.getElementById("textareaChatId");
+	oDiv.scrollTop = oDiv.scrollHeight;
+};

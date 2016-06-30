@@ -1191,7 +1191,8 @@ CKGSClient.prototype.private_HandleLoginFailedNoSuchUser = function(oMessage)
 CKGSClient.prototype.private_HandleConvoJoin = function(oMessage)
 {
 	var nChannelId = oMessage.channelId;
-	var sUserName  = oMessage.user.name;
+	var oUser = this.private_HandleUserRecord(oMessage.user, true);
+	var sUserName  = oUser.GetName();
 
 	this.m_oPrivateChats[nChannelId] = {
 		ChannelId       : nChannelId,
@@ -1202,10 +1203,17 @@ CKGSClient.prototype.private_HandleConvoJoin = function(oMessage)
 
 	this.m_oPrivateChatsByUserName[sUserName] = this.m_oPrivateChats[nChannelId];
 
-	this.private_AddUserToRoom(this.private_GetCurrentUser(), this.m_oPrivateChats[nChannelId]);
-	this.private_AddUserToRoom(this.private_HandleUserRecord(oMessage.user, true), this.m_oPrivateChats[nChannelId]);
+
+
 
 	this.m_oApp.AddChatRoom(nChannelId, sUserName, true);
+
+	this.private_AddUserToRoom(this.private_GetCurrentUser(), this.m_oPrivateChats[nChannelId]);
+
+	if (oUser.IsOnline())
+		this.private_AddUserToRoom(oUser, this.m_oPrivateChats[nChannelId]);
+	else
+		this.m_oApp.OnAddChatMessage(nChannelId, null, sUserName + " is offline");
 
 	if (true !== this.m_oApp.IsTypingChatMessage())
 	{

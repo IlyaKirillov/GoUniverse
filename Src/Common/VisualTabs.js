@@ -260,7 +260,6 @@ CVisualGameRoomTab.prototype.InitGameRoom = function(nId, oGameTree, sDivIdConta
 	{
 		var oDrawing = new CDrawing(oGameTree);
 		oDrawing.Create_GoUniverseViewerTemplate(sGameRoomDivId + "B", this.m_oApp, this, sWhiteAvatar, sBlackAvatar, oWhiteTime, oBlackTime);
-		//oDrawing.Create_MixedFullTemplate(sGameRoomDivId + "B");
 		oDrawing.Update_Size(true);
 	}
 
@@ -428,6 +427,7 @@ CVisualGameRoomTab.prototype.OnClick = function()
 		this.m_oApp.UpdateDropDownChatTabsButton();
 		this.m_oApp.ScrollChatTabsToCurrent();
 		this.m_oApp.UpdateChatScroll();
+		this.m_oApp.ScrollChatAreaToBottom();
 	}
 
 	this.m_oApp.private_CollapseGameTabs();
