@@ -1432,15 +1432,13 @@ CKGSClient.prototype.private_HandleGameClocks = function(oGame, oClocks)
 			oGame.BlackTime.CorrectMainTime(oClock.time);
 		}
 
-		if (true === oClock.running)
+		if (true === oClock.running && true !== oClock.paused)
 		{
 			oGame.BlackTime.Start();
-			oGame.WhiteTime.Stop();
 		}
-		else if (true === oClock.paused)
+		else
 		{
 			oGame.BlackTime.Stop();
-			oGame.WhiteTime.Stop();
 		}
 	}
 
@@ -1476,14 +1474,12 @@ CKGSClient.prototype.private_HandleGameClocks = function(oGame, oClocks)
 			oGame.WhiteTime.CorrectMainTime(oClock.time);
 		}
 
-		if (true === oClock.running)
+		if (true === oClock.running && true !== oClock.paused)
 		{
 			oGame.WhiteTime.Start();
-			oGame.BlackTime.Stop();
 		}
-		else if (true === oClock.paused)
+		else
 		{
-			oGame.BlackTime.Stop();
 			oGame.WhiteTime.Stop();
 		}
 	}
@@ -1715,23 +1711,7 @@ CKGSClient.prototype.private_ReadSgfEvents = function(oGame, arrSgfEvents)
 		}
 		else if ("TIMELEFT" === oProp.name)
 		{
-			// var oTime = null;
-			// if ("black" === oProp.color)
-			// 	oTime = oGame.BlackTime;
-			// else if ("white" === oProp.color)
-			// 	oTime = oGame.WhiteTime;
-			//
-			// if (oTime.IsAbsolute())
-			// {
-			// 	oTime.CorrectMainTime(oProp.float);
-			// }
-			// else if (oTime.IsByoYomi() || oTime.IsCanadian())
-			// {
-			// 	if (0 === oProp.int)
-			// 		oTime.CorrectMainTime(oProp.float);
-			// 	else
-			// 		oTime.CorrectOverTime(oProp.float, oProp.int);
-			// }
+			// В GameTree информацию не пишем.
 		}
 		else if ("TRIANGLE" === oProp.name)
 		{

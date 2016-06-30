@@ -126,15 +126,17 @@ CTimeSettings.prototype.SetByoYomi = function(nMainTime, nByoyomiTime, nByoyomiC
 	this.m_nMainTime     = nMainTime ? nMainTime : 0;
 	this.m_nOverTime     = nByoyomiTime ? nByoyomiTime : 0;
 	this.m_nOverCount    = nByoyomiCount ? nByoyomiCount : 1;
+	this.m_nOverTimeCur  = this.m_nOverTime
 	this.m_nOverCountCur = this.m_nOverCount;
 };
 CTimeSettings.prototype.SetCanadian = function(nMainTime, nOverTime, nMovesCount)
 {
-	this.m_nType        = ETimeSettings.Canadian;
-	this.m_nMainTime    = nMainTime ? nMainTime : 0;
-	this.m_nOverTime    = nOverTime ? nOverTime : 0;
-	this.m_nOverCount   = nMovesCount ? nMovesCount : 1;
-	this.m_nOverTimeCur = this.m_nOverTime;
+	this.m_nType         = ETimeSettings.Canadian;
+	this.m_nMainTime     = nMainTime ? nMainTime : 0;
+	this.m_nOverTime     = nOverTime ? nOverTime : 0;
+	this.m_nOverCount    = nMovesCount ? nMovesCount : 1;
+	this.m_nOverTimeCur  = this.m_nOverTime
+	this.m_nOverCountCur = this.m_nOverCount;
 };
 CTimeSettings.prototype.CorrectMainTime = function(nTime)
 {
@@ -149,6 +151,9 @@ CTimeSettings.prototype.Start = function()
 {
 	if (true === this.m_bEnd || this.m_oTimer.IsTick())
 		return;
+
+	if (this.m_fOnTick)
+		this.m_fOnTick(this.ToString());
 
 	switch (this.m_nType)
 	{
@@ -168,7 +173,7 @@ CTimeSettings.prototype.Start = function()
 			this.m_oTimer.Start(this.m_nMainTime);
 		else
 			this.m_oTimer.Start(this.m_nOverTimeCur);
-
+		break;
 	}
 	}
 };
@@ -176,6 +181,9 @@ CTimeSettings.prototype.Stop = function(bEnd)
 {
 	if (true === this.m_bEnd)
 		return;
+
+	if (this.m_fOnTick)
+		this.m_fOnTick(this.ToString());
 
 	this.m_oTimer.Stop();
 
