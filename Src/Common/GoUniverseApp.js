@@ -44,7 +44,7 @@ CGoUniverseApplication.prototype.Init = function()
 	this.private_GotoLoginPage(false);
 	this.OnResize();
 
-	// // TEST
+	// TEST
 	// this.m_oClient = new CKGSClient(this);
 	// //this.OnConnect();
 	// //
@@ -779,7 +779,12 @@ CGoUniverseApplication.prototype.private_InitExitButton = function()
 	{
 		if (oThis.m_oClient)
 		{
+			// Logout придет из клиента, нельзя самому это делать, т.к. клиенту еще могут приходить сообщения, до
+			// настоящего logout.
 			oThis.m_oClient.Disconnect();
+		}
+		else
+		{
 			oThis.Logout();
 		}
 	});
@@ -807,7 +812,11 @@ CGoUniverseApplication.prototype.private_InitOmnibox = function()
 };
 CGoUniverseApplication.prototype.private_ClearClient = function()
 {
-	this.m_oClient = null;
+	if (null !== this.m_oClient)
+	{
+		this.m_oClient.Clear();
+		this.m_oClient = null;
+	}
 
 	this.m_oGamesListView.Clear();
 	this.m_oPlayersListView.Clear();

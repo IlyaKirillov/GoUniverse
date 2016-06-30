@@ -314,8 +314,6 @@ CTimeSettings.prototype.private_SecondsToString = function(_seconds)
 	var sSeconds  = ((nHours > 0 || nMinutes > 0) && nSeconds < 10 ? "0" + nSeconds : "" + nSeconds);
 	var sMSeconds = "" + nMSeconds;
 
-	console.log(_seconds + "    " + nHours + ":" + nMinutes + ":" + nSeconds + ":" + nMSeconds );
-
 	if (nHours > 0)
 		return sHours + ':' + sMinutes + ':' + sSeconds + "." + sMSeconds;
 	else if (nMinutes > 0)

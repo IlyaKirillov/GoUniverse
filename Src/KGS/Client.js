@@ -31,6 +31,31 @@ function CKGSClient(oApp)
 	this.m_oPlayersListView = oApp.GetPlayersListView();
 	this.m_oGamesListView   = oApp.GetGamesListView();
 }
+CKGSClient.prototype.Clear = function()
+{
+	for (var nChannelId in this.m_aGames)
+	{
+		var oGame = this.m_aGames[nChannelId];
+		oGame.BlackTime.Stop();
+		oGame.WhiteTime.Stop();
+	}
+
+	this.m_bLoggedIn      = false;
+	this.m_aGames         = {};
+	this.m_oFriendList    = [];
+	this.m_oBlackList     = {};
+	this.m_oFollowerList  = {};
+	this.m_aRooms         = {};
+	this.m_nChatChannelId = -1;
+	this.m_aAllRooms      = {};
+	this.m_oAllUsers      = {};
+	this.m_oRoomCategory  = {};
+	this.m_oUserInfo      = {};
+	this.m_oCurrentUser   = new CKGSUser(this);
+
+	this.m_oPrivateChats           = {};
+	this.m_oPrivateChatsByUserName = {};
+};
 CKGSClient.prototype.GetUserName = function()
 {
 	return this.m_oCurrentUser.GetName();
@@ -925,39 +950,20 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 	if (!oCurNode)
 		oCurNode = oGameTree.Get_FirstNode();
 
-	oGame.Demo = bDemo;
-	this.m_oApp.AddGameRoom(GameRoomId, oGameTree, bDemo, sWhiteAvatar, sBlackAvatar, oGame.WhiteTime, oGame.BlackTime);
-	this.m_oApp.SetCurrentGameRoomTab(GameRoomId);
-
-	if (true !== bDemo)
+	if (oMessage.clocks)
 	{
-		if (oMessage.clocks)
-		{
-
-
-
-
-		}
-		else
-		{
-			var nNextMove = oGameTree.Get_NextMove();
-			if (BOARD_BLACK === nNextMove)
-			{
-				oGame.BlackTime.Start();
-				oGame.WhiteTime.Stop();
-			}
-			else if (BOARD_WHITE === nNextMove)
-			{
-				oGame.BlackTime.Stop();
-				oGame.WhiteTime.Start();
-			}
-		}
+		this.private_HandleGameClocks(oGame, oMessage.clocks);
 	}
 	else
 	{
 		oGame.BlackTime.Stop();
 		oGame.WhiteTime.Stop();
 	}
+
+	oGame.Demo = bDemo;
+	this.m_oApp.AddGameRoom(GameRoomId, oGameTree, bDemo, sWhiteAvatar, sBlackAvatar, oGame.WhiteTime, oGame.BlackTime);
+	this.m_oApp.SetCurrentGameRoomTab(GameRoomId);
+
 
 	oGameTree.GoTo_Node(oCurNode);
 	oGame.CurNode  = oCurNode;
@@ -999,22 +1005,6 @@ CKGSClient.prototype.private_HandleGameUpdate = function(oMessage)
 		if (bGoToNode)
 			oGameTree.Execute_CurNodeCommands();
 	}
-
-	if (true !== oGame.Demo)
-	{
-		var nNextMove = oGameTree.Get_NextMove();
-		if (BOARD_BLACK === nNextMove)
-		{
-			oGame.BlackTime.Start();
-			oGame.WhiteTime.Stop();
-		}
-		else if (BOARD_WHITE === nNextMove)
-		{
-			oGame.BlackTime.Stop();
-			oGame.WhiteTime.Start();
-		}
-	}
-
 
 	if (oGameTree.m_oDrawingNavigator)
 	{
@@ -1242,7 +1232,13 @@ CKGSClient.prototype.private_HandleArchiveJoin = function(oMessage)
 };
 CKGSClient.prototype.private_HandleGameState = function(oMessage)
 {
-	// TODO: GAME_STATE
+	var nChannelId = oMessage.channelId;
+	var oGame = this.m_aGames[nChannelId];
+	if (!oGame)
+		return;
+
+	if (oMessage.clocks)
+		this.private_HandleGameClocks(oGame, oMessage.clocks);
 };
 CKGSClient.prototype.private_HandleFriendAddSuccess = function(oMessage)
 {
@@ -1401,6 +1397,96 @@ CKGSClient.prototype.private_HandleClose = function(oMessage)
 CKGSClient.prototype.private_AddUserToRoom = function(oUser, oRoom)
 {
 	oRoom.Users[oUser.GetName()] = oUser;
+};
+CKGSClient.prototype.private_HandleGameClocks = function(oGame, oClocks)
+{
+	if (oClocks.black)
+	{
+		var oClock = oClocks.black;
+		if (undefined !== oClock.periodsLeft)
+		{
+			if (0 === oClock.periodsLeft)
+			{
+				oGame.BlackTime.CorrectMainTime(oClock.time);
+			}
+			else
+			{
+				oGame.BlackTime.CorrectMainTime(0);
+				oGame.BlackTime.CorrectOverTime(oClock.time, oClock.periodsLeft);
+			}
+		}
+		else if (undefined !== oClock.stonesLeft)
+		{
+			if (0 === oClock.stonesLeft)
+			{
+				oGame.BlackTime.CorrectMainTime(oClock.time);
+			}
+			else
+			{
+				oGame.BlackTime.CorrectMainTime(0);
+				oGame.BlackTime.CorrectOverTime(oClock.time, oClock.stonesLeft);
+			}
+		}
+		else
+		{
+			oGame.BlackTime.CorrectMainTime(oClock.time);
+		}
+
+		if (true === oClock.running)
+		{
+			oGame.BlackTime.Start();
+			oGame.WhiteTime.Stop();
+		}
+		else if (true === oClock.paused)
+		{
+			oGame.BlackTime.Stop();
+			oGame.WhiteTime.Stop();
+		}
+	}
+
+	if (oClocks.white)
+	{
+		var oClock = oClocks.white;
+		if (undefined !== oClock.periodsLeft)
+		{
+			if (0 === oClock.periodsLeft)
+			{
+				oGame.WhiteTime.CorrectMainTime(oClock.time);
+			}
+			else
+			{
+				oGame.WhiteTime.CorrectMainTime(0);
+				oGame.WhiteTime.CorrectOverTime(oClock.time, oClock.periodsLeft);
+			}
+		}
+		else if (undefined !== oClock.stonesLeft)
+		{
+			if (0 === oClock.stonesLeft)
+			{
+				oGame.WhiteTime.CorrectMainTime(oClock.time);
+			}
+			else
+			{
+				oGame.WhiteTime.CorrectMainTime(0);
+				oGame.WhiteTime.CorrectOverTime(oClock.time, oClock.stonesLeft);
+			}
+		}
+		else
+		{
+			oGame.WhiteTime.CorrectMainTime(oClock.time);
+		}
+
+		if (true === oClock.running)
+		{
+			oGame.WhiteTime.Start();
+			oGame.BlackTime.Stop();
+		}
+		else if (true === oClock.paused)
+		{
+			oGame.BlackTime.Stop();
+			oGame.WhiteTime.Stop();
+		}
+	}
 };
 CKGSClient.prototype.GetRank = function(sRank)
 {
@@ -1629,23 +1715,23 @@ CKGSClient.prototype.private_ReadSgfEvents = function(oGame, arrSgfEvents)
 		}
 		else if ("TIMELEFT" === oProp.name)
 		{
-			var oTime = null;
-			if ("black" === oProp.color)
-				oTime = oGame.BlackTime;
-			else if ("white" === oProp.color)
-				oTime = oGame.WhiteTime;
-
-			if (oTime.IsAbsolute())
-			{
-				oTime.CorrectMainTime(oProp.float);
-			}
-			else if (oTime.IsByoYomi() || oTime.IsCanadian())
-			{
-				if (0 === oProp.int)
-					oTime.CorrectMainTime(oProp.float);
-				else
-					oTime.CorrectOverTime(oProp.float, oProp.int);
-			}
+			// var oTime = null;
+			// if ("black" === oProp.color)
+			// 	oTime = oGame.BlackTime;
+			// else if ("white" === oProp.color)
+			// 	oTime = oGame.WhiteTime;
+			//
+			// if (oTime.IsAbsolute())
+			// {
+			// 	oTime.CorrectMainTime(oProp.float);
+			// }
+			// else if (oTime.IsByoYomi() || oTime.IsCanadian())
+			// {
+			// 	if (0 === oProp.int)
+			// 		oTime.CorrectMainTime(oProp.float);
+			// 	else
+			// 		oTime.CorrectOverTime(oProp.float, oProp.int);
+			// }
 		}
 		else if ("TRIANGLE" === oProp.name)
 		{
@@ -1716,6 +1802,14 @@ CKGSClient.prototype.private_ReadSgfEvents = function(oGame, arrSgfEvents)
 		{
 			oGameTree.Set_Result(oProp.text);
 		}
+		else if ("TRANSCRIBER" === oProp.name)
+		{
+			oGameTree.Set_GameTranscriber(oProp.text);
+		}
+		else if ("SOURCE" === oProp.name)
+		{
+			oGameTree.Set_GameSource(oProp.text);
+		}
 		else
 		{
 			console.log("PROP_ADD/PROP_CHANGE");
@@ -1748,6 +1842,14 @@ CKGSClient.prototype.private_ReadSgfEvents = function(oGame, arrSgfEvents)
 		else if ("ARROW" === oProp.name || "LINE" === oProp.name)
 		{
 			// Ничего не делаем
+		}
+		else if ("TRANSCRIBER" === oProp.name)
+		{
+			oGameTree.Set_GameTranscriber("");
+		}
+		else if ("SOURCE" === oProp.name)
+		{
+			oGameTree.Set_GameSource("");
 		}
 		else
 		{

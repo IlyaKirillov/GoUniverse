@@ -347,6 +347,20 @@ CGoUniverseDrawingPlayerInfo.prototype.Init = function(sDivId, oGameTree, nPlaye
 	this.m_nPlayer   = nPlayer;
 	this.m_oGameTree = oGameTree;
 
+	if (oGameTree)
+	{
+		if (BOARD_BLACK === nPlayer)
+		{
+			this.m_sName = oGameTree.Get_BlackName();
+			this.m_sRank = oGameTree.Get_BlackRating();
+		}
+		else if (BOARD_WHITE === nPlayer)
+		{
+			this.m_sName = oGameTree.Get_WhiteName();
+			this.m_sRank = oGameTree.Get_WhiteRating();
+		}
+	}
+
 	this.HtmlElement.Control          = CreateControlContainer(sDivId);
 	var oDivElement                   = this.HtmlElement.Control.HtmlElement;
 	oDivElement.style.backgroundColor = new CColor(217, 217, 217, 255).ToString();
@@ -377,8 +391,13 @@ CGoUniverseDrawingPlayerInfo.prototype.Init = function(sDivId, oGameTree, nPlaye
 	oNameWrapperDiv.style.height = nNameH;
 	oNameWrapperDiv.className    = "HorAlignCenter";
 
-	var oCenterDiv          = document.createElement("div");
-	oCenterDiv.style.margin = "0 auto";
+	var oCenterDiv                = document.createElement("div");
+	oCenterDiv.style.margin       = "0 auto";
+	oCenterDiv.style.whiteSpace   = "nowrap";
+	oCenterDiv.style.maxWidth     = "100%";
+	oCenterDiv.style.textOverflow = "ellipsis";
+	oCenterDiv.style.height       = nNameH + "px";
+	oCenterDiv.style.lineHeight   = nNameH + "px";
 	oNameWrapperDiv.appendChild(oCenterDiv);
 
 	// Цвет
@@ -386,11 +405,12 @@ CGoUniverseDrawingPlayerInfo.prototype.Init = function(sDivId, oGameTree, nPlaye
 	oCenterDiv.appendChild(oColorDiv);
 
 	oColorDiv.setAttribute("id", sDivId + "_Image");
-	oColorDiv.style["float"] = "left";
-	oColorDiv.style.width    = 25 + "px";
-	oColorDiv.style.height   = 25 + "px";
-	oColorDiv.width          = 25;
-	oColorDiv.height         = 25;
+	oColorDiv.style.width     = 25 + "px";
+	oColorDiv.style.height    = 25 + "px";
+	oColorDiv.style["float"]  = "left";
+	oColorDiv.width           = 25;
+	oColorDiv.height          = 25;
+	oColorDiv.style.marginTop = 2 + "px"; // (30 - 25) / 2
 
 	var Canvas = oColorDiv.getContext("2d");
 	var Size   = 25;
@@ -414,10 +434,10 @@ CGoUniverseDrawingPlayerInfo.prototype.Init = function(sDivId, oGameTree, nPlaye
 	Canvas.stroke();
 
 	// Имя
-	var oNameDiv = document.createElement("div");
+	var oNameDiv = document.createElement("span");
 	oCenterDiv.appendChild(oNameDiv);
 
-	oNameDiv.style["float"] = "left";
+	//oNameDiv.style["float"] = "left";
 	oNameDiv.style.fontSize = "14pt";
 
 	// Захваченные
