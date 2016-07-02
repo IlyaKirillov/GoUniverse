@@ -233,7 +233,7 @@ CVisualGameRoomTab.prototype.InitMainRoom = function(nId, sMainDivId, sTabDivId)
 		oThis.OnClick();
 	});
 };
-CVisualGameRoomTab.prototype.InitGameRoom = function(nId, oGameTree, sDivIdContainer, bDemonstration, sWhiteAvatar, sBlackAvatar, oWhiteTime, oBlackTime)
+CVisualGameRoomTab.prototype.InitGameRoom = function(nId, oGameTree, sDivIdContainer, bDemonstration, sWhiteAvatar, sBlackAvatar, oWhiteTime, oBlackTime, oGame)
 {
 	var oThis = this;
 
@@ -259,8 +259,9 @@ CVisualGameRoomTab.prototype.InitGameRoom = function(nId, oGameTree, sDivIdConta
 	if (null !== oGameTree)
 	{
 		var oDrawing = new CDrawing(oGameTree);
-		oDrawing.Create_GoUniverseViewerTemplate(sGameRoomDivId + "B", this.m_oApp, this, sWhiteAvatar, sBlackAvatar, oWhiteTime, oBlackTime);
+		oDrawing.Create_GoUniverseViewerTemplate(sGameRoomDivId + "B", this.m_oApp, this, sWhiteAvatar, sBlackAvatar, oWhiteTime, oBlackTime, oGame);
 		oDrawing.Update_Size(true);
+		oGameTree.Set_EditingFlags({LoadFile : false, GameInfo : false});
 	}
 
 	// Создаем дивку под таб

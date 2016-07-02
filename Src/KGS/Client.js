@@ -881,7 +881,9 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 		CurNode    : null,
 		BlackTime  : new CTimeSettings(),
 		WhiteTime  : new CTimeSettings(),
-		Demo       : false
+		Demo       : false,
+		CommentsHandler : null,
+		StateHandler    : null
 	};
 
 	this.m_aGames[GameRoomId] = oGame;
@@ -946,6 +948,10 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 
 	oGame.GameTree = oGameTree;
 
+	oGame.Demo = bDemo;
+	this.m_oApp.AddGameRoom(GameRoomId, oGameTree, bDemo, sWhiteAvatar, sBlackAvatar, oGame.WhiteTime, oGame.BlackTime, oGame);
+	this.m_oApp.SetCurrentGameRoomTab(GameRoomId);
+
 	var oCurNode = this.private_ReadSgfEvents(oGame, oMessage.sgfEvents);
 	if (!oCurNode)
 		oCurNode = oGameTree.Get_FirstNode();
@@ -959,10 +965,6 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 		oGame.BlackTime.Stop();
 		oGame.WhiteTime.Stop();
 	}
-
-	oGame.Demo = bDemo;
-	this.m_oApp.AddGameRoom(GameRoomId, oGameTree, bDemo, sWhiteAvatar, sBlackAvatar, oGame.WhiteTime, oGame.BlackTime);
-	this.m_oApp.SetCurrentGameRoomTab(GameRoomId);
 
 
 	oGameTree.GoTo_Node(oCurNode);
@@ -1648,6 +1650,8 @@ CKGSClient.prototype.private_ReadSgfEvents = function(oGame, arrSgfEvents)
 		else if ("COMMENT" === oProp.name)
 		{
 			oNode.Add_Comment(oProp.text);
+			if (oGame.CommentsHandler)
+				oGame.CommentsHandler.AddComment(oProp.text);
 		}
 		else if ("RULES" === oProp.name)
 		{
