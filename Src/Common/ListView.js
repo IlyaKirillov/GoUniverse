@@ -297,7 +297,7 @@ function CListView()
 }
 CListView.prototype.Clear = function()
 {
-    this.m_aList = [];
+    this.m_aList     = [];
     this.m_aY.length = 1;
 };
 
