@@ -601,6 +601,10 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
 	{
 		this.private_HandleClose(oMessage);
 	}
+	else if ("GAME_OVER" === oMessage.type)
+	{
+		this.private_HandleGameOver(oMessage);
+	}
 	else
 	{
 		console.log(oMessage);
@@ -808,33 +812,8 @@ CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
 		sGameType = "*";
 
 	if ("" !== sScore)
-	{
-		if ("UNKNOWN" === sScore || "UNFINISHED" === sScore || "NO_RESULT" === sScore)
-			sScore = "-";
-		else if ("B+RESIGN" === sScore)
-			sScore = "B+Resign";
-		else if ("W+RESIGN" === sScore)
-			sScore = "W+Resign";
-		else if ("B+FORFEIT" === sScore)
-			sScore = "B+Forfeit";
-		else if ("W+FORFEIT" === sScore)
-			sScore = "W+Forfeit";
-		else if ("B+TIME" === sScore)
-			sScore = "B+Time";
-		else if ("W+TIME" === sScore)
-			sScore = "W+Time";
-		else
-		{
-			var dScore = parseFloat(sScore);
-			if (dScore < 0)
-				sScore = "W+" + Math.abs(dScore);
-			else
-				sScore = "B+" + Math.abs(dScore);
-		}
+		sComment = this.private_ParseScore(sScore);
 
-		sComment = sScore;
-	}
-	
 	var sSizeHandi = sSize + "x" + sSize + (0 !== nHandi ? " H" + nHandi : "");
 	if (true === bPrivate)
 		sGameType = "P";
@@ -965,6 +944,12 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 		oGame.BlackTime.Stop();
 		oGame.WhiteTime.Stop();
 	}
+
+	if (oGame.CommentsHandler && oMessage.score)
+		oGame.CommentsHandler.AddGameOver(oCurNode, this.private_ParseScore(oMessage.score));
+	
+	if (oGame.CommentsHandler)
+		oGame.CommentsHandler.ScrollChatAreaToBottom();
 
 
 	oGameTree.GoTo_Node(oCurNode);
@@ -1204,10 +1189,7 @@ CKGSClient.prototype.private_HandleConvoJoin = function(oMessage)
 	};
 
 	this.m_oPrivateChatsByUserName[sUserName] = this.m_oPrivateChats[nChannelId];
-
-
-
-
+	
 	this.m_oApp.AddChatRoom(nChannelId, sUserName, true);
 
 	this.private_AddUserToRoom(this.private_GetCurrentUser(), this.m_oPrivateChats[nChannelId]);
@@ -1404,6 +1386,17 @@ CKGSClient.prototype.private_HandleClose = function(oMessage)
 {
 	// Ничего не делаем. Пока известно, что данное сообщение приходит после GAME_REVIEW, вся обработка происходит там
 };
+CKGSClient.prototype.private_HandleGameOver = function(oMessage)
+{
+	var nChannelId = oMessage.channelId;
+	if (this.m_aGames[nChannelId])
+	{
+		// TODO: Добавить окно с окончанием партии
+
+		var oGame = this.m_aGames[nChannelId];
+		oGame.CommentsHandler.AddGameOver(oGame.CurNode, this.private_ParseScore(oMessage.score));
+	}
+};
 CKGSClient.prototype.private_AddUserToRoom = function(oUser, oRoom)
 {
 	oRoom.Users[oUser.GetName()] = oUser;
@@ -1563,6 +1556,8 @@ CKGSClient.prototype.private_ReadSgfEvents = function(oGame, arrSgfEvents)
 	var oGameTree      = oGame.GameTree;
 	var oNode          = null;
 	var oActivatedNode = null;
+	var oThis          = this;
+
 	for (var nIndex = 0, nCount = arrSgfEvents.length; nIndex < nCount; ++nIndex)
 	{
 		var sgfEvent = arrSgfEvents[nIndex];
@@ -1651,7 +1646,14 @@ CKGSClient.prototype.private_ReadSgfEvents = function(oGame, arrSgfEvents)
 		{
 			oNode.Add_Comment(oProp.text);
 			if (oGame.CommentsHandler)
-				oGame.CommentsHandler.AddComment(oProp.text);
+			{
+				oGameTree.Get_MovesCount();
+
+				if (true === oGame.Demo)
+					oGame.CommentsHandler.AddComment(oProp.text, oNode, "" !== oGameTree.Get_Result());
+				else
+					oGame.CommentsHandler.AddComment(oProp.text, oNode, false);
+			}
 		}
 		else if ("RULES" === oProp.name)
 		{
@@ -1893,4 +1895,32 @@ CKGSClient.prototype.private_UpdatePlayersList = function()
 CKGSClient.prototype.private_GetCurrentUser = function()
 {
 	return this.m_oCurrentUser;
+};
+CKGSClient.prototype.private_ParseScore = function(sScore)
+{
+	var sResult = "";
+	if ("UNKNOWN" === sScore || "UNFINISHED" === sScore || "NO_RESULT" === sScore)
+		sResult = "-";
+	else if ("B+RESIGN" === sScore)
+		sResult = "B+Resign";
+	else if ("W+RESIGN" === sScore)
+		sResult = "W+Resign";
+	else if ("B+FORFEIT" === sScore)
+		sResult = "B+Forfeit";
+	else if ("W+FORFEIT" === sScore)
+		sResult = "W+Forfeit";
+	else if ("B+TIME" === sScore)
+		sResult = "B+Time";
+	else if ("W+TIME" === sScore)
+		sResult = "W+Time";
+	else
+	{
+		var dScore = parseFloat(sScore);
+		if (dScore < 0)
+			sResult = "W+" + Math.abs(dScore);
+		else
+			sResult = "B+" + Math.abs(dScore);
+	}
+
+	return sResult;
 };

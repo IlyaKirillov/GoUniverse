@@ -64,7 +64,7 @@ CGoUniverseApplication.prototype.Init = function()
 	// 	TEST_AddChatRoom();
 	// }
 	//
-	// this.AddGameRoom(1, new CGameTree());
+	// this.AddGameRoom(1, new CGameTree(), false, "", "", new CTimeSettings(), new CTimeSettings(), {});
 	// // this.AddGameRoom(2, new CGameTree());
 	// // this.AddGameRoom(3, new CGameTree());
 	// // this.AddGameRoom(4, new CGameTree());
