@@ -12,6 +12,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Дополнение к классу CDrawing
 //----------------------------------------------------------------------------------------------------------------------
+CDrawing.prototype.private_GoUniverseCreateWrappingMainDiv = function(sDivId)
+{
+	g_oGlobalSettings.Load_FromLocalStorage();
+	//------------------------------------------------------------------------------------------------------------------
+	// Создаем оберточную div для всего редактора, которая будет главной для нас.
+	//------------------------------------------------------------------------------------------------------------------
+	var oParentControl = CreateControlContainer(sDivId);
+	this.m_oControl = oParentControl;
+	var sMainDivId = sDivId + "GB";
+	this.private_CreateDiv(oParentControl.HtmlElement, sMainDivId);
+	var oMainControl = CreateControlContainer(sMainDivId);
+	oMainControl.Bounds.SetParams(0, 0, 0, 0, true, true, true, true, -1, -1);
+	oMainControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right | g_anchor_bottom);
+	oParentControl.AddControl(oMainControl);
+	this.private_SetMainDiv(sMainDivId, oMainControl);
+};
 CDrawing.prototype.Create_GoUniverseViewerTemplate = function(sDivId, oApp, oTab, sWhiteAvatar, sBlackAvatar, oWhiteTime, oBlackTime, oGameHandler)
 {
 	this.m_oGoUniverseApp = oApp;
@@ -22,7 +38,7 @@ CDrawing.prototype.Create_GoUniverseViewerTemplate = function(sDivId, oApp, oTab
 	this.m_oWhiteTime     = oWhiteTime;
 	this.m_oGameHandler   = oGameHandler;
 
-	this.private_CreateWrappingMainDiv(sDivId);
+	this.private_GoUniverseCreateWrappingMainDiv(sDivId);
 	this.private_GoUniverseCreateHorFullTemplate();
 	this.Set_TemplateType(EDrawingTemplate.GoUniverseViewerHor);
 };
@@ -189,7 +205,7 @@ CDrawing.prototype.private_GoUniverseCreateHorFullTemplate = function()
 	// Чат + ввод для чата
 	//------------------------------------------------------------------------------------------------------------------
 	var oChatsControl = CreateControlContainer(sChatsDivId);
-	oChatsControl.Bounds.SetParams(0, GameInfoH + InfoH + ManagerH, 0, 1000, true, true, true, false, -1, -1);
+	oChatsControl.Bounds.SetParams(0, GameInfoH + InfoH + ManagerH + 1, 0, 1000, true, true, true, false, -1, -1);
 	oChatsControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right | g_anchor_bottom);
 	oPanelControl.AddControl(oChatsControl);
 
