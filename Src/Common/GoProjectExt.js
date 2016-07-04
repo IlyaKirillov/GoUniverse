@@ -104,13 +104,9 @@ CDrawing.prototype.private_GoUniverseCreateHorFullTemplate = function()
 	oGameInfoControl.HtmlElement.style.borderBottom = "1px solid rgb(172, 172, 172)";
 	oGameInfoControl.HtmlElement.className = "HorVerAlignCenter";
 
-	var oGameInfoTextDiv = document.createElement("div");
-	oGameInfoControl.HtmlElement.appendChild(oGameInfoTextDiv);
-	oGameInfoTextDiv.style.whiteSpace = "no wrap";
-	oGameInfoTextDiv.style.fontSize   = "14pt";
-	oGameInfoTextDiv.style.fontFamily = '"Segoe UI", Helvetica, Tahoma, Geneva, Verdana, sans-serif';
-	oGameInfoTextDiv.innerHTML = "Black C4 (1 move)";
-
+	var oGameState = new CGoUniverseDrawingGameState();
+	oGameState.Init(oGameInfoControl.HtmlElement, this.m_oGameHandler);
+	this.m_oGameHandler.StateHandler = oGameState;
 	//------------------------------------------------------------------------------------------------------------------
 	// Информация об игроках
 	//------------------------------------------------------------------------------------------------------------------
@@ -362,6 +358,7 @@ CGoUniverseDrawingComments.prototype.private_AddMoveReference = function(oNode, 
 CGoUniverseDrawingComments.prototype.AddGameOver = function(oNode, sResult)
 {
 	this.private_AddMoveReference(oNode, "Game Over: " + sResult);
+	this.m_oLastNode = oNode;
 	this.private_CheckScrollTop();
 };
 CGoUniverseDrawingComments.prototype.ScrollChatAreaToBottom = function()
@@ -670,4 +667,90 @@ CGoUniverseDrawingPlayerInfo.prototype.private_Update = function()
 
 	Common.Set_InnerTextToElement(oNameDiv, sNameText);
 	Common.Set_InnerTextToElement(oScoresDiv, sScoresText);
+};
+//----------------------------------------------------------------------------------------------------------------------
+// Специальный класс с информацией о текущем состоянии партии
+//----------------------------------------------------------------------------------------------------------------------
+function CGoUniverseDrawingGameState()
+{
+	this.m_oDiv        = null;
+	this.m_oGame       = null;
+	this.m_oCurNode    = null;
+}
+CGoUniverseDrawingGameState.prototype.Init = function(oParent, oGame)
+{
+	var oDiv = document.createElement("div");
+	oParent.appendChild(oDiv);
+	oDiv.style.whiteSpace = "no wrap";
+	oDiv.style.fontSize   = "14pt";
+	oDiv.style.fontFamily = '"Segoe UI", Helvetica, Tahoma, Geneva, Verdana, sans-serif';
+	oDiv.style.cursor     = "pointer";
+	oDiv.innerHTML        = "Game Start: Black to play";
+
+	var oThis = this;
+	oDiv.addEventListener("click", function()
+	{
+		var oGame = oThis.m_oGame;
+		if (!oGame || !oGame.GameTree || !oThis.m_oCurNode)
+			return;
+
+		oGame.GameTree.GoTo_Node(oThis.m_oCurNode);
+	}, false);
+
+	this.m_oDiv  = oDiv;
+	this.m_oGame = oGame;
+};
+CGoUniverseDrawingGameState.prototype.Update = function()
+{
+	if (!this.m_oGame)
+		return;
+
+	this.m_oCurNode = this.m_oGame.CurNode;
+
+	var oGameTree = this.m_oGame.GameTree;
+	var bDemo     = this.m_oGame.Demo;
+	var sResult   = this.m_oGame.Result;
+
+	var oNode = this.m_oCurNode;
+	var sText = "";
+
+	if (null !== sResult && true !== bDemo)
+	{
+		sText += "Game Over: " + this.m_oGame.Result;
+	}
+	else
+	{
+		var nNext = oGameTree.Get_NextMove();
+
+		while (true !== oNode.Have_Move())
+		{
+			var oPrevNode = oNode.Get_Prev();
+			if (null === oPrevNode)
+				break;
+
+			oNode = oPrevNode;
+		}
+
+		if (oNode === oGameTree.Get_StartNode())
+		{
+			sText += "Game Start: ";
+			nNext = BOARD_BLACK;
+		}
+		else
+		{
+			var nMoveNumber = oNode.Get_MoveNumber();
+			var oMove       = oNode.Get_Move();
+			var oSize       = oGameTree.Get_Board().Get_Size();
+			var nMoveValue  = oMove.Get_Value();
+
+			var sMove = 0 === nMoveValue ? "Pass" : Common_PosValueToString(nMoveValue, oSize.X, oSize.Y).toLowerCase();
+
+			sText += "Move " + nMoveNumber + " (" + (BOARD_BLACK ===  oMove.Get_Type() ? "B " : "W ") + sMove + "): ";
+			nNext = BOARD_BLACK ===  oMove.Get_Type() ? BOARD_WHITE : BOARD_BLACK;
+		}
+
+		sText += (BOARD_BLACK ===  nNext ? "Black to play" : "White to play");
+	}
+
+	Common.Set_InnerTextToElement(this.m_oDiv, sText);
 };
