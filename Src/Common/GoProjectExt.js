@@ -107,11 +107,12 @@ CDrawing.prototype.private_GoUniverseCreateHorFullTemplate = function()
 	var oGameState = new CGoUniverseDrawingGameState();
 	oGameState.Init(oGameInfoControl.HtmlElement, this.m_oGameHandler);
 	this.m_oGameHandler.StateHandler = oGameState;
+	this.Add_StateHandler(oGameState);
 	//------------------------------------------------------------------------------------------------------------------
 	// Информация об игроках
 	//------------------------------------------------------------------------------------------------------------------
 	var oInfoControl = CreateControlContainer(sInfoDivId);
-	oInfoControl.Bounds.SetParams(0, GameInfoH, 1000, 0, true, true, false, false, -1, InfoH);
+	oInfoControl.Bounds.SetParams(0, GameInfoH + 3, 1000, 0, true, true, false, false, -1, InfoH - 3);
 	oInfoControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right);
 	oPanelControl.AddControl(oInfoControl);
 
@@ -501,8 +502,8 @@ CGoUniverseDrawingPlayerInfo.prototype.Init = function(sDivId, oGameTree, nPlaye
 	var nAvatarH = 110;
 	var nAvatarW = (nAvatarH * 141 / 200);
 	var nNameH   = 30;
-	var nScoresH = 30;
-	var nTimeH   = 30;
+	var nScoresH = 25;
+	var nTimeH   = 25;
 
 	// Аватарка
 	var oAvatarDiv = document.createElement("div");
@@ -570,15 +571,15 @@ CGoUniverseDrawingPlayerInfo.prototype.Init = function(sDivId, oGameTree, nPlaye
 	var oNameDiv = document.createElement("span");
 	oCenterDiv.appendChild(oNameDiv);
 
-	//oNameDiv.style["float"] = "left";
 	oNameDiv.style.fontSize = "14pt";
 
 	// Захваченные
 	var oScoresWrapperDiv = document.createElement("div");
 	oDivElement.appendChild(oScoresWrapperDiv);
-	oScoresWrapperDiv.style.width  = "100%";
-	oScoresWrapperDiv.style.height = nScoresH;
-	oScoresWrapperDiv.className    = "HorAlignCenter";
+	oScoresWrapperDiv.style.width      = "100%";
+	oScoresWrapperDiv.style.height     = nScoresH + "px";
+	oScoresWrapperDiv.style.lineHeight = nScoresH + "px";
+	oScoresWrapperDiv.className        = "HorAlignCenter";
 
 	var oCenterDiv          = document.createElement("div");
 	oCenterDiv.style.margin = "0 auto";
@@ -593,9 +594,10 @@ CGoUniverseDrawingPlayerInfo.prototype.Init = function(sDivId, oGameTree, nPlaye
 	// Время
 	var oTimeWrapperDiv = document.createElement("div");
 	oDivElement.appendChild(oTimeWrapperDiv);
-	oTimeWrapperDiv.style.width  = "100%";
-	oTimeWrapperDiv.style.height = nTimeH;
-	oTimeWrapperDiv.className    = "HorAlignCenter";
+	oTimeWrapperDiv.style.width      = "100%";
+	oTimeWrapperDiv.style.height     = nTimeH + "px";
+	oTimeWrapperDiv.style.lineHeight = nTimeH + "px";
+	oTimeWrapperDiv.className        = "HorAlignCenter";
 
 	var oCenterDiv          = document.createElement("div");
 	oCenterDiv.style.margin = "0 auto";
@@ -684,7 +686,6 @@ CGoUniverseDrawingGameState.prototype.Init = function(oParent, oGame)
 	oDiv.style.whiteSpace = "no wrap";
 	oDiv.style.fontSize   = "14pt";
 	oDiv.style.fontFamily = '"Segoe UI", Helvetica, Tahoma, Geneva, Verdana, sans-serif';
-	oDiv.style.cursor     = "pointer";
 	oDiv.innerHTML        = "Game Start: Black to play";
 
 	var oThis = this;
@@ -699,6 +700,8 @@ CGoUniverseDrawingGameState.prototype.Init = function(oParent, oGame)
 
 	this.m_oDiv  = oDiv;
 	this.m_oGame = oGame;
+
+	this.private_UpdateCaptionStyle();
 };
 CGoUniverseDrawingGameState.prototype.Update = function()
 {
@@ -753,4 +756,28 @@ CGoUniverseDrawingGameState.prototype.Update = function()
 	}
 
 	Common.Set_InnerTextToElement(this.m_oDiv, sText);
+	this.private_UpdateCaptionStyle();
+};
+CGoUniverseDrawingGameState.prototype.OnGameTreeStateChange = function(oGameTree, oIState)
+{
+	this.private_UpdateCaptionStyle();
+};
+CGoUniverseDrawingGameState.prototype.private_UpdateCaptionStyle = function()
+{
+	var oDiv = this.m_oDiv;
+	var oCurNode = this.m_oGame.GameTree.Get_CurNode();
+	if (this.m_oCurNode !== oCurNode)
+	{
+		oDiv.style.color          = "#2a75f3";
+		oDiv.style.textDecoration = "underline";
+		oDiv.style.cursor         = "pointer";
+		oDiv.title                = "Back to Game";
+	}
+	else
+	{
+		oDiv.style.color          = "rgb(0, 0, 0)";
+		oDiv.style.textDecoration = "none";
+		oDiv.style.cursor         = "default";
+		oDiv.title                = "";
+	}
 };
