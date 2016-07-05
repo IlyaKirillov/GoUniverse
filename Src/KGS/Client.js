@@ -21,6 +21,7 @@ function CKGSClient(oApp)
 	this.m_nChatChannelId = -1;
 	this.m_aAllRooms      = {};
 	this.m_oAllUsers      = {};
+	this.m_oAllGames      = {};
 	this.m_oRoomCategory  = {};
 	this.m_oUserInfo      = {}; // Список открытых окон с информацией пользователя
 	this.m_oCurrentUser   = new CKGSUser(this);
@@ -49,6 +50,7 @@ CKGSClient.prototype.Clear = function()
 	this.m_nChatChannelId = -1;
 	this.m_aAllRooms      = {};
 	this.m_oAllUsers      = {};
+	this.m_oAllGames      = {};
 	this.m_oRoomCategory  = {};
 	this.m_oUserInfo      = {};
 	this.m_oCurrentUser   = new CKGSUser(this);
@@ -655,6 +657,7 @@ CKGSClient.prototype.private_HandleRoomJoin = function(oMessage)
 		{
 			var oEntry = Games[Pos];
 			this.private_HandleGameRecord(oEntry, true);
+			this.private_OnAddGameListRecord(oMessage.channelId, oEntry);
 		}
 		this.m_oGamesListView.Update_Size();
 		this.m_oGamesListView.Update();
@@ -902,27 +905,33 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 
 	if (true === bDemo)
 	{
-		if (oMessage.gameSummary.players.owner)
-		{
-			var oWhiteUser = this.private_HandleUserRecord2(oMessage.gameSummary.players.owner);
-			//if (oWhiteUser.HasAvatar())
-				sWhiteAvatar = "http://goserver.gokgs.com/avatars/" + oWhiteUser.GetName() + ".jpg";
-		}
 	}
 	else
 	{
-		if (oMessage.gameSummary.players.black)
+		var oGameRecord = this.m_oAllGames[GameRoomId];
+		if (oGameRecord)
 		{
-			var oBlackUser = this.private_HandleUserRecord2(oMessage.gameSummary.players.black);
-			//if (oBlackUser.HasAvatar())
-				sBlackAvatar = "http://goserver.gokgs.com/avatars/" + oBlackUser.GetName() + ".jpg";
-		}
+			var oBlackUser = oGameRecord.GetBlack();
+			if (oBlackUser)
+			{
+				if (oBlackUser.HasAvatar())
+					sBlackAvatar = "http://goserver.gokgs.com/avatars/" + oBlackUser.GetName() + ".jpg";
+				else if (oBlackUser.IsRobot())
+					sBlackAvatar = "Files/Robot.png";
+				else
+					sBlackAvatar = "Files/DefaultUserBlack.png"
+			}
 
-		if (oMessage.gameSummary.players.white)
-		{
-			var oWhiteUser = this.private_HandleUserRecord2(oMessage.gameSummary.players.white);
-			//if (oWhiteUser.HasAvatar())
-				sWhiteAvatar = "http://goserver.gokgs.com/avatars/" + oWhiteUser.GetName() + ".jpg";
+			var oWhiteUser = oGameRecord.GetWhite();
+			if (oMessage.gameSummary.players.white)
+			{
+				if (oWhiteUser.HasAvatar())
+					sWhiteAvatar = "http://goserver.gokgs.com/avatars/" + oWhiteUser.GetName() + ".jpg";
+				else if (oWhiteUser.IsRobot())
+					sWhiteAvatar = "Files/Robot.png";
+				else
+					sWhiteAvatar = "Files/DefaultUserWhite.png"
+			}
 		}
 	}
 
@@ -1069,12 +1078,14 @@ CKGSClient.prototype.private_HandleGameList = function(oMessage)
 	{
 		var oEntry = Games[Pos];
 		this.private_HandleGameRecord(oEntry, true);
+		this.private_OnAddGameListRecord(oMessage.channelId, oEntry);
 	}
 	this.m_oGamesListView.Update_Size();
 	this.m_oGamesListView.Update();
 };
 CKGSClient.prototype.private_HandleGameContainerRemoveGame = function(oMessage)
 {
+	this.private_OnRemoveGameListRecord(oMessage.channelId, oMessage.gameId);
 	this.m_oGamesListView.Handle_Record([1, oMessage.gameId]);
 	this.m_oGamesListView.Update_Size();
 	this.m_oGamesListView.Update();
@@ -1171,6 +1182,7 @@ CKGSClient.prototype.private_HandleGlobalGamesJoin = function(oMessage)
 	{
 		var oEntry = Games[Pos];
 		this.private_HandleGameRecord(oEntry, true);
+		this.private_OnAddGameListRecord(oMessage.channelId, oEntry);
 	}
 	this.m_oGamesListView.Update_Size();
 	this.m_oGamesListView.Update();
@@ -1947,4 +1959,30 @@ CKGSClient.prototype.private_ParseScore = function(sScore)
 	}
 
 	return sResult;
+};
+CKGSClient.prototype.private_OnAddGameListRecord = function(nRoomId, oRecord)
+{
+	var nGameId = oRecord.channelId;
+	var oGameRecord;
+	if (this.m_oAllGames[nGameId])
+	{
+		oGameRecord = this.m_oAllGames[nGameId];
+	}
+	else
+	{
+		oGameRecord = new CKGSGameListRecord(this);
+		this.m_oAllGames[nGameId] = oGameRecord;
+	}
+
+	oGameRecord.Update(oRecord);
+	oGameRecord.AddRoom(nRoomId);
+};
+CKGSClient.prototype.private_OnRemoveGameListRecord = function(nRoomId, nGameId)
+{
+	var oGameRecord = this.m_oAllGames[nGameId];
+	if (oGameRecord)
+	{
+		if (oGameRecord.RemoveRoom(nRoomId))
+			delete this.m_oAllGames[nGameId];
+	}
 };
