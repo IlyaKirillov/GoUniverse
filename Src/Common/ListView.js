@@ -294,6 +294,11 @@ function CListView()
         e.preventDefault();
         return false;
     };
+
+    this.private_SortFunction = function(oRecord1, oRecord2)
+    {
+        return oThis.m_oListObject.SortFunction(oRecord1, oRecord2);
+    };
 }
 CListView.prototype.Clear = function()
 {
@@ -344,6 +349,8 @@ CListView.prototype.Update_Size = function()
     this.m_aX[this.m_nColsCount] = this.m_dXLimit;
 
     this.private_UpdateScrollSize();
+
+    this.Update();
 };
 
 CListView.prototype.Get_RecordById = function(sId)
@@ -445,19 +452,19 @@ CListView.prototype.private_Sort = function(nColNum)
 {
     if (undefined === nColNum)
     {
-        this.m_aList.sort(this.m_oListObject.SortFunction);
+        this.m_aList.sort(this.private_SortFunction);
         return;
     }
 
     if (this.m_oListObject.Is_Sortable(Math.abs(nColNum)))
     {
-        var OldSortType = this.m_oListObject.SortType;
+        var OldSortType = this.m_oListObject.GetSortType();
         this.m_oListObject.Set_SortType(nColNum, 1);
 
-        if (OldSortType === this.m_oListObject.SortType)
+        if (OldSortType === this.m_oListObject.GetSortType())
             this.m_oListObject.Set_SortType(nColNum, -1);
 
-        this.m_aList.sort(this.m_oListObject.SortFunction);
+        this.m_aList.sort(this.private_SortFunction);
     }
 };
 
@@ -649,9 +656,9 @@ CListView.prototype.private_DrawGrid = function(oContext)
 
     oContext.putImageData(HorLine, this.m_aX[0], this.m_aY[0]);
 
-    if (this.m_oListObject.Get_VerLines)
+    if (this.m_oListObject.GetVerLinesPositions)
     {
-        var oVerLines = this.m_oListObject.Get_VerLines();
+        var oVerLines = this.m_oListObject.GetVerLinesPositions();
         for (var nIndex = 0, nCount = oVerLines.length; nIndex < nCount; ++nIndex)
         {
             oContext.putImageData(VerLine, this.m_aX[oVerLines[nIndex]], 0);
@@ -765,4 +772,8 @@ CListView.prototype.private_Find = function(sKey)
 CListView.prototype.Set_BGColor = function(r, g, b)
 {
     this.m_oBGColor.Set(r, g, b);
+};
+CListView.prototype.GetListObject = function()
+{
+    return this.m_oListObject;
 };

@@ -17,15 +17,17 @@
  */
 
 var EKGSInGamePlayersListRecord = {
-	Type : 0,
-	Name : 1,
-	Rank : 2
+	Type : 1,
+	Name : 2,
+	Rank : 3
 };
 
-function CKGSInGamePlayersList()
+function CKGSInGamePlayersList(oApp)
 {
+	this.m_oApp = oApp;
+
 	this.m_oHeaders = {
-		Sizes : [0, 15, 120],
+		Sizes : [0, 20, 125],
 		Count : 3,
 		1     : "",
 		2     : "Name",
@@ -33,12 +35,20 @@ function CKGSInGamePlayersList()
 	};
 
 	this.m_nSortType = -EKGSInGamePlayersListRecord.Rank;
+
+	this.m_oBlack = null;
+	this.m_oWhite = null;
 }
 
 CommonExtend(CKGSInGamePlayersList, CListBase);
 
 CKGSInGamePlayersList.prototype.private_PreSort = function(oRecord1, oRecord2)
 {
+	if (true === oRecord1.IsGameParticipant() && true !== oRecord2.IsGameParticipant())
+		return -1;
+	if (true !== oRecord1.IsGameParticipant() && true === oRecord2.IsGameParticipant())
+		return 1;
+
 	if (true === oRecord1.IsFriend() && true !== oRecord2.IsFriend())
 		return -1;
 
@@ -66,28 +76,28 @@ CKGSInGamePlayersList.prototype.private_PostSort = function(oRecord1, oRecord2)
 CKGSInGamePlayersList.prototype.private_Sort = function(oRecord1, oRecord2)
 {
 	var nSortType = this.m_nSortType;
-	if (EPlayersListRecord.Name === nSortType)
+	if (EKGSInGamePlayersListRecord.Name === nSortType)
 	{
 		if (Common.Compare_Strings(oRecord1.m_sName, oRecord2.m_sName) < 0)
 			return -1;
 		else if (Common.Compare_Strings(oRecord1.m_sName, oRecord2.m_sName) > 0)
 			return 1;
 	}
-	else if (-EPlayersListRecord.Name === nSortType)
+	else if (-EKGSInGamePlayersListRecord.Name === nSortType)
 	{
 		if (Common.Compare_Strings(oRecord1.m_sName, oRecord2.m_sName) < 0)
 			return 1;
 		else if (Common.Compare_Strings(oRecord1.m_sName, oRecord2.m_sName) > 0)
 			return -1;
 	}
-	else if (EPlayersListRecord.Rank === nSortType)
+	else if (EKGSInGamePlayersListRecord.Rank === nSortType)
 	{
 		if (oRecord1.m_nRank < oRecord2.m_nRank)
 			return -1;
 		else if (oRecord1.m_nRank > oRecord2.m_nRank)
 			return 1;
 	}
-	else if (-EPlayersListRecord.Rank === nSortType)
+	else if (-EKGSInGamePlayersListRecord.Rank === nSortType)
 	{
 		if (oRecord1.m_nRank < oRecord2.m_nRank)
 			return 1;
@@ -106,31 +116,59 @@ CKGSInGamePlayersList.prototype.Is_Sortable = function(nColNum)
 };
 CKGSInGamePlayersList.prototype.Get_Record = function(aLine)
 {
-	var oRecord = new CKGSInGamePlayersListRecord(oApp.GetClient());
+	var oRecord = new CKGSInGamePlayersListRecord(this, this.m_oApp.GetClient());
 	oRecord.Update(aLine);
 	return oRecord;
 };
 CKGSInGamePlayersList.prototype.Handle_DoubleClick = function(Record)
 {
-	if (oApp && oApp.GetClient())
+	if (this.m_oApp && this.m_oApp.GetClient())
 	{
-		oApp.GetClient().EnterPrivateChat(Record.m_sName);
+		this.m_oApp.GetClient().EnterPrivateChat(Record.m_sName);
 	}
 };
 CKGSInGamePlayersList.prototype.Handle_RightClick = function(Record, e)
 {
-	if (oApp)
+	if (this.m_oApp)
 	{
-		oApp.ShowUserContextMenu(e.pageX, e.pageY, Record.m_sName);
+		this.m_oApp.ShowUserContextMenu(e.pageX, e.pageY, Record.m_sName);
 	}
 };
-
-function CKGSInGamePlayersListRecord(oClient)
+CKGSInGamePlayersList.prototype.SetBlack = function(oUser)
 {
-	this.m_oClient = oClient;
-	this.m_sName   = "";
-	this.m_nRank   = 0;
-	this.m_oUser   = null;
+	this.m_oBlack = oUser;
+};
+CKGSInGamePlayersList.prototype.SetWhite = function(oUser)
+{
+	this.m_oWhite = oUser;
+};
+CKGSInGamePlayersList.prototype.IsBlack = function(sUserName)
+{
+	if (this.m_oBlack && sUserName === this.m_oBlack.GetName())
+		return true;
+
+	return false;
+};
+CKGSInGamePlayersList.prototype.IsWhite = function(sUserName)
+{
+	if (this.m_oWhite && sUserName === this.m_oWhite.GetName())
+		return true;
+
+	return false;
+};
+CKGSInGamePlayersList.prototype.GetVerLinesPositions = function()
+{
+	return [2];
+};
+
+
+function CKGSInGamePlayersListRecord(oListObject, oClient)
+{
+	this.m_oListObject = oListObject;
+	this.m_oClient     = oClient;
+	this.m_sName       = "";
+	this.m_nRank       = 0;
+	this.m_oUser       = null;
 }
 
 CommonExtend(CKGSInGamePlayersListRecord, CListRecordBase);
@@ -139,7 +177,6 @@ CKGSInGamePlayersListRecord.prototype.Draw = function(oContext, dX, dY, eType)
 {
 	var oClient = this.m_oClient;
 	var sFont = oContext.font;
-
 
 	if (true !== this.m_oUser.IsSleeping())
 		oContext.fillStyle = "#000000";
@@ -169,11 +206,15 @@ CKGSInGamePlayersListRecord.prototype.Draw = function(oContext, dX, dY, eType)
 	var sString = "";
 	switch(eType)
 	{
+	case EKGSInGamePlayersListRecord.Type : sString += this.private_GetUserType(oContext); break;
 	case EKGSInGamePlayersListRecord.Name : sString += this.m_sName; break;
 	case EKGSInGamePlayersListRecord.Rank : sString += this.private_GetRank(this.m_nRank); break;
 	}
 
 	oContext.fillText(sString, dX, dY);
+
+	if (eType === EKGSInGamePlayersListRecord.Type && "" !== sString)
+		oContext.strokeText(sString, dX, dY);
 
 	if (oClient)
 	{
@@ -211,6 +252,7 @@ CKGSInGamePlayersListRecord.prototype.Update = function(aLine)
 {
 	this.m_sName = aLine[1];
 	this.m_oUser = aLine[2];
+	this.m_nRank = this.m_oUser.GetRank();
 };
 CKGSInGamePlayersListRecord.prototype.Compare = function(sName)
 {
@@ -235,4 +277,29 @@ CKGSInGamePlayersListRecord.prototype.private_GetRank = function(nRank)
 CKGSInGamePlayersListRecord.prototype.IsFriend = function()
 {
 	return this.m_oClient.IsUserInFriendList(this.m_sName);
+};
+CKGSInGamePlayersListRecord.prototype.private_GetUserType = function(oContext)
+{
+	if (this.m_oListObject.IsBlack(this.m_sName))
+	{
+		oContext.fillStyle   = "#000";
+		oContext.strokeStyle = "#000";
+		return String.fromCharCode(0x26AB);
+	}
+	else if (this.m_oListObject.IsWhite(this.m_sName))
+	{
+		oContext.fillStyle   = "#FFF";
+		oContext.strokeStyle = "#000";
+		return String.fromCharCode(0x26AB);
+	}
+
+	return "";
+};
+CKGSInGamePlayersListRecord.prototype.IsGameParticipant = function()
+{
+	if (this.m_oListObject.IsBlack(this.m_sName)
+		|| this.m_oListObject.IsWhite(this.m_sName))
+		return true;
+
+	return false;
 };

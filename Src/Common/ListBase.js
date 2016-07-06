@@ -62,9 +62,9 @@ CListBase.prototype.Draw_Header = function(dX, dY, oContext, nColNum)
 	if (eType === nSortType)
 		sHeaderText = this.m_oHeaders[eType] + String.fromCharCode(0x25B2);
 	else if (eType === -nSortType)
-		sHeaderText = this.m_Headers[eType] + String.fromCharCode(0x25BC);
+		sHeaderText = this.m_oHeaders[eType] + String.fromCharCode(0x25BC);
 	else
-		sHeaderText = this.m_Headers[eType];
+		sHeaderText = this.m_oHeaders[eType];
 
 	oContext.fillStyle = "#000000";
 	oContext.fillText(sHeaderText, dX, dY);
@@ -95,6 +95,14 @@ CListBase.prototype.GetHeadersCount = function()
 CListBase.prototype.GetHeadersSize = function(nColNum)
 {
 	return this.m_oHeaders.Sizes[nColNum];
+};
+CListBase.prototype.GetVerLinesPositions = function()
+{
+	return [1];
+};
+CListBase.prototype.GetSortType = function()
+{
+	return this.m_nSortType;
 };
 
 function CListRecordBase()

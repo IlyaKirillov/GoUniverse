@@ -660,7 +660,6 @@ CKGSClient.prototype.private_HandleRoomJoin = function(oMessage)
 			this.private_OnAddGameListRecord(oMessage.channelId, oEntry);
 		}
 		this.m_oGamesListView.Update_Size();
-		this.m_oGamesListView.Update();
 	}
 
 	var oRoom = this.m_aAllRooms[oMessage.channelId];
@@ -870,8 +869,6 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 		PlayersList     : new CListView()
 	};
 
-	oGame.PlayersList.Set_BGColor(217, 217, 217);
-
 	this.m_aGames[GameRoomId] = oGame;
 
 	var nSize      = oMessage.gameSummary.size | 0;
@@ -967,6 +964,29 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 	if (oGame.CommentsHandler)
 		oGame.CommentsHandler.ScrollChatAreaToBottom();
 
+	if (oGame.PlayersList)
+	{
+		var oGameRecord = this.m_oAllGames[GameRoomId];
+		if (oGameRecord)
+		{
+			var oListObject = oGame.PlayersList.GetListObject();
+			oListObject.SetBlack(oGameRecord.GetBlack());
+			oListObject.SetWhite(oGameRecord.GetWhite());
+		}
+		
+		if (oMessage.users)
+		{
+			var arrUsers = oMessage.users;
+			for (var nIndex = 0, nCount = arrUsers.length; nIndex < nCount; ++nIndex)
+			{
+				var oUser = this.private_HandleUserRecord2(arrUsers[nIndex]);
+				oGame.PlayersList.Handle_Record([0, oUser.GetName(), oUser]);
+			}
+		}
+
+		oGame.PlayersList.Update_Size();
+	}
+
 
 	oGameTree.GoTo_Node(oCurNode);
 	oGame.CurNode  = oCurNode;
@@ -1047,14 +1067,20 @@ CKGSClient.prototype.private_HandleUserAdded = function(oMessage)
 {
 	var oUser = this.private_HandleUserRecord(oMessage.user, true);
 	var oRoom = this.m_aAllRooms[oMessage.channelId];
+	var oGame = this.m_aGames[oMessage.channelId];
 	if (oRoom)
-		this.private_AddUserToRoom(oUser, oRoom);
-
-	if (oMessage.channelId === this.m_nChatChannelId)
 	{
-		this.m_oPlayersListView.Handle_Record([0, oUser.GetName(), oUser.GetRank(), oUser.IsFriend(), oUser]);
-		this.m_oPlayersListView.Update_Size();
-		this.m_oPlayersListView.Update();
+		this.private_AddUserToRoom(oUser, oRoom);
+		if (oMessage.channelId === this.m_nChatChannelId)
+		{
+			this.m_oPlayersListView.Handle_Record([0, oUser.GetName(), oUser.GetRank(), oUser.IsFriend(), oUser]);
+			this.m_oPlayersListView.Update_Size();
+		}
+	}
+	else if (oGame)
+	{
+		oGame.PlayersList.Handle_Record([0, oUser.GetName(), oUser]);
+		oGame.PlayersList.Update_Size();
 	}
 };
 CKGSClient.prototype.private_HandleUserRemoved = function(oMessage)
@@ -1064,14 +1090,21 @@ CKGSClient.prototype.private_HandleUserRemoved = function(oMessage)
 
 	var oUser = this.private_HandleUserRecord(oMessage.user, false);
 	var oRoom = this.m_aAllRooms[oMessage.channelId];
+	var oGame = this.m_aGames[oMessage.channelId];
 	if (oRoom)
-		delete oRoom.Users[oUser.GetName()];
-	
-	if (oMessage.channelId === this.m_nChatChannelId)
 	{
-		this.m_oPlayersListView.Handle_Record([1, oUser.GetName(), -2, false, oUser]);
-		this.m_oPlayersListView.Update_Size();
-		this.m_oPlayersListView.Update();
+		delete oRoom.Users[oUser.GetName()];
+
+		if (oMessage.channelId === this.m_nChatChannelId)
+		{
+			this.m_oPlayersListView.Handle_Record([1, oUser.GetName(), -2, false, oUser]);
+			this.m_oPlayersListView.Update_Size();
+		}
+	}
+	else if (oGame)
+	{
+		oGame.PlayersList.Handle_Record([1, oUser.GetName(), oUser]);
+		oGame.PlayersList.Update_Size();
 	}
 };
 CKGSClient.prototype.private_HandleGameList = function(oMessage)
@@ -1084,14 +1117,15 @@ CKGSClient.prototype.private_HandleGameList = function(oMessage)
 		this.private_OnAddGameListRecord(oMessage.channelId, oEntry);
 	}
 	this.m_oGamesListView.Update_Size();
-	this.m_oGamesListView.Update();
 };
 CKGSClient.prototype.private_HandleGameContainerRemoveGame = function(oMessage)
 {
 	this.private_OnRemoveGameListRecord(oMessage.channelId, oMessage.gameId);
-	this.m_oGamesListView.Handle_Record([1, oMessage.gameId]);
-	this.m_oGamesListView.Update_Size();
-	this.m_oGamesListView.Update();
+	if (!this.m_oAllGames[oMessage.gameId])
+	{
+		this.m_oGamesListView.Handle_Record([1, oMessage.gameId]);
+		this.m_oGamesListView.Update_Size();
+	}
 };
 CKGSClient.prototype.private_HandleUserUpdate = function(oMessage)
 {
@@ -1112,7 +1146,6 @@ CKGSClient.prototype.private_HandleUserUpdate = function(oMessage)
 			{
 				this.m_oPlayersListView.Handle_Record([1, oUser.GetName(), -2, false, oUser]);
 				this.m_oPlayersListView.Update_Size();
-				this.m_oPlayersListView.Update();
 			}
 		}
 		else if (undefined === oPrivateChat.Users[sUserName])
@@ -1123,7 +1156,6 @@ CKGSClient.prototype.private_HandleUserUpdate = function(oMessage)
 			{
 				this.m_oPlayersListView.Handle_Record([0, oUser.GetName(), oUser.GetRank(), oUser.IsFriend(), oUser]);
 				this.m_oPlayersListView.Update_Size();
-				this.m_oPlayersListView.Update();
 			}
 		}
 	}
@@ -1188,7 +1220,6 @@ CKGSClient.prototype.private_HandleGlobalGamesJoin = function(oMessage)
 		this.private_OnAddGameListRecord(oMessage.channelId, oEntry);
 	}
 	this.m_oGamesListView.Update_Size();
-	this.m_oGamesListView.Update();
 };
 CKGSClient.prototype.private_HandleLoginFailedBadPassword = function(oMessage)
 {
@@ -1280,11 +1311,9 @@ CKGSClient.prototype.private_HandleFriendAddSuccess = function(oMessage)
 		};
 
 		this.m_oGamesListView.Update_Size();
-		this.m_oGamesListView.Update();
 	}
 
 	this.m_oPlayersListView.Update_Size();
-	this.m_oPlayersListView.Update();
 };
 CKGSClient.prototype.private_HandleFriendRemoveSuccess = function(oMessage)
 {
@@ -1306,11 +1335,9 @@ CKGSClient.prototype.private_HandleFriendRemoveSuccess = function(oMessage)
 			delete this.m_oFollowerList[sUserName];
 
 		this.m_oGamesListView.Update_Size();
-		this.m_oGamesListView.Update();
 	}
 
 	this.m_oPlayersListView.Update_Size();
-	this.m_oPlayersListView.Update();
 };
 CKGSClient.prototype.private_HandleFriendChangeNoUser = function(oMessage)
 {
@@ -1929,7 +1956,6 @@ CKGSClient.prototype.private_UpdatePlayersList = function()
 	}
 
 	this.m_oPlayersListView.Update_Size();
-	this.m_oPlayersListView.Update();
 };
 CKGSClient.prototype.private_GetCurrentUser = function()
 {

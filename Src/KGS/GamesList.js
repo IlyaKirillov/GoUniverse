@@ -269,6 +269,11 @@ var g_oGamesList =
     GetHeadersSize : function(nColNum)
     {
         return g_oGamesList.Headers.Sizes[nColNum];
+    },
+
+    GetSortType : function()
+    {
+        return g_oGamesList.SortType;
     }
 };
 

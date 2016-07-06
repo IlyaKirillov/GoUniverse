@@ -115,9 +115,24 @@ var g_oKGSRoomList = {
 			oApp.SetCurrentChatRoomTab(Record.m_nRoomId);
 	},
 
-	Get_VerLines : function()
+	GetVerLinesPositions : function()
 	{
 		return [1, 2];
+	},
+
+	GetHeadersCount : function()
+	{
+		return g_oKGSRoomList.Headers.Count;
+	},
+
+	GetHeadersSize : function(nColNum)
+	{
+		return g_oKGSRoomList.Headers.Sizes[nColNum];
+	},
+
+	GetSortType : function()
+	{
+		return g_oKGSRoomList.SortType;
 	}
 };
 

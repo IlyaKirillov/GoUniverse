@@ -176,6 +176,11 @@ var g_oPlayersList =
 	GetHeadersSize : function(nColNum)
 	{
 		return g_oPlayersList.Headers.Sizes[nColNum];
+	},
+
+	GetSortType : function()
+	{
+		return g_oPlayersList.SortType;
 	}
 };
 

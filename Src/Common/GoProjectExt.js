@@ -206,7 +206,7 @@ CDrawing.prototype.private_GoUniverseCreateHorFullTemplate = function()
 	oChatsControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right | g_anchor_bottom);
 	oPanelControl.AddControl(oChatsControl);
 
-	var PlayerListW = 200;
+	var PlayerListW = 180;
 
 	var sChatAreaDivId  = sChatsDivId + "A";
 	var sChatInputDivId = sChatsDivId + "I";
@@ -217,10 +217,16 @@ CDrawing.prototype.private_GoUniverseCreateHorFullTemplate = function()
 	//------------------------------------------------------------------------------------------------------------------
 	// Место под список игроков
 	//------------------------------------------------------------------------------------------------------------------
-	var oPlayersListControl = this.m_oGameHandler.PlayersList.Init(sPlayersListDivId, new CKGSInGamePlayersList());
+	var oPlayersListControl = this.m_oGameHandler.PlayersList.Init(sPlayersListDivId, new CKGSInGamePlayersList(this.m_oGoUniverseApp));
 	oPlayersListControl.Bounds.SetParams(0, 0, 0, 0, true, false, true, true, PlayerListW, -1);
 	oPlayersListControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_bottom);
 	oChatsControl.AddControl(oPlayersListControl);
+	var oPlayerListElement = oPlayersListControl.HtmlElement;
+	oPlayerListElement.style.borderTop  = "1px solid rgb(172, 172, 172)";
+	oPlayerListElement.style.borderLeft = "1px solid rgb(172, 172, 172)";
+	oPlayerListElement.style.background = "rgb(235, 235, 228)";
+	this.m_oGameHandler.PlayersList.Set_BGColor(235, 235, 228);
+	this.m_aElements.push(this.m_oGameHandler.PlayersList);
 	//------------------------------------------------------------------------------------------------------------------
 	// Место под чат
 	//------------------------------------------------------------------------------------------------------------------
@@ -294,17 +300,17 @@ CGoUniverseDrawingComments.prototype.Init = function(sDivId, oGameTree, oApp)
 	var oAreaElement = document.createElement("div");
 	oAreaElement.setAttribute("style", "position:absolute;padding:0;margin:0;top:0px;left:0px;right:0px;bottom:0px;font-family: 'Segoe UI',Helvetica,Tahoma,Geneva,Verdana,sans-serif;");
 	oDivElement.appendChild(oAreaElement);
-	oAreaElement.style.border   = "1px solid rgb(172,172,172)";
-	oAreaElement.style.color    = "rgb(0, 0, 0)";
-	oAreaElement.style.fontSize = "12pt";
-
+	oAreaElement.style.borderTop    = "1px solid rgb(172,172,172)";
+	oAreaElement.style.borderBottom = "1px solid rgb(172,172,172)";
+	oAreaElement.style.color        = "rgb(0, 0, 0)";
+	oAreaElement.style.fontSize     = "12pt";
 
 
 	this.m_oTextArea = oAreaElement;
 
 	this.m_oChatScroll = new CVerticalScroll();
 	this.m_oChatScroll.Init(oAreaElement, "VerScroll", "VerScrollActive", true);
-	this.m_oChatScroll.SetPaddings(0, 0, 1);
+	this.m_oChatScroll.SetPaddings(0, 0, 2);
 
 	this.Update_Size();
 };
