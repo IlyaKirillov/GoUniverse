@@ -199,22 +199,33 @@ CDrawing.prototype.private_GoUniverseCreateHorFullTemplate = function()
 	});
 	this.m_aElements.push(oDrawingMultilevelToolbar);
 	//------------------------------------------------------------------------------------------------------------------
-	// Чат + ввод для чата
+	// Чат + ввод для чата + список игроков
 	//------------------------------------------------------------------------------------------------------------------
 	var oChatsControl = CreateControlContainer(sChatsDivId);
 	oChatsControl.Bounds.SetParams(0, GameInfoH + InfoH + ManagerH + 1, 0, 1000, true, true, true, false, -1, -1);
 	oChatsControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right | g_anchor_bottom);
 	oPanelControl.AddControl(oChatsControl);
 
+	var PlayerListW = 200;
+
 	var sChatAreaDivId  = sChatsDivId + "A";
 	var sChatInputDivId = sChatsDivId + "I";
+	var sPlayersListDivId = sChatsDivId + "L";
 	this.private_CreateDiv(oChatsControl.HtmlElement, sChatAreaDivId);
 	this.private_CreateDiv(oChatsControl.HtmlElement, sChatInputDivId);
+	this.private_CreateDiv(oChatsControl.HtmlElement, sPlayersListDivId);
+	//------------------------------------------------------------------------------------------------------------------
+	// Место под список игроков
+	//------------------------------------------------------------------------------------------------------------------
+	var oPlayersListControl = this.m_oGameHandler.PlayersList.Init(sPlayersListDivId, new CKGSInGamePlayersList());
+	oPlayersListControl.Bounds.SetParams(0, 0, 0, 0, true, false, true, true, PlayerListW, -1);
+	oPlayersListControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_bottom);
+	oChatsControl.AddControl(oPlayersListControl);
 	//------------------------------------------------------------------------------------------------------------------
 	// Место под чат
 	//------------------------------------------------------------------------------------------------------------------
 	var oChatAreaControl = CreateControlContainer(sChatAreaDivId);
-	oChatAreaControl.Bounds.SetParams(0, 0, 1000, ChatInputH, false, false, false, true, -1, -1);
+	oChatAreaControl.Bounds.SetParams(0, 0, PlayerListW, ChatInputH, false, false, true, true, -1, -1);
 	oChatAreaControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right | g_anchor_bottom);
 	oChatsControl.AddControl(oChatAreaControl);
 
@@ -226,7 +237,7 @@ CDrawing.prototype.private_GoUniverseCreateHorFullTemplate = function()
 	// Место под ввод в чат
 	//------------------------------------------------------------------------------------------------------------------
 	var oChatInputControl = CreateControlContainer(sChatInputDivId);
-	oChatInputControl.Bounds.SetParams(0, 0, 1000, 0, false, false, false, true, -1, ChatInputH);
+	oChatInputControl.Bounds.SetParams(0, 0, PlayerListW, 0, false, false, true, true, -1, ChatInputH);
 	oChatInputControl.Anchor = (g_anchor_left | g_anchor_right | g_anchor_bottom);
 	oChatsControl.AddControl(oChatInputControl);
 
@@ -764,6 +775,9 @@ CGoUniverseDrawingGameState.prototype.OnGameTreeStateChange = function(oGameTree
 };
 CGoUniverseDrawingGameState.prototype.private_UpdateCaptionStyle = function()
 {
+	if (!this.m_oGame || !this.m_oGame.GameTree)
+		return;
+
 	var oDiv = this.m_oDiv;
 	var oCurNode = this.m_oGame.GameTree.Get_CurNode();
 	if (this.m_oCurNode !== oCurNode)

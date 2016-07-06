@@ -99,10 +99,10 @@ function CListView()
         }
 
         this.m_oListObject = oListObject;
-        this.m_nColsCount  = oListObject.Headers.Count;
+        this.m_nColsCount  = oListObject.GetHeadersCount();
 
         for (var nCurCol = 0; nCurCol < this.m_nColsCount; nCurCol++)
-            this.m_aX[nCurCol] = oListObject.Headers.Sizes[nCurCol];
+            this.m_aX[nCurCol] = oListObject.GetHeadersSize(nCurCol);
         this.m_aX[this.m_nColsCount] = this.m_dXLimit;
 
         this.m_aY[0] = this.m_dRowHeight;

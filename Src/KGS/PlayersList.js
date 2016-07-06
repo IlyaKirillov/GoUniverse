@@ -166,7 +166,17 @@ var g_oPlayersList =
         {
             oApp.ShowUserContextMenu(e.pageX, e.pageY, Record.m_sName);
         }
-    }
+    },
+
+	GetHeadersCount : function()
+	{
+		return g_oPlayersList.Headers.Count;
+	},
+
+	GetHeadersSize : function(nColNum)
+	{
+		return g_oPlayersList.Headers.Sizes[nColNum];
+	}
 };
 
 function CPlayersListRecord(oClient)

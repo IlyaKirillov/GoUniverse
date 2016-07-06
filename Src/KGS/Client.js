@@ -866,8 +866,11 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 		Demo            : false,
 		Result          : null,
 		CommentsHandler : null,
-		StateHandler    : null
+		StateHandler    : null,
+		PlayersList     : new CListView()
 	};
+
+	oGame.PlayersList.Set_BGColor(217, 217, 217);
 
 	this.m_aGames[GameRoomId] = oGame;
 

@@ -259,6 +259,16 @@ var g_oGamesList =
     {
         if (oApp)
             oApp.SetCurrentGameRoomTab(Record.m_nGameId);
+    },
+
+    GetHeadersCount : function()
+    {
+        return g_oGamesList.Headers.Count;
+    },
+
+    GetHeadersSize : function(nColNum)
+    {
+        return g_oGamesList.Headers.Sizes[nColNum];
     }
 };
 
