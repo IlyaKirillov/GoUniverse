@@ -304,6 +304,7 @@ CGoUniverseDrawingComments.prototype.Init = function(sDivId, oGameTree, oApp)
 	oAreaElement.style.borderBottom = "1px solid rgb(172,172,172)";
 	oAreaElement.style.color        = "rgb(0, 0, 0)";
 	oAreaElement.style.fontSize     = "12pt";
+	oAreaElement.style.paddingLeft  = "5px";
 
 
 	this.m_oTextArea = oAreaElement;

@@ -900,38 +900,32 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 		oGameTree.Set_GameTranscriber(oMessage.gameSummary.players.owner.name + (oMessage.gameSummary.players.owner.rank ? "[" + oMessage.gameSummary.players.owner.rank + "]" : ""));
 	}
 
-	var sWhiteAvatar = null;
-	var sBlackAvatar = null;
+	var sWhiteAvatar = "Files/DefaultUserWhite.png";
+	var sBlackAvatar = "Files/DefaultUserBlack.png";
 
-	if (true === bDemo)
+	var oGameRecord = this.m_oAllGames[GameRoomId];
+	if (oGameRecord)
 	{
-	}
-	else
-	{
-		var oGameRecord = this.m_oAllGames[GameRoomId];
-		if (oGameRecord)
+		var oBlackUser = oGameRecord.GetBlack();
+		if (oBlackUser)
 		{
-			var oBlackUser = oGameRecord.GetBlack();
-			if (oBlackUser)
-			{
-				if (oBlackUser.HasAvatar())
-					sBlackAvatar = "http://goserver.gokgs.com/avatars/" + oBlackUser.GetName() + ".jpg";
-				else if (oBlackUser.IsRobot())
-					sBlackAvatar = "Files/Robot.png";
-				else
-					sBlackAvatar = "Files/DefaultUserBlack.png"
-			}
+			if (oBlackUser.HasAvatar())
+				sBlackAvatar = "http://goserver.gokgs.com/avatars/" + oBlackUser.GetName() + ".jpg";
+			else if (oBlackUser.IsRobot())
+				sBlackAvatar = "Files/Robot.png";
+			else
+				sBlackAvatar = "Files/DefaultUserBlack.png";
+		}
 
-			var oWhiteUser = oGameRecord.GetWhite();
-			if (oMessage.gameSummary.players.white)
-			{
-				if (oWhiteUser.HasAvatar())
-					sWhiteAvatar = "http://goserver.gokgs.com/avatars/" + oWhiteUser.GetName() + ".jpg";
-				else if (oWhiteUser.IsRobot())
-					sWhiteAvatar = "Files/Robot.png";
-				else
-					sWhiteAvatar = "Files/DefaultUserWhite.png"
-			}
+		var oWhiteUser = oGameRecord.GetWhite();
+		if (oMessage.gameSummary.players.white)
+		{
+			if (oWhiteUser.HasAvatar())
+				sWhiteAvatar = "http://goserver.gokgs.com/avatars/" + oWhiteUser.GetName() + ".jpg";
+			else if (oWhiteUser.IsRobot())
+				sWhiteAvatar = "Files/Robot.png";
+			else
+				sWhiteAvatar = "Files/DefaultUserWhite.png";
 		}
 	}
 

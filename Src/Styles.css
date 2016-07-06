@@ -318,7 +318,7 @@ div.VerScroll {
 	background          : rgb(255, 255, 255);
 	border              : 1px solid rgb(190, 193, 196);
 
-	transition-property : background, border;
+	transition-property : background, border, opacity;
 	transition-duration : 0.2s;
 	transition-delay    : 0s;
 }
@@ -336,7 +336,7 @@ div.VerScrollBlack {
 	background          : rgb(0, 0, 0);
 	border              : 1px solid #505050;
 
-	transition-property : background, border;
+	transition-property : background, border, opacity;
 	transition-duration : 0.2s;
 	transition-delay    : 0s;
 }
