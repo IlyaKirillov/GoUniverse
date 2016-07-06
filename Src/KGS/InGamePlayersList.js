@@ -9,13 +9,6 @@
  * Time     1:06
  */
 
-"use strict";
-/**
- * User: Ilja.Kirillov
- * Date: 26.09.14
- * Time: 18:03
- */
-
 var EKGSInGamePlayersListRecord = {
 	Type : 1,
 	Name : 2,
