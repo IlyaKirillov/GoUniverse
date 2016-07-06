@@ -133,6 +133,7 @@ CGoUniverseApplication.prototype.ConnectToKGS = function()
 
 	$(document.getElementById("divIdConnection")).fadeOut(200);
 	$(document.getElementById("divIdConnectionError")).fadeOut(200);
+	$(document.getElementById("divIdAbout")).fadeOut(200);
 };
 CGoUniverseApplication.prototype.OnConnect = function()
 {
@@ -151,6 +152,10 @@ CGoUniverseApplication.prototype.OnResize = function()
 	var ErrorDiv        = document.getElementById("divIdConnectionError");
 	ErrorDiv.style.left = (document.body.clientWidth - 250) / 2 + "px";
 	ErrorDiv.style.top  = (document.body.clientHeight - 100) / 2 + 150 + "px";
+
+	var AboutDiv        = document.getElementById("divIdAbout");
+	AboutDiv.style.left = (document.body.clientWidth - 250) / 2 + "px";
+	AboutDiv.style.top  = (document.body.clientHeight - 60 - 20) + "px";
 
 	if (this.m_oClientControl)
 	{
@@ -210,6 +215,7 @@ CGoUniverseApplication.prototype.Logout = function(sText)
 
 	document.getElementById("divMainId").style.display       = "none";
 	document.getElementById("divIdConnection").style.display = "block";
+	document.getElementById("divIdAbout").style.display      = "block";
 	document.getElementById("inputPasswordId").focus();
 
 	document.title = "KGS: Login";
@@ -544,6 +550,11 @@ CGoUniverseApplication.prototype.private_InitLoginPage = function()
 	{
 		oThis.ConnectToKGS();
 	}, false);
+
+	document.getElementById("divIdAboutButton").addEventListener("mouseup", function()
+	{
+		oThis.ShowAbout();
+	}, false);
 };
 CGoUniverseApplication.prototype.private_InitClientPage = function()
 {
@@ -834,6 +845,7 @@ CGoUniverseApplication.prototype.private_GotoLoginPage = function(bShowError)
 {
 	document.getElementById("divMainId").style.display       = "none";
 	document.getElementById("divIdConnection").style.display = "block";
+	document.getElementById("divIdAbout").style.display      = "block";
 
 	if (true === bShowError)
 		document.getElementById("divIdConnectionError").style.display = "block";
@@ -844,6 +856,7 @@ CGoUniverseApplication.prototype.private_GotoClientPage = function()
 {
 	document.getElementById("divMainId").style.display = "block";
 	$(document.getElementById("divIdConnection")).fadeOut(200);
+	$(document.getElementById("divIdAbout")).fadeOut(200);
 	$(document.getElementById("divIdConnectionError")).fadeOut(200);
 };
 CGoUniverseApplication.prototype.private_ClearChat = function()
@@ -1118,4 +1131,12 @@ CGoUniverseApplication.prototype.ScrollChatAreaToBottom = function()
 {
 	var oDiv = document.getElementById("textareaChatId");
 	oDiv.scrollTop = oDiv.scrollHeight;
+};
+CGoUniverseApplication.prototype.ShowAbout = function()
+{
+	CreateKGSWindow(EKGSWindowType.GoUniverseAbout, {Client : this.m_oClient, App : this});
+};
+CGoUniverseApplication.prototype.GetVersion = function()
+{
+	return g_sGoUniverseVersion;
 };

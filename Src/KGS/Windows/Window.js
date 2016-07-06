@@ -10,6 +10,9 @@
  */
 
 var EKGSWindowType = {
+
+	GoUniverseAbout : -1,
+
 	RoomList    : 0,
 	UserInfo    : 1,
 	RoomInfo    : 2,
@@ -33,11 +36,12 @@ function CreateKGSWindow(nWindowType, oPr)
 	var sApp = "unknownwindow";
 	switch (nWindowType)
 	{
-	case EKGSWindowType.RoomList    : sApp = "RoomList"; break;
-	case EKGSWindowType.UserInfo    : sApp = "UserInfo_" + oPr.UserName; break;
-	case EKGSWindowType.RoomInfo    : sApp = "RoomInfo_" + oPr.RoomId; break;
-	case EKGSWindowType.Information : sApp = "Information" + (new Date()).getTime(); break;
-	case EKGSWindowType.Idle        : sApp = "Idle"; break;
+	case EKGSWindowType.GoUniverseAbout : sApp = "GoUniverseAbout"; break;
+	case EKGSWindowType.RoomList        : sApp = "RoomList"; break;
+	case EKGSWindowType.UserInfo        : sApp = "UserInfo_" + oPr.UserName; break;
+	case EKGSWindowType.RoomInfo        : sApp = "RoomInfo_" + oPr.RoomId; break;
+	case EKGSWindowType.Information     : sApp = "Information" + (new Date()).getTime(); break;
+	case EKGSWindowType.Idle            : sApp = "Idle"; break;
 	}
 	var sId = sParentId + sApp;
 
@@ -61,11 +65,12 @@ function CreateKGSWindow(nWindowType, oPr)
 
 		switch (nWindowType)
 		{
-		case EKGSWindowType.RoomList    : oWindow = new CKGSRoomListWindow(); break;
-		case EKGSWindowType.UserInfo    : oWindow = new CKGSUserInfoWindow(); break;
-		case EKGSWindowType.RoomInfo    : oWindow = new CKGSRoomInfoWindow(); break;
-		case EKGSWindowType.Information : oWindow = new CKGSInformationWindow(); break;
-		case EKGSWindowType.Idle        : oWindow = new CKGSInformationIdleWindow(); break;
+		case EKGSWindowType.GoUniverseAbout : oWindow = new CGoUniverseAboutWindow(); break;
+		case EKGSWindowType.RoomList        : oWindow = new CKGSRoomListWindow(); break;
+		case EKGSWindowType.UserInfo        : oWindow = new CKGSUserInfoWindow(); break;
+		case EKGSWindowType.RoomInfo        : oWindow = new CKGSRoomInfoWindow(); break;
+		case EKGSWindowType.Information     : oWindow = new CKGSInformationWindow(); break;
+		case EKGSWindowType.Idle            : oWindow = new CKGSInformationIdleWindow(); break;
 		}
 
 		oWindows[sId] = oWindow;

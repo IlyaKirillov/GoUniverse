@@ -52,6 +52,8 @@
 	<script type="text/javascript" language="JavaScript" src="Common/GoProjectExt.js"></script>
 	<script type="text/javascript" language="JavaScript" src="Common/GameTimer.js"></script>
 	<script type="text/javascript" language="JavaScript" src="Common/ListBase.js"></script>
+	<script type="text/javascript" language="JavaScript" src="Common/Version.js"></script>
+	<script type="text/javascript" language="JavaScript" src="Common/AboutWindow.js"></script>
 
 
 	<script type="text/javascript" language="JavaScript" src="KGS/PlayersList.js"></script>
@@ -80,9 +82,7 @@
 
 <div id="divIdGoUniverse" style="width:100vw;height:100vh;">
 
-	<div id="divIdConnection"
-		 style="position:absolute; top: 200px; left: 200px; width: 250px; height:130px; border:1px solid silver; background-color: white; box-shadow: 0px 1px 15px rgba(0,0,0,0.8);">
-
+	<div id="divIdConnection" class="StartPageWindow" style="height:135px">
 		<input id="inputLoginId" tabindex="1" type="text" placeholder="Login"
 			   style="position:absolute; top: 20px; left: 25px; width: 200px; height: 25px"/>
 		<input id="inputPasswordId" tabindex="2" type="password" placeholder="Password"
@@ -90,13 +90,17 @@
 		<div id="connectDivId" tabindex="3" style="position:absolute; top: 90px; left: 25px; width: 200px; height: 25px; background-color: rgb(66, 133, 244); color: #FFFFFF;     box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); vertical-align: middle; text-align: center;
     transition: .2s ease-out;cursor: pointer; line-height: 22px; font-size: 16px;">Connect to KGS server
 		</div>
-
 	</div>
 
-	<div id="divIdConnectionError"
-		 style="position:absolute; top: 200px; left: 200px; width: 250px; border:1px solid silver; background-color: white; box-shadow: 0px 1px 15px rgba(0,0,0,0.8);">
+	<div id="divIdConnectionError" class="StartPageWindow">
 		<div id="divIdConnectionErrorText"
 			 style="margin:10px;font-family: 'Segoe UI',Helvetica,Tahoma,Geneva,Verdana,sans-serif;font-size:14px;text-align:center">
+		</div>
+	</div>
+
+	<div id="divIdAbout" class="StartPageWindow" style="height:65px">
+		<div id="divIdAboutButton" tabindex="3" style="position:absolute; top: 20px; left: 25px; width: 200px; height: 25px; background-color: rgb(66, 133, 244); color: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); vertical-align: middle; text-align: center;
+    transition: .2s ease-out;cursor: pointer; line-height: 22px; font-size: 16px;">About
 		</div>
 	</div>
 
