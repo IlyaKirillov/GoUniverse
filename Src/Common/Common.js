@@ -47,7 +47,14 @@ CFadeEffect.prototype.In = function(oElement, nTime, fOnDisplay)
 	if (!oElement)
 		return;
 
-	this.private_RemoveElement(oElement);
+	if (parseFloat(oElement.style.opacity) > 0.99 && "none" !== oElement.style.display)
+		return;
+
+	var nOldDirection = this.private_CheckElement(oElement);
+	if (-1 === nOldDirection)
+		this.private_RemoveElement(oElement);
+	else if (1 === nOldDirection)
+		return;
 
 	oElement.style.opacity    = 0;
 	oElement.style.filter     = "alpha(opacity=0)";
@@ -73,7 +80,7 @@ CFadeEffect.prototype.In = function(oElement, nTime, fOnDisplay)
 			oElement.style.filter  = "alpha(opacity=" + dOpacity * 100 + ")";
 		}, 50);
 
-		this.private_AddElement(oElement, nTimerId);
+		this.private_AddElement(oElement, nTimerId, 1);
 	}
 	else
 	{
@@ -86,7 +93,14 @@ CFadeEffect.prototype.Out = function(oElement, nTime, fOnHidden)
 	if (!oElement)
 		return;
 
-	this.private_RemoveElement(oElement);
+	if (parseFloat(oElement.style.opacity) < 0.01 && "none" === oElement.style.display)
+		return;
+
+	var nOldDirection = this.private_CheckElement(oElement);
+	if (1 === nOldDirection)
+		this.private_RemoveElement(oElement);
+	else if (-1 === nOldDirection)
+		return;
 
 	if (nTime)
 	{
@@ -109,7 +123,7 @@ CFadeEffect.prototype.Out = function(oElement, nTime, fOnHidden)
 			oElement.style.filter  = "alpha(opacity=" + dOpacity * 100 + ")";
 		}, 50);
 
-		this.private_AddElement(oElement, nTimerId);
+		this.private_AddElement(oElement, nTimerId, -1);
 	}
 	else
 	{
@@ -131,12 +145,23 @@ CFadeEffect.prototype.private_RemoveElement = function(oElement)
 		}
 	}
 };
-CFadeEffect.prototype.private_AddElement = function(oElement, nTimerId)
+CFadeEffect.prototype.private_AddElement = function(oElement, nTimerId, nDirection)
 {
 	this.m_oElements.push({
-		Element : oElement,
-		TimerId : nTimerId
+		Element   : oElement,
+		TimerId   : nTimerId,
+		Direction : nDirection
 	});
+};
+CFadeEffect.prototype.private_CheckElement = function(oElement)
+{
+	for (var nIndex = 0, nCount = this.m_oElements.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.m_oElements[nIndex].Element === oElement)
+			return this.m_oElements[nIndex].Direction;
+	}
+
+	return 0;
 };
 
 var g_oFadeEffect = new CFadeEffect();
