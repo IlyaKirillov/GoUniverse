@@ -59,7 +59,7 @@ CGoUniverseAboutWindow.prototype.private_InitAboutPage = function(oDiv)
 	oDivMainPart.style.background = "#fff";
 
 	var oLogo            = document.createElement("img");
-	oLogo.src            = "Files/Icon100.png";
+	oLogo.src            = "Files/icon100.png";
 	oLogo.width          = 100;
 	oLogo.height         = 100;
 	oLogo.style['float'] = "left";
