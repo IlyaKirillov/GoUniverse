@@ -387,6 +387,8 @@ CGoUniverseDrawingComments.prototype.ScrollChatAreaToBottom = function()
 
 	var oDiv = this.m_oTextArea;
 	oDiv.scrollTop = oDiv.scrollHeight;
+	
+	this.m_oChatScroll.UpdatePosition();
 };
 CGoUniverseDrawingComments.prototype.private_AddUserTextMessage = function(sText)
 {

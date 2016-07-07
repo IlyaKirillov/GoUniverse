@@ -134,9 +134,6 @@ CVerticalScroll.prototype.private_OnScroll = function(e)
 	if (this.m_nElementHeight <= 1)
 		return;
 
-	var oDiv       = this.m_oDiv;
-	var oVerScroll = this.m_oScrollDiv;
-
 	var delta = 0;
 	if (undefined != e.wheelDelta && e.wheelDelta != 0)
 	{
@@ -147,7 +144,14 @@ CVerticalScroll.prototype.private_OnScroll = function(e)
 		delta = 45 * e.detail / 3;
 	}
 
-	oDiv.scrollTop += delta;
+	this.m_oDiv.scrollTop += delta;
+
+	this.UpdatePosition();
+};
+CVerticalScroll.prototype.UpdatePosition = function()
+{
+	var oDiv       = this.m_oDiv;
+	var oVerScroll = this.m_oScrollDiv;
 
 	var vaH = parseFloat(this.m_nElementHeight);
 	var saY = this.m_nTop;

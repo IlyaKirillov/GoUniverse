@@ -131,16 +131,16 @@ CGoUniverseApplication.prototype.ConnectToKGS = function()
 	document.getElementById("inputPasswordId").value = "";
 	this.m_oClient.Connect(sLogin, sPassword, "en_US");
 
-	$(document.getElementById("divIdConnection")).fadeOut(200);
-	$(document.getElementById("divIdConnectionError")).fadeOut(200);
-	$(document.getElementById("divIdAbout")).fadeOut(200);
+	g_oFadeEffect.Out(document.getElementById("divIdConnection"), 200);
+	g_oFadeEffect.Out(document.getElementById("divIdConnectionError"), 200);
+	g_oFadeEffect.Out(document.getElementById("divIdAbout"), 200);
 };
 CGoUniverseApplication.prototype.OnConnect = function()
 {
 	document.title = "KGS: " + this.m_oClient.GetUserName();
 	document.getElementById("divIdClientNameText").innerHTML = this.m_oClient.GetUserName();
 
-	$(document.getElementById("divMainId")).fadeIn(200);
+	g_oFadeEffect.In(document.getElementById("divMainId"), 200);
 	this.OnResize();
 };
 CGoUniverseApplication.prototype.OnResize = function()
@@ -855,9 +855,10 @@ CGoUniverseApplication.prototype.private_GotoLoginPage = function(bShowError)
 CGoUniverseApplication.prototype.private_GotoClientPage = function()
 {
 	document.getElementById("divMainId").style.display = "block";
-	$(document.getElementById("divIdConnection")).fadeOut(200);
-	$(document.getElementById("divIdAbout")).fadeOut(200);
-	$(document.getElementById("divIdConnectionError")).fadeOut(200);
+
+	g_oFadeEffect.Out(document.getElementById("divIdConnection"), 200);
+	g_oFadeEffect.Out(document.getElementById("divIdConnectionError"), 200);
+	g_oFadeEffect.Out(document.getElementById("divIdAbout"), 200);
 };
 CGoUniverseApplication.prototype.private_ClearChat = function()
 {
@@ -1129,8 +1130,13 @@ CGoUniverseApplication.prototype.UpdateDropDownGameTabsButton = function()
 };
 CGoUniverseApplication.prototype.ScrollChatAreaToBottom = function()
 {
+	if (this.m_oChatScroll)
+		this.m_oChatScroll.CheckVisibility();
+
 	var oDiv = document.getElementById("textareaChatId");
 	oDiv.scrollTop = oDiv.scrollHeight;
+
+	this.m_oChatScroll.UpdatePosition();
 };
 CGoUniverseApplication.prototype.ShowAbout = function()
 {

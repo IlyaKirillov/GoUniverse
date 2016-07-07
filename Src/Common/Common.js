@@ -38,4 +38,106 @@ function SplitTextToLines(sText)
 	return aLines;
 }
 
+function CFadeEffect()
+{
+	this.m_oElements = [];
+}
+CFadeEffect.prototype.In = function(oElement, nTime, fOnDisplay)
+{
+	if (!oElement)
+		return;
+
+	this.private_RemoveElement(oElement);
+
+	oElement.style.opacity    = 0;
+	oElement.style.filter     = "alpha(opacity=0)";
+	oElement.style.display    = "inline-block";
+	oElement.style.visibility = "visible";
+
+	if (fOnDisplay)
+		fOnDisplay();
+
+	if (nTime)
+	{
+		var oThis    = this;
+		var dOpacity = 0;
+		var nTimerId = setInterval(function()
+		{
+			dOpacity += 50 / nTime;
+			if (dOpacity >= 1)
+			{
+				oThis.private_RemoveElement(oElement);
+				dOpacity = 1;
+			}
+			oElement.style.opacity = dOpacity;
+			oElement.style.filter  = "alpha(opacity=" + dOpacity * 100 + ")";
+		}, 50);
+
+		this.private_AddElement(oElement, nTimerId);
+	}
+	else
+	{
+		oElement.style.opacity = 1;
+		oElement.style.filter  = "alpha(opacity=1)";
+	}
+};
+CFadeEffect.prototype.Out = function(oElement, nTime, fOnHidden)
+{
+	if (!oElement)
+		return;
+
+	this.private_RemoveElement(oElement);
+
+	if (nTime)
+	{
+		var dOpacity = 1;
+		var oThis = this;
+		var nTimerId = setInterval(function()
+		{
+			dOpacity -= 50 / nTime;
+			if (dOpacity <= 0)
+			{
+				oThis.private_RemoveElement(oElement);
+				dOpacity                  = 0;
+				oElement.style.display    = "none";
+				oElement.style.visibility = "hidden";
+
+				if (fOnHidden)
+					fOnHidden();
+			}
+			oElement.style.opacity = dOpacity;
+			oElement.style.filter  = "alpha(opacity=" + dOpacity * 100 + ")";
+		}, 50);
+
+		this.private_AddElement(oElement, nTimerId);
+	}
+	else
+	{
+		oElement.style.opacity    = 0;
+		oElement.style.filter     = "alpha(opacity=0)";
+		oElement.style.display    = "none";
+		oElement.style.visibility = "hidden";
+	}
+};
+CFadeEffect.prototype.private_RemoveElement = function(oElement)
+{
+	for (var nIndex = 0, nCount = this.m_oElements.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.m_oElements[nIndex].Element === oElement)
+		{
+			clearInterval(this.m_oElements[nIndex].TimerId);
+			this.m_oElements.splice(nIndex, 1);
+			return;
+		}
+	}
+};
+CFadeEffect.prototype.private_AddElement = function(oElement, nTimerId)
+{
+	this.m_oElements.push({
+		Element : oElement,
+		TimerId : nTimerId
+	});
+};
+
+var g_oFadeEffect = new CFadeEffect();
 

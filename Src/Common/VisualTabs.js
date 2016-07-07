@@ -212,6 +212,7 @@ function CVisualGameRoomTab(oApp)
 	this.m_oMainDiv      = null; // Дивка того, что мы показываем по нажатию на таб
 	this.m_oGameTree     = null;
 	this.m_oContainerDiv = null;
+	this.m_oGameHandler  = null;
 
 	this.m_oCaptionDiv   = null;
 }
@@ -347,11 +348,12 @@ CVisualGameRoomTab.prototype.InitGameRoom = function(nId, oGameTree, sDivIdConta
 	oCenter.appendChild(oCenterDiv);
 	oCloseButton.appendChild(oCenter);
 
-	this.m_nId         = nId;
-	this.m_oGameTree   = oGameTree;
-	this.m_oMainDiv    = oGameRoomDiv;
-	this.m_oTabDiv     = oDivTab;
-	this.m_oCaptionDiv = oCaptionDiv;
+	this.m_nId          = nId;
+	this.m_oGameTree    = oGameTree;
+	this.m_oMainDiv     = oGameRoomDiv;
+	this.m_oTabDiv      = oDivTab;
+	this.m_oCaptionDiv  = oCaptionDiv;
+	this.m_oGameHandler = oGame;
 
 	this.private_FillCaption(bDemonstration);
 
@@ -411,12 +413,25 @@ CVisualGameRoomTab.prototype.OnClick = function()
 	var oOldTab = this.m_oParent.OnClick(this);
 	if (oOldTab)
 	{
-		$(oOldTab.m_oMainDiv).fadeOut(500);
+		g_oFadeEffect.Out(oOldTab.m_oMainDiv, 500);
 		if (oOldTab.m_oGameTree)
 			oOldTab.m_oTabDiv.style.backgroundColor = "transparent";
 	}
 
-	$(this.m_oMainDiv).fadeIn(500);
+	var oThis = this;
+	g_oFadeEffect.In(this.m_oMainDiv, 500, function()
+	{
+		if (oThis.m_oGameTree && null !== oThis.m_oGameHandler)
+		{
+			oThis.m_oGameHandler.CommentsHandler.ScrollChatAreaToBottom();
+		}
+		else if (null === oThis.m_oGameTree)
+		{
+			oThis.m_oApp.ScrollChatAreaToBottom();
+		}
+	});
+
+
 	if (this.m_oGameTree)
 	{
 		this.m_oTabDiv.style.backgroundColor = "#737373";
@@ -427,8 +442,6 @@ CVisualGameRoomTab.prototype.OnClick = function()
 	{
 		this.m_oApp.UpdateDropDownChatTabsButton();
 		this.m_oApp.ScrollChatTabsToCurrent();
-		this.m_oApp.UpdateChatScroll();
-		this.m_oApp.ScrollChatAreaToBottom();
 	}
 
 	this.m_oApp.private_CollapseGameTabs();
