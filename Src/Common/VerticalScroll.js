@@ -121,13 +121,26 @@ CVerticalScroll.prototype.Hide = function()
 	this.m_oDiv.removeEventListener("DOMMouseScroll", this.m_fOnScroll, false);
 	this.m_oDiv.removeEventListener("mousewheel", this.m_fOnScroll, false);
 };
+CVerticalScroll.prototype.IsHidden = function()
+{
+	return ("none" === this.m_oScrollDiv.style.display ? true : false);
+};
 CVerticalScroll.prototype.CheckVisibility = function()
 {
 	var oDiv = this.m_oDiv;
 	if (oDiv.scrollHeight > oDiv.clientHeight)
+	{
+		var bHidden = this.IsHidden();
+
 		this.Show(oDiv.clientHeight);
+
+		if (true === bHidden)
+			this.m_oDiv.scrollTop = this.m_oDiv.clientHeight;
+	}
 	else
+	{
 		this.Hide();
+	}
 };
 CVerticalScroll.prototype.private_OnScroll = function(e)
 {
