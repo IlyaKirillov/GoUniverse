@@ -166,3 +166,52 @@ CFadeEffect.prototype.private_CheckElement = function(oElement)
 
 var g_oFadeEffect = new CFadeEffect();
 
+function CTimeStamp(sTimeStamp)
+{
+	this.m_oDate = new Date();
+
+	if (sTimeStamp)
+		this.Parse(sTimeStamp);
+}
+CTimeStamp.prototype.Parse = function(sTimeStamp)
+{
+	// <YYYY-MM-DDTHH:mm:ss.sssZ>
+	this.m_oDate = new Date(Date.parse(sTimeStamp));
+};
+CTimeStamp.prototype.ToLocaleString = function()
+{
+	return this.m_oDate.toLocaleString();
+};
+CTimeStamp.prototype.GetDifferenceString = function()
+{
+	var nTime = this.m_oDate.getTime();
+	var nCurTime = (new Date()).getTime();
+
+	var nDiffTime = nCurTime - nTime;
+
+	var nSeconds = parseInt(nDiffTime / 1000);
+
+	if (nSeconds <= 60 * 2)
+	{
+		return "" + nSeconds + " seconds ago";
+	}
+	else if (nSeconds <= 3600 * 2)
+	{
+		var nMinutes = Math.floor(nSeconds / 60);
+		return nMinutes + " minutes ago";
+	}
+	else if (nSeconds <= 3600 * 24 * 2)
+	{
+		var nMinutes = Math.floor(nSeconds / 60);
+		var nHours   = Math.floor(nMinutes / 60);
+		return nHours + " hours ago";
+	}
+	else
+	{
+		var nMinutes = Math.floor(nSeconds / 60);
+		var nHours   = Math.floor(nMinutes / 60);
+		var nDays    = Math.floor(nHours / 24);
+		return nDays + " days ago";
+	}
+};
+

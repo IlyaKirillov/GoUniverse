@@ -98,7 +98,19 @@ CKGSUserInfoWindow.prototype.OnUserDetails = function(oDetails)
 
 		this.private_AddConsoleMessage("UserName", oUser.GetName());
 		this.private_AddConsoleMessage("Rank", oUser.GetStringRank());
-		this.private_AddConsoleMessage("Last on", oUser.IsOnline() ? "online" : oDetails.lastOn);
+
+
+		if (oUser.IsOnline())
+		{
+			this.private_AddConsoleMessage("Last on", "online");
+		}
+		else
+		{
+			var oTimeStamp = new CTimeStamp(oDetails.lastOn);
+			this.private_AddConsoleMessage("Last on", oTimeStamp.GetDifferenceString() + " (" + oTimeStamp.ToLocaleString() + ")");
+		}
+
+
 		this.private_AddConsoleMessage("Locale", oDetails.locale);
 		this.private_AddConsoleMessage("Name", oDetails.personalName);
 
