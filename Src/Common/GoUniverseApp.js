@@ -624,7 +624,7 @@ CGoUniverseApplication.prototype.private_InitMainRoom = function()
 	this.m_oClientControl.AddControl(oMainRoomControl);
 
 	// Список игроков
-	var oPlayersListControl = this.m_oPlayersListView.Init("divPlayersListId", g_oPlayersList);
+	var oPlayersListControl = this.m_oPlayersListView.Init("divPlayersListId", new CKGSPlayersList(this));
 	oPlayersListControl.Bounds.SetParams(0, 0, 0, 1000, false, false, true, false, nPlayersListW, -1);
 	oPlayersListControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right);
 	oPlayersListControl.HtmlElement.style.background = "#F3F3F3";
@@ -642,7 +642,7 @@ CGoUniverseApplication.prototype.private_InitMainRoom = function()
 	oGamesListWrapperControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
 	oLeftPartControl.AddControl(oGamesListWrapperControl);
 
-	var oGamesListControl = this.m_oGamesListView.Init("divIdLGames", g_oGamesList);
+	var oGamesListControl = this.m_oGamesListView.Init("divIdLGames", new CKGSGamesList(this));
 	oGamesListControl.Bounds.SetParams(0, 0, 2, 0, true, false, true, true, -1, -1);
 	oGamesListControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
 	oGamesListControl.HtmlElement.style.background = "#F3F3F3";
@@ -1131,7 +1131,7 @@ CGoUniverseApplication.prototype.UpdateDropDownGameTabsButton = function()
 CGoUniverseApplication.prototype.ScrollChatAreaToBottom = function()
 {
 	if (this.m_oChatScroll)
-		this.m_oChatScroll.CheckVisibility();
+		this.m_oChatScroll.CheckVisibility(true);
 
 	var oDiv = document.getElementById("textareaChatId");
 	oDiv.scrollTop = oDiv.scrollHeight;

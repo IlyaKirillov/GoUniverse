@@ -15,134 +15,88 @@ var EKGSRoomListRecord = {
 	Private  : 3
 };
 
-var g_oKGSRoomList = {
+function CKGSRoomList(oApp)
+{
+	CKGSRoomList.superclass.constructor.call(this);
 
-	Headers : {
+	this.m_oHeaders = {
 		Sizes : [0, 245, 365],
 		Count : 3,
 		1     : "Name",
 		2     : "Category",
 		3     : ""
-	},
+	};
 
-	SortType : EKGSRoomListRecord.Name,
+	this.m_nSortType = EKGSRoomListRecord.Name;
+	this.m_oApp      = oApp;
+}
 
-	Set_SortType : function(nColNum, Direction)
-	{
-		if (Direction > 0)
-			g_oKGSRoomList.SortType = nColNum + 1;
-		else
-			g_oKGSRoomList.SortType = -(nColNum + 1);
-	},
+CommonExtend(CKGSRoomList, CListBase);
 
-	SortFunction : function(oRecord1, oRecord2)
-	{
-		var nRes = 0;
-		var SortType = g_oKGSRoomList.SortType;
+CKGSRoomList.prototype.private_Sort = function(oRecord1, oRecord2)
+{
+	var nRes     = 0;
+	var SortType = this.m_nSortType;
 
-		if (EKGSRoomListRecord.Name === SortType)
-			nRes = Common.Compare_Strings(oRecord1.m_sName, oRecord2.m_sName);
-		else if (-EKGSRoomListRecord.Name === SortType)
-			nRes = Common.Compare_Strings(oRecord2.m_sName, oRecord1.m_sName);
-		else if (EKGSRoomListRecord.Category === SortType)
-			nRes = Common.Compare_Strings(oRecord1.m_sCategory, oRecord2.m_sCategory);
-		else if (-EKGSRoomListRecord.Category === SortType)
-			nRes = Common.Compare_Strings(oRecord2.m_sCategory, oRecord1.m_sCategory);
-
-		if (0 !== nRes)
-			return nRes;
-
-		nRes = Common.Compare_Strings(oRecord1.m_sCategory, oRecord2.m_sCategory);
-		if (0 !== nRes)
-			return nRes;
-
+	if (EKGSRoomListRecord.Name === SortType)
 		nRes = Common.Compare_Strings(oRecord1.m_sName, oRecord2.m_sName);
-		if (0 !== nRes)
-			return nRes;
+	else if (-EKGSRoomListRecord.Name === SortType)
+		nRes = Common.Compare_Strings(oRecord2.m_sName, oRecord1.m_sName);
+	else if (EKGSRoomListRecord.Category === SortType)
+		nRes = Common.Compare_Strings(oRecord1.m_sCategory, oRecord2.m_sCategory);
+	else if (-EKGSRoomListRecord.Category === SortType)
+		nRes = Common.Compare_Strings(oRecord2.m_sCategory, oRecord1.m_sCategory);
 
-		if (oRecord1.m_nRoomId < oRecord2.m_nRoomId)
-			return -1;
-		else
-			return 1;
-	},
+	if (0 !== nRes)
+		return nRes;
 
-	Is_Sortable : function(nColNum)
-	{
-		if (2 === nColNum)
-			return false;
+	nRes = Common.Compare_Strings(oRecord1.m_sCategory, oRecord2.m_sCategory);
+	if (0 !== nRes)
+		return nRes;
 
-		return true;
-	},
+	nRes = Common.Compare_Strings(oRecord1.m_sName, oRecord2.m_sName);
+	if (0 !== nRes)
+		return nRes;
 
-	Draw_Header : function(dX, dY, oContext, nColNum)
-	{
-		var eType    = nColNum + 1;
-		var SortType = g_oKGSRoomList.SortType;
+	if (oRecord1.m_nRoomId < oRecord2.m_nRoomId)
+		return -1;
+	else
+		return 1;
+};
+CKGSRoomList.prototype.Is_Sortable = function(nColNum)
+{
+	if (2 === nColNum)
+		return false;
 
-		var sHeaderText;
-		if (eType === SortType)
-			sHeaderText = g_oKGSRoomList.Headers[eType] + String.fromCharCode(0x25B2);
-		else if (eType === -SortType)
-			sHeaderText = g_oKGSRoomList.Headers[eType] + String.fromCharCode(0x25BC);
-		else
-			sHeaderText = g_oKGSRoomList.Headers[eType];
-
-		oContext.fillStyle = "#000000";
-		oContext.fillText(sHeaderText, dX, dY);
-	},
-
-	Draw_Record : function(dX, dY, oContext, oRecord, nColNum)
-	{
-		var eType = nColNum + 1;
-		oRecord.Draw(oContext, dX, dY, eType);
-	},
-
-	Get_Record : function(aLine)
-	{
-		var oRecord = new CKGSRoomListRecord();
-		oRecord.Update(aLine);
-		return oRecord;
-	},
-
-	Get_Key : function(aLine)
-	{
-		return aLine[1];
-	},
-
-	Handle_DoubleClick : function(Record)
-	{
-		if (oApp)
-			oApp.SetCurrentChatRoomTab(Record.m_nRoomId);
-	},
-
-	GetVerLinesPositions : function()
-	{
-		return [1, 2];
-	},
-
-	GetHeadersCount : function()
-	{
-		return g_oKGSRoomList.Headers.Count;
-	},
-
-	GetHeadersSize : function(nColNum)
-	{
-		return g_oKGSRoomList.Headers.Sizes[nColNum];
-	},
-
-	GetSortType : function()
-	{
-		return g_oKGSRoomList.SortType;
-	}
+	return true;
+};
+CKGSRoomList.prototype.Get_Record = function(aLine)
+{
+	var oRecord = new CKGSRoomListRecord();
+	oRecord.Update(aLine);
+	return oRecord;
+};
+CKGSRoomList.prototype.Handle_DoubleClick = function(Record)
+{
+	if (this.m_oApp)
+		this.m_oApp.SetCurrentChatRoomTab(Record.m_nRoomId);
+};
+CKGSRoomList.prototype.GetVerLinesPositions = function()
+{
+	return [1, 2];
 };
 
 function CKGSRoomListRecord()
 {
+	CKGSRoomListRecord.superclass.constructor.call(this);
+
 	this.m_nRoomId   = -1;
 	this.m_sName     = "";
 	this.m_sCategory = "";
 	this.m_bPrivate  = false;
 }
+
+CommonExtend(CKGSRoomListRecord, CListRecordBase);
 
 CKGSRoomListRecord.prototype.Draw = function(oContext, dX, dY, eType)
 {

@@ -38,7 +38,7 @@ CKGSRoomListWindow.prototype.Init = function(sDivId, oPr)
 	var sListId       = sDivId + "L";
 	var oListElement = this.protected_CreateDivElement(oMainDiv, sListId);
 	this.m_oRoomListView.Set_BGColor(243, 243, 243);
-	var oListControl = this.m_oRoomListView.Init(sListId, g_oKGSRoomList);
+	var oListControl = this.m_oRoomListView.Init(sListId, new CKGSRoomList(this.m_oApp));
 	oListControl.Bounds.SetParams(0, 41, 0, 0, true, true, true, true, -1, -1);
 	oListControl.Anchor = (g_anchor_left | g_anchor_top | g_anchor_bottom  | g_anchor_right);
 	oMainControl.AddControl(oListControl);

@@ -125,7 +125,7 @@ CVerticalScroll.prototype.IsHidden = function()
 {
 	return ("none" === this.m_oScrollDiv.style.display ? true : false);
 };
-CVerticalScroll.prototype.CheckVisibility = function()
+CVerticalScroll.prototype.CheckVisibility = function(bScrollBottomOnShow)
 {
 	var oDiv = this.m_oDiv;
 	if (oDiv.scrollHeight > oDiv.clientHeight)
@@ -134,7 +134,7 @@ CVerticalScroll.prototype.CheckVisibility = function()
 
 		this.Show(oDiv.clientHeight);
 
-		if (true === bHidden)
+		if (true === bHidden && true === bScrollBottomOnShow)
 			this.m_oDiv.scrollTop = this.m_oDiv.clientHeight;
 	}
 	else

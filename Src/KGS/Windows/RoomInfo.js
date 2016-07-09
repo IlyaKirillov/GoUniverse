@@ -130,7 +130,7 @@ CKGSRoomInfoWindow.prototype.private_CreateOwnerList = function(oParentDiv)
 	var sListId      = oParentDiv.id + "L";
 	var oListElement = this.protected_CreateDivElement(oParentDiv, sListId);
 	this.m_oOwnerListView.Set_BGColor(243, 243, 243);
-	var oListControl = this.m_oOwnerListView.Init(sListId, g_oPlayersList);
+	var oListControl = this.m_oOwnerListView.Init(sListId, new CKGSPlayersList(this.m_oApp));
 	
 	if (this.m_oClient)
 	{

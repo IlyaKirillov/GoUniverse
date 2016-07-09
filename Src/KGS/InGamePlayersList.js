@@ -17,6 +17,8 @@ var EKGSInGamePlayersListRecord = {
 
 function CKGSInGamePlayersList(oApp)
 {
+	CKGSInGamePlayersList.superclass.constructor.call(this);
+
 	this.m_oApp = oApp;
 
 	this.m_oHeaders = {
@@ -157,6 +159,8 @@ CKGSInGamePlayersList.prototype.GetVerLinesPositions = function()
 
 function CKGSInGamePlayersListRecord(oListObject, oClient)
 {
+	CKGSInGamePlayersListRecord.superclass.constructor.call(this);
+
 	this.m_oListObject = oListObject;
 	this.m_oClient     = oClient;
 	this.m_sName       = "";

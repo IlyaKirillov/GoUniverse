@@ -383,7 +383,7 @@ CGoUniverseDrawingComments.prototype.AddGameOver = function(oNode, sResult)
 CGoUniverseDrawingComments.prototype.ScrollChatAreaToBottom = function()
 {
 	if (this.m_oChatScroll)
-		this.m_oChatScroll.CheckVisibility();
+		this.m_oChatScroll.CheckVisibility(true);
 
 	var oDiv = this.m_oTextArea;
 	oDiv.scrollTop = oDiv.scrollHeight;
