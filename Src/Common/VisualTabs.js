@@ -215,6 +215,8 @@ function CVisualGameRoomTab(oApp)
 	this.m_oGameHandler  = null;
 
 	this.m_oCaptionDiv   = null;
+	this.m_oMainControl  = null;
+	this.m_oDrawing      = null;
 }
 CVisualGameRoomTab.prototype.InitMainRoom = function(nId, sMainDivId, sTabDivId)
 {
@@ -263,6 +265,7 @@ CVisualGameRoomTab.prototype.InitGameRoom = function(nId, oGameTree, sDivIdConta
 		oDrawing.Create_GoUniverseViewerTemplate(sGameRoomDivId + "B", this.m_oApp, this, sWhiteAvatar, sBlackAvatar, oWhiteTime, oBlackTime, oGame);
 		oDrawing.Update_Size(true);
 		oGameTree.Set_EditingFlags({LoadFile : false, GameInfo : false});
+		this.m_oDrawing = oDrawing;
 	}
 
 	// Создаем дивку под таб
@@ -354,6 +357,8 @@ CVisualGameRoomTab.prototype.InitGameRoom = function(nId, oGameTree, sDivIdConta
 	this.m_oTabDiv      = oDivTab;
 	this.m_oCaptionDiv  = oCaptionDiv;
 	this.m_oGameHandler = oGame;
+
+	this.m_oMainControl = oGameRoomControl;
 
 	this.private_FillCaption(bDemonstration);
 
@@ -460,6 +465,12 @@ CVisualGameRoomTab.prototype.OnCloseTab = function()
 {
 	if (this.m_oContainerDiv)
 		this.m_oContainerDiv.removeChild(this.m_oMainDiv);
+
+	if (this.m_oMainControl && this.m_oMainControl.Parent)
+		this.m_oMainControl.Parent.RemoveControl(this.m_oMainControl);
+
+	if (this.m_oDrawing)
+		this.m_oDrawing.Destroy();
 
 	this.m_oApp.UpdateDropDownGameTabsButton();
 };

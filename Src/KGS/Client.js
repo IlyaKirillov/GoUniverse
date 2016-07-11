@@ -933,7 +933,7 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 
 	oGame.Demo = bDemo;
 	this.m_oApp.AddGameRoom(GameRoomId, oGameTree, bDemo, sWhiteAvatar, sBlackAvatar, oGame.WhiteTime, oGame.BlackTime, oGame);
-	this.m_oApp.SetCurrentGameRoomTab(GameRoomId);
+	//this.m_oApp.SetCurrentGameRoomTab(GameRoomId);
 
 	var oCurNode = this.private_ReadSgfEvents(oGame, oMessage.sgfEvents);
 	if (!oCurNode)
