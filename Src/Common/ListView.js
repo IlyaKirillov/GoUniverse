@@ -282,6 +282,8 @@ function CListView()
 			{
 				if (oThis.m_aList[oThis.m_nSelectedIndex])
 					oThis.m_oListObject.Handle_RightClick(oThis.m_aList[oThis.m_nSelectedIndex], e);
+                else
+                    oThis.m_oListObject.Handle_RightClick(null, e);
 				bRet = false;
 			}
 		}

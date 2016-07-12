@@ -228,7 +228,7 @@ CKGSGamesList.prototype.Handle_DoubleClick = function(Record)
 CKGSGamesList.prototype.Handle_RightClick = function(Record, e)
 {
 	if (this.m_oApp)
-		this.m_oApp.ShowGamesListContextMenu(e.pageX, e.pageY, Record.m_nGameId);
+		this.m_oApp.ShowGamesListContextMenu(e.pageX, e.pageY, Record ? Record.m_nGameId : null);
 };
 
 function CKGSGamesListRecord(oClient)

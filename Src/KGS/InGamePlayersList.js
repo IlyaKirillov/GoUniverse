@@ -124,7 +124,7 @@ CKGSInGamePlayersList.prototype.Handle_DoubleClick = function(Record)
 };
 CKGSInGamePlayersList.prototype.Handle_RightClick = function(Record, e)
 {
-	if (this.m_oApp)
+	if (this.m_oApp && Record)
 	{
 		this.m_oApp.ShowUserContextMenu(e.pageX, e.pageY, Record.m_sName);
 	}

@@ -1151,13 +1151,18 @@ CGoUniverseApplication.prototype.ShowGamesListContextMenu = function(nX, nY, nGa
 {
 	var oClient = this.m_oClient;
 	var oContextMenu = new CVisualContextMenu(this, nX, nY);
-	oContextMenu.AddCheckBoxItem(oClient.IsAllGamesInList(), "All games", function ()
+	var nGamesListType = oClient.GetGamesListType();
+	oContextMenu.AddCheckBoxItem(EKGSGamesListType.All === nGamesListType ? true : false, "All", function ()
 	{
-		oClient.SetAllGamesInList(true);
+		oClient.SetGamesListType(EKGSGamesListType.All);
 	});
-	oContextMenu.AddCheckBoxItem(!oClient.IsAllGamesInList(), "Room games", function ()
+	oContextMenu.AddCheckBoxItem(EKGSGamesListType.Room === nGamesListType ? true : false, "Rooms", function ()
 	{
-		oClient.SetAllGamesInList(false);
+		oClient.SetGamesListType(EKGSGamesListType.Room);
+	});
+	oContextMenu.AddCheckBoxItem(EKGSGamesListType.Follower === nGamesListType ? true : false, "Followers", function ()
+	{
+		oClient.SetGamesListType(EKGSGamesListType.Follower);
 	});
 	oContextMenu.Show();
 };
