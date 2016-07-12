@@ -44,71 +44,72 @@ CGoUniverseApplication.prototype.Init = function()
 	this.private_GotoLoginPage(false);
 	this.OnResize();
 
-	 //TEST
-	 this.m_oClient = new CKGSClient(this);
-	 //this.OnConnect();
+	 // //TEST
+	 // this.m_oClient = new CKGSClient(this);
+	 // //this.OnConnect();
+	 // //
 	 //
-
-	 document.getElementById("divMainId").style.display = "block";
-	 this.OnResize();
-
-	 var nRoomId = 0;
-	 var oThis = this;
-	 function TEST_AddChatRoom()
-	 {
-	 	oThis.AddChatRoom(nRoomId++, "Room " + nRoomId);
-	 }
-
-	 for (var nIndex = 0; nIndex < 100; nIndex++)
-	 {
-	 	TEST_AddChatRoom();
-	 }
-
-	 //this.AddGameRoom(1, new CGameTree(), false, "", "", new CTimeSettings(), new CTimeSettings(), {PlayersList : new CListView()});
-	 // this.AddGameRoom(2, new CGameTree());
-	 // this.AddGameRoom(3, new CGameTree());
-	 // this.AddGameRoom(4, new CGameTree());
-
-	 var nGameRoomId = 0;
-	 function TEST_AddGameRoom()
-	 {
-	 	oThis.AddGameRoom(nGameRoomId++, null);
-	 }
-
-	 for (var nIndex = 0; nIndex < 100; nIndex++)
-	 {
-	 	TEST_AddGameRoom();
-	 }
-
-	 this.SetCurrentChatRoom(0);
-
-	 function TEST_AddChatMessage(nIndex)
-	 {
-	 	oThis.OnAddChatMessage(0, "Test", "Test message " + nIndex);
-	 }
-
-	 for (var nIndex = 0; nIndex < 100; nIndex++)
-	 {
-	 	TEST_AddChatMessage(nIndex);
-	 }
-
-	 function TEST_AddGameRecord(nGameId)
-	 {
-	 	oThis.m_oGamesListView.Handle_Record([0, nGameId, "R", 0, "", "White " + nGameId, 30, "", "Black", 25, "", 15, false, 15, false, false, false, "19x19"]);
-	 }
-
-	 for (var nIndex = 0; nIndex < 100; nIndex++)
-	 {
-	 	TEST_AddGameRecord(nIndex);
-	 }
-
-	 this.m_oGamesListView.Update();
-	 this.m_oGamesListView.Update_Size();
-
-
-	 // this.m_oClient.private_HandleDetailsNonExistant({name : "WWWWWWWW"});
-	 // this.m_oClient.private_HandlePrivateKeepOut({channelId : -1});
-	 // this.m_oClient.private_HandleIdleWarning({});
+	 // document.getElementById("divMainId").style.display = "block";
+	 // this.OnResize();
+	 //
+	 // var nRoomId = 0;
+	 // var oThis = this;
+	 // function TEST_AddChatRoom()
+	 // {
+	 // 	oThis.AddChatRoom(nRoomId++, "Room " + nRoomId);
+	 // }
+	 //
+	 // for (var nIndex = 0; nIndex < 100; nIndex++)
+	 // {
+	 // 	TEST_AddChatRoom();
+	 // }
+	 //
+	 // //this.AddGameRoom(1, new CGameTree(), false, "", "", new CTimeSettings(), new CTimeSettings(), {PlayersList : new CListView()});
+	 // // this.AddGameRoom(2, new CGameTree());
+	 // // this.AddGameRoom(3, new CGameTree());
+	 // // this.AddGameRoom(4, new CGameTree());
+	 //
+	 // var nGameRoomId = 0;
+	 // function TEST_AddGameRoom()
+	 // {
+	 // 	oThis.AddGameRoom(nGameRoomId++, null);
+	 // }
+	 //
+	 //
+	 // for (var nIndex = 0; nIndex < 100; nIndex++)
+	 // {
+	 // 	TEST_AddGameRoom();
+	 // }
+	 //
+	 // this.SetCurrentChatRoom(0);
+	 //
+	 // function TEST_AddChatMessage(nIndex)
+	 // {
+	 // 	oThis.OnAddChatMessage(0, "Test", "Test message " + nIndex);
+	 // }
+	 //
+	 // for (var nIndex = 0; nIndex < 100; nIndex++)
+	 // {
+	 // 	TEST_AddChatMessage(nIndex);
+	 // }
+	 //
+	 // function TEST_AddGameRecord(nGameId)
+	 // {
+	 // 	oThis.m_oGamesListView.Handle_Record([0, nGameId, "R", 0, "", "White " + nGameId, 30, "", "Black", 25, "", 15, false, 15, false, false, false, "19x19"]);
+	 // }
+	 //
+	 // for (var nIndex = 0; nIndex < 100; nIndex++)
+	 // {
+	 // 	TEST_AddGameRecord(nIndex);
+	 // }
+	 //
+	 // this.m_oGamesListView.Update();
+	 // this.m_oGamesListView.Update_Size();
+	 //
+	 //
+	 // // this.m_oClient.private_HandleDetailsNonExistant({name : "WWWWWWWW"});
+	 // // this.m_oClient.private_HandlePrivateKeepOut({channelId : -1});
+	 // // this.m_oClient.private_HandleIdleWarning({});
 
 
 
@@ -1146,33 +1147,49 @@ CGoUniverseApplication.prototype.GetVersion = function()
 {
 	return g_sGoUniverseVersion;
 };
-
-
-var g_nGameRoomId = 0;
-
-function AddGR()
+CGoUniverseApplication.prototype.ShowGamesListContextMenu = function(nX, nY, nGameId)
 {
-	this.AddGameRoom(g_nGameRoomId++, new CGameTree(), false, "", "", new CTimeSettings(), new CTimeSettings(), {PlayersList : new CListView()});
-}
-
-function AddGR_Count(nCount)
-{
-	for (var nIndex = 0; nIndex < nCount; ++nIndex)
+	var oClient = this.m_oClient;
+	var oContextMenu = new CVisualContextMenu(this, nX, nY);
+	oContextMenu.AddCheckBoxItem(oClient.IsAllGamesInList(), "All games", function ()
 	{
-		AddGR();
-	}
-
-	for (var nIndex = 0; nIndex < nCount; ++nIndex)
+		oClient.SetAllGamesInList(true);
+	});
+	oContextMenu.AddCheckBoxItem(!oClient.IsAllGamesInList(), "Room games", function ()
 	{
-		oApp.SetCurrentGameRoomTab(nIndex);
-	}
-}
+		oClient.SetAllGamesInList(false);
+	});
+	oContextMenu.Show();
+};
 
-function RemoveAllGR()
-{
-	for (var nIndex = g_nGameRoomId - 1; nIndex >= 0; --nIndex)
-	{
-		var oTab = oApp.m_oGameRoomTabs.GetTab(nIndex);
-		oTab.OnClickClose();
-	}
-}
+
+// var g_nGameRoomId = 0;
+//
+// function AddGR()
+// {
+// 	oApp.AddGameRoom(g_nGameRoomId++, new CGameTree(), false, "", "", new CTimeSettings(), new CTimeSettings(), {PlayersList : new CListView()});
+// }
+//
+// function AddGR_Count(nCount)
+// {
+// 	for (var nIndex = 0; nIndex < nCount; ++nIndex)
+// 	{
+// 		AddGR();
+// 	}
+//
+// 	for (var nIndex = 0; nIndex < nCount; ++nIndex)
+// 	{
+// 		oApp.SetCurrentGameRoomTab(nIndex);
+// 	}
+// }
+//
+// function RemoveAllGR()
+// {
+// 	for (var nIndex = g_nGameRoomId - 1; nIndex >= 0; --nIndex)
+// 	{
+// 		var oTab = oApp.m_oGameRoomTabs.GetTab(nIndex);
+// 		oTab.OnClickClose();
+// 	}
+//
+// 	g_nGameRoomId = 0;
+// }

@@ -225,6 +225,11 @@ CKGSGamesList.prototype.Handle_DoubleClick = function(Record)
 	if (this.m_oApp)
 		this.m_oApp.SetCurrentGameRoomTab(Record.m_nGameId);
 };
+CKGSGamesList.prototype.Handle_RightClick = function(Record, e)
+{
+	if (this.m_oApp)
+		this.m_oApp.ShowGamesListContextMenu(e.pageX, e.pageY, Record.m_nGameId);
+};
 
 function CKGSGamesListRecord(oClient)
 {

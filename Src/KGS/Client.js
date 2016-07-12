@@ -31,6 +31,8 @@ function CKGSClient(oApp)
 
 	this.m_oPlayersListView = oApp.GetPlayersListView();
 	this.m_oGamesListView   = oApp.GetGamesListView();
+
+	this.m_bAllGamesInList = true;
 }
 CKGSClient.prototype.Clear = function()
 {
@@ -233,6 +235,9 @@ CKGSClient.prototype.SetCurrentChatRoom = function(nChatRoomId)
 {
 	this.m_nChatChannelId = nChatRoomId;
 	this.private_UpdatePlayersList();
+
+	if (true !== this.m_bAllGamesInList)
+		this.private_UpdateGamesList();
 };
 CKGSClient.prototype.EnterPrivateChat = function(sUserName)
 {
@@ -656,10 +661,8 @@ CKGSClient.prototype.private_HandleRoomJoin = function(oMessage)
 		for (var Pos = 0, Count = Games.length; Pos < Count; ++Pos)
 		{
 			var oEntry = Games[Pos];
-			this.private_HandleGameRecord(oEntry, true);
 			this.private_OnAddGameListRecord(oMessage.channelId, oEntry);
 		}
-		this.m_oGamesListView.Update_Size();
 	}
 
 	var oRoom = this.m_aAllRooms[oMessage.channelId];
@@ -678,7 +681,11 @@ CKGSClient.prototype.private_HandleRoomJoin = function(oMessage)
 		}
 	}
 
-	this.private_UpdatePlayersList();
+	if (oMessage.channelId == this.m_nChatChannelId)
+		this.private_UpdatePlayersList();
+
+	if (true === this.m_bAllGamesInList || oMessage.channelId == this.m_nChatChannelId)
+		this.private_UpdateGamesList();
 };
 CKGSClient.prototype.private_HandleLoginSuccess = function(oMessage)
 {
@@ -757,66 +764,83 @@ CKGSClient.prototype.private_HandleLoginSuccess = function(oMessage)
 };
 CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
 {
-	if ("challenge" === oGameRecord.gameType)
+	var nGameType = oGameRecord.GetGameType();
+	if (EKGSGameType.Challenge === nGameType)
 		return;
 
-	var nGameId     = oGameRecord.channelId;
+	var nGameId     = oGameRecord.GetGameId();
 	var sGameType   = "";
-	var nMoveNumber = oGameRecord.moveNum;
-	var nObservers  = undefined !== oGameRecord.observers ? oGameRecord.observers : 0;
-	var sComment    = oGameRecord.score ? oGameRecord.score : "";
-	var sScore      = oGameRecord.score ? "" + oGameRecord.score : "";
+	var nMoveNumber = oGameRecord.GetMoveNum();
+	var nObservers  = oGameRecord.GetObservers();
+	var sComment    = oGameRecord.GetScore();
 	var nAdd        = true === bAdd ? 0 : 1;
-	var sBlack      = oGameRecord.players.black ? oGameRecord.players.black.name : "";
-	var nBlackR     = oGameRecord.players.black ? this.private_GetRank(oGameRecord.players.black.rank) : -3;
-	var sWhite      = oGameRecord.players.white ? oGameRecord.players.white.name : "";
-	var nWhiteR     = oGameRecord.players.white ? this.private_GetRank(oGameRecord.players.white.rank) : -3;
-	var bPrivate    = true === oGameRecord.private ? true : false;
-	var nRoomId     = oGameRecord.roomId;
-	var bAdjourned  = oGameRecord.adjourned ? oGameRecord.adjourned : false;
-	var bEvent      = oGameRecord.event ? oGameRecord.event : false;
-	var bDemo       = false;
-	var sSize       = oGameRecord.size ? "" + oGameRecord.size : "" + 19;
-	var nHandi      = oGameRecord.handicap ? parseInt(oGameRecord.handicap) : 0;
+	var oBlack      = oGameRecord.GetBlack();
+	var oWhite      = oGameRecord.GetWhite();
+	var oOwner      = oGameRecord.GetOwner();
 
-	if ("demonstration" === oGameRecord.gameType)
+	var sBlack      = oBlack ? oBlack.GetName() : "";
+	var nBlackR     = oBlack ? oBlack.GetRank() : -3;
+	var sWhite      = oWhite ? oWhite.GetName() : "";
+	var nWhiteR     = oWhite ? oWhite.GetRank() : -3;
+	var bPrivate    = oGameRecord.IsPrivate();
+	var nRoomId     = oGameRecord.GetRoomId();
+	var bAdjourned  = oGameRecord.IsAdjourned();
+	var bEvent      = oGameRecord.IsEvent();
+	var bDemo       = false;
+	var nSize       = oGameRecord.GetBoardSize();
+	var nHandi      = oGameRecord.GetHandicap();
+
+	if (EKGSGameType.Demonstration === nGameType)
 	{
 		sGameType = "D";
 		sComment  = "";
-		sWhite    = oGameRecord.players.owner.name;
-		nWhiteR   = oGameRecord.players.owner && oGameRecord.players.owner.rank ? this.private_GetRank(oGameRecord.players.owner.rank) : -3;
 		bDemo     = true;
+
+		if (oOwner)
+		{
+			sWhite  = oOwner.GetName();
+			nWhiteR = oOwner.GetRank();
+		}
+		else
+		{
+			sWhite  = "";
+			nWhiteR = -3;
+		}
 	}
-	else if ("review" === oGameRecord.gameType || "rengo_review" === oGameRecord.gameType)
+	else if (EKGSGameType.Review === nGameType || EKGSGameType.RengoReview === nGameType)
 	{
 		sGameType = "D";
-		sComment = "";
-
-		sWhite    = oGameRecord.players.owner.name;
-
-		if (oGameRecord.players.black && oGameRecord.players.black.name && oGameRecord.players.white && oGameRecord.players.white.name)
-			sWhite += " review (" + oGameRecord.players.white.name + " vs. " + oGameRecord.players.black.name + ")";
-
-		nWhiteR   = oGameRecord.players.owner && oGameRecord.players.owner.rank ? this.private_GetRank(oGameRecord.players.owner.rank) : -3;
+		sComment  = "";
 		bDemo     = true;
+		
+		if (oOwner)
+		{
+			sWhite  = oOwner.GetName();
+			nWhiteR = oOwner.GetRank();
+		}
+		else
+		{
+			sWhite  = "";
+			nWhiteR = -3;
+		}
+
+		if (oBlack && oWhite)
+			sWhite += " review (" + oWhite.GetName() + " vs. " + oBlack.GetName() + ")";
 	}
-	else if ("free" === oGameRecord.gameType)
+	else if (EKGSGameType.Free === nGameType)
 		sGameType = "F";
-	else if ("ranked" === oGameRecord.gameType)
+	else if (EKGSGameType.Ranked === nGameType)
 		sGameType = "R";
-	else if ("teaching" === oGameRecord.gameType)
+	else if (EKGSGameType.Teaching === nGameType)
 		sGameType = "T";
-	else if ("simul" === oGameRecord.gameType)
+	else if (EKGSGameType.Simul === nGameType)
 		sGameType = "S";
-	else if ("rengo" === oGameRecord.gameType)
+	else if (EKGSGameType.Rengo === nGameType)
 		sGameType = "2";
-	else if ("tournament" === oGameRecord.gameType)
+	else if (EKGSGameType.Tournament === nGameType)
 		sGameType = "*";
 
-	if ("" !== sScore)
-		sComment = this.private_ParseScore(sScore);
-
-	var sSizeHandi = sSize + "x" + sSize + (0 !== nHandi ? " H" + nHandi : "");
+	var sSizeHandi = nSize + "x" + nSize + (0 !== nHandi ? " H" + nHandi : "");
 	if (true === bPrivate)
 		sGameType = "P";
 
@@ -1107,15 +1131,19 @@ CKGSClient.prototype.private_HandleGameList = function(oMessage)
 	for (var Pos = 0, Count = Games.length; Pos < Count; ++Pos)
 	{
 		var oEntry = Games[Pos];
-		this.private_HandleGameRecord(oEntry, true);
-		this.private_OnAddGameListRecord(oMessage.channelId, oEntry);
+
+		var oGameRecord = this.private_OnAddGameListRecord(oMessage.channelId, oEntry);
+
+		if (true === this.m_bAllGamesInList || this.m_nChatChannelId === oMessage.channelId)
+			this.private_HandleGameRecord(oGameRecord, true);
 	}
 	this.m_oGamesListView.Update_Size();
 };
 CKGSClient.prototype.private_HandleGameContainerRemoveGame = function(oMessage)
 {
 	this.private_OnRemoveGameListRecord(oMessage.channelId, oMessage.gameId);
-	if (!this.m_oAllGames[oMessage.gameId])
+
+	if ((true === this.m_bAllGamesInList && !this.m_oAllGames[oMessage.gameId]) || oMessage.channelId === this.m_nChatChannelId)
 	{
 		this.m_oGamesListView.Handle_Record([1, oMessage.gameId]);
 		this.m_oGamesListView.Update_Size();
@@ -1210,10 +1238,11 @@ CKGSClient.prototype.private_HandleGlobalGamesJoin = function(oMessage)
 	for (var Pos = 0, Count = Games.length; Pos < Count; ++Pos)
 	{
 		var oEntry = Games[Pos];
-		this.private_HandleGameRecord(oEntry, true);
 		this.private_OnAddGameListRecord(oMessage.channelId, oEntry);
 	}
-	this.m_oGamesListView.Update_Size();
+
+	if (true === this.m_bAllGamesInList)
+		this.private_UpdateGamesList();
 };
 CKGSClient.prototype.private_HandleLoginFailedBadPassword = function(oMessage)
 {
@@ -1997,8 +2026,16 @@ CKGSClient.prototype.private_OnAddGameListRecord = function(nRoomId, oRecord)
 		this.m_oAllGames[nGameId] = oGameRecord;
 	}
 
+	var oRoom = this.m_aAllRooms[nRoomId];
+	if (oRoom)
+	{
+		oRoom.Games[nGameId] = oGameRecord;
+	}
+
 	oGameRecord.Update(oRecord);
 	oGameRecord.AddRoom(nRoomId);
+
+	return oGameRecord;
 };
 CKGSClient.prototype.private_OnRemoveGameListRecord = function(nRoomId, nGameId)
 {
@@ -2007,5 +2044,48 @@ CKGSClient.prototype.private_OnRemoveGameListRecord = function(nRoomId, nGameId)
 	{
 		if (oGameRecord.RemoveRoom(nRoomId))
 			delete this.m_oAllGames[nGameId];
+
+		var oRoom = this.m_aAllRooms[nRoomId];
+		if (oRoom)
+			delete oRoom.Games[nGameId];
 	}
+};
+CKGSClient.prototype.IsAllGamesInList = function()
+{
+	return this.m_bAllGamesInList;
+};
+CKGSClient.prototype.SetAllGamesInList = function(bAllGames)
+{
+	if (bAllGames !== this.m_bAllGamesInList)
+	{
+		this.m_bAllGamesInList = bAllGames;
+		this.private_UpdateGamesList();
+	}
+};
+CKGSClient.prototype.private_UpdateGamesList = function()
+{
+	this.m_oGamesListView.Clear();
+
+	if (true === this.m_bAllGamesInList)
+	{
+		for (var nGameId in this.m_oAllGames)
+		{
+			var oGameRecord = this.m_oAllGames[nGameId];
+			this.private_HandleGameRecord(oGameRecord, true);
+		}
+	}
+	else
+	{
+		var oRoom = this.m_aAllRooms[this.m_nChatChannelId];
+		if (oRoom)
+		{
+			for (var nGameId in oRoom.Games)
+			{
+				var oGameRecord = oRoom.Games[nGameId];
+				this.private_HandleGameRecord(oGameRecord, true);
+			}
+		}
+	}
+
+	this.m_oGamesListView.Update_Size();
 };
