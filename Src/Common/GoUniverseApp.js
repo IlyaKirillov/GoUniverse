@@ -30,6 +30,7 @@ function CGoUniverseApplication()
 	
 	this.m_oSound              = new CBoardSound();
 	this.m_oSound.Init("http://webgoboard.com/Sound");
+//	this.m_oSound.Init("Files/Sound");
 	this.m_bFocused            = true;
 
 	this.m_oGameTabsScroll = null;
@@ -1149,8 +1150,19 @@ CGoUniverseApplication.prototype.GetVersion = function()
 };
 CGoUniverseApplication.prototype.ShowGamesListContextMenu = function(nX, nY, nGameId)
 {
+	var oThis = this;
 	var oClient = this.m_oClient;
 	var oContextMenu = new CVisualContextMenu(this, nX, nY);
+
+	if (null !== nGameId)
+	{
+		oContextMenu.AddCheckBoxItem(false, "Observe", function ()
+		{
+			oThis.SetCurrentGameRoomTab(nGameId);
+		});
+		oContextMenu.AddHorizontalLine();
+	}
+
 	var nGamesListType = oClient.GetGamesListType();
 	oContextMenu.AddCheckBoxItem(EKGSGamesListType.All === nGamesListType ? true : false, "All", function ()
 	{
