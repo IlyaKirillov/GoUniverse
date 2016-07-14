@@ -9,6 +9,8 @@
  * Time     2:33
  */
 
+var g_oDrawingBoardElements = null;
+
 //----------------------------------------------------------------------------------------------------------------------
 // Дополнение к классу CDrawing
 //----------------------------------------------------------------------------------------------------------------------
@@ -56,6 +58,11 @@ CDrawing.prototype.private_GoUniverseCreateHorFullTemplate = function()
 	//------------------------------------------------------------------------------------------------------------------
 	var oDrawingBoard = new CDrawingBoard(this);
 	oMainControl.Set_Type(1, oDrawingBoard, {RMin : this.m_nMixedRightSide});
+
+	// if (null === g_oDrawingBoardElements)
+	// 	g_oDrawingBoardElements = oDrawingBoard.m_oImageData;
+	// else
+	// 	oDrawingBoard.m_oImageData = g_oDrawingBoardElements;
 
 	var sBoardDivId = sDivId + "B";
 	var sPanelDivId = sDivId + "P";
