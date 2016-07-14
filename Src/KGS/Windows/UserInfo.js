@@ -35,34 +35,37 @@ CKGSUserInfoWindow.prototype.Init = function(sDivId, oPr)
 
 	var oMainDiv     = this.HtmlElement.InnerDiv;
 	var oMainControl = this.HtmlElement.InnerControl;
+
 	oMainDiv.style.fontSize = "16px";
 	oMainDiv.className += " Selectable";
-
-	var sMainInfo  = sDivId + "M";
-	var sAvatar    = sDivId + "A";
-	var sExtension = sDivId + "E";
-
-	this.m_oMainInfoDiv = this.protected_CreateDivElement(oMainDiv, sMainInfo);
-	var oMainInfoControl = CreateControlContainer(sMainInfo);
-	oMainInfoControl.Bounds.SetParams(5, 5, 155, 0, true, true, true, false, -1, 200);
-	oMainInfoControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left);
-	oMainControl.AddControl(oMainInfoControl);
-
-	this.m_oAvatarDiv = this.protected_CreateDivElement(oMainDiv, sAvatar);
-	var oAvatarControl = CreateControlContainer(sAvatar);
-	oAvatarControl.Bounds.SetParams(0, 5, 5, 0, false, true, true, false, 150, 200);
-	oAvatarControl.Anchor = (g_anchor_top | g_anchor_right);
-	oMainControl.AddControl(oAvatarControl);
-
-	this.m_oExtensionDiv = this.protected_CreateDivElement(oMainDiv, sExtension);
-	var oExtensionControl = CreateControlContainer(sExtension);
-	oExtensionControl.Bounds.SetParams(5, 205, 5, 5, true, true, true, true, -1, -1);
-	oExtensionControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left | g_anchor_bottom);
-	oMainControl.AddControl(oExtensionControl);
-
 	oMainDiv.style.backgroundColor = "rgb(243, 243, 243)";
 
-	this.private_AddMainInfo();
+	var sInfoWrapperId  = sDivId + "I";
+	var sGamesWrapperId = sDivId + "G";
+	var sRankWrapperId  = sDivId + "R";
+
+	var oInfoDivWrapper = this.protected_CreateDivElement(oMainDiv, sInfoWrapperId);
+	var oInfoDifWrapperControl = CreateControlContainer(sInfoWrapperId);
+	oInfoDifWrapperControl.Bounds.SetParams(0, 25, 0, 0, true, true, true, true, -1, -1);
+	oInfoDifWrapperControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left | g_anchor_bottom);
+	oMainControl.AddControl(oInfoDifWrapperControl);
+
+	var oGamesDivWrapper = this.protected_CreateDivElement(oMainDiv, sGamesWrapperId);
+	var oGamesDifWrapperControl = CreateControlContainer(sGamesWrapperId);
+	oGamesDifWrapperControl.Bounds.SetParams(0, 25, 0, 0, true, true, true, true, -1, -1);
+	oGamesDifWrapperControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left | g_anchor_bottom);
+	oMainControl.AddControl(oGamesDifWrapperControl);
+
+	var oRankDivWrapper = this.protected_CreateDivElement(oMainDiv, sRankWrapperId);
+	var oRankDifWrapperControl = CreateControlContainer(sRankWrapperId);
+	oRankDifWrapperControl.Bounds.SetParams(0, 25, 0, 0, true, true, true, true, -1, -1);
+	oRankDifWrapperControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left | g_anchor_bottom);
+	oMainControl.AddControl(oRankDifWrapperControl);
+
+
+	this.private_CreateInfoPage(oInfoDivWrapper, oInfoDifWrapperControl);
+	this.private_CreateInfoPage(oGamesDivWrapper, oGamesDifWrapperControl);
+
 };
 CKGSUserInfoWindow.prototype.Get_DefaultWindowSize = function(bForce)
 {
@@ -278,4 +281,34 @@ CKGSUserInfoWindow.prototype.private_SetCaption = function(sCaption, bOnline)
 		this.HtmlElement.CaptionText.innerHTML = "\<span\>" + sCaption + "\<\/span\>" + "\<span style='position:absolute;left:0px;color:rgb(0,130,57)'\>&#x2600;\<\/span\>";
 	else
 		this.HtmlElement.CaptionText.innerHTML = "\<span\>" + sCaption + "\<\/span\>" + "\<span style='position:absolute;left:0px;color:rgb(199,40,40)'\>&#x26C5;\<\/span\>";
+};
+CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
+{
+	var sMainInfo  = sInfoWrapperId + "M";
+	var sAvatar    = sInfoWrapperId + "A";
+	var sExtension = sInfoWrapperId + "E";
+
+	this.m_oMainInfoDiv = this.protected_CreateDivElement(oDiv, sMainInfo);
+	var oMainInfoControl = CreateControlContainer(sMainInfo);
+	oMainInfoControl.Bounds.SetParams(5, 5, 155, 0, true, true, true, false, -1, 200);
+	oMainInfoControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left);
+	oControl.AddControl(oMainInfoControl);
+
+	this.m_oAvatarDiv = this.protected_CreateDivElement(oDiv, sAvatar);
+	var oAvatarControl = CreateControlContainer(sAvatar);
+	oAvatarControl.Bounds.SetParams(0, 5, 5, 0, false, true, true, false, 150, 200);
+	oAvatarControl.Anchor = (g_anchor_top | g_anchor_right);
+	oControl.AddControl(oAvatarControl);
+
+	this.m_oExtensionDiv = this.protected_CreateDivElement(oDiv, sExtension);
+	var oExtensionControl = CreateControlContainer(sExtension);
+	oExtensionControl.Bounds.SetParams(5, 205, 5, 5, true, true, true, true, -1, -1);
+	oExtensionControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left | g_anchor_bottom);
+	oControl.AddControl(oExtensionControl);
+
+	this.private_AddMainInfo();
+};
+CKGSUserInfoWindow.prototype.private_CreateGamesPage = function(oDiv, oControl)
+{
+	
 };
