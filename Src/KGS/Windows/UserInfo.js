@@ -64,7 +64,7 @@ CKGSUserInfoWindow.prototype.Init = function(sDivId, oPr)
 
 
 	this.private_CreateInfoPage(oInfoDivWrapper, oInfoDifWrapperControl);
-	this.private_CreateInfoPage(oGamesDivWrapper, oGamesDifWrapperControl);
+	this.private_CreateGamesPage(oGamesDivWrapper, oGamesDifWrapperControl);
 
 };
 CKGSUserInfoWindow.prototype.Get_DefaultWindowSize = function(bForce)
@@ -284,9 +284,11 @@ CKGSUserInfoWindow.prototype.private_SetCaption = function(sCaption, bOnline)
 };
 CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
 {
-	var sMainInfo  = sInfoWrapperId + "M";
-	var sAvatar    = sInfoWrapperId + "A";
-	var sExtension = sInfoWrapperId + "E";
+	var sDivId = oDiv.id;
+
+	var sMainInfo  = sDivId + "M";
+	var sAvatar    = sDivId + "A";
+	var sExtension = sDivId + "E";
 
 	this.m_oMainInfoDiv = this.protected_CreateDivElement(oDiv, sMainInfo);
 	var oMainInfoControl = CreateControlContainer(sMainInfo);
@@ -310,5 +312,329 @@ CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
 };
 CKGSUserInfoWindow.prototype.private_CreateGamesPage = function(oDiv, oControl)
 {
-	
+	var sGameViewId = oDiv.id;
+
+	this.m_oGamesListView = new CListView();
+
+	var oGamesDiv = this.protected_CreateDivElement(oDiv, sGameViewId);
+	var oGamesListControl = this.m_oGamesListView.Init(sGameViewId, new CKGSGamesList(this));
+	oGamesListControl.Bounds.SetParams(0, 0, 2, 0, true, false, true, true, -1, -1);
+	oGamesListControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
+	oGamesListControl.HtmlElement.style.background = "#F3F3F3";
+	oControl.AddControl(oGamesListControl);
 };
+
+
+var EKGSUserInfoGameListRecord = {
+	Type      : 1,
+	WRank     : 2,
+	WName     : 3,
+	Vs        : 4,
+	BRank     : 5,
+	BName     : 6,
+	SizeHandi : 7,
+	Komi      : 8,
+	Result    : 9,
+	TimeStamp : 10
+};
+
+function CKGSUserInfoGamesList(oApp)
+{
+	CKGSGamesList.superclass.constructor.call(this);
+
+	this.m_oHeaders = {
+		Sizes : [0, 16, 56, 196, 221, 261, 381, 450, 515, 609],
+		Count : 10,
+		1     : "Kind",
+		2     : "wr",
+		3     : "White",
+		4     : "",
+		5     : "br",
+		6     : "Black",
+		7     : "",
+		8     : "Komi",
+		9     : "Result",
+		10    : "Date"
+	};
+
+	this.m_nSortType = -EKGSUserInfoGameListRecord.TimeStamp;
+
+	this.m_oApp = oApp;
+}
+
+CommonExtend(CKGSUserInfoGamesList, CListBase);
+
+CKGSUserInfoGamesList.prototype.private_Sort = function (oRecord1, oRecord2)
+{
+	var SortType = this.m_nSortType;
+	if (EKGSUserInfoGameListRecord.WRank === SortType)
+	{
+		if (oRecord1.m_nWhiteRank < oRecord2.m_nWhiteRank)
+			return -1;
+		else if (oRecord1.m_nWhiteRank > oRecord2.m_nWhiteRank)
+			return 1;
+	}
+	else if (-EKGSUserInfoGameListRecord.WRank === SortType)
+	{
+		if (oRecord1.m_nWhiteRank < oRecord2.m_nWhiteRank)
+			return 1;
+		else if (oRecord1.m_nWhiteRank > oRecord2.m_nWhiteRank)
+			return -1;
+	}
+	else if (EKGSUserInfoGameListRecord.WName === SortType)
+	{
+		if (Common.Compare_Strings(oRecord1.m_sWhiteName, oRecord2.m_sWhiteName) < 0)
+			return -1;
+		else if (Common.Compare_Strings(oRecord1.m_sWhiteName, oRecord2.m_sWhiteName) > 0)
+			return 1;
+	}
+	else if (-EKGSUserInfoGameListRecord.WName === SortType)
+	{
+		if (Common.Compare_Strings(oRecord1.m_sWhiteName, oRecord2.m_sWhiteName) < 0)
+			return 1;
+		else if (Common.Compare_Strings(oRecord1.m_sWhiteName, oRecord2.m_sWhiteName) > 0)
+			return -1;
+	}
+	else if (EKGSUserInfoGameListRecord.BRank === SortType)
+	{
+		if (oRecord1.m_nBlackRank < oRecord2.m_nBlackRank)
+			return -1;
+		else if (oRecord1.m_nBlackRank > oRecord2.m_nBlackRank)
+			return 1;
+	}
+	else if (-EKGSUserInfoGameListRecord.BRank === SortType)
+	{
+		if (oRecord1.m_nBlackRank < oRecord2.m_nBlackRank)
+			return 1;
+		else if (oRecord1.m_nBlackRank > oRecord2.m_nBlackRank)
+			return -1;
+	}
+	else if (EKGSUserInfoGameListRecord.BName === SortType)
+	{
+		if (Common.Compare_Strings(oRecord1.m_sBlackName, oRecord2.m_sBlackName) < 0)
+			return -1;
+		else if (Common.Compare_Strings(oRecord1.m_sBlackName, oRecord2.m_sBlackName) > 0)
+			return 1;
+	}
+	else if (-EKGSUserInfoGameListRecord.BName === SortType)
+	{
+		if (Common.Compare_Strings(oRecord1.m_sBlackName, oRecord2.m_sBlackName) < 0)
+			return 1;
+		else if (Common.Compare_Strings(oRecord1.m_sBlackName, oRecord2.m_sBlackName) > 0)
+			return -1;
+	}
+	else if (EKGSUserInfoGameListRecord.TimeStamp === SortType)
+	{
+		if (Common.Compare_Strings(oRecord1.GetTimeStamp(), oRecord2.GetTimeStamp()) < 0)
+			return -1;
+		else if (Common.Compare_Strings(oRecord1.GetTimeStamp(), oRecord2.GetTimeStamp()) > 0)
+			return 1;
+	}
+	else if (-EKGSUserInfoGameListRecord.TimeStamp === SortType)
+	{
+		if (Common.Compare_Strings(oRecord1.GetTimeStamp(), oRecord2.GetTimeStamp()) < 0)
+			return 1;
+		else if (Common.Compare_Strings(oRecord1.GetTimeStamp(), oRecord2.GetTimeStamp()) > 0)
+			return -1;
+	}
+
+	return 0;
+};
+CKGSUserInfoGamesList.prototype.private_PreSort = function(oRecord1, oRecord2)
+{
+	return 0;
+};
+CKGSUserInfoGamesList.prototype.private_PostSort = function(oRecord1, oRecord2)
+{
+	if (Common.Compare_Strings(oRecord1.GetTimeStamp(), oRecord2.GetTimeStamp()) < 0)
+		return -1;
+	else if (Common.Compare_Strings(oRecord1.GetTimeStamp(), oRecord2.GetTimeStamp()) > 0)
+		return 1;
+
+
+	return 0;
+};
+CKGSUserInfoGamesList.prototype.Is_Sortable = function(nColNum)
+{
+	var eType = nColNum + 1;
+	switch (eType)
+	{
+		case EKGSGameListRecord.WRank    :
+		case EKGSGameListRecord.WName    :
+		case EKGSGameListRecord.BRank    :
+		case EKGSGameListRecord.BName    :
+		case EKGSGameListRecord.TimeStamp:
+			return true;
+	}
+
+	return false;
+};
+CKGSUserInfoGamesList.prototype.Draw_Record = function(dX, dY, oContext, oRecord, nColNum, oListView)
+{
+	var eType = nColNum + 1;
+	if (true === oRecord.m_bDemo)
+	{
+		if (true === oRecord.m_bDemo && 2 === nColNum)
+			oListView.Start_ClipException(oContext, 2, 6);
+
+		if (3 !== nColNum && 4 !== nColNum && 5 !== nColNum)
+			oRecord.Draw(oContext, dX, dY, eType);
+
+		if (true === oRecord.m_bDemo && 2 === nColNum)
+			oListView.Restore_Clip(oContext, 2);
+	}
+	else
+	{
+		oRecord.Draw(oContext, dX, dY, eType);
+	}
+};
+CKGSUserInfoGamesList.prototype.Get_Record = function(aLine)
+{
+	var oRecord = new CKGSUserInfoGamesListRecord(this.m_oApp.GetClient());
+	oRecord.Update(aLine);
+	return oRecord;
+};
+
+function CKGSUserInfoGamesListRecord(oClient)
+{
+	CKGSUserInfoGamesListRecord.superclass.constructor.call(this);
+
+	this.m_oClient         = oClient;
+
+	this.m_sTimeStamp = "";
+}
+
+CommonExtend(CKGSUserInfoGamesListRecord, CListRecordBase);
+
+CKGSUserInfoGamesListRecord.prototype.Draw = function(oContext, dX, dY, eType)
+{
+	var sFont = oContext.font;
+	var bResetFont = false;
+	if ((eType === EKGSGameListRecord.WName && this.m_oClient.IsUserInFollowerList(this.m_sWhiteName)
+		|| (eType === EKGSGameListRecord.BName && this.m_oClient.IsUserInFollowerList(this.m_sBlackName))))
+	{
+		oContext.font = "bold " + sFont;
+		bResetFont = true;
+		if (true === this.m_bAdjourned) // Отложенная игра
+			oContext.fillStyle = "#99C9C3";
+		else
+			oContext.fillStyle = "#008272";
+	}
+	else
+	{
+		if (true === this.m_bAdjourned) // Отложенная игра
+			oContext.fillStyle = "#AAAAAA";
+		else
+			oContext.fillStyle = "#000000";
+	}
+
+	var sString = "";
+	switch(eType)
+	{
+		case EKGSGameListRecord.Type     : sString += this.m_sGameType; break;
+		case EKGSGameListRecord.WRank    : sString += this.private_GetRank(this.m_nWhiteRank); break;
+		case EKGSGameListRecord.WName    : sString += this.m_sWhiteName; break;
+		case EKGSGameListRecord.Vs       : sString +=  ("" !== this.m_sWhiteName && "" !== this.m_sBlackName ? "vs." : ""); break;
+		case EKGSGameListRecord.BRank    : sString += this.private_GetRank(this.m_nBlackRank); break;
+		case EKGSGameListRecord.BName    : sString += this.m_sBlackName; break;
+		case EKGSGameListRecord.Observers: sString += this.m_nObserversCount; break;
+		case EKGSGameListRecord.Move     : sString += this.m_sGameInfo ? this.m_sGameInfo : "" + this.m_nMove; break;
+		case EKGSGameListRecord.Info     : sString += ""; break;
+		case EKGSGameListRecord.Place    : sString += this.private_GetRoomName(this.m_nRoomId); break;
+		case EKGSGameListRecord.SizeHandi: sString += this.m_sSizeHandi; break;
+	}
+
+	oContext.fillText(sString, dX, dY);
+
+	if (true === bResetFont)
+		oContext.font = sFont;
+};
+CKGSUserInfoGamesListRecord.prototype.Compare = function(sKey)
+{
+	if (this.m_sTimeStamp === sKey)
+		return true;
+
+	return false;
+};
+CKGSUserInfoGamesListRecord.prototype.Get_Key = function()
+{
+	return this.m_sTimeStamp;
+};
+CKGSUserInfoGamesListRecord.prototype.Update = function(aLine)
+{
+	var oRecord = aLine[2];
+
+	this.m_nGameType = this.private_ParseGameType(oRecord.gameType);
+	this.m_nHandicap = oRecord.handicap ? parseInt(oRecord.handicap) : 0;
+	// handicap
+	// 	:
+	// 	0
+	// komi
+	// 	:
+	// 	6.5
+	// players
+	// 	:
+	// 	Object
+	// private
+	// 	:
+	// 	true
+	// score
+	// 	:
+	// 	"W+TIME"
+	// size
+	// 	:
+	// 	19
+	// timestamp
+	// 	:
+	// 	"2016-01-18T21:30:36.429Z"
+
+};
+CKGSUserInfoGamesListRecord.prototype.private_GetRank = function(nRank)
+{
+	if (nRank <= -3)
+		return "";
+	if (nRank === -2)
+		return "[?]";
+	else if (nRank === -1)
+		return "[-]";
+	else if (nRank <= 29)
+		return "[" + (30 - nRank) + "k]";
+	else if (nRank <= 49)
+		return "[" + (nRank - 29) + "d]";
+	else
+		return "[" + (nRank - 49) + "p]";
+};
+CKGSUserInfoGamesListRecord.prototype.GetTimeStamp = function()
+{
+	return this.m_sTimeStamp;
+};
+CKGSUserInfoGamesListRecord.prototype.private_ParseGameType = function(sGameType)
+{
+	if ("challenge" === sGameType)
+		this.m_nGameType = EKGSGameType.Challenge;
+	else if ("demonstration" === sGameType)
+		this.m_nGameType = EKGSGameType.Demonstration;
+	else if ("review" === sGameType)
+		this.m_nGameType = EKGSGameType.Review;
+	else if ("rengo_review" === sGameType)
+		this.m_nGameType = EKGSGameType.RengoReview;
+	else if ("teaching" === sGameType)
+		this.m_nGameType = EKGSGameType.Teaching;
+	else if ("simul" === sGameType)
+		this.m_nGameType = EKGSGameType.Simul;
+	else if ("rengo" === sGameType)
+		this.m_nGameType = EKGSGameType.Rengo;
+	else if ("free" === sGameType)
+		this.m_nGameType = EKGSGameType.Free;
+	else if ("ranked" === sGameType)
+		this.m_nGameType = EKGSGameType.Ranked;
+	else if ("tournament" === sGameType)
+		this.m_nGameType = EKGSGameType.Tournament;
+
+	return EKGSGameType.Free;
+};
+
+
+
+
+
