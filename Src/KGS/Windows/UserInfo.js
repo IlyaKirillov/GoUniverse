@@ -501,6 +501,15 @@ function CKGSUserInfoGamesListRecord(oClient)
 
 	this.m_oClient         = oClient;
 
+	this.m_nGameType  = EKGSGameType.Free;
+	this.m_nHandicap  = 0;
+	this.m_nKomi      = 0;
+	this.m_oBlack     = null;
+	this.m_oWhite     = null;
+	this.m_oOwner     = null;
+	this.m_bPrivate   = false;
+	this.m_sScore     = "";
+	this.m_nSize      = 19;
 	this.m_sTimeStamp = "";
 }
 
@@ -508,46 +517,22 @@ CommonExtend(CKGSUserInfoGamesListRecord, CListRecordBase);
 
 CKGSUserInfoGamesListRecord.prototype.Draw = function(oContext, dX, dY, eType)
 {
-	var sFont = oContext.font;
-	var bResetFont = false;
-	if ((eType === EKGSGameListRecord.WName && this.m_oClient.IsUserInFollowerList(this.m_sWhiteName)
-		|| (eType === EKGSGameListRecord.BName && this.m_oClient.IsUserInFollowerList(this.m_sBlackName))))
-	{
-		oContext.font = "bold " + sFont;
-		bResetFont = true;
-		if (true === this.m_bAdjourned) // Отложенная игра
-			oContext.fillStyle = "#99C9C3";
-		else
-			oContext.fillStyle = "#008272";
-	}
-	else
-	{
-		if (true === this.m_bAdjourned) // Отложенная игра
-			oContext.fillStyle = "#AAAAAA";
-		else
-			oContext.fillStyle = "#000000";
-	}
-
 	var sString = "";
 	switch(eType)
 	{
-		case EKGSGameListRecord.Type     : sString += this.m_sGameType; break;
-		case EKGSGameListRecord.WRank    : sString += this.private_GetRank(this.m_nWhiteRank); break;
-		case EKGSGameListRecord.WName    : sString += this.m_sWhiteName; break;
-		case EKGSGameListRecord.Vs       : sString +=  ("" !== this.m_sWhiteName && "" !== this.m_sBlackName ? "vs." : ""); break;
-		case EKGSGameListRecord.BRank    : sString += this.private_GetRank(this.m_nBlackRank); break;
-		case EKGSGameListRecord.BName    : sString += this.m_sBlackName; break;
-		case EKGSGameListRecord.Observers: sString += this.m_nObserversCount; break;
-		case EKGSGameListRecord.Move     : sString += this.m_sGameInfo ? this.m_sGameInfo : "" + this.m_nMove; break;
-		case EKGSGameListRecord.Info     : sString += ""; break;
-		case EKGSGameListRecord.Place    : sString += this.private_GetRoomName(this.m_nRoomId); break;
-		case EKGSGameListRecord.SizeHandi: sString += this.m_sSizeHandi; break;
+		case EKGSUserInfoGameListRecord.Type     : sString += this.m_sGameType; break;
+		case EKGSUserInfoGameListRecord.WRank    : sString += this.private_GetWhiteRank(); break;
+		case EKGSUserInfoGameListRecord.WName    : sString += this.private_GetWhiteName(); break;
+		case EKGSUserInfoGameListRecord.Vs       : sString += this.private_GetVs(); break;
+		case EKGSUserInfoGameListRecord.BRank    : sString += this.private_GetBlackRank(); break;
+		case EKGSUserInfoGameListRecord.BName    : sString += this.private_GetBlackName(); break;
+		case EKGSUserInfoGameListRecord.SizeHandi: sString += this.private_GetSizeAndHandi(); break;
+		case EKGSUserInfoGameListRecord.Komi     : sString += this.private_GetKomi(); break;
+		case EKGSUserInfoGameListRecord.Result   : sString += this.m_sScore; break;
+		case EKGSUserInfoGameListRecord.Date     : sString += this.private_GetTimeStamp(); break;
 	}
 
 	oContext.fillText(sString, dX, dY);
-
-	if (true === bResetFont)
-		oContext.font = sFont;
 };
 CKGSUserInfoGamesListRecord.prototype.Compare = function(sKey)
 {
@@ -566,43 +551,36 @@ CKGSUserInfoGamesListRecord.prototype.Update = function(aLine)
 
 	this.m_nGameType = this.private_ParseGameType(oRecord.gameType);
 	this.m_nHandicap = oRecord.handicap ? parseInt(oRecord.handicap) : 0;
-	// handicap
-	// 	:
-	// 	0
-	// komi
-	// 	:
-	// 	6.5
-	// players
-	// 	:
-	// 	Object
-	// private
-	// 	:
-	// 	true
-	// score
-	// 	:
-	// 	"W+TIME"
-	// size
-	// 	:
-	// 	19
-	// timestamp
-	// 	:
-	// 	"2016-01-18T21:30:36.429Z"
+	this.m_nKomi     = oRecord.komi ? parse.Float(oRecord.komi) : 0;
+	this.m_oBlack    = null;
+	this.m_oWhite    = null;
+	this.m_oOwner    = null;
 
-};
-CKGSUserInfoGamesListRecord.prototype.private_GetRank = function(nRank)
-{
-	if (nRank <= -3)
-		return "";
-	if (nRank === -2)
-		return "[?]";
-	else if (nRank === -1)
-		return "[-]";
-	else if (nRank <= 29)
-		return "[" + (30 - nRank) + "k]";
-	else if (nRank <= 49)
-		return "[" + (nRank - 29) + "d]";
-	else
-		return "[" + (nRank - 49) + "p]";
+	if (oRecord.players)
+	{
+		if (oRecord.players.black)
+		{
+			this.m_oBlack = new CKGSUser(this.m_oClient);
+			this.m_oBlack.Update(oRecord.players.black);
+		}
+
+		if (oRecord.players.white)
+		{
+			this.m_oWhite = new CKGSUser(this.m_oClient);
+			this.m_oWhite.Update(oRecord.players.white);
+		}
+
+		if (oRecord.players.owner)
+		{
+			this.m_oOwner = new CKGSUser(this.m_oClient);
+			this.m_oOwner.Update(oRecord.players.owner);
+		}
+	}
+
+	this.m_bPrivate   = true === oRecord.private ? true : false;
+	this.m_sScore     = oRecord.score ? this.m_oClient.private_ParseScore(oRecord.score) : "";
+	this.m_nSize      = oRecord.size ? parseInt(oRecord.size) : 19;
+	this.m_sTimeStamp = oRecord.timestamp;
 };
 CKGSUserInfoGamesListRecord.prototype.GetTimeStamp = function()
 {
@@ -632,6 +610,70 @@ CKGSUserInfoGamesListRecord.prototype.private_ParseGameType = function(sGameType
 		this.m_nGameType = EKGSGameType.Tournament;
 
 	return EKGSGameType.Free;
+};
+CKGSUserInfoGamesListRecord.prototype.private_GetWhiteRank = function()
+{
+	if (this.m_oOwner)
+		return this.m_oOwner.GetStringRank();
+	else if (this.m_oWhite)
+		return this.m_oWhite.GetStringRank();
+	else
+		return "";
+};
+CKGSUserInfoGamesListRecord.prototype.private_GetWhiteName = function()
+{
+	var sResult = "";
+	if (this.m_oOwner)
+	{
+		sResult = this.m_oOwner.GetName();
+
+		if (this.m_oWhite && this.m_oBlack)
+			sResult +=  " (" + this.m_oWhite.GetName() + "[" + this.m_oWhite.GetStringRank() + "] vs. " +  this.m_oBlack.GetName() + "[" + this.m_oBlack.GetStringRank() + "])";
+	}
+	else if (this.m_oWhite)
+	{
+		sResult = this.m_oWhite.GetName();
+	}
+
+	return sResult;
+};
+CKGSUserInfoGamesListRecord.prototype.private_GetVs = function()
+{
+	if (null === this.m_oOwner && this.m_oBlack && this.m_oWhite)
+		return "vs.";
+
+	return "";
+};
+CKGSUserInfoGamesListRecord.prototype.private_GetBlackRank = function()
+{
+	if (null !== this.m_oOwner && this.m_oBlack)
+		return this.m_oBlack.GetStringRank();
+
+	return "";
+};
+CKGSUserInfoGamesListRecord.prototype.private_GetBlackName = function()
+{
+	if (null !== this.m_oOwner && this.m_oBlack)
+		return this.m_oBlack.GetName();
+
+	return "";
+};
+CKGSUserInfoGamesListRecord.prototype.private_GetSizeAndHandi = function()
+{
+	var sResult = "" + this.m_nSize + "x" + this.m_nSize;
+	if (this.m_nHandicap > 1)
+		sResult += " H" + this.m_nHandicap;
+
+	return sResult;
+};
+CKGSUserInfoGamesListRecord.prototype.private_GetKomi = function()
+{
+	return "" + this.m_nKomi;
+};
+CKGSUserInfoGamesListRecord.prototype.private_GetTimeStamp = function()
+{
+	var oDate = Date.parse(this.m_sTimeStamp);
+	return oDate.toLocaleString();
 };
 
 
