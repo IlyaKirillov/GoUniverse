@@ -13,11 +13,11 @@ function CKGSUserInfoWindow()
 {
 	CKGSUserInfoWindow.superclass.constructor.call(this);
 
-	this.m_sUserName = "";
-	this.m_oClient   = null;
-
-	this.m_oContainerDiv = null;
-	this.m_oInfoScroll   = null;
+	this.m_sUserName      = "";
+	this.m_oClient        = null;
+	this.m_oContainerDiv  = null;
+	this.m_oInfoScroll    = null;
+	this.m_oGamesListView = new CListView();
 }
 CommonExtend(CKGSUserInfoWindow, CKGSWindowBase);
 
@@ -56,11 +56,11 @@ CKGSUserInfoWindow.prototype.Init = function(sDivId, oPr)
 	oGamesDifWrapperControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left | g_anchor_bottom);
 	oMainControl.AddControl(oGamesDifWrapperControl);
 
-	var oRankDivWrapper = this.protected_CreateDivElement(oMainDiv, sRankWrapperId);
-	var oRankDifWrapperControl = CreateControlContainer(sRankWrapperId);
-	oRankDifWrapperControl.Bounds.SetParams(0, 25, 0, 0, true, true, true, true, -1, -1);
-	oRankDifWrapperControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left | g_anchor_bottom);
-	oMainControl.AddControl(oRankDifWrapperControl);
+	// var oRankDivWrapper = this.protected_CreateDivElement(oMainDiv, sRankWrapperId);
+	// var oRankDifWrapperControl = CreateControlContainer(sRankWrapperId);
+	// oRankDifWrapperControl.Bounds.SetParams(0, 25, 0, 0, true, true, true, true, -1, -1);
+	// oRankDifWrapperControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left | g_anchor_bottom);
+	// oMainControl.AddControl(oRankDifWrapperControl);
 
 
 	this.private_CreateInfoPage(oInfoDivWrapper, oInfoDifWrapperControl);
@@ -69,7 +69,7 @@ CKGSUserInfoWindow.prototype.Init = function(sDivId, oPr)
 };
 CKGSUserInfoWindow.prototype.Get_DefaultWindowSize = function(bForce)
 {
-	return {W : 500, H : 600};
+	return {W : 800, H : 600};
 };
 CKGSUserInfoWindow.prototype.Close = function()
 {
@@ -87,6 +87,9 @@ CKGSUserInfoWindow.prototype.Update_Size = function(bForce)
 
 	if (this.m_oInfoScroll)
 		this.m_oInfoScroll.CheckVisibility();
+
+	if (this.m_oGamesListView)
+		this.m_oGamesListView.Update_Size();
 };
 CKGSUserInfoWindow.prototype.OnUserDetails = function(oDetails)
 {
@@ -142,6 +145,7 @@ CKGSUserInfoWindow.prototype.OnUserGameArchive = function(oMessage)
 
 	var sUserName = this.m_sUserName.toLocaleLowerCase();
 
+	this.m_oGamesListView.Clear();
 	for (var nIndex = arrGames.length - 1; nIndex >= 0; --nIndex)
 	{
 		var oGame  = arrGames[nIndex];
@@ -195,7 +199,11 @@ CKGSUserInfoWindow.prototype.OnUserGameArchive = function(oMessage)
 				}
 			}
 		}
+
+		this.m_oGamesListView.Handle_Record([0, oGame.timestamp, oGame]);
 	}
+
+	this.m_oGamesListView.Update_Size();
 
 	this.private_AddConsoleMessage("Games", "" + nWins + "-" + nLoses + "-" + nUnfinished);
 	this.private_AddConsoleMessage("Recent games", sRecentGames);
@@ -312,12 +320,10 @@ CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
 };
 CKGSUserInfoWindow.prototype.private_CreateGamesPage = function(oDiv, oControl)
 {
-	var sGameViewId = oDiv.id;
-
-	this.m_oGamesListView = new CListView();
+	var sGameViewId = oDiv.id + "L";
 
 	var oGamesDiv = this.protected_CreateDivElement(oDiv, sGameViewId);
-	var oGamesListControl = this.m_oGamesListView.Init(sGameViewId, new CKGSGamesList(this));
+	var oGamesListControl = this.m_oGamesListView.Init(sGameViewId, new CKGSUserInfoGamesList(this.m_oApp));
 	oGamesListControl.Bounds.SetParams(0, 0, 2, 0, true, false, true, true, -1, -1);
 	oGamesListControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
 	oGamesListControl.HtmlElement.style.background = "#F3F3F3";
@@ -459,11 +465,11 @@ CKGSUserInfoGamesList.prototype.Is_Sortable = function(nColNum)
 	var eType = nColNum + 1;
 	switch (eType)
 	{
-		case EKGSGameListRecord.WRank    :
-		case EKGSGameListRecord.WName    :
-		case EKGSGameListRecord.BRank    :
-		case EKGSGameListRecord.BName    :
-		case EKGSGameListRecord.TimeStamp:
+		case EKGSUserInfoGameListRecord.WRank    :
+		case EKGSUserInfoGameListRecord.WName    :
+		case EKGSUserInfoGameListRecord.BRank    :
+		case EKGSUserInfoGameListRecord.BName    :
+		case EKGSUserInfoGameListRecord.TimeStamp:
 			return true;
 	}
 
@@ -472,15 +478,15 @@ CKGSUserInfoGamesList.prototype.Is_Sortable = function(nColNum)
 CKGSUserInfoGamesList.prototype.Draw_Record = function(dX, dY, oContext, oRecord, nColNum, oListView)
 {
 	var eType = nColNum + 1;
-	if (true === oRecord.m_bDemo)
+	if (null !== oRecord.m_oOwner)
 	{
-		if (true === oRecord.m_bDemo && 2 === nColNum)
+		if (null !== oRecord.m_oOwner && 2 === nColNum)
 			oListView.Start_ClipException(oContext, 2, 6);
 
 		if (3 !== nColNum && 4 !== nColNum && 5 !== nColNum)
 			oRecord.Draw(oContext, dX, dY, eType);
 
-		if (true === oRecord.m_bDemo && 2 === nColNum)
+		if (null !== oRecord.m_oOwner && 2 === nColNum)
 			oListView.Restore_Clip(oContext, 2);
 	}
 	else
@@ -520,7 +526,7 @@ CKGSUserInfoGamesListRecord.prototype.Draw = function(oContext, dX, dY, eType)
 	var sString = "";
 	switch(eType)
 	{
-		case EKGSUserInfoGameListRecord.Type     : sString += this.m_sGameType; break;
+		case EKGSUserInfoGameListRecord.Type     : sString += this.private_GetGameType(); break;
 		case EKGSUserInfoGameListRecord.WRank    : sString += this.private_GetWhiteRank(); break;
 		case EKGSUserInfoGameListRecord.WName    : sString += this.private_GetWhiteName(); break;
 		case EKGSUserInfoGameListRecord.Vs       : sString += this.private_GetVs(); break;
@@ -529,7 +535,7 @@ CKGSUserInfoGamesListRecord.prototype.Draw = function(oContext, dX, dY, eType)
 		case EKGSUserInfoGameListRecord.SizeHandi: sString += this.private_GetSizeAndHandi(); break;
 		case EKGSUserInfoGameListRecord.Komi     : sString += this.private_GetKomi(); break;
 		case EKGSUserInfoGameListRecord.Result   : sString += this.m_sScore; break;
-		case EKGSUserInfoGameListRecord.Date     : sString += this.private_GetTimeStamp(); break;
+		case EKGSUserInfoGameListRecord.TimeStamp: sString += this.private_GetTimeStamp(); break;
 	}
 
 	oContext.fillText(sString, dX, dY);
@@ -551,7 +557,7 @@ CKGSUserInfoGamesListRecord.prototype.Update = function(aLine)
 
 	this.m_nGameType = this.private_ParseGameType(oRecord.gameType);
 	this.m_nHandicap = oRecord.handicap ? parseInt(oRecord.handicap) : 0;
-	this.m_nKomi     = oRecord.komi ? parse.Float(oRecord.komi) : 0;
+	this.m_nKomi     = oRecord.komi ? parseFloat(oRecord.komi) : 0;
 	this.m_oBlack    = null;
 	this.m_oWhite    = null;
 	this.m_oOwner    = null;
@@ -611,6 +617,29 @@ CKGSUserInfoGamesListRecord.prototype.private_ParseGameType = function(sGameType
 
 	return EKGSGameType.Free;
 };
+CKGSUserInfoGamesListRecord.prototype.private_GetGameType = function()
+{
+	if (true === this.m_bPrivate)
+		return "P";
+	else if (null !== this.m_oOwner)
+		return "D";
+	else if (EKGSGameType.Demonstration === this.m_nGameType || EKGSGameType.Review === this.m_nGameType || EKGSGameType.RengoReview === this.m_nGameType)
+		return "D";
+	else if (EKGSGameType.Free === this.m_nGameType)
+		return "F";
+	else if (EKGSGameType.Ranked === this.m_nGameType)
+		return "R";
+	else if (EKGSGameType.Teaching === this.m_nGameType)
+		return "T";
+	else if (EKGSGameType.Simul === this.m_nGameType)
+		return "S";
+	else if (EKGSGameType.Rengo === this.m_nGameType)
+		return "2";
+	else if (EKGSGameType.Tournament === this.m_nGameType)
+		return "*";
+
+	return "";
+};
 CKGSUserInfoGamesListRecord.prototype.private_GetWhiteRank = function()
 {
 	if (this.m_oOwner)
@@ -646,14 +675,14 @@ CKGSUserInfoGamesListRecord.prototype.private_GetVs = function()
 };
 CKGSUserInfoGamesListRecord.prototype.private_GetBlackRank = function()
 {
-	if (null !== this.m_oOwner && this.m_oBlack)
+	if (null === this.m_oOwner && this.m_oBlack)
 		return this.m_oBlack.GetStringRank();
 
 	return "";
 };
 CKGSUserInfoGamesListRecord.prototype.private_GetBlackName = function()
 {
-	if (null !== this.m_oOwner && this.m_oBlack)
+	if (null === this.m_oOwner && this.m_oBlack)
 		return this.m_oBlack.GetName();
 
 	return "";
@@ -672,7 +701,8 @@ CKGSUserInfoGamesListRecord.prototype.private_GetKomi = function()
 };
 CKGSUserInfoGamesListRecord.prototype.private_GetTimeStamp = function()
 {
-	var oDate = Date.parse(this.m_sTimeStamp);
+	// TODO: Неправильно работает сортировка по дате
+	var oDate = new Date(Date.parse(this.m_sTimeStamp));
 	return oDate.toLocaleString();
 };
 
