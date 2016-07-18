@@ -431,16 +431,16 @@ CKGSUserInfoGamesList.prototype.private_Sort = function (oRecord1, oRecord2)
 	}
 	else if (EKGSUserInfoGameListRecord.TimeStamp === SortType)
 	{
-		if (Common.Compare_Strings(oRecord1.GetTimeStamp(), oRecord2.GetTimeStamp()) < 0)
+		if (oRecord1.GetDate() < oRecord2.GetDate())
 			return -1;
-		else if (Common.Compare_Strings(oRecord1.GetTimeStamp(), oRecord2.GetTimeStamp()) > 0)
+		else if (oRecord1.GetDate() > oRecord2.GetDate())
 			return 1;
 	}
 	else if (-EKGSUserInfoGameListRecord.TimeStamp === SortType)
 	{
-		if (Common.Compare_Strings(oRecord1.GetTimeStamp(), oRecord2.GetTimeStamp()) < 0)
+		if (oRecord1.GetDate() < oRecord2.GetDate())
 			return 1;
-		else if (Common.Compare_Strings(oRecord1.GetTimeStamp(), oRecord2.GetTimeStamp()) > 0)
+		else if (oRecord1.GetDate() > oRecord2.GetDate())
 			return -1;
 	}
 
@@ -452,11 +452,15 @@ CKGSUserInfoGamesList.prototype.private_PreSort = function(oRecord1, oRecord2)
 };
 CKGSUserInfoGamesList.prototype.private_PostSort = function(oRecord1, oRecord2)
 {
+	if (oRecord1.GetDate() < oRecord2.GetDate())
+		return -1;
+	else if (oRecord1.GetDate() > oRecord2.GetDate())
+		return 1;
+
 	if (Common.Compare_Strings(oRecord1.GetTimeStamp(), oRecord2.GetTimeStamp()) < 0)
 		return -1;
 	else if (Common.Compare_Strings(oRecord1.GetTimeStamp(), oRecord2.GetTimeStamp()) > 0)
 		return 1;
-
 
 	return 0;
 };
@@ -517,6 +521,7 @@ function CKGSUserInfoGamesListRecord(oClient)
 	this.m_sScore     = "";
 	this.m_nSize      = 19;
 	this.m_sTimeStamp = "";
+	this.m_oDate      = new Date();
 }
 
 CommonExtend(CKGSUserInfoGamesListRecord, CListRecordBase);
@@ -587,10 +592,15 @@ CKGSUserInfoGamesListRecord.prototype.Update = function(aLine)
 	this.m_sScore     = oRecord.score ? this.m_oClient.private_ParseScore(oRecord.score) : "";
 	this.m_nSize      = oRecord.size ? parseInt(oRecord.size) : 19;
 	this.m_sTimeStamp = oRecord.timestamp;
+	this.m_oDate      = new Date(Date.parse(this.m_sTimeStamp));
 };
 CKGSUserInfoGamesListRecord.prototype.GetTimeStamp = function()
 {
 	return this.m_sTimeStamp;
+};
+CKGSUserInfoGamesListRecord.prototype.GetDate = function()
+{
+	return this.m_oDate;
 };
 CKGSUserInfoGamesListRecord.prototype.private_ParseGameType = function(sGameType)
 {
@@ -701,9 +711,7 @@ CKGSUserInfoGamesListRecord.prototype.private_GetKomi = function()
 };
 CKGSUserInfoGamesListRecord.prototype.private_GetTimeStamp = function()
 {
-	// TODO: Неправильно работает сортировка по дате
-	var oDate = new Date(Date.parse(this.m_sTimeStamp));
-	return oDate.toLocaleString();
+	return this.m_oDate.toLocaleString();
 };
 
 
