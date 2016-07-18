@@ -30,7 +30,7 @@ function CGoUniverseApplication()
 	
 	this.m_oSound              = new CBoardSound();
 	this.m_oSound.Init("http://webgoboard.com/Sound");
-//	this.m_oSound.Init("Files/Sound");
+	//this.m_oSound.Init("Files/Sound");
 	this.m_bFocused            = true;
 
 	this.m_oGameTabsScroll = null;
@@ -211,13 +211,13 @@ CGoUniverseApplication.prototype.Logout = function(sText)
 
 	if (sText)
 	{
-		document.getElementById("divIdConnectionError").style.display = "block";
 		document.getElementById("divIdConnectionErrorText").innerHTML = sText;
+		g_oFadeEffect.In(document.getElementById("divIdConnectionError"), -1);
 	}
 
-	document.getElementById("divMainId").style.display       = "none";
-	document.getElementById("divIdConnection").style.display = "block";
-	document.getElementById("divIdAbout").style.display      = "block";
+	g_oFadeEffect.Out(document.getElementById("divMainId"), -1);
+	g_oFadeEffect.In(document.getElementById("divIdConnection"), -1);
+	g_oFadeEffect.In(document.getElementById("divIdAbout"), -1);
 	document.getElementById("inputPasswordId").focus();
 
 	document.title = "KGS: Login";

@@ -64,7 +64,7 @@ CFadeEffect.prototype.In = function(oElement, nTime, fOnDisplay)
 	if (fOnDisplay)
 		fOnDisplay();
 
-	if (nTime)
+	if (nTime > 0)
 	{
 		var oThis    = this;
 		var dOpacity = 0;
@@ -102,7 +102,7 @@ CFadeEffect.prototype.Out = function(oElement, nTime, fOnHidden)
 	else if (-1 === nOldDirection)
 		return;
 
-	if (nTime)
+	if (nTime > 0)
 	{
 		var dOpacity = 1;
 		var oThis = this;

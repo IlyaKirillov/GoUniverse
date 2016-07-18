@@ -423,17 +423,19 @@ CKGSClient.prototype.private_SendMessage = function(oMessage)
 			}
 			else
 			{
-				// Upload failed. We'll just report it to the user. This is to help debugging, in a finished client you would
-				// want to hide this.
-				// The responseText is a big error page from your JSP system, but all KGS error messages have the format
-				// ":KGS: error text :KGS:", which makes it easy to extract that with a regex. If the error is in that format,
-				// we extract the error; otherwise we show the whole report.
 				var errorText = req.responseText;
 				var matcher = /:KGS: (.*?) :KGS:/.exec(errorText);
-				if (matcher) {
+				if (matcher)
+				{
 					errorText = matcher[1];
 				}
 				console.log("Error : " + errorText);
+
+				if (oMessage.type == "LOGIN")
+				{
+					oThis.m_bLoggedIn = false;
+					oThis.m_oApp.Logout("Server is unavaliable. Try again later.");
+				}
 			}
 		}
 	};
