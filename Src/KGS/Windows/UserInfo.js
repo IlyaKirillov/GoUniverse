@@ -208,6 +208,10 @@ CKGSUserInfoWindow.prototype.OnUserGameArchive = function(oMessage)
 	this.private_AddConsoleMessage("Games", "" + nWins + "-" + nLoses + "-" + nUnfinished);
 	this.private_AddConsoleMessage("Recent games", sRecentGames);
 };
+CKGSUserInfoWindow.prototype.OnRankGraph = function(arrRankData)
+{
+	console.log(arrRankData);
+};
 CKGSUserInfoWindow.prototype.Show = function(oPr)
 {
 	CKGSUserInfoWindow.superclass.Show.call(this, oPr);

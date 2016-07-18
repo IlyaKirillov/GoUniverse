@@ -627,6 +627,10 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
 	{
 		this.private_HandleGameOver(oMessage);
 	}
+	else if ("DETAILS_RANK_GRAPH" === oMessage.type)
+	{
+		this.private_HandleDetailsRankGraph(oMessage);
+	}
 	else
 	{
 		console.log(oMessage);
@@ -1222,6 +1226,11 @@ CKGSClient.prototype.private_HandleDetailsJoin = function(oMessage)
 		this.m_oUserInfo[sUserName].Window.OnUserDetails(oMessage);
 		this.m_oUserInfo[sUserName].Window.Show();
 		this.m_oUserInfo[sUserName].DetailsChannel = oMessage.channelId;
+
+		this.private_SendMessage({
+			"type"      : "DETAILS_RANK_GRAPH_REQUEST",
+			"channelId" : oMessage.channelId
+		});
 	}
 	else
 	{
@@ -1506,6 +1515,17 @@ CKGSClient.prototype.private_HandleGameOver = function(oMessage)
 		oGame.Result = this.private_ParseScore(oMessage.score);
 		oGame.CommentsHandler.AddGameOver(oGame.CurNode, this.private_ParseScore(oMessage.score));
 		oGame.StateHandler.Update();
+	}
+};
+CKGSClient.prototype.private_HandleDetailsRankGraph = function(oMessage)
+{
+	for (var sUserName in this.m_oUserInfo)
+	{
+		var oInfo = this.m_oUserInfo[sUserName];
+		if (oInfo.DetailsChannel === oMessage.channelId && oInfo.Window)
+		{
+			oInfo.Window.OnRankGraph(oMessage.rankData);
+		}
 	}
 };
 CKGSClient.prototype.private_AddUserToRoom = function(oUser, oRoom)
