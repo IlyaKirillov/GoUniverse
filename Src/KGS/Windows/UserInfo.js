@@ -508,6 +508,17 @@ CKGSUserInfoGamesList.prototype.Get_Record = function(aLine)
 	oRecord.Update(aLine);
 	return oRecord;
 };
+CKGSUserInfoGamesList.prototype.Handle_DoubleClick = function(oRecord)
+{
+	if (true === oRecord.IsInPlay())
+	{
+		var oClient = this.m_oApp.GetClient();
+		if (!oClient)
+			return;
+
+		oClient.EnterGameRoomByTimeStamp(oRecord.GetTimeStamp());
+	}
+};
 
 function CKGSUserInfoGamesListRecord(oClient)
 {
@@ -526,12 +537,22 @@ function CKGSUserInfoGamesListRecord(oClient)
 	this.m_nSize      = 19;
 	this.m_sTimeStamp = "";
 	this.m_oDate      = new Date();
+	this.m_bInPlay    = false;
 }
 
 CommonExtend(CKGSUserInfoGamesListRecord, CListRecordBase);
 
 CKGSUserInfoGamesListRecord.prototype.Draw = function(oContext, dX, dY, eType)
 {
+	var bResetFont = false;
+	var sFont = oContext.font;
+
+	if (true === this.m_bInPlay)
+	{
+		oContext.font = "bold " + sFont;
+		bResetFont = true;
+	}
+
 	var sString = "";
 	switch(eType)
 	{
@@ -548,6 +569,9 @@ CKGSUserInfoGamesListRecord.prototype.Draw = function(oContext, dX, dY, eType)
 	}
 
 	oContext.fillText(sString, dX, dY);
+
+	if (true === bResetFont)
+		oContext.font = sFont;
 };
 CKGSUserInfoGamesListRecord.prototype.Compare = function(sKey)
 {
@@ -597,6 +621,7 @@ CKGSUserInfoGamesListRecord.prototype.Update = function(aLine)
 	this.m_nSize      = oRecord.size ? parseInt(oRecord.size) : 19;
 	this.m_sTimeStamp = oRecord.timestamp;
 	this.m_oDate      = new Date(Date.parse(this.m_sTimeStamp));
+	this.m_bInPlay    = true === oRecord.inPlay ? true : false;
 };
 CKGSUserInfoGamesListRecord.prototype.GetTimeStamp = function()
 {
@@ -605,6 +630,10 @@ CKGSUserInfoGamesListRecord.prototype.GetTimeStamp = function()
 CKGSUserInfoGamesListRecord.prototype.GetDate = function()
 {
 	return this.m_oDate;
+};
+CKGSUserInfoGamesListRecord.prototype.IsInPlay = function()
+{
+	return this.m_bInPlay;
 };
 CKGSUserInfoGamesListRecord.prototype.private_ParseGameType = function(sGameType)
 {

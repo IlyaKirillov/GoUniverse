@@ -117,6 +117,13 @@ CKGSClient.prototype.LeaveGameRoom = function(nGameRoomId)
 		"channelId" : nGameRoomId
 	});
 };
+CKGSClient.prototype.EnterGameRoomByTimeStamp = function(sTimeStamp)
+{
+	this.private_SendMessage({
+		"type"      : "JOIN_GAME_BY_ID",
+		"timestamp" : sTimeStamp
+	});
+};
 CKGSClient.prototype.EnterChatRoom = function(nChatRoomId)
 {
 	this.private_SendMessage({
