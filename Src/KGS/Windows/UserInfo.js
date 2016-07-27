@@ -538,6 +538,7 @@ function CKGSUserInfoGamesListRecord(oClient)
 	this.m_sTimeStamp = "";
 	this.m_oDate      = new Date();
 	this.m_bInPlay    = false;
+	this.m_bAdjourned = false;
 }
 
 CommonExtend(CKGSUserInfoGamesListRecord, CListRecordBase);
@@ -546,12 +547,28 @@ CKGSUserInfoGamesListRecord.prototype.Draw = function(oContext, dX, dY, eType)
 {
 	var bResetFont = false;
 	var sFont = oContext.font;
+	oContext.fillStyle = "#000000";
 
 	if (true === this.m_bInPlay)
 	{
 		oContext.font = "bold " + sFont;
-		bResetFont = true;
+		bResetFont    = true;
 	}
+
+	if ((EKGSUserInfoGameListRecord.WName === eType && -1 !== this.m_sScore.indexOf("W+"))
+		|| (EKGSUserInfoGameListRecord.BName === eType && -1 !== this.m_sScore.indexOf("B+")))
+	{
+		oContext.fillStyle = "#008272";
+		bResetFont         = true;
+	}
+
+	if (true === this.m_bAdjourned)
+	{
+		oContext.font      = "italic " + sFont;
+		oContext.fillStyle = "#AAAAAA";
+		bResetFont         = true;
+	}
+
 
 	var sString = "";
 	switch(eType)
@@ -588,7 +605,7 @@ CKGSUserInfoGamesListRecord.prototype.Update = function(aLine)
 {
 	var oRecord = aLine[2];
 
-	this.m_nGameType = this.private_ParseGameType(oRecord.gameType);
+	this.private_ParseGameType(oRecord.gameType);
 	this.m_nHandicap = oRecord.handicap ? parseInt(oRecord.handicap) : 0;
 	this.m_nKomi     = oRecord.komi ? parseFloat(oRecord.komi) : 0;
 	this.m_oBlack    = null;
@@ -622,6 +639,8 @@ CKGSUserInfoGamesListRecord.prototype.Update = function(aLine)
 	this.m_sTimeStamp = oRecord.timestamp;
 	this.m_oDate      = new Date(Date.parse(this.m_sTimeStamp));
 	this.m_bInPlay    = true === oRecord.inPlay ? true : false;
+
+	this.private_ParseAbjourned(oRecord.score);
 };
 CKGSUserInfoGamesListRecord.prototype.GetTimeStamp = function()
 {
@@ -657,8 +676,6 @@ CKGSUserInfoGamesListRecord.prototype.private_ParseGameType = function(sGameType
 		this.m_nGameType = EKGSGameType.Ranked;
 	else if ("tournament" === sGameType)
 		this.m_nGameType = EKGSGameType.Tournament;
-
-	return EKGSGameType.Free;
 };
 CKGSUserInfoGamesListRecord.prototype.private_GetGameType = function()
 {
@@ -745,6 +762,19 @@ CKGSUserInfoGamesListRecord.prototype.private_GetKomi = function()
 CKGSUserInfoGamesListRecord.prototype.private_GetTimeStamp = function()
 {
 	return this.m_oDate.toLocaleString();
+};
+CKGSUserInfoGamesListRecord.prototype.private_ParseAbjourned = function(sScore)
+{
+	if (true !== this.m_bInPlay
+		&& true !== this.m_bPrivate
+		&& EKGSGameType.Challenge !== this.m_nGameType
+		&& EKGSGameType.Demonstration !== this.m_nGameType
+		&& EKGSGameType.Review !== this.m_nGameType
+		&& EKGSGameType.RengoReview !== this.m_nGameType
+	&& "UNFINISHED" === sScore)
+		this.m_bAdjourned = true;
+	else
+		this.m_bAdjourned = false;
 };
 
 
