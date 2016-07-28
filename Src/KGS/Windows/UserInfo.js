@@ -18,6 +18,17 @@ function CKGSUserInfoWindow()
 	this.m_oContainerDiv  = null;
 	this.m_oInfoScroll    = null;
 	this.m_oGamesListView = new CListView();
+	this.m_oTabs          = new CVisualUserInfoTabs();
+
+	this.m_oInfoTable = {
+		UserName    : null,
+		Rank        : null,
+		LastOn      : null,
+		Locale      : null,
+		Name        : null,
+		Games       : null,
+		RecentGames : null
+	};
 }
 CommonExtend(CKGSUserInfoWindow, CKGSWindowBase);
 
@@ -40,6 +51,8 @@ CKGSUserInfoWindow.prototype.Init = function(sDivId, oPr)
 	oMainDiv.className += " Selectable";
 	oMainDiv.style.backgroundColor = "rgb(243, 243, 243)";
 
+	var sTabsId         = sDivId + "T";
+	var sTabsBackId     = sDivId + "B";
 	var sInfoWrapperId  = sDivId + "I";
 	var sGamesWrapperId = sDivId + "G";
 	var sRankWrapperId  = sDivId + "R";
@@ -49,23 +62,50 @@ CKGSUserInfoWindow.prototype.Init = function(sDivId, oPr)
 	oInfoDifWrapperControl.Bounds.SetParams(0, 25, 0, 0, true, true, true, true, -1, -1);
 	oInfoDifWrapperControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left | g_anchor_bottom);
 	oMainControl.AddControl(oInfoDifWrapperControl);
+	oInfoDivWrapper.style.display = "none";
 
 	var oGamesDivWrapper = this.protected_CreateDivElement(oMainDiv, sGamesWrapperId);
 	var oGamesDifWrapperControl = CreateControlContainer(sGamesWrapperId);
 	oGamesDifWrapperControl.Bounds.SetParams(0, 25, 0, 0, true, true, true, true, -1, -1);
 	oGamesDifWrapperControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left | g_anchor_bottom);
 	oMainControl.AddControl(oGamesDifWrapperControl);
+	oGamesDivWrapper.style.display = "none";
 
 	// var oRankDivWrapper = this.protected_CreateDivElement(oMainDiv, sRankWrapperId);
 	// var oRankDifWrapperControl = CreateControlContainer(sRankWrapperId);
 	// oRankDifWrapperControl.Bounds.SetParams(0, 25, 0, 0, true, true, true, true, -1, -1);
 	// oRankDifWrapperControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left | g_anchor_bottom);
 	// oMainControl.AddControl(oRankDifWrapperControl);
+	// oRankDivWrapper.style.display = "none";
 
 
 	this.private_CreateInfoPage(oInfoDivWrapper, oInfoDifWrapperControl);
 	this.private_CreateGamesPage(oGamesDivWrapper, oGamesDifWrapperControl);
 
+	var oTabsBack = this.protected_CreateDivElement(oMainDiv, sTabsBackId);
+	oTabsBack.style.borderBottom = "1px solid #BEBEBE";
+	var oTabsBackControl = CreateControlContainer(sTabsBackId);
+	oTabsBackControl.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, 24);
+	oTabsBackControl.Anchor = (g_anchor_top |g_anchor_left | g_anchor_right);
+	oMainControl.AddControl(oTabsBackControl);
+
+	this.protected_CreateDivElement(oMainDiv, sTabsId);
+	var oTabsControl = this.m_oTabs.Init(sTabsId);
+	oTabsControl.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, 25);
+	oTabsControl.Anchor = (g_anchor_top |g_anchor_left | g_anchor_right);
+	oMainControl.AddControl(oTabsControl);
+
+	var oTab;
+	oTab = new CVisualUserInfoTab(this);
+	oTab.Init(0, oInfoDivWrapper, "Info");
+	this.m_oTabs.AddTab(oTab);
+	oTab.OnClick();
+
+	oTab = new CVisualUserInfoTab(this);
+	oTab.Init(1, oGamesDivWrapper, "Games");
+	this.m_oTabs.AddTab(oTab);
+
+	this.m_oGamesListView.Set_BGColor(243, 243, 243);
 };
 CKGSUserInfoWindow.prototype.Get_DefaultWindowSize = function(bForce)
 {
@@ -102,23 +142,23 @@ CKGSUserInfoWindow.prototype.OnUserDetails = function(oDetails)
 		if (oUser.HasAvatar())
 			this.OnUserAvatar();
 
-		this.private_AddConsoleMessage("UserName", oUser.GetName());
-		this.private_AddConsoleMessage("Rank", oUser.GetStringRank());
+		this.m_oInfoTable.UserName.textContent = oUser.GetName();
+		this.m_oInfoTable.Rank.textContent     = oUser.GetStringRank();
 
 
 		if (oUser.IsOnline())
 		{
-			this.private_AddConsoleMessage("Last on", "online");
+			this.m_oInfoTable.LastOn.textContent = "online";
 		}
 		else
 		{
 			var oTimeStamp = new CTimeStamp(oDetails.lastOn);
-			this.private_AddConsoleMessage("Last on", oTimeStamp.GetDifferenceString() + " (" + oTimeStamp.ToLocaleString() + ")");
+			this.m_oInfoTable.LastOn.textContent = oTimeStamp.GetDifferenceString() + " (" + oTimeStamp.ToLocaleString() + ")";
 		}
 
 
-		this.private_AddConsoleMessage("Locale", oDetails.locale);
-		this.private_AddConsoleMessage("Name", oDetails.personalName);
+		this.m_oInfoTable.Locale.textContent = oDetails.locale;
+		this.m_oInfoTable.Name.textContent   = oDetails.personalName;
 
 		this.private_AddInfo(oDetails.personalInfo);
 	}
@@ -205,8 +245,8 @@ CKGSUserInfoWindow.prototype.OnUserGameArchive = function(oMessage)
 
 	this.m_oGamesListView.Update_Size();
 
-	this.private_AddConsoleMessage("Games", "" + nWins + "-" + nLoses + "-" + nUnfinished);
-	this.private_AddConsoleMessage("Recent games", sRecentGames);
+	this.m_oInfoTable.Games.textContent       = "" + nWins + "-" + nLoses + "-" + nUnfinished;
+	this.m_oInfoTable.RecentGames.textContent = sRecentGames;
 };
 CKGSUserInfoWindow.prototype.OnRankGraph = function(arrRankData)
 {
@@ -219,14 +259,21 @@ CKGSUserInfoWindow.prototype.Show = function(oPr)
 	if (this.m_oInfoScroll)
 		this.m_oInfoScroll.CheckVisibility();
 };
-CKGSUserInfoWindow.prototype.private_AddMainInfo = function(oDetails)
+CKGSUserInfoWindow.prototype.private_AddMainInfo = function()
 {
 	var oDiv = this.m_oMainInfoDiv;
 
 	this.m_oMainInfoTable = document.createElement("table");
 
-
 	oDiv.appendChild(this.m_oMainInfoTable);
+
+	this.m_oInfoTable.UserName    = this.private_AddConsoleMessage("UserName", "");
+	this.m_oInfoTable.Rank        = this.private_AddConsoleMessage("Rank", "");
+	this.m_oInfoTable.LastOn      = this.private_AddConsoleMessage("Last on", "");
+	this.m_oInfoTable.Locale      = this.private_AddConsoleMessage("Locale", "");
+	this.m_oInfoTable.Name        = this.private_AddConsoleMessage("Name", "");
+	this.m_oInfoTable.Games       = this.private_AddConsoleMessage("Games", "");
+	this.m_oInfoTable.RecentGames = this.private_AddConsoleMessage("Recent games", "");
 };
 CKGSUserInfoWindow.prototype.private_AddConsoleMessage = function(sField, sText)
 {
@@ -251,6 +298,8 @@ CKGSUserInfoWindow.prototype.private_AddConsoleMessage = function(sField, sText)
 	oTextSpan             = document.createElement("span");
 	oTextSpan.textContent = sText;
 	oCell.appendChild(oTextSpan);
+
+	return oTextSpan;
 };
 CKGSUserInfoWindow.prototype.private_AddInfo = function(sText)
 {
@@ -258,14 +307,6 @@ CKGSUserInfoWindow.prototype.private_AddInfo = function(sText)
 
 	var oTextDiv = document.createElement("div");
 	oTextDiv.style.height = "100%";
-
-	var oTextSpan;
-
-	oTextSpan                  = document.createElement("div");
-	oTextSpan.style.fontWeight = "bold";
-	oTextSpan.style.fontStyle  = "italic";
-	oTextSpan.textContent      = "Info: ";
-	oTextDiv.appendChild(oTextSpan);
 
 	var oInfoDiv = document.createElement("div");
 	var aLines = SplitTextToLines(sText);
@@ -283,7 +324,7 @@ CKGSUserInfoWindow.prototype.private_AddInfo = function(sText)
 
 	this.m_oInfoScroll = new CVerticalScroll();
 	this.m_oInfoScroll.Init(oTextDiv, "VerScroll", "VerScrollActive", true);
-	this.m_oInfoScroll.SetPaddings(0, 2, 1);
+	this.m_oInfoScroll.SetPaddings(-1, 1, 1);
 
 	return oTextDiv;
 };
@@ -316,9 +357,12 @@ CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
 
 	this.m_oExtensionDiv = this.protected_CreateDivElement(oDiv, sExtension);
 	var oExtensionControl = CreateControlContainer(sExtension);
-	oExtensionControl.Bounds.SetParams(5, 205, 5, 5, true, true, true, true, -1, -1);
+	oExtensionControl.Bounds.SetParams(5, 205, 5, 7, true, true, true, true, -1, -1);
 	oExtensionControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left | g_anchor_bottom);
 	oControl.AddControl(oExtensionControl);
+
+	this.m_oExtensionDiv.style.borderBottom = "1px solid #BEBEBE";
+	this.m_oExtensionDiv.style.borderTop    = "1px solid #BEBEBE";
 
 	this.private_AddMainInfo();
 };
@@ -328,7 +372,7 @@ CKGSUserInfoWindow.prototype.private_CreateGamesPage = function(oDiv, oControl)
 
 	var oGamesDiv = this.protected_CreateDivElement(oDiv, sGameViewId);
 	var oGamesListControl = this.m_oGamesListView.Init(sGameViewId, new CKGSUserInfoGamesList(this.m_oApp));
-	oGamesListControl.Bounds.SetParams(0, 0, 2, 0, true, false, true, true, -1, -1);
+	oGamesListControl.Bounds.SetParams(0, 0, 0, 0, true, false, true, true, -1, -1);
 	oGamesListControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
 	oGamesListControl.HtmlElement.style.background = "#F3F3F3";
 	oControl.AddControl(oGamesListControl);
@@ -799,4 +843,158 @@ CKGSUserInfoGamesListRecord.prototype.private_ParseAbjourned = function(sScore)
 		this.m_bAdjourned = true;
 	else
 		this.m_bAdjourned = false;
+};
+
+function CVisualUserInfoTabs()
+{
+	CVisualUserInfoTabs.superclass.constructor.call(this);
+}
+CommonExtend(CVisualUserInfoTabs, CVisualTabs);
+
+function CVisualUserInfoTab(oWindow)
+{
+	this.m_oParent = null;
+	this.m_nId     = -1;
+	this.m_oTabDiv = null;
+
+	this.m_oPageDiv = null;
+	this.m_oWindow  = oWindow;
+}
+CVisualUserInfoTab.prototype.Init = function(nId, oPageDiv, sTabName)
+{
+	this.m_nId = nId;
+	this.m_oPageDiv = oPageDiv;
+	this.private_InitTab(sTabName);
+};
+CVisualUserInfoTab.prototype.GetId = function()
+{
+	return this.m_nId;
+};
+CVisualUserInfoTab.prototype.SetParent = function(oParent)
+{
+	this.m_oParent = oParent;
+};
+CVisualUserInfoTab.prototype.GetDiv = function()
+{
+	return this.m_oTabDiv;
+};
+CVisualUserInfoTab.prototype.OnClick = function()
+{
+	if (!this.m_oParent)
+		return;
+
+	var oOldTab = this.m_oParent.OnClick(this);
+	if (oOldTab)
+	{
+		oOldTab.m_oBackDiv.style.borderTop   = "1px solid #BEBEBE";
+		oOldTab.m_oBackDiv.style.borderRight = "1px solid #BEBEBE";
+		oOldTab.m_oBackDiv.style.borderLeft  = "1px solid transparent";
+
+		oOldTab.m_oTabDiv.style.borderBottom = "1px solid #BEBEBE";
+		oOldTab.m_oTabDiv.style.borderTop    = "3px solid #F3F3F3";
+
+		oOldTab.m_oPageDiv.style.display = "none";
+	}
+
+	this.m_oBackDiv.style.borderTop          = "1px solid rgb(0, 130, 114)";
+	this.m_oBackDiv.style.borderRight        = "1px solid rgb(0, 130, 114)";
+	this.m_oBackDiv.style.borderLeft         = "1px solid rgb(0, 130, 114)";
+
+	this.m_oTabDiv.style.borderBottom = "1px solid #F3F3F3";
+	this.m_oTabDiv.style.borderTop    = "3px solid rgb(0, 130, 114)";
+
+	this.m_oPageDiv.style.display = "block";
+	this.m_oWindow.Update_Size(true);
+};
+CVisualUserInfoTab.prototype.private_InitTab = function(sTabName)
+{
+	var oThis      = this;
+	this.m_oTabDiv = document.createElement("div");
+	var sHeight    = "21px";
+
+	var oBackDiv               = document.createElement("div");
+	oBackDiv.style.position    = "absolute";
+	oBackDiv.style.top         = "-4px";
+	oBackDiv.style.left        = "-1px";
+	oBackDiv.style.right       = "-1px";
+	oBackDiv.style.height      = "3px";
+	oBackDiv.style.borderTop   = "1px solid #BEBEBE";
+	oBackDiv.style.borderRight = "1px solid #BEBEBE";
+	oBackDiv.style.borderLeft  = "1px solid transparent";
+
+	this.m_oBackDiv = oBackDiv;
+
+	this.m_oTabDiv.appendChild(oBackDiv);
+
+
+	var DivTab                      = this.m_oTabDiv;
+	DivTab.style.overflow           = "visible";
+	DivTab.style.position           = "relative";
+	DivTab["aria-label"]            = sTabName;
+	DivTab.title                    = sTabName;
+	DivTab.style.transitionProperty = "width,height,background,margin,border,padding";
+	DivTab.style.transitionDuration = ".25s";
+	DivTab.style.float              = "left";
+	DivTab.style.height             = sHeight;
+	DivTab.style.minWidth           = this.m_nMinWidth + "px";
+	DivTab.style.margin             = "0px";
+	DivTab.style.padding            = "0px";
+	DivTab.style.color              = "#000";
+	DivTab.style.whiteSpace         = "nowrap";
+	DivTab.style.textOverflow       = "ellipsis";
+	DivTab.style.borderTop          = "3px solid transparent";
+	DivTab.style.borderRight        = "1px solid #BEBEBE";
+	DivTab.style.borderBottom       = "1px solid #BEBEBE";
+	DivTab.addEventListener("selectstart", function()
+	{
+		return false;
+	}, false);
+
+	var NewTab                             = document.createElement("button");
+	NewTab.tabIndex                        = "0";
+	NewTab.style.transitionProperty        = "all";
+	NewTab.style.transitionDuration        = ".25s";
+	NewTab.style.background                = "none";
+	NewTab.style.outline                   = "none";
+	NewTab.style.cursor                    = "pointer";
+	NewTab.style["-webkit-appearance"]     = "none";
+	NewTab.style["-webkit-border-radius"]  = "0";
+	NewTab.style.overflow                  = "visible";
+	NewTab.style.fontFamily                = '"Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif';
+	NewTab.style["-webkit-font-smoothing"] = "antialiased";
+	NewTab.style.padding                   = "0px";
+	NewTab.style.border                    = "1px solid transparent";
+	NewTab.style.boxSizing                 = "border-box";
+	NewTab.style.fontSize                  = "14px";
+	NewTab.style.lineHeight                = "20px";
+	NewTab.style.height                    = "100%";
+	NewTab.style.margin                    = "0px";
+	NewTab.style.padding                   = "0px 14px 0px 14px";
+	NewTab.style.maxWidth                  = "200px";
+	NewTab.style.overflow                  = "hidden";
+	NewTab.style.float                     = "left";
+	NewTab.addEventListener("click", function()
+	{
+		oThis.OnClick();
+	});
+
+	var NewTabDiv = document.createElement("div");
+	NewTabDiv.style.textAlign = "left";
+	var oCaptionDiv = document.createElement("div");
+	if (true === this.m_bPrivateChat)
+	{
+		oCaptionDiv.style.fontWeight = "bold";
+		oCaptionDiv.style.color      = "#008272";
+	}
+	oCaptionDiv.innerHTML = sTabName;
+	NewTabDiv.appendChild(oCaptionDiv);
+	NewTabDiv.addEventListener("selectstart", function()
+	{
+		return false;
+	}, false);
+	NewTab.appendChild(NewTabDiv);
+	DivTab.appendChild(NewTab);
+
+	DivTab.visualTab = this;
+	this.m_oTabDiv = DivTab;
 };
