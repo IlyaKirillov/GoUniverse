@@ -379,58 +379,58 @@ CKGSUserInfoGamesList.prototype.private_Sort = function (oRecord1, oRecord2)
 	var SortType = this.m_nSortType;
 	if (EKGSUserInfoGameListRecord.WRank === SortType)
 	{
-		if (oRecord1.m_nWhiteRank < oRecord2.m_nWhiteRank)
+		if (oRecord1.GetWhiteRank() < oRecord2.GetWhiteRank())
 			return -1;
-		else if (oRecord1.m_nWhiteRank > oRecord2.m_nWhiteRank)
+		else if (oRecord1.GetWhiteRank() > oRecord2.GetWhiteRank())
 			return 1;
 	}
 	else if (-EKGSUserInfoGameListRecord.WRank === SortType)
 	{
-		if (oRecord1.m_nWhiteRank < oRecord2.m_nWhiteRank)
+		if (oRecord1.GetWhiteRank() < oRecord2.GetWhiteRank())
 			return 1;
-		else if (oRecord1.m_nWhiteRank > oRecord2.m_nWhiteRank)
+		else if (oRecord1.GetWhiteRank() > oRecord2.GetWhiteRank())
 			return -1;
 	}
 	else if (EKGSUserInfoGameListRecord.WName === SortType)
 	{
-		if (Common.Compare_Strings(oRecord1.m_sWhiteName, oRecord2.m_sWhiteName) < 0)
+		if (Common.Compare_Strings(oRecord1.GetWhiteName(), oRecord2.GetWhiteName()) < 0)
 			return -1;
-		else if (Common.Compare_Strings(oRecord1.m_sWhiteName, oRecord2.m_sWhiteName) > 0)
+		else if (Common.Compare_Strings(oRecord1.GetWhiteName(), oRecord2.GetWhiteName()) > 0)
 			return 1;
 	}
 	else if (-EKGSUserInfoGameListRecord.WName === SortType)
 	{
-		if (Common.Compare_Strings(oRecord1.m_sWhiteName, oRecord2.m_sWhiteName) < 0)
+		if (Common.Compare_Strings(oRecord1.GetWhiteName(), oRecord2.GetWhiteName()) < 0)
 			return 1;
-		else if (Common.Compare_Strings(oRecord1.m_sWhiteName, oRecord2.m_sWhiteName) > 0)
+		else if (Common.Compare_Strings(oRecord1.GetWhiteName(), oRecord2.GetWhiteName()) > 0)
 			return -1;
 	}
 	else if (EKGSUserInfoGameListRecord.BRank === SortType)
 	{
-		if (oRecord1.m_nBlackRank < oRecord2.m_nBlackRank)
+		if (oRecord1.GetBlackRank() < oRecord2.GetBlackRank())
 			return -1;
-		else if (oRecord1.m_nBlackRank > oRecord2.m_nBlackRank)
+		else if (oRecord1.GetBlackRank() > oRecord2.GetBlackRank())
 			return 1;
 	}
 	else if (-EKGSUserInfoGameListRecord.BRank === SortType)
 	{
-		if (oRecord1.m_nBlackRank < oRecord2.m_nBlackRank)
+		if (oRecord1.GetBlackRank() < oRecord2.GetBlackRank())
 			return 1;
-		else if (oRecord1.m_nBlackRank > oRecord2.m_nBlackRank)
+		else if (oRecord1.GetBlackRank() > oRecord2.GetBlackRank())
 			return -1;
 	}
 	else if (EKGSUserInfoGameListRecord.BName === SortType)
 	{
-		if (Common.Compare_Strings(oRecord1.m_sBlackName, oRecord2.m_sBlackName) < 0)
+		if (Common.Compare_Strings(oRecord1.GetBlackName(), oRecord2.GetBlackName()) < 0)
 			return -1;
-		else if (Common.Compare_Strings(oRecord1.m_sBlackName, oRecord2.m_sBlackName) > 0)
+		else if (Common.Compare_Strings(oRecord1.GetBlackName(), oRecord2.GetBlackName()) > 0)
 			return 1;
 	}
 	else if (-EKGSUserInfoGameListRecord.BName === SortType)
 	{
-		if (Common.Compare_Strings(oRecord1.m_sBlackName, oRecord2.m_sBlackName) < 0)
+		if (Common.Compare_Strings(oRecord1.GetBlackName(), oRecord2.GetBlackName()) < 0)
 			return 1;
-		else if (Common.Compare_Strings(oRecord1.m_sBlackName, oRecord2.m_sBlackName) > 0)
+		else if (Common.Compare_Strings(oRecord1.GetBlackName(), oRecord2.GetBlackName()) > 0)
 			return -1;
 	}
 	else if (EKGSUserInfoGameListRecord.TimeStamp === SortType)
@@ -457,9 +457,9 @@ CKGSUserInfoGamesList.prototype.private_PreSort = function(oRecord1, oRecord2)
 CKGSUserInfoGamesList.prototype.private_PostSort = function(oRecord1, oRecord2)
 {
 	if (oRecord1.GetDate() < oRecord2.GetDate())
-		return -1;
-	else if (oRecord1.GetDate() > oRecord2.GetDate())
 		return 1;
+	else if (oRecord1.GetDate() > oRecord2.GetDate())
+		return -1;
 
 	if (Common.Compare_Strings(oRecord1.GetTimeStamp(), oRecord2.GetTimeStamp()) < 0)
 		return -1;
@@ -654,6 +654,30 @@ CKGSUserInfoGamesListRecord.prototype.IsInPlay = function()
 {
 	return this.m_bInPlay;
 };
+CKGSUserInfoGamesListRecord.prototype.GetWhiteName = function()
+{
+	return this.private_GetWhiteName();
+};
+CKGSUserInfoGamesListRecord.prototype.GetWhiteRank = function()
+{
+	if (this.m_oOwner)
+		return this.m_oOwner.GetRank();
+	else if (this.m_oWhite)
+		return this.m_oWhite.GetRank();
+	else
+		return -3;
+};
+CKGSUserInfoGamesListRecord.prototype.GetBlackName = function()
+{
+	return this.private_GetBlackName();
+};
+CKGSUserInfoGamesListRecord.prototype.GetBlackRank = function()
+{
+	if (this.m_oBlack)
+		return this.m_oBlack.GetRank();
+	else
+		return -3;
+};
 CKGSUserInfoGamesListRecord.prototype.private_ParseGameType = function(sGameType)
 {
 	if ("challenge" === sGameType)
@@ -776,8 +800,3 @@ CKGSUserInfoGamesListRecord.prototype.private_ParseAbjourned = function(sScore)
 	else
 		this.m_bAdjourned = false;
 };
-
-
-
-
-
