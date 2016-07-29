@@ -357,7 +357,7 @@ CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
 
 	this.m_oExtensionDiv = this.protected_CreateDivElement(oDiv, sExtension);
 	var oExtensionControl = CreateControlContainer(sExtension);
-	oExtensionControl.Bounds.SetParams(5, 205, 5, 7, true, true, true, true, -1, -1);
+	oExtensionControl.Bounds.SetParams(5, 210, 5, 7, true, true, true, true, -1, -1);
 	oExtensionControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left | g_anchor_bottom);
 	oControl.AddControl(oExtensionControl);
 
