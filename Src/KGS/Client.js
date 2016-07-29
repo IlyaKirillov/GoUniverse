@@ -1021,6 +1021,7 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 			var oListObject = oGame.PlayersList.GetListObject();
 			oListObject.SetBlack(oGameRecord.GetBlack());
 			oListObject.SetWhite(oGameRecord.GetWhite());
+			oListObject.SetOwner(oGameRecord.GetOwner());
 		}
 		
 		if (oMessage.users)

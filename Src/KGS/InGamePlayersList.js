@@ -33,6 +33,7 @@ function CKGSInGamePlayersList(oApp)
 
 	this.m_oBlack = null;
 	this.m_oWhite = null;
+	this.m_oOwner = null;
 }
 
 CommonExtend(CKGSInGamePlayersList, CListBase);
@@ -137,6 +138,10 @@ CKGSInGamePlayersList.prototype.SetWhite = function(oUser)
 {
 	this.m_oWhite = oUser;
 };
+CKGSInGamePlayersList.prototype.SetOwner = function(oUser)
+{
+	this.m_oOwner = oUser;
+};
 CKGSInGamePlayersList.prototype.IsBlack = function(sUserName)
 {
 	if (this.m_oBlack && sUserName === this.m_oBlack.GetName())
@@ -147,6 +152,13 @@ CKGSInGamePlayersList.prototype.IsBlack = function(sUserName)
 CKGSInGamePlayersList.prototype.IsWhite = function(sUserName)
 {
 	if (this.m_oWhite && sUserName === this.m_oWhite.GetName())
+		return true;
+
+	return false;
+};
+CKGSInGamePlayersList.prototype.IsOwner = function(sUserName)
+{
+	if (this.m_oOwner && sUserName === this.m_oOwner.GetName())
 		return true;
 
 	return false;
@@ -277,7 +289,13 @@ CKGSInGamePlayersListRecord.prototype.IsFriend = function()
 };
 CKGSInGamePlayersListRecord.prototype.private_GetUserType = function(oContext)
 {
-	if (this.m_oListObject.IsBlack(this.m_sName))
+	if (this.m_oListObject.IsOwner(this.m_sName))
+	{
+		oContext.fillStyle   = "#FFF";
+		oContext.strokeStyle = "#000";
+		return String.fromCharCode(0x270E);
+	}
+	else if (this.m_oListObject.IsBlack(this.m_sName))
 	{
 		oContext.fillStyle   = "#000";
 		oContext.strokeStyle = "#000";
@@ -295,7 +313,8 @@ CKGSInGamePlayersListRecord.prototype.private_GetUserType = function(oContext)
 CKGSInGamePlayersListRecord.prototype.IsGameParticipant = function()
 {
 	if (this.m_oListObject.IsBlack(this.m_sName)
-		|| this.m_oListObject.IsWhite(this.m_sName))
+		|| this.m_oListObject.IsWhite(this.m_sName)
+		|| this.m_oListObject.IsOwner(this.m_sName))
 		return true;
 
 	return false;
