@@ -31,15 +31,21 @@ function CKGSInGamePlayersList(oApp)
 
 	this.m_nSortType = -EKGSInGamePlayersListRecord.Rank;
 
-	this.m_oBlack = null;
-	this.m_oWhite = null;
-	this.m_oOwner = null;
+	this.m_oBlack  = null;
+	this.m_oWhite  = null;
+	this.m_oOwner  = null;
+	this.m_oEditor = null;
 }
 
 CommonExtend(CKGSInGamePlayersList, CListBase);
 
 CKGSInGamePlayersList.prototype.private_PreSort = function(oRecord1, oRecord2)
 {
+	if (true === oRecord1.IsEditor() && true !== oRecord2.IsEditor())
+		return -1;
+	if (true !== oRecord1.IsEditor() && true === oRecord2.IsEditor())
+		return 1;
+
 	if (true === oRecord1.IsGameParticipant() && true !== oRecord2.IsGameParticipant())
 		return -1;
 	if (true !== oRecord1.IsGameParticipant() && true === oRecord2.IsGameParticipant())
@@ -142,6 +148,10 @@ CKGSInGamePlayersList.prototype.SetOwner = function(oUser)
 {
 	this.m_oOwner = oUser;
 };
+CKGSInGamePlayersList.prototype.SetEditor = function(oUser)
+{
+	this.m_oEditor = oUser;
+};
 CKGSInGamePlayersList.prototype.IsBlack = function(sUserName)
 {
 	if (this.m_oBlack && sUserName === this.m_oBlack.GetName())
@@ -159,6 +169,13 @@ CKGSInGamePlayersList.prototype.IsWhite = function(sUserName)
 CKGSInGamePlayersList.prototype.IsOwner = function(sUserName)
 {
 	if (this.m_oOwner && sUserName === this.m_oOwner.GetName())
+		return true;
+
+	return false;
+};
+CKGSInGamePlayersList.prototype.IsEditor = function(sUserName)
+{
+	if (this.m_oEditor && sUserName === this.m_oEditor.GetName())
 		return true;
 
 	return false;
@@ -289,11 +306,17 @@ CKGSInGamePlayersListRecord.prototype.IsFriend = function()
 };
 CKGSInGamePlayersListRecord.prototype.private_GetUserType = function(oContext)
 {
-	if (this.m_oListObject.IsOwner(this.m_sName))
+	if (this.m_oListObject.IsEditor(this.m_sName))
 	{
 		oContext.fillStyle   = "#FFF";
 		oContext.strokeStyle = "#000";
 		return String.fromCharCode(0x270E);
+	}
+	else if (this.m_oListObject.IsOwner(this.m_sName))
+	{
+		oContext.fillStyle   = "#000";
+		oContext.strokeStyle = "transparent";
+		return String.fromCharCode(0x2615);
 	}
 	else if (this.m_oListObject.IsBlack(this.m_sName))
 	{
@@ -310,11 +333,16 @@ CKGSInGamePlayersListRecord.prototype.private_GetUserType = function(oContext)
 
 	return "";
 };
+CKGSInGamePlayersListRecord.prototype.IsEditor = function()
+{
+	return this.m_oListObject.IsEditor(this.m_sName);
+};
 CKGSInGamePlayersListRecord.prototype.IsGameParticipant = function()
 {
 	if (this.m_oListObject.IsBlack(this.m_sName)
 		|| this.m_oListObject.IsWhite(this.m_sName)
-		|| this.m_oListObject.IsOwner(this.m_sName))
+		|| this.m_oListObject.IsOwner(this.m_sName)
+		|| this.m_oListObject.IsEditor(this.m_sName))
 		return true;
 
 	return false;

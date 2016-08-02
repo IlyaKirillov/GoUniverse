@@ -1012,6 +1012,8 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 		oGame.WhiteTime.Stop();
 	}
 
+	this.private_HandleGameActions(oMessage["actions"], oGame);
+
 	if (oMessage.score)
 		oGame.Result = this.private_ParseScore(oMessage.score);
 
@@ -1364,6 +1366,8 @@ CKGSClient.prototype.private_HandleGameState = function(oMessage)
 	var oGame = this.m_aGames[nChannelId];
 	if (!oGame)
 		return;
+
+	this.private_HandleGameActions(oMessage["actions"], oGame);
 
 	if (oMessage.clocks)
 		this.private_HandleGameClocks(oGame, oMessage.clocks);
@@ -2170,4 +2174,25 @@ CKGSClient.prototype.private_UpdateGamesList = function()
 	}
 
 	this.m_oGamesListView.Update_Size();
+};
+CKGSClient.prototype.private_HandleGameActions = function(arrActions, oGame)
+{
+	if (!arrActions || !oGame)
+		return;
+
+	for (var nIndex = 0, nCount = arrActions.length; nIndex < nCount; ++nIndex)
+	{
+		var oAction = arrActions[nIndex];
+		var sAction = oAction["action"];
+		if ("EDIT" === sAction)
+		{
+			var oListObject = oGame.PlayersList.GetListObject();
+			oListObject.SetEditor(this.private_HandleUserRecord2(oAction["user"]));
+			oGame.PlayersList.Update_Size();
+		}
+		else if ("MOVE" === sAction)
+		{
+
+		}
+	}
 };
