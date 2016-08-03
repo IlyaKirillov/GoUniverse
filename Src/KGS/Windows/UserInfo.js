@@ -563,6 +563,20 @@ CKGSUserInfoGamesList.prototype.Handle_DoubleClick = function(oRecord)
 		oClient.EnterGameRoomByTimeStamp(oRecord.GetTimeStamp());
 	}
 };
+CKGSUserInfoGamesList.prototype.Handle_RightClick = function(oRecord)
+{
+	var oClient = this.m_oApp.GetClient();
+	if (!oClient)
+		return;
+
+	if (true === oRecord.IsInPlay())
+	{
+	}
+	else
+	{
+		oClient.LoadGameInRoom(oRecord.GetTimeStamp(), "13");
+	}
+};
 
 function CKGSUserInfoGamesListRecord(oClient)
 {

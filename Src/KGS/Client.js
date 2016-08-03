@@ -124,6 +124,14 @@ CKGSClient.prototype.EnterGameRoomByTimeStamp = function(sTimeStamp)
 		"timestamp" : sTimeStamp
 	});
 };
+CKGSClient.prototype.LoadGameInRoom = function(sTimeStamp, nRoomId)
+{
+	this.private_SendMessage({
+		"type"      : "ROOM_LOAD_GAME",
+		"timestamp" : sTimeStamp,
+		"channelId" : nRoomId
+	});
+};
 CKGSClient.prototype.EnterChatRoom = function(nChatRoomId)
 {
 	this.private_SendMessage({
