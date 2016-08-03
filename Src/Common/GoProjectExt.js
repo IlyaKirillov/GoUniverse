@@ -11,6 +11,40 @@
 
 var g_oDrawingBoardElements = null;
 
+String.prototype.IsLatinLetter = function(nPos)
+{
+	var nCharCode = this.charCodeAt(nPos);
+
+	if ((65 <= nCharCode && nCharCode <= 90)
+		|| (97 <= nCharCode && nCharCode <= 122))
+		return true;
+
+	return false;
+};
+String.prototype.IsDigit = function(nPos)
+{
+	var nCharCode = this.charCodeAt(nPos);
+
+	if (48 <= nCharCode && nCharCode <= 57)
+		return true;
+
+	return false;
+};
+String.prototype.IsSpace = function(nPos)
+{
+	if (32 === this.charCodeAt(nPos))
+		return true;
+
+	return false;
+};
+String.prototype.IsEnd = function(nPos)
+{
+	if (nPos >= this.length)
+		return true;
+
+	return false;
+};
+
 //----------------------------------------------------------------------------------------------------------------------
 // Дополнение к классу CDrawing
 //----------------------------------------------------------------------------------------------------------------------
@@ -421,6 +455,8 @@ CGoUniverseDrawingComments.prototype.private_AddUserTextMessage = function(sText
 	var sMessageText = sText.substr(nPos + 1);
 
 
+
+
 	var oTextSpan;
 
 	var bMessageForMe = false;
@@ -448,21 +484,80 @@ CGoUniverseDrawingComments.prototype.private_AddUserTextMessage = function(sText
 	oTextDiv.appendChild(oTextSpan);
 
 
-	oTextSpan           = document.createElement("span");
-	oTextSpan.innerHTML = sMessageText;
+	this.private_ParseMessage(oTextDiv, sMessageText);
+	// oTextSpan           = document.createElement("span");
+	// oTextSpan.innerHTML = sMessageText;
+	//
+	// if (true === bMessageForMe)
+	// {
+	// 	oTextSpan.style.fontStyle = "italic";
+	// }
 
-	if (true === bMessageForMe)
-	{
-		oTextSpan.style.fontStyle = "italic";
-	}
-
-	oTextDiv.appendChild(oTextSpan);
+	//oTextDiv.appendChild(oTextSpan);
 	oTextDiv.appendChild(document.createElement("br"));
 
 	oDiv.appendChild(oTextDiv);
 
 	if (sUserName === sCurUserName)
 		this.private_CheckScrollTop(true);
+};
+CGoUniverseDrawingComments.prototype.private_ParseMessage = function(oTextDiv, sMessage)
+{
+	function private_AddSimpleText(sText)
+	{
+		var oTextSpan = document.createElement("span");
+		oTextSpan.innerHTML = sText;
+		oTextDiv.appendChild(oTextSpan);
+	}
+	
+	function private_AddMoveReference(sRef)
+	{
+		var oTextSpan = document.createElement("span");
+		oTextSpan.className = "InGameChatMoveRef";
+		oTextSpan.innerHTML = sRef;
+		oTextDiv.appendChild(oTextSpan);
+
+		oTextSpan = document.createElement("span");
+		oTextSpan.innerHTML = " ";
+		oTextDiv.appendChild(oTextSpan);
+	}
+	
+	var sBuffer = "";
+	for (var nPos = 0, nLen = sMessage.length; nPos < nLen; ++nPos)
+	{
+		if ((0 === nPos || sMessage.IsSpace(nPos - 1)) && sMessage.IsLatinLetter(nPos) && sMessage.IsDigit(nPos + 1))
+		{
+			var sRef;
+			if (sMessage.IsSpace(nPos + 2) || sMessage.IsEnd(nPos + 2))
+			{
+				sRef = sMessage.substr(nPos, 2);
+				nPos += 2;
+			}
+			else if (sMessage.IsDigit(nPos + 2) && (sMessage.IsSpace(nPos + 3) || sMessage.IsEnd(nPos + 3)))
+			{
+				sRef = sMessage.substr(nPos, 3);
+				nPos += 3;
+			}
+
+			if ("" !== sBuffer)
+			{
+				private_AddSimpleText(sBuffer);
+				sBuffer = "";
+			}
+
+			private_AddMoveReference(sRef);
+		}
+		else
+		{
+			sBuffer += sMessage.charAt(nPos);
+		}
+	}
+
+	if ("" !== sBuffer)
+	{
+		private_AddSimpleText(sBuffer);
+		sBuffer = "";
+	}
 };
 CGoUniverseDrawingComments.prototype.Update_Size = function()
 {

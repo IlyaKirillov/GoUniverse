@@ -427,3 +427,13 @@ div.StartPageWindow {
 	background-color : white;
 	box-shadow       : 0px 1px 15px rgba(0, 0, 0, 0.8);
 }
+
+span.InGameChatMoveRef {
+	cursor          : pointer;
+	text-decoration : none;
+	color           : rgb(42, 117, 243);
+}
+
+span.InGameChatMoveRef:hover {
+	text-decoration : underline;
+}
