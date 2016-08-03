@@ -527,7 +527,7 @@ CGoUniverseDrawingComments.prototype.private_ParseMessage = function(oTextDiv, s
 	{
 		if ((0 === nPos || sMessage.IsSpace(nPos - 1)) && sMessage.IsLatinLetter(nPos) && sMessage.IsDigit(nPos + 1))
 		{
-			var sRef;
+			var sRef = "";
 			if (sMessage.IsSpace(nPos + 2) || sMessage.IsEnd(nPos + 2))
 			{
 				sRef = sMessage.substr(nPos, 2);
@@ -539,13 +539,20 @@ CGoUniverseDrawingComments.prototype.private_ParseMessage = function(oTextDiv, s
 				nPos += 3;
 			}
 
-			if ("" !== sBuffer)
+			if ("" !== sRef)
 			{
-				private_AddSimpleText(sBuffer);
-				sBuffer = "";
-			}
+				if ("" !== sBuffer)
+				{
+					private_AddSimpleText(sBuffer);
+					sBuffer = "";
+				}
 
-			private_AddMoveReference(sRef);
+				private_AddMoveReference(sRef);
+			}
+			else
+			{
+				sBuffer += sMessage.charAt(nPos);
+			}
 		}
 		else
 		{

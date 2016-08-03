@@ -431,7 +431,7 @@ div.StartPageWindow {
 span.InGameChatMoveRef {
 	cursor          : pointer;
 	text-decoration : none;
-	color           : rgb(42, 117, 243);
+	color           : rgb(255, 0, 0);
 }
 
 span.InGameChatMoveRef:hover {
