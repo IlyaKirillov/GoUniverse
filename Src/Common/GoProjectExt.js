@@ -346,6 +346,8 @@ CGoUniverseDrawingComments.prototype.Init = function(sDivId, oGameTree, oApp)
 	oAreaElement.style.color        = "rgb(0, 0, 0)";
 	oAreaElement.style.fontSize     = "12pt";
 	oAreaElement.style.paddingLeft  = "5px";
+	oAreaElement.style.whiteSpace   = "pre-wrap";
+	oAreaElement.style.wordWrap     = "break-word";
 
 
 	this.m_oTextArea = oAreaElement;
@@ -409,9 +411,6 @@ CGoUniverseDrawingComments.prototype.private_AddMoveReference = function(oNode, 
 		oThis.m_oGameTree.GoTo_Node(oNode);
 	});
 	oTextDiv.appendChild(oTextSpan);
-
-
-	oTextDiv.appendChild(document.createElement("br"));
 
 	oDiv.appendChild(oTextDiv);
 };
