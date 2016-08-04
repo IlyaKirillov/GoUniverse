@@ -44,6 +44,14 @@ String.prototype.IsEnd = function(nPos)
 
 	return false;
 };
+String.prototype.IsSpaceOrPunctuation = function(nPos)
+{
+	var nChar = this.charAt(nPos);
+	if (' ' === nChar || '!' === nChar || ',' === nChar || '.' === nChar || '?' === nChar)
+		return true;
+
+	return false;
+};
 
 //----------------------------------------------------------------------------------------------------------------------
 // Дополнение к классу CDrawing
@@ -526,10 +534,6 @@ CGoUniverseDrawingComments.prototype.private_ParseMessage = function(oTextDiv, s
 				oDrawingBoard.Hide_Hint();
 			}
 		}, false);
-
-		oTextSpan = document.createElement("span");
-		oTextSpan.innerHTML = " ";
-		oTextDiv.appendChild(oTextSpan);
 	}
 	
 	var sBuffer = "";
@@ -538,12 +542,12 @@ CGoUniverseDrawingComments.prototype.private_ParseMessage = function(oTextDiv, s
 		if ((0 === nPos || sMessage.IsSpace(nPos - 1)) && sMessage.IsLatinLetter(nPos) && sMessage.IsDigit(nPos + 1))
 		{
 			var sRef = "";
-			if (sMessage.IsSpace(nPos + 2) || sMessage.IsEnd(nPos + 2))
+			if (sMessage.IsSpaceOrPunctuation(nPos + 2) || sMessage.IsEnd(nPos + 2))
 			{
 				sRef = sMessage.substr(nPos, 2);
 				nPos += 2;
 			}
-			else if (sMessage.IsDigit(nPos + 2) && (sMessage.IsSpace(nPos + 3) || sMessage.IsEnd(nPos + 3)))
+			else if (sMessage.IsDigit(nPos + 2) && (sMessage.IsSpaceOrPunctuation(nPos + 3) || sMessage.IsEnd(nPos + 3)))
 			{
 				sRef = sMessage.substr(nPos, 3);
 				nPos += 3;
@@ -560,6 +564,7 @@ CGoUniverseDrawingComments.prototype.private_ParseMessage = function(oTextDiv, s
 					}
 
 					private_AddMoveReference(sRef);
+					sBuffer += sMessage.charAt(nPos);
 				}
 				else
 				{
