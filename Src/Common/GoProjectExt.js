@@ -300,6 +300,8 @@ CDrawing.prototype.private_GoUniverseCreateHorFullTemplate = function()
 	oChatInputArea.className = "ChatInput";
 	oChatInputControl.HtmlElement.appendChild(oChatInputArea);
 
+	this.m_oChatInput = oChatInputArea;
+
 	var oThis = this;
 	oChatInputArea.addEventListener("keydown", function(e)
 	{
@@ -319,6 +321,16 @@ CDrawing.prototype.private_GoUniverseCreateHorFullTemplate = function()
 
 	this.Update_Size();
 	oGameTree.On_EndLoadDrawing();
+};
+CDrawing.prototype.Add_CommentWithCoordinates = function(sComment)
+{
+	if (this.m_oChatInput)
+	{
+		if ("" !== this.m_oChatInput.value && ' ' !== this.m_oChatInput.value.charAt(this.m_oChatInput.value.length - 1))
+			this.m_oChatInput.value += " " + sComment + " ";
+		else
+			this.m_oChatInput.value += sComment + " ";
+	}
 };
 
 //----------------------------------------------------------------------------------------------------------------------

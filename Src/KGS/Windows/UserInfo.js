@@ -565,17 +565,17 @@ CKGSUserInfoGamesList.prototype.Handle_DoubleClick = function(oRecord)
 };
 CKGSUserInfoGamesList.prototype.Handle_RightClick = function(oRecord)
 {
-	var oClient = this.m_oApp.GetClient();
-	if (!oClient)
-		return;
-
-	if (true === oRecord.IsInPlay())
-	{
-	}
-	else
-	{
-		oClient.LoadGameInRoom(oRecord.GetTimeStamp(), "13");
-	}
+	// var oClient = this.m_oApp.GetClient();
+	// if (!oClient)
+	// 	return;
+	//
+	// if (true === oRecord.IsInPlay())
+	// {
+	// }
+	// else
+	// {
+	// 	oClient.LoadGameInRoom(oRecord.GetTimeStamp(), "13");
+	// }
 };
 
 function CKGSUserInfoGamesListRecord(oClient)
