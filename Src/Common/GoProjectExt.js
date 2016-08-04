@@ -481,18 +481,7 @@ CGoUniverseDrawingComments.prototype.private_AddUserTextMessage = function(sText
 		return false;
 	}, false);
 	oTextDiv.appendChild(oTextSpan);
-
-
 	this.private_ParseMessage(oTextDiv, sMessageText);
-	// oTextSpan           = document.createElement("span");
-	// oTextSpan.innerHTML = sMessageText;
-	//
-	// if (true === bMessageForMe)
-	// {
-	// 	oTextSpan.style.fontStyle = "italic";
-	// }
-
-	//oTextDiv.appendChild(oTextSpan);
 	oTextDiv.appendChild(document.createElement("br"));
 
 	oDiv.appendChild(oTextDiv);
@@ -502,6 +491,11 @@ CGoUniverseDrawingComments.prototype.private_AddUserTextMessage = function(sText
 };
 CGoUniverseDrawingComments.prototype.private_ParseMessage = function(oTextDiv, sMessage)
 {
+	var oGameTree     = this.m_oDrawing.Get_GameTree();
+	var oDrawingBoard = oGameTree ? oGameTree.Get_DrawingBoard() : null;
+	var oLogicBoard   = oGameTree ? oGameTree.Get_Board() : null;
+	var oSize         = oLogicBoard ? oLogicBoard.Get_Size() : {X : 1, Y : 1};
+
 	function private_AddSimpleText(sText)
 	{
 		var oTextSpan = document.createElement("span");
@@ -515,6 +509,23 @@ CGoUniverseDrawingComments.prototype.private_ParseMessage = function(oTextDiv, s
 		oTextSpan.className = "InGameChatMoveRef";
 		oTextSpan.innerHTML = sRef;
 		oTextDiv.appendChild(oTextSpan);
+
+		var oPos = Common_StringToXY(sRef, oSize.X, oSize.Y);
+
+		oTextSpan.addEventListener("mouseover", function()
+		{
+			if (oDrawingBoard)
+			{
+				oDrawingBoard.Show_Hint(oPos.X + 1, oPos.Y + 1);
+			}
+		}, false);
+		oTextSpan.addEventListener("mouseout", function()
+		{
+			if (oDrawingBoard)
+			{
+				oDrawingBoard.Hide_Hint();
+			}
+		}, false);
 
 		oTextSpan = document.createElement("span");
 		oTextSpan.innerHTML = " ";
@@ -540,13 +551,20 @@ CGoUniverseDrawingComments.prototype.private_ParseMessage = function(oTextDiv, s
 
 			if ("" !== sRef)
 			{
-				if ("" !== sBuffer)
+				if (null !== Common_StringToXY(sRef, oSize.X, oSize.Y))
 				{
-					private_AddSimpleText(sBuffer);
-					sBuffer = "";
-				}
+					if ("" !== sBuffer)
+					{
+						private_AddSimpleText(sBuffer);
+						sBuffer = "";
+					}
 
-				private_AddMoveReference(sRef);
+					private_AddMoveReference(sRef);
+				}
+				else
+				{
+					sBuffer += sRef;
+				}
 			}
 			else
 			{
