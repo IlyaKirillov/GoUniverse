@@ -157,7 +157,7 @@ CGoUniverseApplication.prototype.OnResize = function()
 
 	var AboutDiv        = document.getElementById("divIdAbout");
 	AboutDiv.style.left = (document.body.clientWidth - 250) / 2 + "px";
-	AboutDiv.style.top  = (document.body.clientHeight - 60 - 20) + "px";
+	AboutDiv.style.top  = (document.body.clientHeight - 90 - 20) + "px";
 
 	if (this.m_oClientControl)
 	{
