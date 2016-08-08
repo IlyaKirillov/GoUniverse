@@ -1019,6 +1019,9 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 
 	this.private_HandleGameActions(oMessage["actions"], oGame);
 
+	var oGameTreeHandler = oGameTree.Get_Handler();
+	oGameTree.Set_Handler(null);
+
 	if (oMessage.score)
 		oGame.Result = this.private_ParseScore(oMessage.score);
 
@@ -1067,6 +1070,8 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 		oGameTree.m_oDrawingNavigator.Update_Current(true);
 		oGameTree.m_oDrawingNavigator.Update_GameCurrent();
 	}
+
+	oGameTree.Set_Handler(oGameTreeHandler);
 };
 CKGSClient.prototype.private_HandleGameUpdate = function(oMessage)
 {
@@ -1076,6 +1081,8 @@ CKGSClient.prototype.private_HandleGameUpdate = function(oMessage)
 		return;
 
 	var oGameTree = oGame.GameTree;
+	var oHandler  = oGameTree.Get_Handler();
+	oGameTree.Set_Handler(null);
 
 	var oCurNode = oGame.CurNode;
 
@@ -1107,6 +1114,8 @@ CKGSClient.prototype.private_HandleGameUpdate = function(oMessage)
 		oGameTree.m_oDrawingNavigator.Update_Current(true);
 		oGameTree.m_oDrawingNavigator.Update_GameCurrent();
 	}
+
+	oGameTree.Set_Handler(oHandler);
 };
 CKGSClient.prototype.private_HandleChat = function(oMessage)
 {
@@ -2250,7 +2259,7 @@ function CKGSEditorHandler(oClient, oGame)
 	this.m_oGame   = oGame;
 	this.m_nGameId = oGame.GameRoomId;
 }
-CKGSEditorHandler.prototype.GoTo_Node = function(oNode)
+CKGSEditorHandler.prototype.GoToNode = function(oNode)
 {
 	var sPrevNodeId = null;
 	for (var sNodeId in this.m_oGame.Nodes)
@@ -2270,6 +2279,7 @@ CKGSEditorHandler.prototype.GoTo_Node = function(oNode)
 		if (this.m_oGame.Nodes[sNodeId] === oNode)
 		{
 			this.m_oClient.SendSgfEventChangeCurrentNode(this.m_nGameId, parseInt(sNodeId), parseInt(sPrevNodeId));
+			return;
 		}
 	}
 };
