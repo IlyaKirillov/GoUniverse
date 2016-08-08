@@ -96,6 +96,11 @@ function CListView()
             oMainElement.addEventListener("mousewheel", this.private_OnMouseWheel, false);
             oMainElement.addEventListener("DOMMouseScroll", this.private_OnMouseWheel, false);
             oMainElement.addEventListener("contextmenu", this.private_OnContextMenu, false);
+
+            oMainElement.addEventListener("touchstart", this.private_OnTouchStart, false);
+            oMainElement.addEventListener("touchend", this.private_OnTouchEnd, false);
+            oMainElement.addEventListener("touchcancel", this.private_OnTouchCancel, false);
+            oMainElement.addEventListener("touchmove", this.private_OnTouchMove, false);
         }
 
         this.m_oListObject = oListObject;
@@ -300,6 +305,26 @@ function CListView()
     this.private_SortFunction = function(oRecord1, oRecord2)
     {
         return oThis.m_oListObject.SortFunction(oRecord1, oRecord2);
+    };
+
+    this.private_OnTouchStart = function(e)
+    {
+        console.log("TouchStart");
+    };
+
+    this.private_OnTouchEnd = function(e)
+    {
+        console.log("TouchEnd");
+    };
+
+    this.private_OnTouchCancel = function(e)
+    {
+        console.log("TouchCancel");
+    };
+
+    this.private_OnTouchMove = function(e)
+    {
+        console.log("TouchMove");
     };
 }
 CListView.prototype.Clear = function()
