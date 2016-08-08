@@ -646,6 +646,10 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
 	{
 		this.private_HandleDetailsRankGraph(oMessage);
 	}
+	else if ("CHANNEL_AUDIO" === oMessage.type)
+	{
+		this.private_HandleChannelAudio(oMessage);
+	}
 	else
 	{
 		console.log(oMessage);
@@ -929,7 +933,8 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 		Result          : null,
 		CommentsHandler : null,
 		StateHandler    : null,
-		PlayersList     : new CListView()
+		PlayersList     : new CListView(),
+		Editor          : false
 	};
 
 	this.m_aGames[GameRoomId] = oGame;
@@ -1547,6 +1552,19 @@ CKGSClient.prototype.private_HandleDetailsRankGraph = function(oMessage)
 			oInfo.Window.OnRankGraph(oMessage.rankData);
 		}
 	}
+};
+CKGSClient.prototype.private_HandleChannelAudio = function(oMessage)
+{
+	//var srcAudio = Common.Decode_Base64(oMessage.audio);
+	//var srcAudio = atob(oMessage.audio);
+
+	//this.m_oApp.m_oSound.PlayLecture("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAVFYAAFRWAAABAAgAZGF0YQAAAAA=");
+	this.m_oApp.m_oSound.PlayLecture("data:audio/ogg;base64," + oMessage.audio);
+
+	// var audio = new Audio();
+	// audio.src = "data:audio/ogg;base64," + oMessage.audio;
+	// //audio.addEventListener('MozAudioAvailable', someFunction, false);
+	// audio.play();
 };
 CKGSClient.prototype.private_AddUserToRoom = function(oUser, oRoom)
 {
@@ -2187,12 +2205,71 @@ CKGSClient.prototype.private_HandleGameActions = function(arrActions, oGame)
 		if ("EDIT" === sAction)
 		{
 			var oListObject = oGame.PlayersList.GetListObject();
-			oListObject.SetEditor(this.private_HandleUserRecord2(oAction["user"]));
+
+			var oEditor = this.private_HandleUserRecord2(oAction["user"]);
+			oListObject.SetEditor(oEditor);
 			oGame.PlayersList.Update_Size();
+
+			if (oEditor.GetName() === this.GetUserName())
+			{
+				if (false === oGame.Editor)
+				{
+					oGame.Editor = true;
+					var oGameTree = oGame.GameTree;
+					var oHandler = new CKGSEditorHandler(this, oGame);
+					oGameTree.Set_Handler(oHandler);
+				}
+			}
+			else if (true === oGame.Editor)
+			{
+				oGame.Editor = false;
+			}
 		}
 		else if ("MOVE" === sAction)
 		{
 
+		}
+	}
+};
+CKGSClient.prototype.SendSgfEventChangeCurrentNode = function(nGameRoomId, nNodeId, nPrevNodeId)
+{
+	this.private_SendMessage({
+		"type"      : "KGS_SGF_CHANGE",
+		"channelId" : nGameRoomId,
+		"sgfEvents" : [{
+			"type"       : "ACTIVATED",
+			"nodeId"     : nNodeId,
+			"prevNodeId" : nPrevNodeId
+		}]
+	});
+};
+
+function CKGSEditorHandler(oClient, oGame)
+{
+	this.m_oClient = oClient;
+	this.m_oGame   = oGame;
+	this.m_nGameId = oGame.GameRoomId;
+}
+CKGSEditorHandler.prototype.GoTo_Node = function(oNode)
+{
+	var sPrevNodeId = null;
+	for (var sNodeId in this.m_oGame.Nodes)
+	{
+		if (this.m_oGame.Nodes[sNodeId] === this.m_oGame.CurNode)
+		{
+			sPrevNodeId = sNodeId;
+			break;
+		}
+	}
+
+	if (null === sPrevNodeId)
+		return;
+
+	for (var sNodeId in this.m_oGame.Nodes)
+	{
+		if (this.m_oGame.Nodes[sNodeId] === oNode)
+		{
+			this.m_oClient.SendSgfEventChangeCurrentNode(this.m_nGameId, parseInt(sNodeId), parseInt(sPrevNodeId));
 		}
 	}
 };
