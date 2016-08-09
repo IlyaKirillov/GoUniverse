@@ -221,6 +221,8 @@ CGoUniverseApplication.prototype.Logout = function(sText)
 	document.getElementById("inputPasswordId").focus();
 
 	document.title = "KGS: Login";
+	
+	this.SetCurrentGameRoomTab(-1);
 };
 CGoUniverseApplication.prototype.GetClient = function()
 {
