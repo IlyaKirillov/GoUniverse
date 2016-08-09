@@ -2252,6 +2252,33 @@ CKGSClient.prototype.SendSgfEventChangeCurrentNode = function(nGameRoomId, nNode
 		}]
 	});
 };
+CKGSClient.prototype.SendSgfEventNewNodeWithMove = function(nGameRoomId, nNodeId, nNewNodeId, X, Y, Value)
+{
+	this.private_SendMessage({
+		"type"      : "KGS_SGF_CHANGE",
+		"channelId" : nGameRoomId,
+		"sgfEvents" : [{
+			"type"        : "CHILD_ADDED",
+			"nodeId"      : nNodeId,
+			"childNodeId" : nNewNodeId
+		}, {
+			"type"       : "ACTIVATED",
+			"nodeId"     : nNewNodeId,
+			"prevNodeId" : nNodeId
+		}, {
+			"type"   : "PROP_ADDED",
+			"nodeId" : nNewNodeId,
+			"prop"   : {
+				"name"  : "MOVE",
+				"color" : BOARD_BLACK === Value ? "black" : "white",
+				"loc"   : {
+					"x" : X - 1,
+					"y" : Y - 1
+				}
+			}
+		}]
+	});
+};
 
 function CKGSEditorHandler(oClient, oGame)
 {
@@ -2261,25 +2288,44 @@ function CKGSEditorHandler(oClient, oGame)
 }
 CKGSEditorHandler.prototype.GoToNode = function(oNode)
 {
-	var sPrevNodeId = null;
-	for (var sNodeId in this.m_oGame.Nodes)
-	{
-		if (this.m_oGame.Nodes[sNodeId] === this.m_oGame.CurNode)
-		{
-			sPrevNodeId = sNodeId;
-			break;
-		}
-	}
-
-	if (null === sPrevNodeId)
+	var sPrevNodeId = this.private_GetNodeId();
+	var sNodeId     = this.private_GetNodeId(oNode);
+	if (null === sPrevNodeId || null === sNodeId)
 		return;
+
+	this.m_oClient.SendSgfEventChangeCurrentNode(this.m_nGameId, sNodeId, sPrevNodeId);
+};
+CKGSEditorHandler.prototype.AddNewNodeWithMove = function(oNode, X, Y, Value)
+{
+	var sNodeId = this.private_GetNodeId(oNode);
+	if (null === sNodeId)
+		return;
+
+	this.m_oClient.SendSgfEventNewNodeWithMove(this.m_nGameId, sNodeId, this.private_GetNewNodeId(), X, Y, Value);
+};
+CKGSEditorHandler.prototype.private_GetNodeId = function(oNode)
+{
+	if (!oNode)
+		oNode = this.m_oGame.CurNode;
 
 	for (var sNodeId in this.m_oGame.Nodes)
 	{
 		if (this.m_oGame.Nodes[sNodeId] === oNode)
 		{
-			this.m_oClient.SendSgfEventChangeCurrentNode(this.m_nGameId, parseInt(sNodeId), parseInt(sPrevNodeId));
-			return;
+			return sNodeId;
 		}
 	}
+
+	return null;
 };
+CKGSEditorHandler.prototype.private_GetNewNodeId = function()
+{
+	var nId = 1;
+	while (this.m_oGame.Nodes[nId])
+	{
+		nId++;
+	}
+
+	return nId;
+};
+
