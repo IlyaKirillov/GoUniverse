@@ -923,18 +923,19 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 		return;
 
 	var oGame = {
-		GameRoomId      : GameRoomId,
-		GameTree        : null,
-		Nodes           : {},
-		CurNode         : null,
-		BlackTime       : new CTimeSettings(),
-		WhiteTime       : new CTimeSettings(),
-		Demo            : false,
-		Result          : null,
-		CommentsHandler : null,
-		StateHandler    : null,
-		PlayersList     : new CListView(),
-		Editor          : false
+		GameRoomId         : GameRoomId,
+		GameTree           : null,
+		Nodes              : {},
+		CurNode            : null,
+		BlackTime          : new CTimeSettings(),
+		WhiteTime          : new CTimeSettings(),
+		Demo               : false,
+		Result             : null,
+		CommentsHandler    : null,
+		StateHandler       : null,
+		PlayersList        : new CListView(),
+		Editor             : false,
+		SgfEventInProgress : false
 	};
 
 	this.m_aGames[GameRoomId] = oGame;
@@ -1116,6 +1117,8 @@ CKGSClient.prototype.private_HandleGameUpdate = function(oMessage)
 	}
 
 	oGameTree.Set_Handler(oHandler);
+
+	this.private_EndSgfEvent(GameRoomId);
 };
 CKGSClient.prototype.private_HandleChat = function(oMessage)
 {
@@ -2224,6 +2227,7 @@ CKGSClient.prototype.private_HandleGameActions = function(arrActions, oGame)
 				if (false === oGame.Editor)
 				{
 					oGame.Editor = true;
+					this.private_EndSgfEvent(oGame.GameRoomId);
 					var oGameTree = oGame.GameTree;
 					var oHandler = new CKGSEditorHandler(this, oGame);
 					oGameTree.Set_Handler(oHandler);
@@ -2232,6 +2236,7 @@ CKGSClient.prototype.private_HandleGameActions = function(arrActions, oGame)
 			else if (true === oGame.Editor)
 			{
 				oGame.Editor = false;
+				this.private_EndSgfEvent(oGame.GameRoomId);
 			}
 		}
 		else if ("MOVE" === sAction)
@@ -2242,6 +2247,9 @@ CKGSClient.prototype.private_HandleGameActions = function(arrActions, oGame)
 };
 CKGSClient.prototype.SendSgfEventChangeCurrentNode = function(nGameRoomId, nNodeId, nPrevNodeId)
 {
+	if (true !== this.private_BeginSgfEvent(nGameRoomId))
+		return;
+
 	this.private_SendMessage({
 		"type"      : "KGS_SGF_CHANGE",
 		"channelId" : nGameRoomId,
@@ -2254,6 +2262,9 @@ CKGSClient.prototype.SendSgfEventChangeCurrentNode = function(nGameRoomId, nNode
 };
 CKGSClient.prototype.SendSgfEventNewNodeWithMove = function(nGameRoomId, nNodeId, nNewNodeId, X, Y, Value)
 {
+	if (true !== this.private_BeginSgfEvent(nGameRoomId))
+		return;
+
 	this.private_SendMessage({
 		"type"      : "KGS_SGF_CHANGE",
 		"channelId" : nGameRoomId,
@@ -2279,6 +2290,29 @@ CKGSClient.prototype.SendSgfEventNewNodeWithMove = function(nGameRoomId, nNodeId
 		}]
 	});
 };
+CKGSClient.prototype.private_IsSgfEventInProgress = function(nGameRoomId)
+{
+	if (!this.m_aGames[nGameRoomId])
+		return true;
+
+	return this.m_aGames[nGameRoomId].SgfEventInProgress;
+};
+CKGSClient.prototype.private_BeginSgfEvent = function(nGameRoomId)
+{
+	if (this.private_IsSgfEventInProgress(nGameRoomId))
+		return false;
+
+	this.m_aGames[nGameRoomId].SgfEventInProgress = true;
+
+	return true;
+};
+CKGSClient.prototype.private_EndSgfEvent = function(nGameRoomId)
+{
+	if (!this.m_aGames[nGameRoomId])
+		return;
+
+	this.m_aGames[nGameRoomId].SgfEventInProgress = false;
+};
 
 function CKGSEditorHandler(oClient, oGame)
 {
@@ -2290,7 +2324,7 @@ CKGSEditorHandler.prototype.GoToNode = function(oNode)
 {
 	var sPrevNodeId = this.private_GetNodeId();
 	var sNodeId     = this.private_GetNodeId(oNode);
-	if (null === sPrevNodeId || null === sNodeId)
+	if (null === sPrevNodeId || null === sNodeId || sPrevNodeId == sNodeId)
 		return;
 
 	this.m_oClient.SendSgfEventChangeCurrentNode(this.m_nGameId, sNodeId, sPrevNodeId);
