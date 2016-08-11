@@ -2337,6 +2337,9 @@ CKGSEditorHandler.prototype.AddNewNodeWithMove = function(oNode, X, Y, Value)
 
 	this.m_oClient.SendSgfEventNewNodeWithMove(this.m_nGameId, sNodeId, this.private_GetNewNodeId(), X, Y, Value);
 };
+CKGSEditorHandler.prototype.RemoveNode = function(oNode)
+{
+};
 CKGSEditorHandler.prototype.private_GetNodeId = function(oNode)
 {
 	if (!oNode)
