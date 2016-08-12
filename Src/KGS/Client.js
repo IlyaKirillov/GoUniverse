@@ -2313,6 +2313,58 @@ CKGSClient.prototype.private_EndSgfEvent = function(nGameRoomId)
 
 	this.m_aGames[nGameRoomId].SgfEventInProgress = false;
 };
+CKGSClient.prototype.SendSgfEventNewNodeWithAddOrRemoveStone = function(nGameRoomId, nNodeId, nNewNodeId, X, Y, Value)
+{
+	if (true !== this.private_BeginSgfEvent(nGameRoomId))
+		return;
+
+	this.private_SendMessage({
+		"type"      : "KGS_SGF_CHANGE",
+		"channelId" : nGameRoomId,
+		"sgfEvents" : [{
+			"type"        : "CHILD_ADDED",
+			"nodeId"      : nNodeId,
+			"childNodeId" : nNewNodeId
+		}, {
+			"type"       : "ACTIVATED",
+			"nodeId"     : nNewNodeId,
+			"prevNodeId" : nNodeId
+		}, {
+			"type"   : "PROP_ADDED",
+			"nodeId" : nNewNodeId,
+			"prop"   : {
+				"name"  : "ADDSTONE",
+				"color" : (BOARD_BLACK === Value ? "black" : (BOARD_WHITE === Value ? "white" : "empty")),
+				"loc"   : {
+					"x" : X - 1,
+					"y" : Y - 1
+				}
+			}
+		}]
+	});
+};
+CKGSClient.prototype.SendSgfEventAddOrRemoveStone = function(nGameRoomId, nNodeId, X, Y, Value)
+{
+	if (true !== this.private_BeginSgfEvent(nGameRoomId))
+		return;
+
+	this.private_SendMessage({
+		"type"      : "KGS_SGF_CHANGE",
+		"channelId" : nGameRoomId,
+		"sgfEvents" : [{
+			"type"   : "PROP_ADDED",
+			"nodeId" : nNodeId,
+			"prop"   : {
+				"name"  : "ADDSTONE",
+				"color" : (BOARD_BLACK === Value ? "black" : (BOARD_WHITE === Value ? "white" : "empty")),
+				"loc"   : {
+					"x" : X - 1,
+					"y" : Y - 1
+				}
+			}
+		}]
+	});
+};
 
 function CKGSEditorHandler(oClient, oGame)
 {
@@ -2339,6 +2391,17 @@ CKGSEditorHandler.prototype.AddNewNodeWithMove = function(oNode, X, Y, Value)
 };
 CKGSEditorHandler.prototype.RemoveNode = function(oNode)
 {
+};
+CKGSEditorHandler.prototype.AddOrRemoveStone = function(isAddNewNode, X, Y, Value)
+{
+	var sNodeId = this.private_GetNodeId();
+	if (null === sNodeId)
+		return;
+
+	if (true === isAddNewNode)
+		this.m_oClient.SendSgfEventNewNodeWithAddOrRemoveStone(this.m_nGameId, sNodeId, this.private_GetNewNodeId(), X, Y, Value);
+	else
+		this.m_oClient.SendSgfEventAddOrRemoveStone(this.m_nGameId, sNodeId, X, Y, Value);
 };
 CKGSEditorHandler.prototype.private_GetNodeId = function(oNode)
 {
