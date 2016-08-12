@@ -2409,7 +2409,7 @@ CKGSClient.prototype.SendSgfEventAddOrRemoveMark = function(nGameRoomId, nNodeId
 						"x" : X - 1,
 						"y" : Y - 1
 					},
-					"text" : true == isAdd ? Text : ""
+					"text" : Text
 				}
 			}]
 		});
