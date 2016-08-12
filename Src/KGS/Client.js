@@ -2383,6 +2383,9 @@ CKGSClient.prototype.SendSgfEventAddOrRemoveMark = function(nGameRoomId, nNodeId
 		case EDrawingMark.X:
 			sType = "CROSS";
 			break;
+		case EDrawingMark.Tx:
+			sType = "LABEL";
+			break;
 	}
 
 	if (null === sType)
@@ -2392,21 +2395,43 @@ CKGSClient.prototype.SendSgfEventAddOrRemoveMark = function(nGameRoomId, nNodeId
 	if (true !== this.private_BeginSgfEvent(nGameRoomId))
 		return;
 
-	this.private_SendMessage({
-		"type"      : "KGS_SGF_CHANGE",
-		"channelId" : nGameRoomId,
-		"sgfEvents" : [{
-			"type"   : true == isAdd ? "PROP_ADDED" : "PROP_REMOVED",
-			"nodeId" : nNodeId,
-			"prop"   : {
-				"name"  : sType,
-				"loc"   : {
-					"x" : X - 1,
-					"y" : Y - 1
+	if (EDrawingMark.Tx === Type)
+	{
+		this.private_SendMessage({
+			"type"      : "KGS_SGF_CHANGE",
+			"channelId" : nGameRoomId,
+			"sgfEvents" : [{
+				"type"   : true == isAdd ? "PROP_ADDED" : "PROP_REMOVED",
+				"nodeId" : nNodeId,
+				"prop"   : {
+					"name" : sType,
+					"loc"  : {
+						"x" : X - 1,
+						"y" : Y - 1
+					},
+					"text" : true == isAdd ? Text : ""
 				}
-			}
-		}]
-	});
+			}]
+		});
+	}
+	else
+	{
+		this.private_SendMessage({
+			"type"      : "KGS_SGF_CHANGE",
+			"channelId" : nGameRoomId,
+			"sgfEvents" : [{
+				"type"   : true == isAdd ? "PROP_ADDED" : "PROP_REMOVED",
+				"nodeId" : nNodeId,
+				"prop"   : {
+					"name" : sType,
+					"loc"  : {
+						"x" : X - 1,
+						"y" : Y - 1
+					}
+				}
+			}]
+		});
+	}
 };
 
 function CKGSEditorHandler(oClient, oGame)
@@ -2446,13 +2471,13 @@ CKGSEditorHandler.prototype.AddOrRemoveStone = function(isAddNewNode, X, Y, Valu
 	else
 		this.m_oClient.SendSgfEventAddOrRemoveStone(this.m_nGameId, sNodeId, X, Y, Value);
 };
-CKGSEditorHandler.prototype.AddOrRemoveMark = function(isAdd, X, Y, Type)
+CKGSEditorHandler.prototype.AddOrRemoveMark = function(isAdd, X, Y, Type, Text)
 {
 	var sNodeId = this.private_GetNodeId();
 	if (null === sNodeId)
 		return;
 
-	this.m_oClient.SendSgfEventAddOrRemoveMark(this.m_nGameId, sNodeId, isAdd, X, Y, Type);
+	this.m_oClient.SendSgfEventAddOrRemoveMark(this.m_nGameId, sNodeId, isAdd, X, Y, Type, Text);
 };
 CKGSEditorHandler.prototype.private_GetNodeId = function(oNode)
 {
