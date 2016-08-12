@@ -2365,6 +2365,49 @@ CKGSClient.prototype.SendSgfEventAddOrRemoveStone = function(nGameRoomId, nNodeI
 		}]
 	});
 };
+CKGSClient.prototype.SendSgfEventAddOrRemoveMark = function(nGameRoomId, nNodeId, isAdd, X, Y, Type, Text)
+{
+	var sType = null;
+
+	switch(Type)
+	{
+		case EDrawingMark.Tr:
+			sType = "TRIANGLE";
+			break;
+		case EDrawingMark.Sq:
+			sType = "SQUARE";
+			break;
+		case EDrawingMark.Cr:
+			sType = "CIRCLE";
+			break;
+		case EDrawingMark.X:
+			sType = "CROSS";
+			break;
+	}
+
+	if (null === sType)
+		return;
+
+
+	if (true !== this.private_BeginSgfEvent(nGameRoomId))
+		return;
+
+	this.private_SendMessage({
+		"type"      : "KGS_SGF_CHANGE",
+		"channelId" : nGameRoomId,
+		"sgfEvents" : [{
+			"type"   : true == isAdd ? "PROP_ADDED" : "PROP_REMOVED",
+			"nodeId" : nNodeId,
+			"prop"   : {
+				"name"  : sType,
+				"loc"   : {
+					"x" : X - 1,
+					"y" : Y - 1
+				}
+			}
+		}]
+	});
+};
 
 function CKGSEditorHandler(oClient, oGame)
 {
@@ -2402,6 +2445,14 @@ CKGSEditorHandler.prototype.AddOrRemoveStone = function(isAddNewNode, X, Y, Valu
 		this.m_oClient.SendSgfEventNewNodeWithAddOrRemoveStone(this.m_nGameId, sNodeId, this.private_GetNewNodeId(), X, Y, Value);
 	else
 		this.m_oClient.SendSgfEventAddOrRemoveStone(this.m_nGameId, sNodeId, X, Y, Value);
+};
+CKGSEditorHandler.prototype.AddOrRemoveMark = function(isAdd, X, Y, Type)
+{
+	var sNodeId = this.private_GetNodeId();
+	if (null === sNodeId)
+		return;
+
+	this.m_oClient.SendSgfEventAddOrRemoveMark(this.m_nGameId, sNodeId, isAdd, X, Y, Type);
 };
 CKGSEditorHandler.prototype.private_GetNodeId = function(oNode)
 {
