@@ -133,7 +133,47 @@ CKGSInGamePlayersList.prototype.Handle_RightClick = function(Record, e)
 {
 	if (this.m_oApp && Record)
 	{
-		this.m_oApp.ShowUserContextMenu(e.pageX, e.pageY, Record.m_sName);
+		var nX = e.pageX, nY = e.pageY;
+		var sUserName = Record.m_sName;
+		var oClient = this.m_oApp.GetClient();
+
+		var oContextMenu = new CVisualContextMenu(this.m_oApp, nX, nY);
+		oContextMenu.AddCheckBoxItem(false, "Talk to...", function()
+		{
+			oClient.EnterPrivateChat(sUserName);
+		});
+		oContextMenu.AddCheckBoxItem(false, "View info", function()
+		{
+			oClient.LoadUserInfo(sUserName);
+		});
+		oContextMenu.AddCheckBoxItem(false, "Give control", function()
+		{
+			oClient.LoadUserInfo(sUserName);
+		}, true);
+		oContextMenu.AddHorizontalLine();
+		oContextMenu.AddCheckBoxItem(oClient.IsUserInFriendList(sUserName), "Buddy", function()
+		{
+			if (oClient.IsUserInFriendList(sUserName))
+				oClient.RemoveFromFriendList(sUserName);
+			else
+				oClient.AddToFriendList(sUserName);
+		});
+		oContextMenu.AddCheckBoxItem(oClient.IsUserInBlackList(sUserName), "Censored", function()
+		{
+			if (oClient.IsUserInBlackList(sUserName))
+				oClient.RemoveFromBlackList(sUserName);
+			else
+				oClient.AddToBlackList(sUserName);
+		});
+		oContextMenu.AddCheckBoxItem(oClient.IsUserInFollowerList(sUserName), "Follow", function()
+		{
+			if (oClient.IsUserInFollowerList(sUserName))
+				oClient.RemoveFromFollowerList(sUserName);
+			else
+				oClient.AddToFollowerList(sUserName);
+		});
+		oContextMenu.Show();
+
 	}
 };
 CKGSInGamePlayersList.prototype.SetBlack = function(oUser)

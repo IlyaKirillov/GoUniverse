@@ -157,6 +157,7 @@ function CVisualContextMenu(oApp, nX, nY)
 	this.m_oList = oList;
 
 	this.m_nHeight = 12;
+	this.m_nWidth  = 100;
 }
 CVisualContextMenu.prototype.AddListItem = function(sText, fAction)
 {
@@ -180,10 +181,10 @@ CVisualContextMenu.prototype.AddHorizontalLine = function()
 
 	this.m_nHeight += 6;
 };
-CVisualContextMenu.prototype.AddCheckBoxItem = function(bChecked, sText, fAction)
+CVisualContextMenu.prototype.AddCheckBoxItem = function(bChecked, sText, fAction, isDisabled)
 {
 	var oListEntry = document.createElement("li");
-	oListEntry.className = "ContextMenuItem";
+	oListEntry.className = true === isDisabled ? "ContextMenuItemDisabled" : "ContextMenuItem";
 	this.m_oList.appendChild(oListEntry);
 
 	var oCheckItem               = document.createElement("div");
@@ -201,7 +202,13 @@ CVisualContextMenu.prototype.AddCheckBoxItem = function(bChecked, sText, fAction
 	Common.Set_InnerTextToElement(oTextItem, sText);
 	oListEntry.appendChild(oTextItem);
 
-	if (fAction)
+	g_oTextMeasurer.SetFont("16px 'Times New Roman', Times, serif");
+	var nWidth = (g_oTextMeasurer.Measure(sText) | 0) + 1;
+
+	if (this.m_nWidth < 5 + 3 + 20 + nWidth + 5)
+		this.m_nWidth = 5 + 3 + 20 + nWidth + 5;
+
+	if (fAction && true !== isDisabled)
 		oListEntry.addEventListener("click", fAction, false);
 
 	this.m_nHeight += 20;
@@ -216,10 +223,15 @@ CVisualContextMenu.prototype.UpdatePopupPosition = function(oPopup)
 	if (this.m_nY + this.m_nHeight > nAppHeight)
 		this.m_nY = nAppHeight - this.m_nHeight;
 
+	var nAppWidth = this.m_oApp.GetWidth();
+
+	if (this.m_nX + this.m_nWidth > nAppWidth)
+		this.m_nX = nAppWidth - this.m_nWidth;
+
 	var oHtmlElement        = this.m_oPopup.GetHtmlElement();
 	oHtmlElement.style.left = this.m_nX + "px";
 	oHtmlElement.style.top  = this.m_nY + "px";
-}
+};
 CVisualContextMenu.prototype.OnHidePopup = function(oPopup)
 {
 	var oHtmlElement = oPopup.GetHtmlElement();
@@ -229,5 +241,6 @@ CVisualContextMenu.prototype.OnShowPopup = function(oPopup)
 {
 	var oHtmlElement = oPopup.GetHtmlElement();
 	oHtmlElement.style.height = this.m_nHeight + "px";
+	oHtmlElement.style.width  = this.m_nWidth + "px";
 };
 

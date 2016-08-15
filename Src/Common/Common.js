@@ -215,3 +215,19 @@ CTimeStamp.prototype.GetDifferenceString = function()
 	}
 };
 
+var g_oTextMeasurer = new CTextMeasurer();
+function CTextMeasurer()
+{
+	this.m_oCanvas  = document.createElement("canvas");
+	this.m_oContext = this.m_oCanvas.getContext("2d");
+}
+CTextMeasurer.prototype.SetFont = function(sFont)
+{
+	this.m_oContext.font = sFont;
+};
+CTextMeasurer.prototype.Measure = function(sText)
+{
+	var oMetrics = this.m_oContext.measureText(sText);
+	return oMetrics.width;
+};
+

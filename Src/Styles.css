@@ -295,6 +295,14 @@ div.ContextMenu ul li.ContextMenuItem {
 	background  : transparent;
 }
 
+div.ContextMenu ul li.ContextMenuItemDisabled {
+	font-family : 'Times New Roman', Times, serif;
+	height      : 20px;
+	color       : rgb(168, 168, 168);
+	margin      : 0px 5px;
+	cursor      : default;
+	background  : transparent;
+}
 
 div.ContextMenu ul li.ContextMenuItem:hover {
 	background  : rgb(216, 218, 220);
