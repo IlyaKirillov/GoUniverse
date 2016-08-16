@@ -563,19 +563,56 @@ CKGSUserInfoGamesList.prototype.Handle_DoubleClick = function(oRecord)
 		oClient.EnterGameRoomByTimeStamp(oRecord.GetTimeStamp());
 	}
 };
-CKGSUserInfoGamesList.prototype.Handle_RightClick = function(oRecord)
+CKGSUserInfoGamesList.prototype.Handle_RightClick = function(oRecord, e)
 {
-	// var oClient = this.m_oApp.GetClient();
-	// if (!oClient)
-	// 	return;
-	//
-	// if (true === oRecord.IsInPlay())
-	// {
-	// }
-	// else
-	// {
-	// 	oClient.LoadGameInRoom(oRecord.GetTimeStamp(), "13");
-	// }
+	var oClient = this.m_oApp.GetClient();
+	if (!oClient)
+		return;
+
+	var nX = e.pageX, nY = e.pageY;
+	var oContextMenu = new CVisualContextMenu(this.m_oApp, nX, nY);
+
+	var oThis = this;
+	if (true === oRecord.IsInPlay())
+	{
+		oContextMenu.AddCheckBoxItem(false, "Observe", function()
+		{
+			oClient.EnterGameRoomByTimeStamp(oRecord.GetTimeStamp());
+		});
+	}
+	else
+	{
+		oContextMenu.AddCheckBoxItem(false, "Load in...", function(e)
+		{
+			var oContextMenu2 = oContextMenu.GetAdditionalInfo("LoadIn");
+			if (undefined === oContextMenu2)
+			{
+				var nWidth        = oContextMenu.GetWidth();
+				oContextMenu2 = new CVisualContextMenu(oThis.m_oApp, nX + nWidth + 3, nY + 10);
+
+				for (var nIndex = 0; nIndex < 10; ++nIndex)
+				{
+					oContextMenu2.AddListItem("Client Testing", function()
+					{
+						oClient.LoadGameInRoom(oRecord.GetTimeStamp(), "1824129");
+					});
+				}
+				
+				oContextMenu2.Show();
+				oContextMenu.SetAdditionalInfo("LoadIn", oContextMenu2);
+			}
+			else
+			{
+				oContextMenu2.Hide();
+				oContextMenu.SetAdditionalInfo("LoadIn", undefined);
+			}
+
+			e.stopPropagation();
+			return false;
+		});
+	}
+
+	oContextMenu.Show();
 };
 
 function CKGSUserInfoGamesListRecord(oClient)
