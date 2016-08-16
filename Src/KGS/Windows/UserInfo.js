@@ -569,6 +569,7 @@ CKGSUserInfoGamesList.prototype.Handle_RightClick = function(oRecord, e)
 	if (!oClient)
 		return;
 
+	var isPrivate = oRecord.IsPrivate();
 	var nX = e.pageX, nY = e.pageY;
 	var oContextMenu = new CVisualContextMenu(this.m_oApp, nX, nY);
 
@@ -578,7 +579,7 @@ CKGSUserInfoGamesList.prototype.Handle_RightClick = function(oRecord, e)
 		oContextMenu.AddCheckBoxItem(false, "Observe", function()
 		{
 			oClient.EnterGameRoomByTimeStamp(oRecord.GetTimeStamp());
-		});
+		}, isPrivate);
 	}
 	else
 	{
@@ -609,7 +610,7 @@ CKGSUserInfoGamesList.prototype.Handle_RightClick = function(oRecord, e)
 
 			e.stopPropagation();
 			return false;
-		});
+		}, isPrivate);
 	}
 
 	oContextMenu.Show();
@@ -748,6 +749,10 @@ CKGSUserInfoGamesListRecord.prototype.GetDate = function()
 CKGSUserInfoGamesListRecord.prototype.IsInPlay = function()
 {
 	return this.m_bInPlay;
+};
+CKGSUserInfoGamesListRecord.prototype.IsPrivate = function()
+{
+	return this.m_bPrivate;
 };
 CKGSUserInfoGamesListRecord.prototype.GetWhiteName = function()
 {
