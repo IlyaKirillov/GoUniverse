@@ -124,13 +124,25 @@ CKGSClient.prototype.EnterGameRoomByTimeStamp = function(sTimeStamp)
 		"timestamp" : sTimeStamp
 	});
 };
-CKGSClient.prototype.LoadGameInRoom = function(sTimeStamp, nRoomId)
+CKGSClient.prototype.LoadGameInRoom = function(sTimeStamp, nRoomId, isPrivate)
 {
-	this.private_SendMessage({
-		"type"      : "ROOM_LOAD_GAME",
-		"timestamp" : sTimeStamp,
-		"channelId" : nRoomId
-	});
+	if (true === isPrivate)
+	{
+		this.private_SendMessage({
+			"type"      : "ROOM_LOAD_GAME",
+			"timestamp" : sTimeStamp,
+			"private"   : true,
+			"channelId" : nRoomId
+		});
+	}
+	else
+	{
+		this.private_SendMessage({
+			"type"      : "ROOM_LOAD_GAME",
+			"timestamp" : sTimeStamp,
+			"channelId" : nRoomId
+		});
+	}
 };
 CKGSClient.prototype.EnterChatRoom = function(nChatRoomId)
 {
@@ -285,6 +297,20 @@ CKGSClient.prototype.GetRoomName = function(nRoomId)
 CKGSClient.prototype.GetAllRooms = function()
 {
 	return this.m_aAllRooms;
+};
+CKGSClient.prototype.GetRooms = function()
+{
+	var arrRooms = [];
+	for (var nChannelId in this.m_aRooms)
+	{
+		var oRoom = this.m_aAllRooms[nChannelId];
+		if (!oRoom)
+			continue;
+
+		arrRooms.push(oRoom);
+	}
+
+	return arrRooms;
 };
 CKGSClient.prototype.GetCategoryName = function(nCategoryId)
 {

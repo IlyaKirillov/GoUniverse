@@ -554,6 +554,9 @@ CKGSUserInfoGamesList.prototype.Get_Record = function(aLine)
 };
 CKGSUserInfoGamesList.prototype.Handle_DoubleClick = function(oRecord)
 {
+	if (!oRecord)
+		return;
+
 	if (true === oRecord.IsInPlay())
 	{
 		var oClient = this.m_oApp.GetClient();
@@ -565,6 +568,9 @@ CKGSUserInfoGamesList.prototype.Handle_DoubleClick = function(oRecord)
 };
 CKGSUserInfoGamesList.prototype.Handle_RightClick = function(oRecord, e)
 {
+	if (!oRecord)
+		return;
+
 	var oClient = this.m_oApp.GetClient();
 	if (!oClient)
 		return;
@@ -583,22 +589,24 @@ CKGSUserInfoGamesList.prototype.Handle_RightClick = function(oRecord, e)
 	}
 	else
 	{
-		oContextMenu.AddCheckBoxItem(false, "Load in...", function(e)
+		function privateLoadIn(e, isLoadPrivately)
 		{
 			var oContextMenu2 = oContextMenu.GetAdditionalInfo("LoadIn");
 			if (undefined === oContextMenu2)
 			{
-				var nWidth        = oContextMenu.GetWidth();
-				oContextMenu2 = new CVisualContextMenu(oThis.m_oApp, nX + nWidth + 3, nY + 10);
+				var nWidth    = oContextMenu.GetWidth();
+				oContextMenu2 = new CVisualContextMenu(oThis.m_oApp, nX + nWidth + 3, nY + 10 + (true === isLoadPrivately ? 20 : 0));
 
-				for (var nIndex = 0; nIndex < 10; ++nIndex)
+				var arrRooms = oClient.GetRooms();
+				for (var nRoomIndex = 0, nRoomsCount = arrRooms.length; nRoomIndex < nRoomsCount; ++nRoomIndex)
 				{
-					oContextMenu2.AddListItem("Client Testing", function()
+					var oRoom = arrRooms[nRoomIndex];
+					oContextMenu2.AddListItem(oRoom.Name, function(e, nChannelId)
 					{
-						oClient.LoadGameInRoom(oRecord.GetTimeStamp(), "1824129");
-					});
+						oClient.LoadGameInRoom(oRecord.GetTimeStamp(), nChannelId, isLoadPrivately);
+					}, false, oRoom.ChannelId);
 				}
-				
+
 				oContextMenu2.Show();
 				oContextMenu.SetAdditionalInfo("LoadIn", oContextMenu2);
 			}
@@ -610,7 +618,10 @@ CKGSUserInfoGamesList.prototype.Handle_RightClick = function(oRecord, e)
 
 			e.stopPropagation();
 			return false;
-		}, isPrivate);
+		}
+
+		oContextMenu.AddCheckBoxItem(false, "Load in...", privateLoadIn, isPrivate, false);
+		oContextMenu.AddCheckBoxItem(false, "Load (P) in...", privateLoadIn, isPrivate, true);
 	}
 
 	oContextMenu.Show();

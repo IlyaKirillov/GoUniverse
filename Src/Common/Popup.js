@@ -161,10 +161,10 @@ function CVisualContextMenu(oApp, nX, nY)
 
 	this.m_oAdditionalInfo = {};
 }
-CVisualContextMenu.prototype.AddListItem = function(sText, fAction)
+CVisualContextMenu.prototype.AddListItem = function(sText, fAction, isDisabled, oAdditionalInfo)
 {
 	var oListEntry = document.createElement("li");
-	oListEntry.className = "ContextMenuItem";
+	oListEntry.className = true === isDisabled ? "ContextMenuItemDisabled" : "ContextMenuItem";
 	this.m_oList.appendChild(oListEntry);
 
 	if (sText)
@@ -178,8 +178,12 @@ CVisualContextMenu.prototype.AddListItem = function(sText, fAction)
 			this.m_nWidth = 5 + nWidth + 5;
 	}
 
-	if (fAction)
-		oListEntry.addEventListener("click", fAction, false);
+	if (fAction && true !== isDisabled)
+	{
+		oListEntry.addEventListener("click", function(e){
+			fAction(e, oAdditionalInfo);
+		}, false);
+	}
 
 	this.m_nHeight += 20;
 };
@@ -191,7 +195,7 @@ CVisualContextMenu.prototype.AddHorizontalLine = function()
 
 	this.m_nHeight += 6;
 };
-CVisualContextMenu.prototype.AddCheckBoxItem = function(bChecked, sText, fAction, isDisabled)
+CVisualContextMenu.prototype.AddCheckBoxItem = function(bChecked, sText, fAction, isDisabled, oAdditionalInfo)
 {
 	var oListEntry = document.createElement("li");
 	oListEntry.className = true === isDisabled ? "ContextMenuItemDisabled" : "ContextMenuItem";
@@ -219,7 +223,11 @@ CVisualContextMenu.prototype.AddCheckBoxItem = function(bChecked, sText, fAction
 		this.m_nWidth = 5 + 3 + 20 + nWidth + 5;
 
 	if (fAction && true !== isDisabled)
-		oListEntry.addEventListener("click", fAction, false);
+	{
+		oListEntry.addEventListener("click", function(e){
+			fAction(e, oAdditionalInfo);
+		}, false);
+	}
 
 	this.m_nHeight += 20;
 };
