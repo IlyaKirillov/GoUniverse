@@ -578,8 +578,38 @@ CKGSUserInfoGamesList.prototype.Handle_RightClick = function(oRecord, e)
 	var isPrivate = oRecord.IsPrivate();
 	var nX = e.pageX, nY = e.pageY;
 	var oContextMenu = new CVisualContextMenu(this.m_oApp, nX, nY);
-
 	var oThis = this;
+	function privateLoadIn(e, isLoadPrivately)
+	{
+		var oContextMenu2 = oContextMenu.GetAdditionalInfo("LoadIn");
+		if (undefined === oContextMenu2)
+		{
+			var nWidth    = oContextMenu.GetWidth();
+			oContextMenu2 = new CVisualContextMenu(oThis.m_oApp, nX + nWidth + 3, nY + 10 + (true === isLoadPrivately ? 20 : 0));
+
+			var arrRooms = oClient.GetRooms();
+			for (var nRoomIndex = 0, nRoomsCount = arrRooms.length; nRoomIndex < nRoomsCount; ++nRoomIndex)
+			{
+				var oRoom = arrRooms[nRoomIndex];
+				oContextMenu2.AddListItem(oRoom.Name, function(e, nChannelId)
+				{
+					oClient.LoadGameInRoom(oRecord.GetTimeStamp(), nChannelId, isLoadPrivately);
+				}, false, oRoom.ChannelId);
+			}
+
+			oContextMenu2.Show();
+			oContextMenu.SetAdditionalInfo("LoadIn", oContextMenu2);
+		}
+		else
+		{
+			oContextMenu2.Hide();
+			oContextMenu.SetAdditionalInfo("LoadIn", undefined);
+		}
+
+		e.stopPropagation();
+		return false;
+	}
+
 	if (true === oRecord.IsInPlay())
 	{
 		oContextMenu.AddCheckBoxItem(false, "Observe", function()
@@ -589,37 +619,6 @@ CKGSUserInfoGamesList.prototype.Handle_RightClick = function(oRecord, e)
 	}
 	else
 	{
-		function privateLoadIn(e, isLoadPrivately)
-		{
-			var oContextMenu2 = oContextMenu.GetAdditionalInfo("LoadIn");
-			if (undefined === oContextMenu2)
-			{
-				var nWidth    = oContextMenu.GetWidth();
-				oContextMenu2 = new CVisualContextMenu(oThis.m_oApp, nX + nWidth + 3, nY + 10 + (true === isLoadPrivately ? 20 : 0));
-
-				var arrRooms = oClient.GetRooms();
-				for (var nRoomIndex = 0, nRoomsCount = arrRooms.length; nRoomIndex < nRoomsCount; ++nRoomIndex)
-				{
-					var oRoom = arrRooms[nRoomIndex];
-					oContextMenu2.AddListItem(oRoom.Name, function(e, nChannelId)
-					{
-						oClient.LoadGameInRoom(oRecord.GetTimeStamp(), nChannelId, isLoadPrivately);
-					}, false, oRoom.ChannelId);
-				}
-
-				oContextMenu2.Show();
-				oContextMenu.SetAdditionalInfo("LoadIn", oContextMenu2);
-			}
-			else
-			{
-				oContextMenu2.Hide();
-				oContextMenu.SetAdditionalInfo("LoadIn", undefined);
-			}
-
-			e.stopPropagation();
-			return false;
-		}
-
 		oContextMenu.AddCheckBoxItem(false, "Load in...", privateLoadIn, isPrivate, false);
 		oContextMenu.AddCheckBoxItem(false, "Load (P) in...", privateLoadIn, isPrivate, true);
 	}
