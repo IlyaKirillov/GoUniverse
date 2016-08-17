@@ -17,7 +17,8 @@ var EKGSWindowType = {
 	UserInfo    : 1,
 	RoomInfo    : 2,
 	Information : 3,
-	Idle        : 4
+	Idle        : 4,
+	SgfViewer   : 5
 };
 
 var g_aKGSWindows      = {};
@@ -42,6 +43,7 @@ function CreateKGSWindow(nWindowType, oPr)
 	case EKGSWindowType.RoomInfo        : sApp = "RoomInfo_" + oPr.RoomId; break;
 	case EKGSWindowType.Information     : sApp = "Information" + (new Date()).getTime(); break;
 	case EKGSWindowType.Idle            : sApp = "Idle"; break;
+	case EKGSWindowType.SgfViewer       : sApp = "SgfViewer_" + oPr.Url; break;
 	}
 	var sId = sParentId + sApp;
 
@@ -71,6 +73,7 @@ function CreateKGSWindow(nWindowType, oPr)
 		case EKGSWindowType.RoomInfo        : oWindow = new CKGSRoomInfoWindow(); break;
 		case EKGSWindowType.Information     : oWindow = new CKGSInformationWindow(); break;
 		case EKGSWindowType.Idle            : oWindow = new CKGSInformationIdleWindow(); break;
+		case EKGSWindowType.SgfViewer       : oWindow = new CKGSSgfViewerWindow(); break;
 		}
 
 		oWindows[sId] = oWindow;

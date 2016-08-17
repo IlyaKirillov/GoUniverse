@@ -640,6 +640,15 @@ CKGSUserInfoGamesList.prototype.Handle_RightClick = function(oRecord, e)
 	}
 	else
 	{
+		oContextMenu.AddListItem("View", function(e)
+		{
+			function privateViewGame(sUrl, sSgf)
+			{
+				CreateKGSWindow(EKGSWindowType.SgfViewer, {Client : oClient, App : oThis.m_oApp, Url : sUrl, Sgf : sSgf});
+			}
+
+			privateLoadSgfByUrl(sUrl, privateViewGame);
+		}, isPrivate, false);
 		oContextMenu.AddListItem("Download to disk", function(e)
 		{
 			function privateDownload(sUrl, sSgf)
@@ -1131,4 +1140,38 @@ CVisualUserInfoTab.prototype.private_InitTab = function(sTabName)
 
 	DivTab.visualTab = this;
 	this.m_oTabDiv = DivTab;
+};
+
+function CKGSSgfViewerWindow()
+{
+	CKGSSgfViewerWindow.superclass.constructor.call(this);
+}
+CommonExtend(CKGSSgfViewerWindow, CKGSWindowBase);
+CKGSSgfViewerWindow.prototype.Init = function(sDivId, oPr)
+{
+	CKGSSgfViewerWindow.superclass.Init.apply(this, arguments, false);
+
+	this.Set_Caption("");
+
+	var oMainDiv     = this.HtmlElement.InnerDiv;
+	var oMainControl = this.HtmlElement.InnerControl;
+
+
+	var sEmbedConfig = {
+		"viewPort"  : undefined,
+		"moveNumber": 0,
+		"boardMode" : "viewer",
+		"width"     : 585,
+		"sgfData"   : oPr.Sgf
+	};
+
+	GoBoardApi.Embed(oMainDiv.id, sEmbedConfig);
+};
+CKGSSgfViewerWindow.prototype.Get_DefaultWindowSize = function(bForce)
+{
+	return {W : 600, H : 650};
+};
+CKGSSgfViewerWindow.prototype.Update_Size = function()
+{
+	CKGSSgfViewerWindow.superclass.Init.apply(this, arguments, false);
 };
