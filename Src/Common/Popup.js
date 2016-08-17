@@ -69,8 +69,8 @@ CVisualPopup.prototype.Toggle = function()
 
 				oThis.m_oHtmlElement.style.display = "block";
 
-				if (oHandler.OnHidePopup)
-					oHandler.OnHidePopup(oThis);
+				if (oHandler.OnPreShowPopup)
+					oHandler.OnPreShowPopup(oThis);
 
 				oThis.m_nTransitionId = setTimeout(function ()
 				{
@@ -159,7 +159,8 @@ function CVisualContextMenu(oApp, nX, nY)
 	this.m_nHeight = 12;
 	this.m_nWidth  = 100;
 
-	this.m_oAdditionalInfo = {};
+	this.m_oAdditionalInfo    = {};
+	this.m_arrOnHideCallbacks = [];
 }
 CVisualContextMenu.prototype.AddListItem = function(sText, fAction, isDisabled, oAdditionalInfo)
 {
@@ -258,6 +259,16 @@ CVisualContextMenu.prototype.OnHidePopup = function(oPopup)
 {
 	var oHtmlElement = oPopup.GetHtmlElement();
 	oHtmlElement.style.height = "0px";
+
+	for (var nIndex = 0, nCount = this.m_arrOnHideCallbacks.length; nIndex < nCount; ++nIndex)
+	{
+		this.m_arrOnHideCallbacks[nIndex]();
+	}
+};
+CVisualContextMenu.prototype.OnPreShowPopup = function(oPopup)
+{
+	var oHtmlElement = oPopup.GetHtmlElement();
+	oHtmlElement.style.height = "0px";
 };
 CVisualContextMenu.prototype.OnShowPopup = function(oPopup)
 {
@@ -280,5 +291,9 @@ CVisualContextMenu.prototype.SetAdditionalInfo = function(sKey, vValue)
 CVisualContextMenu.prototype.GetAdditionalInfo = function(sKey)
 {
 	return this.m_oAdditionalInfo[sKey];
+};
+CVisualContextMenu.prototype.AddOnHideCallback = function(fCallback)
+{
+	this.m_arrOnHideCallbacks.push(fCallback);
 };
 

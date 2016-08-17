@@ -633,14 +633,14 @@ CKGSUserInfoGamesList.prototype.Handle_RightClick = function(oRecord, e)
 
 	if (true === oRecord.IsInPlay())
 	{
-		oContextMenu.AddCheckBoxItem(false, "Observe", function()
+		oContextMenu.AddListItem("Observe", function()
 		{
 			oClient.EnterGameRoomByTimeStamp(oRecord.GetTimeStamp());
 		}, isPrivate);
 	}
 	else
 	{
-		oContextMenu.AddCheckBoxItem(false, "Download to disk", function(e)
+		oContextMenu.AddListItem("Download to disk", function(e)
 		{
 			function privateDownload(sUrl, sSgf)
 			{
@@ -651,11 +651,12 @@ CKGSUserInfoGamesList.prototype.Handle_RightClick = function(oRecord, e)
 
 			privateLoadSgfByUrl(sUrl, privateDownload);
 		}, isPrivate || "" === sUrl);
-		oContextMenu.AddCheckBoxItem(false, "Load in...", privateLoadIn, isPrivate, false);
-		oContextMenu.AddCheckBoxItem(false, "Load (P) in...", privateLoadIn, isPrivate, true);
+		oContextMenu.AddListItem("Load in...", privateLoadIn, isPrivate, false);
+		oContextMenu.AddListItem("Load (P) in...", privateLoadIn, isPrivate, true);
 	}
 
 	oContextMenu.Show();
+	return oContextMenu;
 };
 
 function CKGSUserInfoGamesListRecord(oClient)

@@ -104,7 +104,7 @@ CKGSPlayersList.prototype.Handle_RightClick = function(Record, e)
 {
 	if (this.m_oApp && Record)
 	{
-		this.m_oApp.ShowUserContextMenu(e.pageX, e.pageY, Record.m_sName);
+		return this.m_oApp.ShowUserContextMenu(e.pageX, e.pageY, Record.m_sName);
 	}
 };
 

@@ -174,6 +174,7 @@ CKGSInGamePlayersList.prototype.Handle_RightClick = function(Record, e)
 		});
 		oContextMenu.Show();
 
+		return oContextMenu;
 	}
 };
 CKGSInGamePlayersList.prototype.SetBlack = function(oUser)

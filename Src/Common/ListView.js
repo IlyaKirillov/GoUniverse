@@ -44,6 +44,8 @@ function CListView()
     this.m_sFontHeader   = "14px bold 'Segoe UI',Helvetica,Tahoma,Geneva,Verdana,sans-serif";
     this.m_sFontRecord   = "14px      'Segoe UI',Helvetica,Tahoma,Geneva,Verdana,sans-serif";
 
+	this.m_bFreezedSelection = false;
+
     var oThis = this;
 
     this.Init = function(sName, oListObject)
@@ -117,6 +119,9 @@ function CListView()
 
     this.private_OnMouseMove = function(e)
     {
+		if (true === oThis.m_bFreezedSelection)
+			return;
+
         check_MouseMoveEvent(e);
         var oPos = oThis.private_UpdateMousePos(global_mouseEvent.X, global_mouseEvent.Y);
 
@@ -135,6 +140,9 @@ function CListView()
 
     this.private_OnMouseOut = function(e)
     {
+		if (true === oThis.m_bFreezedSelection)
+			return;
+
         check_MouseMoveEvent(e);
         oThis.m_nSelectedIndex = -1;
         oThis.private_UpdateSelectionContext();
@@ -286,9 +294,22 @@ function CListView()
 			if (oThis.m_oListObject && oThis.m_oListObject.Handle_RightClick)
 			{
 				if (oThis.m_aList[oThis.m_nSelectedIndex])
-					oThis.m_oListObject.Handle_RightClick(oThis.m_aList[oThis.m_nSelectedIndex], e);
+                {
+                    oThis.private_UpdateSelectionContext();
+                    var oContextMenu = oThis.m_oListObject.Handle_RightClick(oThis.m_aList[oThis.m_nSelectedIndex], e);
+                    if (oContextMenu instanceof CVisualContextMenu)
+                    {
+                        oThis.FreezeSelection();
+                        oContextMenu.AddOnHideCallback(function()
+                        {
+                            oThis.UnfreezeSelection();
+                        });
+                    }
+                }
                 else
+                {
                     oThis.m_oListObject.Handle_RightClick(null, e);
+                }
 				bRet = false;
 			}
 		}
@@ -335,6 +356,10 @@ CListView.prototype.Clear = function()
 
 CListView.prototype.Handle_Record = function(aLine)
 {
+	var oSelectedRecord = undefined;
+	if (true === this.m_bFreezedSelection)
+		oSelectedRecord = this.m_aList[this.m_nSelectedIndex];
+
     var sKey = this.m_oListObject.Get_Key(aLine);
     var nIndex = this.private_Find(sKey);
 
@@ -348,6 +373,7 @@ CListView.prototype.Handle_Record = function(aLine)
             var nLast = this.m_aList.length;
             this.m_aList.push(this.m_oListObject.Get_Record(aLine));
             this.m_aY.push(this.m_aY[nLast] + this.m_dRowHeight);
+			this.private_ScrollByY(0);
         }
     }
     else
@@ -357,9 +383,14 @@ CListView.prototype.Handle_Record = function(aLine)
         {
             this.m_aList.splice(nIndex, 1);
             this.m_aY.splice(this.m_aY.length - 1, 1);
-            this.private_ScrollByY(0);
+           	this.private_ScrollByY(0);
         }
     }
+
+	if (oSelectedRecord)
+	{
+		this.m_nSelectedIndex = this.private_Find(oSelectedRecord.Get_Key());
+	}
 };
 
 CListView.prototype.Update_Size = function()
@@ -409,6 +440,15 @@ CListView.prototype.Update = function()
     this.private_UpdateMainContext();
     this.private_UpdateSelectionContext();
     this.private_UpdateScrollSize();
+};
+
+CListView.prototype.FreezeSelection = function()
+{
+	this.m_bFreezedSelection = true;
+};
+CListView.prototype.UnfreezeSelection = function()
+{
+	this.m_bFreezedSelection = false;
 };
 
 CListView.prototype.private_UpdateScrollSize = function()
@@ -477,22 +517,32 @@ CListView.prototype.private_IsValid = function()
 
 CListView.prototype.private_Sort = function(nColNum)
 {
+	var oSelectedRecord = undefined;
+	if (true === this.m_bFreezedSelection)
+		oSelectedRecord = this.m_aList[this.m_nSelectedIndex];
+
     if (undefined === nColNum)
     {
         this.m_aList.sort(this.private_SortFunction);
-        return;
     }
+	else
+	{
+		if (this.m_oListObject.Is_Sortable(Math.abs(nColNum)))
+		{
+			var OldSortType = this.m_oListObject.GetSortType();
+			this.m_oListObject.Set_SortType(nColNum, 1);
 
-    if (this.m_oListObject.Is_Sortable(Math.abs(nColNum)))
-    {
-        var OldSortType = this.m_oListObject.GetSortType();
-        this.m_oListObject.Set_SortType(nColNum, 1);
+			if (OldSortType === this.m_oListObject.GetSortType())
+				this.m_oListObject.Set_SortType(nColNum, -1);
 
-        if (OldSortType === this.m_oListObject.GetSortType())
-            this.m_oListObject.Set_SortType(nColNum, -1);
+			this.m_aList.sort(this.private_SortFunction);
+		}
+	}
 
-        this.m_aList.sort(this.private_SortFunction);
-    }
+	if (oSelectedRecord)
+	{
+		this.m_nSelectedIndex = this.private_Find(oSelectedRecord.Get_Key());
+	}
 };
 
 CListView.prototype.private_UpdateMainContext = function()

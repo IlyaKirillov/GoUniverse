@@ -928,6 +928,7 @@ CGoUniverseApplication.prototype.ShowUserContextMenu = function(nX, nY, sUserNam
 			oClient.AddToFollowerList(sUserName);
 	});
 	oContextMenu.Show();
+	return oContextMenu;
 };
 CGoUniverseApplication.prototype.private_OpenChatTabs = function()
 {
@@ -1179,6 +1180,8 @@ CGoUniverseApplication.prototype.ShowGamesListContextMenu = function(nX, nY, nGa
 		oClient.SetGamesListType(EKGSGamesListType.Follower);
 	});
 	oContextMenu.Show();
+
+	return oContextMenu;
 };
 
 

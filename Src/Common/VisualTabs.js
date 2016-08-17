@@ -632,6 +632,13 @@ CVisualChatRoomTab.prototype.OnHidePopup = function(oPopup)
 
 	this.m_oMenuSpan.style.transform  = "rotate(90deg)";
 };
+CVisualChatRoomTab.prototype.OnPreShowPopup = function(oPopup)
+{
+	var oHtmlElement = oPopup.GetHtmlElement();
+	oHtmlElement.style.height = "0px";
+
+	this.m_oMenuSpan.style.transform  = "rotate(90deg)";
+};
 CVisualChatRoomTab.prototype.OnShowPopup = function(oPopup)
 {
 	var oHtmlElement = oPopup.GetHtmlElement();
