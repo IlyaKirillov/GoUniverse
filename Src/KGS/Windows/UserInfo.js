@@ -576,6 +576,7 @@ CKGSUserInfoGamesList.prototype.Handle_RightClick = function(oRecord, e)
 		return;
 
 	var isPrivate = oRecord.IsPrivate();
+	var sUrl = oRecord.GetUrl();
 	var nX = e.pageX, nY = e.pageY;
 	var oContextMenu = new CVisualContextMenu(this.m_oApp, nX, nY);
 	var oThis = this;
@@ -610,6 +611,26 @@ CKGSUserInfoGamesList.prototype.Handle_RightClick = function(oRecord, e)
 		return false;
 	}
 
+	function privateLoadSgfByUrl(sUrl, fCallBack)
+	{
+		sUrl        = decodeURIComponent(sUrl);
+		var rawFile = new XMLHttpRequest();
+		rawFile["open"]("GET", sUrl + '?_=' + new Date().getTime(), false);
+
+		rawFile["onreadystatechange"] = function ()
+		{
+			if (rawFile["readyState"] === 4)
+			{
+				if (rawFile["status"] === 200 || rawFile["status"] == 0)
+				{
+					fCallBack(sUrl, rawFile.responseText);
+				}
+			}
+		};
+		rawFile["send"](null);
+	}
+
+
 	if (true === oRecord.IsInPlay())
 	{
 		oContextMenu.AddCheckBoxItem(false, "Observe", function()
@@ -619,6 +640,17 @@ CKGSUserInfoGamesList.prototype.Handle_RightClick = function(oRecord, e)
 	}
 	else
 	{
+		oContextMenu.AddCheckBoxItem(false, "Download to disk", function(e)
+		{
+			function privateDownload(sUrl, sSgf)
+			{
+				var sGameName = sUrl.substring(sUrl.lastIndexOf('/') + 1);
+				var oBlob = new Blob([sSgf], {type: "text/plain;charset=utf-8"});
+				Common.SaveAs(oBlob, sGameName, "application/x-go-sgf");
+			}
+
+			privateLoadSgfByUrl(sUrl, privateDownload);
+		}, isPrivate || "" === sUrl);
 		oContextMenu.AddCheckBoxItem(false, "Load in...", privateLoadIn, isPrivate, false);
 		oContextMenu.AddCheckBoxItem(false, "Load (P) in...", privateLoadIn, isPrivate, true);
 	}
@@ -645,6 +677,7 @@ function CKGSUserInfoGamesListRecord(oClient)
 	this.m_oDate      = new Date();
 	this.m_bInPlay    = false;
 	this.m_bAdjourned = false;
+	this.m_sUrl       = "";
 }
 
 CommonExtend(CKGSUserInfoGamesListRecord, CListRecordBase);
@@ -747,6 +780,7 @@ CKGSUserInfoGamesListRecord.prototype.Update = function(aLine)
 	this.m_bInPlay    = true === oRecord.inPlay ? true : false;
 
 	this.private_ParseAbjourned(oRecord.score);
+	this.private_ParseUrl(oRecord.revision);
 };
 CKGSUserInfoGamesListRecord.prototype.GetTimeStamp = function()
 {
@@ -787,6 +821,10 @@ CKGSUserInfoGamesListRecord.prototype.GetBlackRank = function()
 		return this.m_oBlack.GetRank();
 	else
 		return -3;
+};
+CKGSUserInfoGamesListRecord.prototype.GetUrl = function()
+{
+	return this.m_sUrl;
 };
 CKGSUserInfoGamesListRecord.prototype.private_ParseGameType = function(sGameType)
 {
@@ -909,6 +947,35 @@ CKGSUserInfoGamesListRecord.prototype.private_ParseAbjourned = function(sScore)
 		this.m_bAdjourned = true;
 	else
 		this.m_bAdjourned = false;
+};
+CKGSUserInfoGamesListRecord.prototype.private_ParseUrl = function(nRevision)
+{
+	// http://files.gokgs.com/games/year/month/day/white-black-revision.sgf
+
+	var sUrl = "http://files.gokgs.com/games/";
+
+	var sYear  = this.m_oDate.getUTCFullYear();
+	var sMonth = this.m_oDate.getUTCMonth() + 1;
+	var sDay   = this.m_oDate.getUTCDate();
+
+	var sPlayers = "";
+	if (this.m_oOwner)
+	{
+		sPlayers = this.m_oOwner.GetName();
+	}
+	else if (this.m_oWhite && this.m_oBlack)
+	{
+		sPlayers = this.m_oWhite.GetName() + "-" + this.m_oBlack.GetName();
+	}
+	else
+	{
+		this.m_sUrl = "";
+		return;
+	}
+
+	sUrl += sYear + '/' + sMonth + '/' + sDay + '/' + sPlayers + (undefined !== nRevision ? '-' + (nRevision + 1) : "") + ".sgf";
+
+	this.m_sUrl = sUrl;
 };
 
 function CVisualUserInfoTabs()
