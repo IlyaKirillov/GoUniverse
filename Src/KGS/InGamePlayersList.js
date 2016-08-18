@@ -15,7 +15,7 @@ var EKGSInGamePlayersListRecord = {
 	Rank : 3
 };
 
-function CKGSInGamePlayersList(oApp)
+function CKGSInGamePlayersList(oApp, nGameId)
 {
 	CKGSInGamePlayersList.superclass.constructor.call(this);
 
@@ -35,6 +35,9 @@ function CKGSInGamePlayersList(oApp)
 	this.m_oWhite  = null;
 	this.m_oOwner  = null;
 	this.m_oEditor = null;
+
+	this.m_sUserName = oApp.GetClient().GetUserName();
+	this.m_nGameId   = nGameId;
 }
 
 CommonExtend(CKGSInGamePlayersList, CListBase);
@@ -138,6 +141,7 @@ CKGSInGamePlayersList.prototype.Handle_RightClick = function(Record, e)
 		var oClient = this.m_oApp.GetClient();
 
 		var oContextMenu = new CVisualContextMenu(this.m_oApp, nX, nY);
+		var oThis = this;
 		oContextMenu.AddCheckBoxItem(false, "Talk to...", function()
 		{
 			oClient.EnterPrivateChat(sUserName);
@@ -148,8 +152,8 @@ CKGSInGamePlayersList.prototype.Handle_RightClick = function(Record, e)
 		});
 		oContextMenu.AddCheckBoxItem(false, "Give control", function()
 		{
-			oClient.LoadUserInfo(sUserName);
-		}, true);
+			oClient.GiveGameControl(oThis.m_nGameId, sUserName);
+		}, (this.IsOwner(this.m_sUserName) || (this.IsEditor(this.m_sUserName) && this.IsOwner(sUserName)) ? false : true));
 		oContextMenu.AddHorizontalLine();
 		oContextMenu.AddCheckBoxItem(oClient.IsUserInFriendList(sUserName), "Buddy", function()
 		{

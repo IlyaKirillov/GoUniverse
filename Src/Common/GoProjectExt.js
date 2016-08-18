@@ -266,7 +266,7 @@ CDrawing.prototype.private_GoUniverseCreateHorFullTemplate = function()
 	//------------------------------------------------------------------------------------------------------------------
 	// Место под список игроков
 	//------------------------------------------------------------------------------------------------------------------
-	var oPlayersListControl = this.m_oGameHandler.PlayersList.Init(sPlayersListDivId, new CKGSInGamePlayersList(this.m_oGoUniverseApp));
+	var oPlayersListControl = this.m_oGameHandler.PlayersList.Init(sPlayersListDivId, new CKGSInGamePlayersList(this.m_oGoUniverseApp, this.m_oGameHandler.GameRoomId));
 	oPlayersListControl.Bounds.SetParams(0, 0, 0, 0, true, false, true, true, PlayerListW, -1);
 	oPlayersListControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_bottom);
 	oChatsControl.AddControl(oPlayersListControl);

@@ -575,6 +575,7 @@ CKGSUserInfoGamesList.prototype.Handle_RightClick = function(oRecord, e)
 	if (!oClient)
 		return;
 
+	var isDemo = oRecord.IsDemo();
 	var isPrivate = oRecord.IsPrivate();
 	var sUrl = oRecord.GetUrl();
 	var nX = e.pageX, nY = e.pageY;
@@ -649,7 +650,7 @@ CKGSUserInfoGamesList.prototype.Handle_RightClick = function(oRecord, e)
 			}
 
 			privateLoadSgfByUrl(sUrl, privateViewGame);
-		}, isPrivate, false);
+		}, isPrivate || isDemo, false);
 		oContextMenu.AddListItem("Download to disk", function(e)
 		{
 			function privateDownload(sUrl, sSgf)
@@ -836,6 +837,13 @@ CKGSUserInfoGamesListRecord.prototype.GetBlackRank = function()
 CKGSUserInfoGamesListRecord.prototype.GetUrl = function()
 {
 	return this.m_sUrl;
+};
+CKGSUserInfoGamesListRecord.prototype.IsDemo = function()
+{
+	if (this.m_oOwner)
+		return true;
+
+	return false;
 };
 CKGSUserInfoGamesListRecord.prototype.private_ParseGameType = function(sGameType)
 {

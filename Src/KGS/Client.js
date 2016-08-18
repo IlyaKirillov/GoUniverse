@@ -438,6 +438,14 @@ CKGSClient.prototype.SleepOn = function()
 		"type" : "IDLE_ON"
 	});
 };
+CKGSClient.prototype.GiveGameControl = function(nGameId, sUserName)
+{
+	this.private_SendMessage({
+		"channelId": nGameId,
+		"type"     : "GAME_GIVE_CONTROL",
+		"name"     : sUserName
+	});
+};
 CKGSClient.prototype.private_SendMessage = function(oMessage)
 {
 	// console.log("Send:");
@@ -1597,7 +1605,7 @@ CKGSClient.prototype.private_HandleChannelAudio = function(oMessage)
 	//var srcAudio = atob(oMessage.audio);
 
 	//this.m_oApp.m_oSound.PlayLecture("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAVFYAAFRWAAABAAgAZGF0YQAAAAA=");
-	this.m_oApp.m_oSound.PlayLecture("data:audio/ogg;base64," + oMessage.audio);
+	//this.m_oApp.m_oSound.PlayLecture("data:audio/ogg;base64," + oMessage.audio);
 
 	// var audio = new Audio();
 	// audio.src = "data:audio/ogg;base64," + oMessage.audio;
