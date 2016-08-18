@@ -44,7 +44,7 @@ function CListView()
     this.m_sFontHeader   = "14px bold 'Segoe UI',Helvetica,Tahoma,Geneva,Verdana,sans-serif";
     this.m_sFontRecord   = "14px      'Segoe UI',Helvetica,Tahoma,Geneva,Verdana,sans-serif";
 
-	this.m_bFreezedSelection = false;
+	this.m_nFreezedSelection = 0;
 
     var oThis = this;
 
@@ -119,7 +119,7 @@ function CListView()
 
     this.private_OnMouseMove = function(e)
     {
-		if (true === oThis.m_bFreezedSelection)
+		if (true === oThis.IsFreezedSelection())
 			return;
 
         check_MouseMoveEvent(e);
@@ -140,7 +140,7 @@ function CListView()
 
     this.private_OnMouseOut = function(e)
     {
-		if (true === oThis.m_bFreezedSelection)
+		if (true === oThis.IsFreezedSelection())
 			return;
 
         check_MouseMoveEvent(e);
@@ -357,7 +357,7 @@ CListView.prototype.Clear = function()
 CListView.prototype.Handle_Record = function(aLine)
 {
 	var oSelectedRecord = undefined;
-	if (true === this.m_bFreezedSelection)
+	if (true === this.IsFreezedSelection())
 		oSelectedRecord = this.m_aList[this.m_nSelectedIndex];
 
     var sKey = this.m_oListObject.Get_Key(aLine);
@@ -444,11 +444,22 @@ CListView.prototype.Update = function()
 
 CListView.prototype.FreezeSelection = function()
 {
-	this.m_bFreezedSelection = true;
+	this.m_nFreezedSelection++;
 };
 CListView.prototype.UnfreezeSelection = function()
 {
-	this.m_bFreezedSelection = false;
+	this.m_nFreezedSelection--;
+
+	if (this.m_nFreezedSelection <= 0)
+	{
+		this.m_nFreezedSelection = 0;
+		this.m_nSelectedIndex    = -1;
+		this.private_UpdateSelectionContext();
+	}
+};
+CListView.prototype.IsFreezedSelection = function()
+{
+    return  (this.m_nFreezedSelection > 0 ? true : false);
 };
 
 CListView.prototype.private_UpdateScrollSize = function()
@@ -518,7 +529,7 @@ CListView.prototype.private_IsValid = function()
 CListView.prototype.private_Sort = function(nColNum)
 {
 	var oSelectedRecord = undefined;
-	if (true === this.m_bFreezedSelection)
+	if (true === this.IsFreezedSelection())
 		oSelectedRecord = this.m_aList[this.m_nSelectedIndex];
 
     if (undefined === nColNum)
