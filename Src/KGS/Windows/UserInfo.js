@@ -644,7 +644,8 @@ CKGSUserInfoGamesList.prototype.Handle_RightClick = function(oRecord, e)
 		{
 			function privateViewGame(sUrl, sSgf)
 			{
-				CreateKGSWindow(EKGSWindowType.SgfViewer, {Client : oClient, App : oThis.m_oApp, Url : sUrl, Sgf : sSgf});
+				var oWindow = CreateKGSWindow(EKGSWindowType.SgfViewer, {Client : oClient, App : oThis.m_oApp, Url : sUrl, Sgf : sSgf});
+				oWindow.Focus();
 			}
 
 			privateLoadSgfByUrl(sUrl, privateViewGame);
@@ -1145,11 +1146,13 @@ CVisualUserInfoTab.prototype.private_InitTab = function(sTabName)
 function CKGSSgfViewerWindow()
 {
 	CKGSSgfViewerWindow.superclass.constructor.call(this);
+
+	this.m_oGameTree = null;
 }
 CommonExtend(CKGSSgfViewerWindow, CKGSWindowBase);
 CKGSSgfViewerWindow.prototype.Init = function(sDivId, oPr)
 {
-	CKGSSgfViewerWindow.superclass.Init.apply(this, arguments, false);
+	CKGSSgfViewerWindow.superclass.Init.call(this, sDivId, oPr, false);
 
 	this.Set_Caption("");
 
@@ -1161,17 +1164,55 @@ CKGSSgfViewerWindow.prototype.Init = function(sDivId, oPr)
 		"viewPort"  : undefined,
 		"moveNumber": 0,
 		"boardMode" : "viewer",
-		"width"     : 585,
+		"width"     : 700,
 		"sgfData"   : oPr.Sgf
 	};
 
-	GoBoardApi.Embed(oMainDiv.id, sEmbedConfig);
+	this.m_oGameTree = GoBoardApi.Embed(sDivId, sEmbedConfig);
+
+	var oCaptionElement = document.getElementById(sDivId + "GBI");
+	Common_DragHandler.Init(oCaptionElement, null);
+	var oThis = this;
+	oCaptionElement.onDrag  = function (X, Y)
+	{
+		var CurLeft = parseInt(oThis.HtmlElement.Control.HtmlElement.style.left);
+		var CurTop  = parseInt(oThis.HtmlElement.Control.HtmlElement.style.top);
+
+		var LeftHandler = parseInt(oCaptionElement.style.left);
+		var TopHandler  = parseInt(oCaptionElement.style.top);
+
+		oThis.HtmlElement.Control.HtmlElement.style.left = CurLeft + LeftHandler + "px";
+		oThis.HtmlElement.Control.HtmlElement.style.top  = CurTop + TopHandler + "px";
+
+		oCaptionElement.style.left = "0px";
+		oCaptionElement.style.top  = "0px";
+		oThis.Update_Size();
+	};
+
+	// CloseButton
+	var sCloseButtonId                        = sDivId + "_Close2";
+	var oCloseButtonElement                   = this.protected_CreateDivElement(oCaptionElement, sCloseButtonId);
+	var oCloseButtonControl                   = CreateControlContainer(sCloseButtonId);
+	oCloseButtonControl.Bounds.SetParams(0, 0, 6, 1000, false, true, true, false, 45, 20);
+	oCloseButtonControl.Anchor                = (g_anchor_top | g_anchor_right);
+	this.HtmlElement.Control.AddControl(oCloseButtonControl);
+	oCloseButtonElement.style.backgroundColor = (new CColor(255, 0, 0, 255)).ToString();
+
+	var oCloseButton             = new CDrawingButtonClose(this.m_oDrawing);
+	oCloseButton.Init(sCloseButtonId, this);
+	oCloseButton.m_oNormaFColor  = new CColor(199, 80, 80, 255);
+	oCloseButton.m_oHoverFColor  = new CColor(224, 67, 67, 255);
+	oCloseButton.m_oActiveFColor = new CColor(153, 61, 61, 255);
+
+	this.HtmlElement.CloseButton = oCloseButton;
+
 };
 CKGSSgfViewerWindow.prototype.Get_DefaultWindowSize = function(bForce)
 {
-	return {W : 600, H : 650};
+	return {W : 702, H : 763};
 };
-CKGSSgfViewerWindow.prototype.Update_Size = function()
+CKGSSgfViewerWindow.prototype.Close = function()
 {
-	CKGSSgfViewerWindow.superclass.Init.apply(this, arguments, false);
+	CKGSSgfViewerWindow.superclass.Close.call(this);
+	RemoveWindow(this);
 };

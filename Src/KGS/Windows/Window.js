@@ -145,9 +145,9 @@ function CKGSWindowBase()
 	this.m_oApp = null;
 }
 CommonExtend(CKGSWindowBase, CDrawingWindow);
-CKGSWindowBase.prototype.Init = function(sDivId, oPr)
+CKGSWindowBase.prototype.Init = function(sDivId, oPr, bResizeble)
 {
-	CKGSWindowBase.superclass.Init.apply(this, arguments);
+	CKGSWindowBase.superclass.Init.call(this, sDivId, bResizeble);
 	this.m_oApp    = oPr.App;
 	this.m_oClient = oPr.Client;
 	this.private_UpdatePosition();
@@ -192,6 +192,10 @@ CKGSWindowBase.prototype.Update_Size = function(bForce)
 		else if (nTop >= nHeight - 20)
 			this.HtmlElement.Control.HtmlElement.style.top = (nHeight - 20) + "px";
 	}
+};
+CKGSWindowBase.prototype.Focus = function()
+{
+	this.private_OnFocus();
 };
 CKGSWindowBase.prototype.private_OnFocus = function()
 {
