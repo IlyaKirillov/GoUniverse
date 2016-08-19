@@ -1595,7 +1595,7 @@ CKGSClient.prototype.private_HandleDetailsRankGraph = function(oMessage)
 		var oInfo = this.m_oUserInfo[sUserName];
 		if (oInfo.DetailsChannel === oMessage.channelId && oInfo.Window)
 		{
-			oInfo.Window.OnRankGraph(oMessage.rankData);
+			oInfo.Window.OnRankGraph(oMessage.data);
 		}
 	}
 };

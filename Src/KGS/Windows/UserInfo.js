@@ -19,6 +19,8 @@ function CKGSUserInfoWindow()
 	this.m_oInfoScroll    = null;
 	this.m_oGamesListView = new CListView();
 	this.m_oTabs          = new CVisualUserInfoTabs();
+	this.m_oRankCanvas    = null;
+	this.m_oRankData      = [];
 
 	this.m_oInfoTable = {
 		UserName    : null,
@@ -71,16 +73,17 @@ CKGSUserInfoWindow.prototype.Init = function(sDivId, oPr)
 	oMainControl.AddControl(oGamesDifWrapperControl);
 	oGamesDivWrapper.style.display = "none";
 
-	// var oRankDivWrapper = this.protected_CreateDivElement(oMainDiv, sRankWrapperId);
-	// var oRankDifWrapperControl = CreateControlContainer(sRankWrapperId);
-	// oRankDifWrapperControl.Bounds.SetParams(0, 25, 0, 0, true, true, true, true, -1, -1);
-	// oRankDifWrapperControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left | g_anchor_bottom);
-	// oMainControl.AddControl(oRankDifWrapperControl);
-	// oRankDivWrapper.style.display = "none";
+	var oRankDivWrapper = this.protected_CreateDivElement(oMainDiv, sRankWrapperId);
+	var oRankDifWrapperControl = CreateControlContainer(sRankWrapperId);
+	oRankDifWrapperControl.Bounds.SetParams(0, 25, 0, 0, true, true, true, true, -1, -1);
+	oRankDifWrapperControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left | g_anchor_bottom);
+	oMainControl.AddControl(oRankDifWrapperControl);
+	oRankDivWrapper.style.display = "none";
 
 
 	this.private_CreateInfoPage(oInfoDivWrapper, oInfoDifWrapperControl);
 	this.private_CreateGamesPage(oGamesDivWrapper, oGamesDifWrapperControl);
+	this.private_CreateRankPage(oRankDivWrapper, oRankDifWrapperControl);
 
 	var oTabsBack = this.protected_CreateDivElement(oMainDiv, sTabsBackId);
 	oTabsBack.style.borderBottom = "1px solid #BEBEBE";
@@ -103,6 +106,10 @@ CKGSUserInfoWindow.prototype.Init = function(sDivId, oPr)
 
 	oTab = new CVisualUserInfoTab(this);
 	oTab.Init(1, oGamesDivWrapper, "Games");
+	this.m_oTabs.AddTab(oTab);
+
+	oTab = new CVisualUserInfoTab(this);
+	oTab.Init(2, oRankDivWrapper, "Rank");
 	this.m_oTabs.AddTab(oTab);
 
 	this.m_oGamesListView.Set_BGColor(243, 243, 243);
@@ -130,6 +137,9 @@ CKGSUserInfoWindow.prototype.Update_Size = function(bForce)
 
 	if (this.m_oGamesListView)
 		this.m_oGamesListView.Update_Size();
+
+	if (this.m_oRankCanvas)
+		this.private_DrawRank();
 };
 CKGSUserInfoWindow.prototype.OnUserDetails = function(oDetails)
 {
@@ -250,7 +260,94 @@ CKGSUserInfoWindow.prototype.OnUserGameArchive = function(oMessage)
 };
 CKGSUserInfoWindow.prototype.OnRankGraph = function(arrRankData)
 {
-	console.log(arrRankData);
+	this.m_oRankData = arrRankData;
+	this.private_DrawRank();
+};
+CKGSUserInfoWindow.prototype.private_DrawRank = function()
+{
+	var arrRankData = this.m_oRankData;
+	if (!this.m_oRankCanvas || !arrRankData || arrRankData.length <= 0)
+	{
+		// TODO: Написать NoRankData
+		return;
+	}
+
+	var nMin = null, nMax = null;
+	var nPointsCount = arrRankData.length;
+	for (var nPointIndex = 0; nPointIndex < nPointsCount; ++nPointIndex)
+	{
+		if (null === nMin || nMin > arrRankData[nPointIndex])
+			nMin = arrRankData[nPointIndex];
+
+		if (null === nMax || nMax < arrRankData[nPointIndex])
+			nMax = arrRankData[nPointIndex];
+	}
+
+	var nMax = Math.ceil(nMax / 100) * 100;
+	var nMin = Math.floor(nMin / 100) * 100;
+
+	if (nMax === nMin)
+		nMin -= 100;
+
+	var nRank0 = (nMin / 100) | 0;
+	var nRank1 = (nMax / 100) | 0;
+
+	nMin -= 10;
+	nMax += 10;
+
+	if (nPointsCount < 2 || null === nMin || null === nMax)
+	{
+		// TODO: Написать NoRankData
+		return;
+	}
+
+	var oContext = this.m_oRankCanvas.getContext("2d");
+
+
+	var nW = this.m_oRankCanvas.width;
+	var nH = this.m_oRankCanvas.height;
+
+	oContext.clearRect(0, 0, nW, nH);
+
+	var nStepX = nW / nPointsCount;
+	var dKoefY = nH / (nMax - nMin);
+
+	oContext.strokeStyle = "rgba(128,128,128,1)";
+	oContext.lineWidth   = 1;
+	for (var nRankCounter = nRank0; nRankCounter <= nRank1; ++nRankCounter)
+	{
+		var dY = nH - (nRankCounter * 100 - nMin) * dKoefY;
+		oContext.beginPath();
+		oContext.moveTo(0, dY);
+		oContext.lineTo(nW, dY);
+		oContext.stroke();
+	}
+
+
+	var nX = 0;
+	var nY = 0;
+
+	oContext.strokeStyle = "rgba(0,255,0,1)";
+	oContext.lineWidth   = 1;
+	oContext.beginPath();
+
+	for (var nPointIndex = 0; nPointIndex < nPointsCount; ++nPointIndex)
+	{
+		nY = nH - (arrRankData[nPointIndex] - nMin) * dKoefY;
+
+		if (0 === nPointIndex)
+		{
+			oContext.moveTo(nX, nY);
+		}
+		else
+		{
+			oContext.lineTo(nX, nY);
+		}
+
+		nX += nStepX;
+	}
+	oContext.stroke();
+
 };
 CKGSUserInfoWindow.prototype.Show = function(oPr)
 {
@@ -376,6 +473,21 @@ CKGSUserInfoWindow.prototype.private_CreateGamesPage = function(oDiv, oControl)
 	oGamesListControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
 	oGamesListControl.HtmlElement.style.background = "#F3F3F3";
 	oControl.AddControl(oGamesListControl);
+};
+CKGSUserInfoWindow.prototype.private_CreateRankPage = function(oDiv, oControl)
+{
+	var sCanvasId = oDiv.id + "C";
+	var oCanvas = document.createElement("canvas");
+	oCanvas.id = sCanvasId;
+	oDiv.appendChild(oCanvas);
+
+	var oCanvasControl = CreateControlContainer(sCanvasId);
+	oCanvasControl.Bounds.SetParams(0, 0, 0, 0, true, false, true, true, -1, -1);
+	oCanvasControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
+	oCanvasControl.HtmlElement.style.background = "#000000";
+	oControl.AddControl(oCanvasControl);
+
+	this.m_oRankCanvas = oCanvas;
 };
 
 
