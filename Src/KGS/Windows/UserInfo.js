@@ -266,11 +266,8 @@ CKGSUserInfoWindow.prototype.OnRankGraph = function(arrRankData)
 CKGSUserInfoWindow.prototype.private_DrawRank = function()
 {
 	var arrRankData = this.m_oRankData;
-	if (!this.m_oRankCanvas || !arrRankData || arrRankData.length <= 0)
-	{
-		// TODO: Написать NoRankData
-		return;
-	}
+	if (!this.m_oRankCanvas || !arrRankData || arrRankData.length <= 0 || "-" === this.m_oInfoTable.Rank.textContent)
+		return this.private_DrawNoRank();
 
 	var nMin = null, nMax = null;
 	var nPointsCount = arrRankData.length;
@@ -283,8 +280,11 @@ CKGSUserInfoWindow.prototype.private_DrawRank = function()
 			nMax = arrRankData[nPointIndex];
 	}
 
-	var nMax = Math.ceil(nMax / 100) * 100;
-	var nMin = Math.floor(nMin / 100) * 100;
+	if (nPointsCount < 2 || null === nMin || null === nMax)
+		return this.private_DrawNoRank();
+
+	nMax = Math.ceil(nMax / 100) * 100;
+	nMin = Math.floor(nMin / 100) * 100;
 
 	if (nMax === nMin)
 		nMin -= 100;
@@ -295,21 +295,14 @@ CKGSUserInfoWindow.prototype.private_DrawRank = function()
 	nMin -= 10;
 	nMax += 10;
 
-	if (nPointsCount < 2 || null === nMin || null === nMax)
-	{
-		// TODO: Написать NoRankData
-		return;
-	}
-
 	var oContext = this.m_oRankCanvas.getContext("2d");
-
 
 	var nW = this.m_oRankCanvas.width;
 	var nH = this.m_oRankCanvas.height;
 
 	oContext.clearRect(0, 0, nW, nH);
 
-	var nStepX = nW / nPointsCount;
+	var nStepX = nW / (nPointsCount - 1);
 	var dKoefY = nH / (nMax - nMin);
 
 	oContext.strokeStyle = "rgba(128,128,128,1)";
@@ -331,6 +324,7 @@ CKGSUserInfoWindow.prototype.private_DrawRank = function()
 	oContext.lineWidth   = 1;
 	oContext.beginPath();
 
+	var arrPoints = [];
 	for (var nPointIndex = 0; nPointIndex < nPointsCount; ++nPointIndex)
 	{
 		nY = nH - (arrRankData[nPointIndex] - nMin) * dKoefY;
@@ -344,10 +338,51 @@ CKGSUserInfoWindow.prototype.private_DrawRank = function()
 			oContext.lineTo(nX, nY);
 		}
 
+		arrPoints.push({x : nX, y : nY});
+
 		nX += nStepX;
 	}
-	oContext.stroke();
+	//oContext.stroke();
 
+	var arrSpline = GetSpline(arrPoints);
+	console.log(arrSpline);
+
+	oContext.strokeStyle = "rgba(0,255, 0,1)";
+	oContext.beginPath();
+
+	for (var nSegmentIndex = 0, nSegmentsCount = arrSpline.length; nSegmentIndex < nSegmentsCount; ++nSegmentIndex)
+	{
+		var oSegment = arrSpline[nSegmentIndex];
+
+		if (0 == nSegmentIndex)
+			oContext.moveTo(oSegment.points[0].x, oSegment.points[0].y);
+
+		oContext.bezierCurveTo(
+			oSegment.points[1].x, oSegment.points[1].y,
+			oSegment.points[2].x, oSegment.points[2].y,
+			oSegment.points[3].x, oSegment.points[3].y);
+	}
+	oContext.stroke();
+};
+CKGSUserInfoWindow.prototype.private_DrawNoRank = function()
+{
+	if (!this.m_oRankCanvas)
+		return;
+
+	var sText = "No rank data avaliable";
+	var sFont = "20px 'Times New Roman', Helvetica";
+
+	var oContext = this.m_oRankCanvas.getContext("2d");
+	var nW = this.m_oRankCanvas.width;
+	var nH = this.m_oRankCanvas.height;
+	oContext.clearRect(0, 0, nW, nH);
+
+	oContext.font = sFont;
+	oContext.fillStyle = "rgba(255, 255, 255, 1)";
+
+	g_oTextMeasurer.SetFont(sFont);
+	var nTextWidth = g_oTextMeasurer.Measure(sText);
+	oContext.fillText(sText, (nW - nTextWidth) / 2, (nH - 20) / 2);
 };
 CKGSUserInfoWindow.prototype.Show = function(oPr)
 {
