@@ -442,8 +442,8 @@ CKGSClient.prototype.GiveGameControl = function(nGameId, sUserName)
 {
 	this.private_SendMessage({
 		"channelId": nGameId,
-		"type"     : "GAME_GIVE_CONTROL",
-		"name"     : sUserName
+		"type"     : "GAME_SET_ROLES",
+		"owner"    : sUserName
 	});
 };
 CKGSClient.prototype.private_SendMessage = function(oMessage)
