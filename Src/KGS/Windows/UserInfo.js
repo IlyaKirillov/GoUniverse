@@ -21,6 +21,8 @@ function CKGSUserInfoWindow()
 	this.m_oTabs          = new CVisualUserInfoTabs();
 	this.m_oRankCanvas    = null;
 	this.m_oRankData      = [];
+	this.m_arrPoints      = [];
+	this.m_nStepX         = 0;
 
 	this.m_oInfoTable = {
 		UserName    : null,
@@ -31,6 +33,8 @@ function CKGSUserInfoWindow()
 		Games       : null,
 		RecentGames : null
 	};
+
+	this.m_oRankHint = null;
 }
 CommonExtend(CKGSUserInfoWindow, CKGSWindowBase);
 
@@ -123,6 +127,9 @@ CKGSUserInfoWindow.prototype.Close = function()
 	CKGSUserInfoWindow.superclass.Close.call(this);
 	if (this.m_oClient)
 		this.m_oClient.CloseUserInfo(this.m_sUserName);
+
+	if (this.m_oRankHint)
+		this.private_HideRankHint();
 };
 CKGSUserInfoWindow.prototype.Hide = function()
 {
@@ -260,7 +267,17 @@ CKGSUserInfoWindow.prototype.OnUserGameArchive = function(oMessage)
 };
 CKGSUserInfoWindow.prototype.OnRankGraph = function(arrRankData)
 {
+	while (arrRankData.length > 0 && 0x7fff === arrRankData[0])
+		arrRankData.splice(0, 1);
+
+	for (var nPointIndex = 0, nPointsCount = arrRankData.length; nPointIndex < nPointsCount; ++nPointIndex)
+	{
+		if (0x7fff === arrRankData[nPointIndex] && nPointIndex > 0)
+			arrRankData[nPointIndex] = arrRankData[nPointIndex - 1];
+	}
+
 	this.m_oRankData = arrRankData;
+	this.m_arrPoints = [];
 	this.private_DrawRank();
 };
 CKGSUserInfoWindow.prototype.private_DrawRank = function()
@@ -302,14 +319,16 @@ CKGSUserInfoWindow.prototype.private_DrawRank = function()
 
 	oContext.clearRect(0, 0, nW, nH);
 
+	var nGraphH = nH - 30;
+
 	var nStepX = nW / (nPointsCount - 1);
-	var dKoefY = nH / (nMax - nMin);
+	var dKoefY = nGraphH / (nMax - nMin);
 
 	oContext.strokeStyle = "rgba(128,128,128,1)";
 	oContext.lineWidth   = 1;
 	for (var nRankCounter = nRank0; nRankCounter <= nRank1; ++nRankCounter)
 	{
-		var dY = nH - (nRankCounter * 100 - nMin) * dKoefY;
+		var dY = ((nGraphH - (nRankCounter * 100 - nMin) * dKoefY) | 0) + 0.5;
 		oContext.beginPath();
 		oContext.moveTo(0, dY);
 		oContext.lineTo(nW, dY);
@@ -321,32 +340,18 @@ CKGSUserInfoWindow.prototype.private_DrawRank = function()
 	var nY = 0;
 
 	oContext.strokeStyle = "rgba(0,255,0,1)";
-	oContext.lineWidth   = 1;
 	oContext.beginPath();
 
 	var arrPoints = [];
 	for (var nPointIndex = 0; nPointIndex < nPointsCount; ++nPointIndex)
 	{
-		nY = nH - (arrRankData[nPointIndex] - nMin) * dKoefY;
-
-		if (0 === nPointIndex)
-		{
-			oContext.moveTo(nX, nY);
-		}
-		else
-		{
-			oContext.lineTo(nX, nY);
-		}
-
-		arrPoints.push({x : nX, y : nY});
-
+		nY = (nGraphH - (arrRankData[nPointIndex] - nMin) * dKoefY);
+		arrPoints.push({x : nX, y : nY, rank : arrRankData[nPointIndex]});
 		nX += nStepX;
 	}
-	//oContext.stroke();
 
 	var arrSpline = GetSpline(arrPoints);
-	console.log(arrSpline);
-
+	oContext.lineWidth = 1;
 	oContext.strokeStyle = "rgba(0,255, 0,1)";
 	oContext.beginPath();
 
@@ -363,6 +368,74 @@ CKGSUserInfoWindow.prototype.private_DrawRank = function()
 			oSegment.points[3].x, oSegment.points[3].y);
 	}
 	oContext.stroke();
+
+	oContext.font        = "14px Arial";
+	oContext.fillStyle   = "rgba(255, 255, 255, 1)";
+	oContext.strokeStyle = "rgba(128,128,128,1)";
+	oContext.lineWidth   = 1;
+
+	for (var nRankCounter = nRank0; nRankCounter <= nRank1; ++nRankCounter)
+	{
+		var sText = "";
+		if (nRankCounter >= 0)
+			sText = (nRankCounter + 1) + "d";
+		else
+			sText = (-nRankCounter) + "k";
+
+		var dY = nGraphH - (nRankCounter * 100 - nMin) * dKoefY;
+
+		if (dY - 5 - 14 >= 0)
+		{
+			oContext.fillText(sText, 5, dY - 5);
+		}
+	}
+
+	oContext.font = "14px Arial";
+	oContext.fillStyle = "rgba(255, 255, 255, 1)";
+	var oCurDate  = new Date();
+	var nCurTime  = oCurDate.getTime();
+	var nCurMonth = oCurDate.getUTCMonth() + 1;
+	for (var nPointIndex = nPointsCount - 1; nPointIndex >= 0; --nPointIndex)
+	{
+		var nTime  = nCurTime - 86400000 * (nPointsCount - 1 - nPointIndex); // 1000 * 60 * 60 * 24
+		var oDate  = new Date(nTime);
+		var nMonth = oDate.getUTCMonth() + 1;
+
+		arrPoints[nPointIndex].time = nTime;
+
+		if (nMonth !== nCurMonth)
+		{
+			var dX = nPointIndex * nStepX;
+
+			oContext.beginPath();
+			oContext.moveTo(dX, nH - 20);
+			oContext.lineTo(dX, nH);
+			oContext.stroke();
+
+			var sText = "";
+			switch (nCurMonth)
+			{
+				case 1: sText = "Jan"; break;
+				case 2: sText = "Feb"; break;
+				case 3: sText = "Mar"; break;
+				case 4: sText = "Apr"; break;
+				case 5: sText = "May"; break;
+				case 6: sText = "Jun"; break;
+				case 7: sText = "Jul"; break;
+				case 8: sText = "Aug"; break;
+				case 9: sText = "Sep"; break;
+				case 10: sText = "Oct"; break;
+				case 11: sText = "Nov"; break;
+				case 12: sText = "Dec"; break;
+			}
+
+			oContext.fillText(sText, dX + 5, nH - 5);
+			nCurMonth = nMonth;
+		}
+	}
+
+	this.m_arrPoints = arrPoints;
+	this.m_nStepX    = nStepX;
 };
 CKGSUserInfoWindow.prototype.private_DrawNoRank = function()
 {
@@ -523,6 +596,155 @@ CKGSUserInfoWindow.prototype.private_CreateRankPage = function(oDiv, oControl)
 	oControl.AddControl(oCanvasControl);
 
 	this.m_oRankCanvas = oCanvas;
+
+	var oThis = this;
+	oCanvas.addEventListener("mousemove", function(e)
+	{
+		check_MouseMoveEvent(e);
+		var oPos = oThis.private_UpdateMousePosOnRankGraph(global_mouseEvent.X, global_mouseEvent.Y);
+		oThis.private_OnMouseMoveRankGraph(oPos.X, oPos.Y);
+	}, false);
+
+	oCanvas.addEventListener("mouseout", function(e)
+	{
+		check_MouseMoveEvent(e);
+		var oPos = oThis.private_UpdateMousePosOnRankGraph(global_mouseEvent.X, global_mouseEvent.Y);
+		oThis.private_OnMouseOutRankGraph(oPos.X, oPos.Y);
+	}, false);
+};
+CKGSUserInfoWindow.prototype.private_UpdateMousePosOnRankGraph = function(X, Y)
+{
+	var oPos = Common_FindPosition(this.m_oRankCanvas);
+	return { X: X - oPos.X, Y : Y - oPos.Y };
+};
+CKGSUserInfoWindow.prototype.private_OnMouseMoveRankGraph = function(X, Y)
+{
+	var nDiffX = Math.min(7, this.m_nStepX);
+	for (var nPointIndex = 0, nPointsCount = this.m_arrPoints.length; nPointIndex < nPointsCount; ++nPointIndex)
+	{
+		var oPoint = this.m_arrPoints[nPointIndex];
+
+		if (oPoint.x - nDiffX < X
+			&& X < oPoint.x + nDiffX
+			&& (Y >= this.m_oRankCanvas.height - 30 || (oPoint.y - 7 < Y && Y < oPoint.y + 7)))
+		{
+			var oPos = Common_FindPosition(this.m_oRankCanvas);
+
+			var nRank = oPoint.rank;
+			var sRank = "1d";
+			if (nRank >= 0)
+				sRank = (((((nRank + 100) / 100) * 100) | 0) / 100) + "d";
+			else
+				sRank = ((((-nRank / 100) * 100) | 0) / 100) + "k";
+
+			var oDate = new Date(oPoint.time);
+
+			this.private_ShowRankHint(oPoint.x + oPos.X, oPoint.y + oPos.Y, sRank + " " + oDate.toLocaleDateString());
+			return;
+		}
+	}
+
+	this.private_HideRankHint();
+};
+CKGSUserInfoWindow.prototype.private_OnMouseOutRankGraph = function(X, Y)
+{
+	this.private_HideRankHint();
+};
+CKGSUserInfoWindow.prototype.private_ShowRankHint = function(X, Y, sText)
+{
+	var oThis = this;
+	if (!this.m_oRankHint)
+	{
+		this.m_oRankHint = {
+			Div    : null,
+			Canvas : null,
+			Parent : this.m_oApp.GetMainDiv()
+		};
+	}
+
+	if (!this.m_oRankHint.Div)
+	{
+		var oMainDiv = this.m_oApp.GetMainDiv();
+
+		var oElement              = document.createElement("div");
+		oElement.style.position   = "absolute";
+		oElement.style.width      = "auto";
+		oElement.style.height     = "auto";
+		oElement.style.background = "rgb(243, 243, 243)";
+		oElement.style.border     = "1px solid rgb(0,0,0)";
+		oElement.style.display    = "block";
+		oElement.style.overflow   = "hidden";
+		oElement.style.zIndex     = 0xFFFF;
+		oMainDiv.appendChild(oElement);
+
+		oElement.addEventListener("mousemove", function(e){
+			check_MouseMoveEvent(e);
+			var oPos = oThis.private_UpdateMousePosOnRankGraph(global_mouseEvent.X, global_mouseEvent.Y);
+			oThis.private_OnMouseMoveRankGraph(oPos.X, oPos.Y);
+		});
+
+		this.m_oRankHint.Div = oElement;
+	}
+
+	if (!this.m_oRankHint.Canvas)
+	{
+		var oMainDiv = this.m_oApp.GetMainDiv();
+
+		var nW = 8;
+		var nH = 8;
+		var nR = 3;
+
+		var oElement            = document.createElement("canvas");
+		oElement.style.position = "absolute";
+		oElement.style.width    = nW + "px";
+		oElement.style.height   = nH + "px";
+		oElement.style.display  = "block";
+		oElement.style.overflow = "hidden";
+		oElement.style.zIndex   = 0xFFFF;
+		oElement.width          = nW;
+		oElement.height         = nH;
+		oMainDiv.appendChild(oElement);
+
+		this.m_oRankHint.Canvas = oElement;
+
+		oElement.addEventListener("mousemove", function(e){
+			check_MouseMoveEvent(e);
+			var oPos = oThis.private_UpdateMousePosOnRankGraph(global_mouseEvent.X, global_mouseEvent.Y);
+			oThis.private_OnMouseMoveRankGraph(oPos.X, oPos.Y);
+		});
+
+		var oContext = oElement.getContext("2d");
+		oContext.strokeStyle = "rgb(255, 0, 0)";
+		oContext.lineWidth = 1;
+		oContext.beginPath();
+		oContext.arc(nW / 2, nH / 2, nR, 0, 2 * Math.PI, false);
+		oContext.stroke();
+	}
+
+	var oDiv           = this.m_oRankHint.Div;
+	oDiv.style.top     = (Y + 5) + "px";
+	oDiv.style.left    = (X + 10) + "px";
+	oDiv.style.display = "block";
+	oDiv.innerHTML     = sText;
+
+	var oCanvas           = this.m_oRankHint.Canvas;
+	oCanvas.style.top     = (Y - 2) + "px";
+	oCanvas.style.left    = (X - 2) + "px";
+	oCanvas.style.display = "block";
+};
+CKGSUserInfoWindow.prototype.private_HideRankHint = function()
+{
+	if (!this.m_oRankHint)
+		return;
+
+	var oParent = this.m_oRankHint.Parent;
+	if (oParent && this.m_oRankHint.Div)
+		oParent.removeChild(this.m_oRankHint.Div);
+
+	if (oParent && this.m_oRankHint.Canvas)
+		oParent.removeChild(this.m_oRankHint.Canvas);
+
+	this.m_oRankHint = null;
 };
 
 
