@@ -405,7 +405,7 @@ CKGSUserInfoWindow.prototype.private_DrawRank = function()
 
 		if (nMonth !== nCurMonth)
 		{
-			var dX = nPointIndex * nStepX;
+			var dX = nPointIndex * nStepX + nStepX;
 
 			oContext.beginPath();
 			oContext.moveTo(dX, nH - 20);
