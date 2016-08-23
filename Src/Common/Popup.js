@@ -156,8 +156,11 @@ function CVisualContextMenu(oApp, nX, nY)
 	oHtmlElement.appendChild(oList);
 	this.m_oList = oList;
 
-	this.m_nHeight = 12;
-	this.m_nWidth  = 100;
+	this.m_nMaxHeight = null;
+	this.m_nHeight    = 12;
+	this.m_nWidth     = 100;
+
+	this.m_oScroll    = null;
 
 	this.m_oAdditionalInfo    = {};
 	this.m_arrOnHideCallbacks = [];
@@ -242,14 +245,26 @@ CVisualContextMenu.prototype.Hide = function()
 };
 CVisualContextMenu.prototype.UpdatePopupPosition = function(oPopup)
 {
+	var nHeight = this.m_nHeight;
+	if (null !== this.m_nMaxHeight && nHeight > this.m_nMaxHeight)
+	{
+		nHeight = this.m_nMaxHeight;
+	}
+
+	var nWidth = this.m_nWidth;
+	if (this.m_oScroll)
+	{
+		nWidth += 20;
+	}
+
 	var nAppHeight = this.m_oApp.GetHeight();
-	if (this.m_nY + this.m_nHeight > nAppHeight)
-		this.m_nY = nAppHeight - this.m_nHeight;
+	if (this.m_nY + nHeight > nAppHeight)
+		this.m_nY = nAppHeight - nHeight;
 
 	var nAppWidth = this.m_oApp.GetWidth();
 
-	if (this.m_nX + this.m_nWidth > nAppWidth)
-		this.m_nX = nAppWidth - this.m_nWidth;
+	if (this.m_nX + nWidth > nAppWidth)
+		this.m_nX = nAppWidth - nWidth;
 
 	var oHtmlElement        = this.m_oPopup.GetHtmlElement();
 	oHtmlElement.style.left = this.m_nX + "px";
@@ -272,9 +287,35 @@ CVisualContextMenu.prototype.OnPreShowPopup = function(oPopup)
 };
 CVisualContextMenu.prototype.OnShowPopup = function(oPopup)
 {
+	var bAddScroll = false;
+	var nHeight = this.m_nHeight;
+	if (null !== this.m_nMaxHeight && nHeight > this.m_nMaxHeight)
+	{
+		nHeight    = this.m_nMaxHeight;
+		bAddScroll = true;
+	}
+	var nWidth = this.m_nWidth;
+	if (true === bAddScroll)
+	{
+		nWidth += 20;
+	}
+
 	var oHtmlElement = oPopup.GetHtmlElement();
-	oHtmlElement.style.height = this.m_nHeight + "px";
-	oHtmlElement.style.width  = this.m_nWidth + "px";
+	oHtmlElement.style.width  = nWidth + "px";
+	oHtmlElement.style.height = nHeight + "px";
+
+	if (true === bAddScroll && !this.m_oScroll)
+	{
+		if (!this.m_oScroll)
+		{
+			this.m_oList.style.height = (nHeight - 12) + "px";
+			this.m_oScroll = new CVerticalScroll();
+			this.m_oScroll.Init(this.m_oList, "VerScroll", "VerScrollActive", true);
+			this.m_oScroll.SetPaddings(-2, 0, 0);
+			this.m_oScroll.SetStopPropagation(true);
+		}
+		this.m_oScroll.CheckVisibility();
+	}
 };
 CVisualContextMenu.prototype.GetWidth = function()
 {
@@ -295,5 +336,9 @@ CVisualContextMenu.prototype.GetAdditionalInfo = function(sKey)
 CVisualContextMenu.prototype.AddOnHideCallback = function(fCallback)
 {
 	this.m_arrOnHideCallbacks.push(fCallback);
+};
+CVisualContextMenu.prototype.SetMaxHeight = function(nMaxHeight)
+{
+	this.m_nMaxHeight = nMaxHeight;
 };
 

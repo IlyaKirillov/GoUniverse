@@ -28,10 +28,11 @@ function CVerticalScroll()
 	var oThis = this;
 	this.m_fOnScroll = function(e)
 	{
-		oThis.private_OnScroll(e);
+		return oThis.private_OnScroll(e);
 	};
 
-	this.m_nElementHeight = 0;
+	this.m_nElementHeight   = 0;
+	this.m_bStopPropagation = false;
 }
 CVerticalScroll.prototype.Init = function(oDiv, sNormalClass, sActiveClass, bAddPaddingsOnShow)
 {
@@ -98,14 +99,25 @@ CVerticalScroll.prototype.Show = function(nElementHeight)
 		sY -= oDiv.offsetTop;
 		oDiv.scrollTop = (sY - saY) * (paH - vaH) / (saH - sH);
 	};
-	oVerScroll.onDragStart = function()
+	oVerScroll.onDragStart = function(sX, sY)
 	{
 		oVerScroll.className = oThis.m_sNormalClass + " " + oThis.m_sActiveClass;
 	};
-	oVerScroll.onDragEnd = function()
+	oVerScroll.onDragEnd = function(sX, sY)
 	{
 		oVerScroll.className = oThis.m_sNormalClass;
 	};
+	oVerScroll.onclick = function(e)
+	{
+		if (oThis && oThis.m_bStopPropagation)
+		{
+			e.stopPropagation();
+			return false;
+		}
+	};
+
+	oVerScroll.addEventListener("DOMMouseScroll", this.m_fOnScroll, false);
+	oVerScroll.addEventListener("mousewheel", this.m_fOnScroll, false);
 
 	oDiv.addEventListener("DOMMouseScroll", this.m_fOnScroll, false);
 	oDiv.addEventListener("mousewheel", this.m_fOnScroll, false);
@@ -145,7 +157,14 @@ CVerticalScroll.prototype.CheckVisibility = function(bScrollBottomOnShow)
 CVerticalScroll.prototype.private_OnScroll = function(e)
 {
 	if (this.m_nElementHeight <= 1)
+	{
+		if (true === this.m_bStopPropagation)
+		{
+			e.stopPropagation();
+			return false;
+		}
 		return;
+	}
 
 	var delta = 0;
 	if (undefined != e.wheelDelta && e.wheelDelta != 0)
@@ -160,6 +179,12 @@ CVerticalScroll.prototype.private_OnScroll = function(e)
 	this.m_oDiv.scrollTop += delta;
 
 	this.UpdatePosition();
+
+	if (true === this.m_bStopPropagation)
+	{
+		e.stopPropagation();
+		return false;
+	}
 };
 CVerticalScroll.prototype.UpdatePosition = function()
 {
@@ -176,4 +201,8 @@ CVerticalScroll.prototype.UpdatePosition = function()
 	var sY = Math.max(saY, Math.min(saY + saH - sH + 1, saY + paY * (saH - sH) / (paH - vaH)));
 
 	oVerScroll.style.top = (sY + oDiv.offsetTop) + "px";
+};
+CVerticalScroll.prototype.SetStopPropagation = function(isStop)
+{
+	this.m_bStopPropagation = isStop;
 };

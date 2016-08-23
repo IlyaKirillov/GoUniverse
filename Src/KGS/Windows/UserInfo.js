@@ -957,6 +957,7 @@ CKGSUserInfoGamesList.prototype.Handle_RightClick = function(oRecord, e)
 		{
 			var nWidth    = oContextMenu.GetWidth();
 			oContextMenu2 = new CVisualContextMenu(oThis.m_oApp, nX + nWidth + 3, nY + 10 + (true === isLoadPrivately ? 20 : 0));
+			oContextMenu2.SetMaxHeight(412);
 
 			var arrRooms = oClient.GetRooms();
 			for (var nRoomIndex = 0, nRoomsCount = arrRooms.length; nRoomIndex < nRoomsCount; ++nRoomIndex)
