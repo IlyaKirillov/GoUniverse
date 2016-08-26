@@ -1834,7 +1834,7 @@ CKGSClient.prototype.private_ReadSgfEvents = function(oGame, arrSgfEvents)
 		{
 			private_ReadProp(sgfEvent.prop, oNode, oGameTree);
 
-			if ("COMMENT" !== sgfEvent.prop)
+			if ("COMMENT" !== sgfEvent.prop.name)
 				private_ReadProp(sgfEvent.prop, oNodeOrigin, oGameTree);
 		}
 		else if ("PROP_REMOVED" === sgfEvent.type)
