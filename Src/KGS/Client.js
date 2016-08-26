@@ -960,6 +960,7 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 		GameRoomId         : GameRoomId,
 		GameTree           : null,
 		Nodes              : {},
+		NodesOrigin        : {},
 		CurNode            : null,
 		BlackTime          : new CTimeSettings(),
 		WhiteTime          : new CTimeSettings(),
@@ -1770,6 +1771,7 @@ CKGSClient.prototype.private_ReadSgfEvents = function(oGame, arrSgfEvents)
 {
 	var oGameTree      = oGame.GameTree;
 	var oNode          = null;
+	var oNodeOrigin    = null;
 	var oActivatedNode = null;
 	var oThis          = this;
 
@@ -1781,11 +1783,16 @@ CKGSClient.prototype.private_ReadSgfEvents = function(oGame, arrSgfEvents)
 		if (!oGame.Nodes[sNodeId])
 		{
 			// Сюда мы должны попадать ровно 1 раз в самом начале с самой первой нодой
-			oGame.Nodes[sNodeId] = oGameTree.Get_FirstNode();
+			oGame.Nodes[sNodeId]       = oGameTree.Get_FirstNode();
+			oGame.NodesOrigin[sNodeId] = new CNode(oGameTree);
+
+			oGame.Nodes[sNodeId].Set_Origin(true);
+			oGame.NodesOrigin[sNodeId].Set_Origin(true);
 		}
 
-		oNode = oGame.Nodes[sNodeId];
-		if (!oNode)
+		oNode       = oGame.Nodes[sNodeId];
+		oNodeOrigin = oGame.NodesOrigin[sNodeId];
+		if (!oNode || !oNodeOrigin)
 			continue;
 
 		if ("PROP_GROUP_ADDED" === sgfEvent.type)
@@ -1793,18 +1800,30 @@ CKGSClient.prototype.private_ReadSgfEvents = function(oGame, arrSgfEvents)
 			var oProps = sgfEvent.props;
 			for (var nPropsIndex = 0, nPropsCount = oProps.length; nPropsIndex < nPropsCount; ++nPropsIndex)
 			{
-				private_ReadProp(oProps[nPropsIndex]);
+				private_ReadProp(oProps[nPropsIndex], oNode, oGameTree);
+
+				if ("COMMENT" !== oProps[nPropsIndex].name)
+					private_ReadProp(oProps[nPropsIndex], oNodeOrigin, oGameTree);
 			}
 		}
 		else if ("PROP_ADDED" === sgfEvent.type)
 		{
-			private_ReadProp(sgfEvent.prop);
+			private_ReadProp(sgfEvent.prop, oNode, oGameTree);
+
+			if ("COMMENT" !== sgfEvent.prop.name)
+				private_ReadProp(sgfEvent.prop, oNodeOrigin, oGameTree);
 		}
 		else if ("CHILD_ADDED" === sgfEvent.type)
 		{
 			var oNewNode = new CNode(oGameTree);
-			oNode.Add_Next(oNewNode, true);
+			oNewNode.Set_Origin(true);
+			oNode.Add_Next(oNewNode, false);
 			oGame.Nodes[sgfEvent.childNodeId] = oNewNode;
+
+			var oNewNodeOrigin = new CNode(oGameTree);
+			oNewNodeOrigin.Set_Origin(true);
+			oNodeOrigin.Add_Next(oNewNodeOrigin, false);
+			oGame.NodesOrigin[sgfEvent.childNodeId] = oNewNodeOrigin;
 		}
 		else if ("ACTIVATED" === sgfEvent.type)
 		{
@@ -1813,18 +1832,23 @@ CKGSClient.prototype.private_ReadSgfEvents = function(oGame, arrSgfEvents)
 		}
 		else if ("PROP_CHANGED" === sgfEvent.type)
 		{
-			private_ReadProp(sgfEvent.prop);
+			private_ReadProp(sgfEvent.prop, oNode, oGameTree);
+
+			if ("COMMENT" !== sgfEvent.prop)
+				private_ReadProp(sgfEvent.prop, oNodeOrigin, oGameTree);
 		}
 		else if ("PROP_REMOVED" === sgfEvent.type)
 		{
-			private_ReadPropRemove(sgfEvent.prop);
+			private_ReadPropRemove(sgfEvent.prop, oNode, oGameTree);
+			private_ReadPropRemove(sgfEvent.prop, oNodeOrigin, oGameTree);
 		}
 		else if ("PROP_GROUP_REMOVED" === sgfEvent.type)
 		{
 			var oProps = sgfEvent.props;
 			for (var nPropsIndex = 0, nPropsCount = oProps.length; nPropsIndex < nPropsCount; ++nPropsIndex)
 			{
-				private_ReadPropRemove(oProps[nPropsIndex]);
+				private_ReadPropRemove(oProps[nPropsIndex], oNode, oGameTree);
+				private_ReadPropRemove(oProps[nPropsIndex], oNodeOrigin, oGameTree);
 			}
 		}
 		else
@@ -1833,7 +1857,7 @@ CKGSClient.prototype.private_ReadSgfEvents = function(oGame, arrSgfEvents)
 		}
 	}
 
-	function private_ReadProp(oProp)
+	function private_ReadProp(oProp, oNode, oGameTree)
 	{
 		if ("MOVE" === oProp.name)
 		{
@@ -2036,7 +2060,7 @@ CKGSClient.prototype.private_ReadSgfEvents = function(oGame, arrSgfEvents)
 		}
 	}
 
-	function private_ReadPropRemove(oProp)
+	function private_ReadPropRemove(oProp, oNode, oGameTree)
 	{
 		if ("ADDSTONE" === oProp.name)
 		{

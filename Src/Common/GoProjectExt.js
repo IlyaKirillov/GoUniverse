@@ -995,14 +995,43 @@ function CGoUniverseButtonEditorControl(oDrawing)
 	oMainDiv.appendChild(oMenuElementWrapper);
 
 	var oThis = this;
-
 	this.private_CreateMenuItem(oMenuElementWrapper, "Back to game", function()
 	{
+		var oGame = oDrawing.m_oGameHandler;
+		if (!oGame || !oGame.GameTree)
+			return;
 
+		oGame.GameTree.GoTo_Node(oGame.CurNode);
 	});
-	this.private_CreateMenuItem(oMenuElementWrapper, "Remove own branches", function()
+	this.private_CreateMenuItem(oMenuElementWrapper, "Remove own changes", function()
 	{
+		var oGame = oDrawing.m_oGameHandler;
+		if (!oGame || !oGame.Nodes || !oGame.GameTree)
+			return;
 
+		for (var sNodeId in oGame.Nodes)
+		{
+			var oNode = oGame.Nodes[sNodeId];
+			oNode.Reset_ToOrigin(oGame.NodesOrigin[sNodeId]);
+		}
+
+		var oCurNode = oGame.GameTree.Get_CurNode();
+		while (oCurNode && true !== oCurNode.Is_Origin())
+			oCurNode = oCurNode.Get_Prev();
+
+		if (!oCurNode)
+			oCurNode = oGame.CurNode;
+
+		oGame.GameTree.GoTo_Node(oCurNode);
+
+		var oDrawingNavigator = oGame.GameTree.m_oDrawingNavigator;
+		if (oDrawingNavigator)
+		{
+			oDrawingNavigator.Create_FromGameTree();
+			oDrawingNavigator.Update();
+			oDrawingNavigator.Update_Current(true);
+			oDrawingNavigator.Update_GameCurrent();
+		}
 	});
 	this.private_CreateMenuItem(oMenuElementWrapper, "Return control", function()
 	{
