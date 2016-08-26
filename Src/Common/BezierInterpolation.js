@@ -50,8 +50,25 @@
 		var bezier = [];
 
 		var n = values.length - 1;
-		if (n < 2)
+
+		if (1 === n)
+		{
+			bezier[0]           = new CSegment();
+			bezier[0].points[0] = bezier[0].points[1] = values[0];
+			bezier[0].points[2] = bezier[0].points[3] = values[1];
+			return bezier;
+		}
+		else if (0 === n)
+		{
+			bezier[0]           = new CSegment();
+			bezier[0].points[0] = bezier[0].points[1] = values[0];
+			bezier[0].points[2] = bezier[0].points[3] = values[0];
+			return bezier;
+		}
+		else if (n < 0)
+		{
 			return [];
+		}
 
 		var tgL  = new CPoint();
 		var tgR  = new CPoint();
