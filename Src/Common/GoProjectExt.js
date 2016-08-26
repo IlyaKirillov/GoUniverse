@@ -202,6 +202,20 @@ CDrawing.prototype.private_GoUniverseCreateHorFullTemplate = function()
 	this.Register_MenuButton(oDrawingMenuButton);
 	this.m_aElements.push(oDrawingMenuButton);
 	//------------------------------------------------------------------------------------------------------------------
+	// Кнопка редактирования
+	//------------------------------------------------------------------------------------------------------------------
+	var sEditButton = sPanelDivId + "E";
+	this.private_CreateDiv(oPanelControl.HtmlElement, sEditButton);
+	var oEditButtonControl = CreateControlContainer(sEditButton);
+	oEditButtonControl.Bounds.SetParams(0, 0, 7, 7, false, true, true, true, 36, 36);
+	oEditButtonControl.Anchor = (g_anchor_top | g_anchor_right);
+	oPanelControl.AddControl(oEditButtonControl);
+
+	var oEditButton = new CGoUniverseButtonEditorControl(this);
+	oEditButton.Init(sEditButton, oGameTree);
+	this.Register_EditorControlButton(oEditButton);
+	this.m_aElements.push(oEditButton);
+	//------------------------------------------------------------------------------------------------------------------
 	// Навигатор и панель управления
 	//------------------------------------------------------------------------------------------------------------------
 	var oManagerControl = CreateControlContainer(sManagerDivId);
@@ -946,4 +960,269 @@ CGoUniverseDrawingGameState.prototype.private_UpdateCaptionStyle = function()
 		oDiv.style.cursor         = "default";
 		oDiv.title                = "";
 	}
+};
+//----------------------------------------------------------------------------------------------------------------------
+// Кнопка меню
+//----------------------------------------------------------------------------------------------------------------------
+function CGoUniverseButtonEditorControl(oDrawing)
+{
+	CGoUniverseButtonEditorControl.superclass.constructor.call(this, oDrawing);
+
+	var oMainDiv  = oDrawing.Get_MainDiv();
+	var oGameTree = oDrawing.Get_GameTree();
+
+	var oMenuElementWrapper                   = document.createElement("div");
+	oMenuElementWrapper.style.position        = "absolute";
+	oMenuElementWrapper.style.top             = "40px";
+	oMenuElementWrapper.style.width           = "200px";
+	oMenuElementWrapper.style.backgroundColor = "white";
+	oMenuElementWrapper.style.borderWidth     = "1px";
+	oMenuElementWrapper.style.borderColor     = "#b3b3b3";
+	oMenuElementWrapper.style.borderStyle     = "solid";
+	oMenuElementWrapper.style.padding         = "0px";
+	oMenuElementWrapper.style.boxShadow       = "0px 0px 2px 0px rgba(0,0,0,0.3)";
+	oMenuElementWrapper.style.opacity         = "1";
+	oMenuElementWrapper.style.zIndex          = "10";
+	oMenuElementWrapper.style.overflowX       = "hidden";
+	oMenuElementWrapper.style.overflowY       = "hidden";
+	oMenuElementWrapper.style.maxHeight       = "calc(100vh - 90px)";
+
+	oMenuElementWrapper.style.transitionProperty = "height";
+	oMenuElementWrapper.style.transitionDuration = "0.2s";
+	oMenuElementWrapper.style.transitionDelay    = "0s";
+
+
+	oMainDiv.appendChild(oMenuElementWrapper);
+
+	var oThis = this;
+
+	this.private_CreateMenuItem(oMenuElementWrapper, "Back to game", function()
+	{
+
+	});
+	this.private_CreateMenuItem(oMenuElementWrapper, "Remove own branches", function()
+	{
+
+	});
+	this.private_CreateMenuItem(oMenuElementWrapper, "Return control", function()
+	{
+
+	});
+
+	this.m_oMenuElement  = oMenuElementWrapper;
+	this.m_nHeight       = oMenuElementWrapper.clientHeight;
+	this.m_nWidth        = oMenuElementWrapper.clientWidth;
+	this.m_nTransitionId = null;
+	this.m_nShowId       = null;
+
+	oMenuElementWrapper.style.display = "none";
+}
+CommonExtend(CGoUniverseButtonEditorControl, CDrawingButtonBase);
+
+CGoUniverseButtonEditorControl.prototype.private_DrawOnCanvas = function(Canvas, Size, X_off, Y_off, bDisabled, W, H, BackColor, FillColor)
+{
+	var Text       = String.fromCharCode(0x270E);
+	var FontSize   = Size * 0.8;
+	var FontFamily = "Arial";
+	var sFont      = FontSize + "px " + FontFamily;
+
+	Canvas.fillStyle = (true === this.m_oActiveBColor.Compare(BackColor) ? "rgb(167, 167, 167)" : "rgb(217, 217, 217)");
+	Canvas.fillRect(0, 0, Size + 2 * X_off, Size + 2 * X_off);
+
+	Canvas.fillStyle = "rgb(0, 0, 0)";
+	Canvas.font = sFont;
+
+	var Y = Y_off + Size / 2 + FontSize / 3;
+	var X = X_off + (Size - Canvas.measureText(Text).width) / 2;
+
+	Canvas.fillText(Text, X, Y);
+};
+CGoUniverseButtonEditorControl.prototype.private_CreateMenuItem = function(oMenuElement, sText, pOnClickHandler)
+{
+	var oItemWrapper           = document.createElement("div");
+	oItemWrapper.style.padding = "0px";
+	oItemWrapper.style.maring  = "0px";
+	oMenuElement.appendChild(oItemWrapper);
+
+	var oItemElement                   = document.createElement("div");
+	oItemElement.style.display         = "flex";
+	oItemElement.style.alignItems      = "center";
+	oItemElement.style.padding         = "0px";
+	oItemElement.style.position        = "relative";
+	oItemElement.style.cursor          = "pointer";
+	oItemElement.style.transition      = "background-color 0.25s ease";
+	oItemElement.style.backgroundColor = "#fff";
+	oItemElement.style.color           = "#424242";
+	oItemElement.style.border          = "1px solid transparent";
+	oItemElement.style.outline         = "none";
+	oItemWrapper.appendChild(oItemElement);
+
+
+	var oInnerDiv                = document.createElement("div");
+	oInnerDiv.style.padding      = "10px 20px";
+	oInnerDiv.style.position     = "relative";
+	oInnerDiv.style.cursor       = "pointer";
+	oInnerDiv.style.borderBottom = "1px solid #e6e7e8";
+	oInnerDiv.style.transition   = "background-color 0.25s ease";
+	oInnerDiv.style.outline      = "none";
+	oInnerDiv.style.width        = "100%";
+	oItemElement.appendChild(oInnerDiv);
+
+	var TextSpan = document.createElement("span");
+
+	TextSpan.style.color         = "#4d4d4d";
+	TextSpan.style.fontFamily    = '"Segoe UI Light","Segoe UI Semilight","Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif';
+	TextSpan.style.fontWeight    = 'lighter';
+	TextSpan.style.fontSize      = "15px";
+	TextSpan.style.userSelect    = "none";
+	TextSpan.style.verticalAlign = "middle";
+	TextSpan.style.cursor        = "pointer";
+
+	Common.Set_InnerTextToElement(TextSpan, sText);
+	oInnerDiv.appendChild(TextSpan);
+
+	oItemElement.onmouseover = function()
+	{
+		oItemElement.style.backgroundColor = "#e6e6e6";
+		oItemElement.style.color           = "#424242";
+	};
+
+	oItemElement.onmouseout = function()
+	{
+		oItemElement.style.background = "transparent";
+		oItemElement.style.color      = "#424242";
+		oItemElement.style.border     = "1px solid transparent";
+	};
+
+	oItemElement.onmousedown = function()
+	{
+		oItemElement.style.backgroundColor = "#969696";
+		oItemElement.style.border          = "1px solid #737373";
+		oItemElement.style.color           = "#424242";
+	};
+
+	oItemElement.onmouseup = function()
+	{
+		oItemElement.style.backgroundColor = "#e6e6e6";
+		oItemElement.style.color           = "#424242";
+		oItemElement.style.border          = "1px solid transparent";
+	};
+
+	var oThis = this;
+	oItemElement.onclick = function()
+	{
+		if (pOnClickHandler)
+			pOnClickHandler();
+
+		oThis.Hide_Menu(true);
+	};
+
+	return oItemWrapper;
+};
+CGoUniverseButtonEditorControl.prototype.private_HandleMouseDown = function()
+{
+	this.Show_Menu();
+};
+CGoUniverseButtonEditorControl.prototype.private_GetHint = function()
+{
+	return "Editor control";
+};
+CGoUniverseButtonEditorControl.prototype.Show_Menu = function()
+{
+	if ("none" === this.m_oMenuElement.style.display)
+	{
+		if (null === this.m_nShowId)
+		{
+			var oThis = this;
+			this.m_nShowId = setTimeout(function ()
+			{
+				if (null !== oThis.m_nTransitionId)
+				{
+					clearTimeout(oThis.m_nTransitionId);
+					oThis.m_nTransitionId = null;
+				}
+
+				oThis.m_oMenuElement.style.display = "block";
+				oThis.m_oMenuElement.style.height  = "0px";
+
+				oThis.m_nTransitionId = setTimeout(function ()
+				{
+					oThis.m_oMenuElement.style.height = oThis.m_nHeight + "px";
+					oThis.m_nTransitionId = null;
+					oThis.m_nShowId       = null;
+					oThis.Set_Selected(true);
+				}, 20);
+			}, 20);
+		}
+	}
+	else
+	{
+		this.Hide_Menu();
+	}
+};
+CGoUniverseButtonEditorControl.prototype.Hide_Menu = function(bFast)
+{
+	if ("none" !== this.m_oMenuElement.style.display)
+	{
+		if (true === bFast)
+		{
+			this.m_oMenuElement.style.height  = "0px";
+			this.m_oMenuElement.style.display = "none";
+			this.Set_Selected(false);
+		}
+		else
+		{
+
+			if (null !== this.m_nTransitionId)
+			{
+				clearTimeout(this.m_nTransitionId);
+				this.m_nTransitionId = null;
+			}
+
+			this.m_oMenuElement.style.height = "0px";
+			var oThis                               = this;
+			this.m_nTransitionId                    = setTimeout(function()
+			{
+				oThis.m_oMenuElement.style.display = "none";
+				oThis.m_nTransitionId                     = null;
+				oThis.Set_Selected(false);
+			}, 200);
+		}
+	}
+};
+CGoUniverseButtonEditorControl.prototype.Update_Size = function()
+{
+	CDrawingButtonFileMenu.superclass.Update_Size.apply(this, arguments);
+	var oOffset = this.m_oDrawing.Get_ElementOffset(this.HtmlElement.Control.HtmlElement);
+
+	var nLeft = oOffset.X;
+	var nTop  = oOffset.Y + 36 + 5;
+
+	var nOverallW = this.m_oDrawing.Get_Width();
+	var nOverallH = this.m_oDrawing.Get_Height();
+
+	var nMinOffset = 5;
+
+	if (nLeft + this.m_nWidth  > nOverallW - nMinOffset)
+		nLeft = nOverallW - nMinOffset - this.m_nWidth;
+
+	if (nLeft < nMinOffset)
+		nLeft = nMinOffset;
+
+	if (nTop + this.m_nHeight > nOverallH - nMinOffset)
+		nTop = nOverallH - nMinOffset - this.m_nHeight;
+
+	if (nTop < nMinOffset)
+		nTop = nMinOffset;
+
+	this.m_nTop = nTop;
+
+	this.m_oMenuElement.style.left = nLeft + "px";
+	this.m_oMenuElement.style.top  = nTop + "px";
+};
+CGoUniverseButtonEditorControl.prototype.private_ClickTransformIn = function()
+{
+};
+CGoUniverseButtonEditorControl.prototype.private_ClickTransformOut = function()
+{
 };
