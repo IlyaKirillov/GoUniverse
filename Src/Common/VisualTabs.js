@@ -234,9 +234,10 @@ CVisualGameRoomTab.prototype.InitMainRoom = function(nId, sMainDivId, sTabDivId)
 		oThis.OnClick();
 	});
 };
-CVisualGameRoomTab.prototype.InitGameRoom = function(nId, oGameTree, sDivIdContainer, bDemonstration, sWhiteAvatar, sBlackAvatar, oWhiteTime, oBlackTime, oGame)
+CVisualGameRoomTab.prototype.InitGameRoom = function(sDivIdContainer, oGame)
 {
 	var oThis = this;
+	var nId   = oGame.GetRoomId();
 
 	// Создаем дивку под комнату с доской
 	var sGameRoomDivId          = sDivIdContainer + nId;
@@ -257,10 +258,11 @@ CVisualGameRoomTab.prototype.InitGameRoom = function(nId, oGameTree, sDivIdConta
 	oGameRoomBoardControl.Anchor = (g_anchor_top | g_anchor_bottom |g_anchor_left | g_anchor_right);
 	oGameRoomControl.AddControl(oGameRoomBoardControl);
 
+	var oGameTree = oGame.GetGameTree();
 	if (null !== oGameTree)
 	{
 		var oDrawing = new CDrawing(oGameTree);
-		oDrawing.Create_GoUniverseViewerTemplate(sGameRoomDivId + "B", this.m_oApp, this, sWhiteAvatar, sBlackAvatar, oWhiteTime, oBlackTime, oGame);
+		oDrawing.Create_GoUniverseViewerTemplate(sGameRoomDivId + "B", this.m_oApp, this, oGame);
 		oDrawing.Update_Size(true);
 		oGameTree.Set_EditingFlags({LoadFile : false, GameInfo : false});
 	}
@@ -355,7 +357,7 @@ CVisualGameRoomTab.prototype.InitGameRoom = function(nId, oGameTree, sDivIdConta
 	this.m_oCaptionDiv  = oCaptionDiv;
 	this.m_oGameHandler = oGame;
 
-	this.private_FillCaption(bDemonstration);
+	this.private_FillCaption(oGame.IsDemonstration());
 
 	return oGameRoomControl;
 };

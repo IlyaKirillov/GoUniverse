@@ -57,13 +57,13 @@ CKGSGameListRecord.prototype.Update = function(oGameRecord)
 	this.m_sScore      = undefined !== oGameRecord.score ? this.m_oClient.private_ParseScore(oGameRecord.score) : null;
 
 	if (oGameRecord.players.black)
-		this.m_oBlack = this.m_oClient.private_HandleUserRecord2(oGameRecord.players.black);
+		this.m_oBlack = GetKGSUser(oGameRecord.players.black);
 
 	if (oGameRecord.players.white)
-		this.m_oWhite = this.m_oClient.private_HandleUserRecord2(oGameRecord.players.white);
+		this.m_oWhite = GetKGSUser(oGameRecord.players.white);
 
 	if (oGameRecord.players.owner)
-		this.m_oOwner = this.m_oClient.private_HandleUserRecord2(oGameRecord.players.owner);
+		this.m_oOwner = GetKGSUser(oGameRecord.players.owner);
 
 	this.m_nHandicap  = oGameRecord.handicap ? parseInt(oGameRecord.handicap) : 0;
 	this.m_nBoardSize = oGameRecord.size ? oGameRecord.size : 19;

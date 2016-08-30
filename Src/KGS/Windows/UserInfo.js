@@ -280,6 +280,10 @@ CKGSUserInfoWindow.prototype.OnRankGraph = function(arrRankData)
 	this.m_arrPoints = [];
 	this.private_DrawRank();
 };
+CKGSUserInfoWindow.prototype.OnUserGameArchiveUpdate = function(oMessage)
+{
+
+};
 CKGSUserInfoWindow.prototype.private_DrawRank = function()
 {
 	var arrRankData = this.m_oRankData;

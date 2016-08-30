@@ -72,15 +72,15 @@ CDrawing.prototype.private_GoUniverseCreateWrappingMainDiv = function(sDivId)
 	oParentControl.AddControl(oMainControl);
 	this.private_SetMainDiv(sMainDivId, oMainControl);
 };
-CDrawing.prototype.Create_GoUniverseViewerTemplate = function(sDivId, oApp, oTab, sWhiteAvatar, sBlackAvatar, oWhiteTime, oBlackTime, oGameHandler)
+CDrawing.prototype.Create_GoUniverseViewerTemplate = function(sDivId, oApp, oTab, oGameRoom)
 {
 	this.m_oGoUniverseApp = oApp;
 	this.m_oVisualTab     = oTab;
-	this.m_sBlackAvatar   = sBlackAvatar;
-	this.m_sWhiteAvatar   = sWhiteAvatar;
-	this.m_oBlackTime     = oBlackTime;
-	this.m_oWhiteTime     = oWhiteTime;
-	this.m_oGameHandler   = oGameHandler;
+	this.m_sBlackAvatar   = oGameRoom.GetBlackAvatarUrl();
+	this.m_sWhiteAvatar   = oGameRoom.GetWhiteAvatarUrl();
+	this.m_oBlackTime     = oGameRoom.GetBlackTime();
+	this.m_oWhiteTime     = oGameRoom.GetWhiteTime();
+	this.m_oGameRoom      = oGameRoom;
 
 	this.private_GoUniverseCreateWrappingMainDiv(sDivId);
 	this.private_GoUniverseCreateHorFullTemplate();
@@ -154,8 +154,8 @@ CDrawing.prototype.private_GoUniverseCreateHorFullTemplate = function()
 	oGameInfoControl.HtmlElement.className = "HorVerAlignCenter";
 
 	var oGameState = new CGoUniverseDrawingGameState();
-	oGameState.Init(oGameInfoControl.HtmlElement, this.m_oGameHandler);
-	this.m_oGameHandler.StateHandler = oGameState;
+	oGameState.Init(oGameInfoControl.HtmlElement, this.m_oGameRoom);
+	this.m_oGameRoom.SetStateHandler(oGameState);
 	this.Add_StateHandler(oGameState);
 	//------------------------------------------------------------------------------------------------------------------
 	// Информация об игроках
@@ -280,7 +280,8 @@ CDrawing.prototype.private_GoUniverseCreateHorFullTemplate = function()
 	//------------------------------------------------------------------------------------------------------------------
 	// Место под список игроков
 	//------------------------------------------------------------------------------------------------------------------
-	var oPlayersListControl = this.m_oGameHandler.PlayersList.Init(sPlayersListDivId, new CKGSInGamePlayersList(this.m_oGoUniverseApp, this.m_oGameHandler.GameRoomId));
+	var oPlayersListView = this.m_oGameRoom.GetPlayersListView();
+	var oPlayersListControl = oPlayersListView.Init(sPlayersListDivId, new CKGSInGamePlayersList(this.m_oGoUniverseApp, this.m_oGameRoom.GetRoomId()));
 	oPlayersListControl.Bounds.SetParams(0, 0, 0, 0, true, false, true, true, PlayerListW, -1);
 	oPlayersListControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_bottom);
 	oChatsControl.AddControl(oPlayersListControl);
@@ -288,8 +289,8 @@ CDrawing.prototype.private_GoUniverseCreateHorFullTemplate = function()
 	oPlayerListElement.style.borderTop  = "1px solid rgb(172, 172, 172)";
 	oPlayerListElement.style.borderLeft = "1px solid rgb(172, 172, 172)";
 	oPlayerListElement.style.background = "rgb(235, 235, 228)";
-	this.m_oGameHandler.PlayersList.Set_BGColor(235, 235, 228);
-	this.m_aElements.push(this.m_oGameHandler.PlayersList);
+	oPlayersListView.Set_BGColor(235, 235, 228);
+	this.m_aElements.push(oPlayersListView);
 	//------------------------------------------------------------------------------------------------------------------
 	// Место под чат
 	//------------------------------------------------------------------------------------------------------------------
@@ -301,7 +302,7 @@ CDrawing.prototype.private_GoUniverseCreateHorFullTemplate = function()
 	var oDrawingComments = new CGoUniverseDrawingComments(this);
 	oDrawingComments.Init(sChatAreaDivId, oGameTree, this.m_oGoUniverseApp);
 	this.m_aElements.push(oDrawingComments);
-	this.m_oGameHandler.CommentsHandler = oDrawingComments;
+	this.m_oGameRoom.SetCommentsHandler(oDrawingComments);
 	//------------------------------------------------------------------------------------------------------------------
 	// Место под ввод в чат
 	//------------------------------------------------------------------------------------------------------------------
@@ -852,11 +853,11 @@ CGoUniverseDrawingPlayerInfo.prototype.private_Update = function()
 //----------------------------------------------------------------------------------------------------------------------
 function CGoUniverseDrawingGameState()
 {
-	this.m_oDiv        = null;
-	this.m_oGame       = null;
-	this.m_oCurNode    = null;
+	this.m_oDiv      = null;
+	this.m_oGameRoom = null;
+	this.m_oCurNode  = null;
 }
-CGoUniverseDrawingGameState.prototype.Init = function(oParent, oGame)
+CGoUniverseDrawingGameState.prototype.Init = function(oParent, oGameRoom)
 {
 	var oDiv = document.createElement("div");
 	oParent.appendChild(oDiv);
@@ -868,35 +869,35 @@ CGoUniverseDrawingGameState.prototype.Init = function(oParent, oGame)
 	var oThis = this;
 	oDiv.addEventListener("click", function()
 	{
-		var oGame = oThis.m_oGame;
-		if (!oGame || !oGame.GameTree || !oThis.m_oCurNode)
+		var oGameRoom = oThis.m_oGameRoom;
+		if (!oGameRoom)
 			return;
 
-		oGame.GameTree.GoTo_Node(oThis.m_oCurNode);
+		oGameRoom.BackToGame();
 	}, false);
 
-	this.m_oDiv  = oDiv;
-	this.m_oGame = oGame;
+	this.m_oDiv      = oDiv;
+	this.m_oGameRoom = oGameRoom;
 
 	this.private_UpdateCaptionStyle();
 };
 CGoUniverseDrawingGameState.prototype.Update = function()
 {
-	if (!this.m_oGame)
+	if (!this.m_oGameRoom)
 		return;
 
-	this.m_oCurNode = this.m_oGame.CurNode;
+	this.m_oCurNode = this.m_oGameRoom.GetCurNode();
 
-	var oGameTree = this.m_oGame.GameTree;
-	var bDemo     = this.m_oGame.Demo;
-	var sResult   = this.m_oGame.Result;
+	var oGameTree = this.m_oGameRoom.GetGameTree();
+	var bDemo     = this.m_oGameRoom.IsDemonstration();
+	var sResult   = this.m_oGameRoom.GetResult();
 
 	var oNode = this.m_oCurNode;
 	var sText = "";
 
 	if (null !== sResult && true !== bDemo)
 	{
-		sText += "Game Over: " + this.m_oGame.Result;
+		sText += "Game Over: " + sResult;
 	}
 	else
 	{
@@ -941,11 +942,11 @@ CGoUniverseDrawingGameState.prototype.OnGameTreeStateChange = function(oGameTree
 };
 CGoUniverseDrawingGameState.prototype.private_UpdateCaptionStyle = function()
 {
-	if (!this.m_oGame || !this.m_oGame.GameTree)
+	if (!this.m_oGameRoom)
 		return;
 
 	var oDiv = this.m_oDiv;
-	var oCurNode = this.m_oGame.GameTree.Get_CurNode();
+	var oCurNode = this.m_oGameRoom.GetGameTree().Get_CurNode();
 	if (this.m_oCurNode !== oCurNode)
 	{
 		oDiv.style.color          = "#2a75f3";
@@ -997,41 +998,19 @@ function CGoUniverseButtonEditorControl(oDrawing)
 	var oThis = this;
 	this.private_CreateMenuItem(oMenuElementWrapper, "Back to game", function()
 	{
-		var oGame = oDrawing.m_oGameHandler;
-		if (!oGame || !oGame.GameTree)
+		var oGameRoom = oDrawing.m_oGameRoom;
+		if (!oGame)
 			return;
 
-		oGame.GameTree.GoTo_Node(oGame.CurNode);
+		oGameRoom.BackToGame();
 	});
 	this.private_CreateMenuItem(oMenuElementWrapper, "Remove own changes", function()
 	{
-		var oGame = oDrawing.m_oGameHandler;
-		if (!oGame || !oGame.Nodes || !oGame.GameTree)
+		var oGameRoom = oDrawing.m_oGameRoom;
+		if (!oGame)
 			return;
-
-		for (var sNodeId in oGame.Nodes)
-		{
-			var oNode = oGame.Nodes[sNodeId];
-			oNode.Reset_ToOrigin(oGame.NodesOrigin[sNodeId]);
-		}
-
-		var oCurNode = oGame.GameTree.Get_CurNode();
-		while (oCurNode && true !== oCurNode.Is_Origin())
-			oCurNode = oCurNode.Get_Prev();
-
-		if (!oCurNode)
-			oCurNode = oGame.CurNode;
-
-		oGame.GameTree.GoTo_Node(oCurNode);
-
-		var oDrawingNavigator = oGame.GameTree.m_oDrawingNavigator;
-		if (oDrawingNavigator)
-		{
-			oDrawingNavigator.Create_FromGameTree();
-			oDrawingNavigator.Update();
-			oDrawingNavigator.Update_Current(true);
-			oDrawingNavigator.Update_GameCurrent();
-		}
+		
+		oGameRoom.RemoveOwnChanges();
 	});
 	this.private_CreateMenuItem(oMenuElementWrapper, "Return control", function()
 	{

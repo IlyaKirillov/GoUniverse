@@ -48,8 +48,7 @@ CKGSClient.prototype.Clear = function()
 	for (var nChannelId in this.m_aGames)
 	{
 		var oGame = this.m_aGames[nChannelId];
-		oGame.BlackTime.Stop();
-		oGame.WhiteTime.Stop();
+		oGame.StopClocks();
 	}
 
 	this.m_bLoggedIn      = false;
@@ -684,6 +683,10 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
 	{
 		this.private_HandleChannelAudio(oMessage);
 	}
+	else if ("ARCHIVE_GAMES_CHANGED" === oMessage.type)
+	{
+		this.private_HandleArchiveGamesChanged(oMessage);
+	}
 	else
 	{
 		console.log(oMessage);
@@ -943,171 +946,27 @@ CKGSClient.prototype.private_HandleUserRecord = function(oUserRecord, bUpdateUse
 
 	return oUser;
 };
-CKGSClient.prototype.private_HandleUserRecord2 = function(oUserRecord)
-{
-	var oUser = new CKGSUser(this);
-	oUser.Update(oUserRecord);
-	return oUser;
-};
 CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 {
-	var GameRoomId = oMessage.channelId;
+	var nGameRoomId = oMessage.channelId;
 
-	if (this.m_aGames[GameRoomId])
+	if (this.m_aGames[nGameRoomId])
 		return;
 
-	var oGame = {
-		GameRoomId         : GameRoomId,
-		GameTree           : null,
-		Nodes              : {},
-		NodesOrigin        : {},
-		CurNode            : null,
-		BlackTime          : new CTimeSettings(),
-		WhiteTime          : new CTimeSettings(),
-		Demo               : false,
-		Result             : null,
-		CommentsHandler    : null,
-		StateHandler       : null,
-		PlayersList        : new CListView(),
-		Editor             : false,
-		SgfEventInProgress : false
-	};
+	var oGame = new CKGSGameRoom(this, nGameRoomId);
+	this.m_aGames[nGameRoomId] = oGame;
 
-	this.m_aGames[GameRoomId] = oGame;
+	oGame.InitGameTree(oMessage.gameSummary);
+	oGame.SetPlayers(this.m_oAllGames[nGameRoomId]);
 
-	var nSize      = oMessage.gameSummary.size | 0;
-	var sBlackName = oMessage.gameSummary.players.black && oMessage.gameSummary.players.black.name ? oMessage.gameSummary.players.black.name : "-";
-	var sBlackRank = oMessage.gameSummary.players.black && oMessage.gameSummary.players.black.rank ? oMessage.gameSummary.players.black.rank : "-";
-	var sWhiteName = oMessage.gameSummary.players.white && oMessage.gameSummary.players.white.name ? oMessage.gameSummary.players.white.name : "-";
-	var sWhiteRank = oMessage.gameSummary.players.white && oMessage.gameSummary.players.white.rank ? oMessage.gameSummary.players.white.rank : "-";
+	this.m_oApp.AddGameRoom(oGame);
+	this.m_oApp.SetCurrentGameRoomTab(nGameRoomId);
 
-	var sSGF = "(;FF[4]";
-	sSGF += "SZ[" + nSize + "]";
-	sSGF += "PB[" + sBlackName + "]";
-	sSGF += "PW[" + sWhiteName + "]";
-	sSGF += "WR[" + sWhiteRank + "]";
-	sSGF += "BR[" + sBlackRank + "]";
-	sSGF += ")";
-
-	var oGameTree = new CGameTree();
-	oGameTree.Set_SoundClass(null);
-	oGameTree.Load_Sgf(sSGF);
-	oGameTree.Set_Black(sBlackName);
-	oGameTree.Set_White(sWhiteName);
-	oGameTree.Set_BlackRating(sBlackRank);
-	oGameTree.Set_WhiteRating(sWhiteRank);
-
-	var bDemo = false;
-	if (oMessage.gameSummary.players.owner)
-	{
-		bDemo = true;
-		oGameTree.Set_GameTranscriber(oMessage.gameSummary.players.owner.name + (oMessage.gameSummary.players.owner.rank ? "[" + oMessage.gameSummary.players.owner.rank + "]" : ""));
-	}
-
-	var sWhiteAvatar = "Files/DefaultUserWhite.png";
-	var sBlackAvatar = "Files/DefaultUserBlack.png";
-
-	var oGameRecord = this.m_oAllGames[GameRoomId];
-	if (oGameRecord)
-	{
-		var oBlackUser = oGameRecord.GetBlack();
-		if (oBlackUser)
-		{
-			if (oBlackUser.HasAvatar())
-				sBlackAvatar = "http://goserver.gokgs.com/avatars/" + oBlackUser.GetName() + ".jpg";
-			else if (oBlackUser.IsRobot())
-				sBlackAvatar = "Files/Robot.png";
-			else
-				sBlackAvatar = "Files/DefaultUserBlack.png";
-		}
-
-		var oWhiteUser = oGameRecord.GetWhite();
-		if (oMessage.gameSummary.players.white)
-		{
-			if (oWhiteUser.HasAvatar())
-				sWhiteAvatar = "http://goserver.gokgs.com/avatars/" + oWhiteUser.GetName() + ".jpg";
-			else if (oWhiteUser.IsRobot())
-				sWhiteAvatar = "Files/Robot.png";
-			else
-				sWhiteAvatar = "Files/DefaultUserWhite.png";
-		}
-	}
-
-	oGame.GameTree = oGameTree;
-
-	oGame.Demo = bDemo;
-	this.m_oApp.AddGameRoom(GameRoomId, oGameTree, bDemo, sWhiteAvatar, sBlackAvatar, oGame.WhiteTime, oGame.BlackTime, oGame);
-	this.m_oApp.SetCurrentGameRoomTab(GameRoomId);
-
-	var oCurNode = this.private_ReadSgfEvents(oGame, oMessage.sgfEvents);
-	if (!oCurNode)
-		oCurNode = oGameTree.Get_FirstNode();
-
-	if (oMessage.clocks)
-	{
-		this.private_HandleGameClocks(oGame, oMessage.clocks);
-	}
-	else
-	{
-		oGame.BlackTime.Stop();
-		oGame.WhiteTime.Stop();
-	}
-
-	this.private_HandleGameActions(oMessage["actions"], oGame);
-
-	var oGameTreeHandler = oGameTree.Get_Handler();
-	oGameTree.Set_Handler(null);
-
-	if (oMessage.score)
-		oGame.Result = this.private_ParseScore(oMessage.score);
-
-	if (oGame.CommentsHandler && oMessage.score)
-		oGame.CommentsHandler.AddGameOver(oCurNode, this.private_ParseScore(oMessage.score));
-	
-	if (oGame.CommentsHandler)
-		oGame.CommentsHandler.ScrollChatAreaToBottom();
-
-	if (oGame.PlayersList)
-	{
-		var oGameRecord = this.m_oAllGames[GameRoomId];
-		if (oGameRecord)
-		{
-			var oListObject = oGame.PlayersList.GetListObject();
-			oListObject.SetBlack(oGameRecord.GetBlack());
-			oListObject.SetWhite(oGameRecord.GetWhite());
-			oListObject.SetOwner(oGameRecord.GetOwner());
-		}
-		
-		if (oMessage.users)
-		{
-			var arrUsers = oMessage.users;
-			for (var nIndex = 0, nCount = arrUsers.length; nIndex < nCount; ++nIndex)
-			{
-				var oUser = this.private_HandleUserRecord2(arrUsers[nIndex]);
-				oGame.PlayersList.Handle_Record([0, oUser.GetName(), oUser]);
-			}
-		}
-
-		oGame.PlayersList.Update_Size();
-	}
-
-
-	oGameTree.GoTo_Node(oCurNode);
-	oGame.CurNode  = oCurNode;
-	oGameTree.Set_GameCurNode(oCurNode);
-
-	if (oGame.StateHandler)
-		oGame.StateHandler.Update();
-
-	if (oGameTree.m_oDrawingNavigator)
-	{
-		oGameTree.m_oDrawingNavigator.Create_FromGameTree();
-		oGameTree.m_oDrawingNavigator.Update();
-		oGameTree.m_oDrawingNavigator.Update_Current(true);
-		oGameTree.m_oDrawingNavigator.Update_GameCurrent();
-	}
-
-	oGameTree.Set_Handler(oGameTreeHandler);
+	oGame.UpdateClocks(oMessage["clocks"], true);
+	oGame.HandleGameActions(oMessage["actions"]);
+	oGame.ReadSgfEvents(oMessage["sgfEvents"], true);
+	oGame.HandleScore(oMessage["score"] ? this.private_ParseScore(oMessage["score"]) : null);
+	oGame.UpdatePlayersList(oMessage["users"]);
 };
 CKGSClient.prototype.private_HandleGameUpdate = function(oMessage)
 {
@@ -1116,44 +975,7 @@ CKGSClient.prototype.private_HandleGameUpdate = function(oMessage)
 	if (!oGame)
 		return;
 
-	var oGameTree = oGame.GameTree;
-	var oHandler  = oGameTree.Get_Handler();
-	oGameTree.Set_Handler(null);
-
-	var oCurNode = oGame.CurNode;
-
-	var bGoToNode = oCurNode === oGameTree.Get_CurNode();
-
-	oCurNode = this.private_ReadSgfEvents(oGame, oMessage.sgfEvents);
-
-	if (oCurNode)
-	{
-		if (bGoToNode)
-			oGameTree.GoTo_Node(oCurNode);
-
-		oGame.CurNode = oCurNode;
-		oGameTree.Set_GameCurNode(oCurNode);
-
-		if (oGame.StateHandler)
-			oGame.StateHandler.Update();
-	}
-	else
-	{
-		if (bGoToNode)
-			oGameTree.Execute_CurNodeCommands();
-	}
-
-	if (oGameTree.m_oDrawingNavigator)
-	{
-		oGameTree.m_oDrawingNavigator.Create_FromGameTree();
-		oGameTree.m_oDrawingNavigator.Update();
-		oGameTree.m_oDrawingNavigator.Update_Current(true);
-		oGameTree.m_oDrawingNavigator.Update_GameCurrent();
-	}
-
-	oGameTree.Set_Handler(oHandler);
-
-	this.private_EndSgfEvent(GameRoomId);
+	oGame.ReadSgfEvents(oMessage["sgfEvents"], false);
 };
 CKGSClient.prototype.private_HandleChat = function(oMessage)
 {
@@ -1191,8 +1013,7 @@ CKGSClient.prototype.private_HandleUserAdded = function(oMessage)
 	}
 	else if (oGame)
 	{
-		oGame.PlayersList.Handle_Record([0, oUser.GetName(), oUser]);
-		oGame.PlayersList.Update_Size();
+		oGame.HandleUserAdded(oUser);
 	}
 };
 CKGSClient.prototype.private_HandleUserRemoved = function(oMessage)
@@ -1215,8 +1036,7 @@ CKGSClient.prototype.private_HandleUserRemoved = function(oMessage)
 	}
 	else if (oGame)
 	{
-		oGame.PlayersList.Handle_Record([1, oUser.GetName(), oUser]);
-		oGame.PlayersList.Update_Size();
+		oGame.HandleUserRemoved(oUser);
 	}
 };
 CKGSClient.prototype.private_HandleGameList = function(oMessage)
@@ -1419,10 +1239,8 @@ CKGSClient.prototype.private_HandleGameState = function(oMessage)
 	if (!oGame)
 		return;
 
-	this.private_HandleGameActions(oMessage["actions"], oGame);
-
-	if (oMessage.clocks)
-		this.private_HandleGameClocks(oGame, oMessage.clocks);
+	oGame.HandleGameActions(oMessage["actions"]);
+	oGame.UpdateClocks(oMessage["clocks"], false);
 };
 CKGSClient.prototype.private_HandleFriendAddSuccess = function(oMessage)
 {
@@ -1549,23 +1367,8 @@ CKGSClient.prototype.private_HandleGameReview = function(oMessage)
 		return;
 
 	var nNewChannelId = oMessage.review.channelId;
-	var oGameTree = oGame.GameTree;
-	oGame.GameRoomId = nNewChannelId;
-	oGame.Demo       = true;
-	oGame.BlackTime.Stop();
-	oGame.WhiteTime.Stop();
-	oGame.StateHandler.Update();
 
-
-	if (oMessage.review.players.owner)
-	{
-		oGameTree.Set_GameTranscriber(oMessage.review.players.owner.name + (oMessage.review.players.owner.rank ? "[" + oMessage.review.players.owner.rank + "]" : ""));
-	}
-	else
-	{
-		// Такого не должно быть
-		oGameTree.Set_GameTranscriber("unknown");
-	}
+	oGame.OnStartReview(nNewChannelId, GetKGSUser(oMessage["review"]["players"]["owner"]));
 
 	this.m_aGames[nNewChannelId] = oGame;
 	delete this.m_aGames[nChannelId];
@@ -1579,15 +1382,12 @@ CKGSClient.prototype.private_HandleClose = function(oMessage)
 CKGSClient.prototype.private_HandleGameOver = function(oMessage)
 {
 	var nChannelId = oMessage.channelId;
-	if (this.m_aGames[nChannelId])
-	{
-		// TODO: Добавить окно с окончанием партии
+	var oGame = this.m_aGames[nChannelId];
+	if (!oGame)
+		return;
 
-		var oGame = this.m_aGames[nChannelId];
-		oGame.Result = this.private_ParseScore(oMessage.score);
-		oGame.CommentsHandler.AddGameOver(oGame.CurNode, this.private_ParseScore(oMessage.score));
-		oGame.StateHandler.Update();
-	}
+	oGame.HandleScore(oMessage["score"] ? this.private_ParseScore(oMessage["score"]) : null);
+	// TODO: Добавить окно с окончанием партии
 };
 CKGSClient.prototype.private_HandleDetailsRankGraph = function(oMessage)
 {
@@ -1613,95 +1413,20 @@ CKGSClient.prototype.private_HandleChannelAudio = function(oMessage)
 	// //audio.addEventListener('MozAudioAvailable', someFunction, false);
 	// audio.play();
 };
+CKGSClient.prototype.private_HandleArchiveGamesChanged = function(oMessage)
+{
+	for (var sUserName in this.m_oUserInfo)
+	{
+		var oInfo = this.m_oUserInfo[sUserName];
+		if (oInfo.ArchiveChannel === oMessage.channelId && oInfo.Window)
+		{
+			oInfo.Window.OnRankGraph(oMessage.data);
+		}
+	}
+};
 CKGSClient.prototype.private_AddUserToRoom = function(oUser, oRoom)
 {
 	oRoom.Users[oUser.GetName()] = oUser;
-};
-CKGSClient.prototype.private_HandleGameClocks = function(oGame, oClocks)
-{
-	if (oClocks.black)
-	{
-		var oClock = oClocks.black;
-		if (undefined !== oClock.periodsLeft)
-		{
-			if (0 === oClock.periodsLeft)
-			{
-				oGame.BlackTime.CorrectMainTime(oClock.time);
-			}
-			else
-			{
-				oGame.BlackTime.CorrectMainTime(0);
-				oGame.BlackTime.CorrectOverTime(oClock.time, oClock.periodsLeft);
-			}
-		}
-		else if (undefined !== oClock.stonesLeft)
-		{
-			if (0 === oClock.stonesLeft)
-			{
-				oGame.BlackTime.CorrectMainTime(oClock.time);
-			}
-			else
-			{
-				oGame.BlackTime.CorrectMainTime(0);
-				oGame.BlackTime.CorrectOverTime(oClock.time, oClock.stonesLeft);
-			}
-		}
-		else
-		{
-			oGame.BlackTime.CorrectMainTime(oClock.time);
-		}
-
-		if (true === oClock.running && true !== oClock.paused)
-		{
-			oGame.BlackTime.Start();
-		}
-		else
-		{
-			oGame.BlackTime.Stop();
-		}
-	}
-
-	if (oClocks.white)
-	{
-		var oClock = oClocks.white;
-		if (undefined !== oClock.periodsLeft)
-		{
-			if (0 === oClock.periodsLeft)
-			{
-				oGame.WhiteTime.CorrectMainTime(oClock.time);
-			}
-			else
-			{
-				oGame.WhiteTime.CorrectMainTime(0);
-				oGame.WhiteTime.CorrectOverTime(oClock.time, oClock.periodsLeft);
-			}
-		}
-		else if (undefined !== oClock.stonesLeft)
-		{
-			if (0 === oClock.stonesLeft)
-			{
-				oGame.WhiteTime.CorrectMainTime(oClock.time);
-			}
-			else
-			{
-				oGame.WhiteTime.CorrectMainTime(0);
-				oGame.WhiteTime.CorrectOverTime(oClock.time, oClock.stonesLeft);
-			}
-		}
-		else
-		{
-			oGame.WhiteTime.CorrectMainTime(oClock.time);
-		}
-
-		if (true === oClock.running && true !== oClock.paused)
-		{
-			oGame.WhiteTime.Start();
-		}
-		else
-		{
-			oGame.WhiteTime.Stop();
-		}
-	}
 };
 CKGSClient.prototype.GetRank = function(sRank)
 {
@@ -1766,354 +1491,6 @@ CKGSClient.prototype.private_TranslateUnicodeMessage = function(sMessage)
 			sUnicode += "\\u" + ("0000" + nCharCode.toString(16)).substr(-4);
 	}
 	return sUnicode;
-};
-CKGSClient.prototype.private_ReadSgfEvents = function(oGame, arrSgfEvents)
-{
-	var oGameTree      = oGame.GameTree;
-	var oNode          = null;
-	var oNodeOrigin    = null;
-	var oActivatedNode = null;
-	var oThis          = this;
-
-	for (var nIndex = 0, nCount = arrSgfEvents.length; nIndex < nCount; ++nIndex)
-	{
-		var sgfEvent = arrSgfEvents[nIndex];
-
-		var sNodeId = sgfEvent.nodeId;
-		if (!oGame.Nodes[sNodeId])
-		{
-			// Сюда мы должны попадать ровно 1 раз в самом начале с самой первой нодой
-			oGame.Nodes[sNodeId]       = oGameTree.Get_FirstNode();
-			oGame.NodesOrigin[sNodeId] = new CNode(oGameTree);
-
-			oGame.Nodes[sNodeId].Set_Origin(true);
-			oGame.NodesOrigin[sNodeId].Set_Origin(true);
-		}
-
-		oNode       = oGame.Nodes[sNodeId];
-		oNodeOrigin = oGame.NodesOrigin[sNodeId];
-		if (!oNode || !oNodeOrigin)
-			continue;
-
-		if ("PROP_GROUP_ADDED" === sgfEvent.type)
-		{
-			var oProps = sgfEvent.props;
-			for (var nPropsIndex = 0, nPropsCount = oProps.length; nPropsIndex < nPropsCount; ++nPropsIndex)
-			{
-				private_ReadProp(oProps[nPropsIndex], oNode, oGameTree);
-
-				if ("COMMENT" !== oProps[nPropsIndex].name)
-					private_ReadProp(oProps[nPropsIndex], oNodeOrigin, oGameTree);
-			}
-		}
-		else if ("PROP_ADDED" === sgfEvent.type)
-		{
-			private_ReadProp(sgfEvent.prop, oNode, oGameTree);
-
-			if ("COMMENT" !== sgfEvent.prop.name)
-				private_ReadProp(sgfEvent.prop, oNodeOrigin, oGameTree);
-		}
-		else if ("CHILD_ADDED" === sgfEvent.type)
-		{
-			var oNewNode = new CNode(oGameTree);
-			oNewNode.Set_Origin(true);
-			oNode.Add_Next(oNewNode, false);
-			oGame.Nodes[sgfEvent.childNodeId] = oNewNode;
-
-			var oNewNodeOrigin = new CNode(oGameTree);
-			oNewNodeOrigin.Set_Origin(true);
-			oNodeOrigin.Add_Next(oNewNodeOrigin, false);
-			oGame.NodesOrigin[sgfEvent.childNodeId] = oNewNodeOrigin;
-		}
-		else if ("ACTIVATED" === sgfEvent.type)
-		{
-			if (oGame.Nodes[sgfEvent.nodeId])
-				oActivatedNode = oGame.Nodes[sgfEvent.nodeId];
-		}
-		else if ("PROP_CHANGED" === sgfEvent.type)
-		{
-			private_ReadProp(sgfEvent.prop, oNode, oGameTree);
-
-			if ("COMMENT" !== sgfEvent.prop.name)
-				private_ReadProp(sgfEvent.prop, oNodeOrigin, oGameTree);
-		}
-		else if ("PROP_REMOVED" === sgfEvent.type)
-		{
-			private_ReadPropRemove(sgfEvent.prop, oNode, oGameTree);
-			private_ReadPropRemove(sgfEvent.prop, oNodeOrigin, oGameTree);
-		}
-		else if ("PROP_GROUP_REMOVED" === sgfEvent.type)
-		{
-			var oProps = sgfEvent.props;
-			for (var nPropsIndex = 0, nPropsCount = oProps.length; nPropsIndex < nPropsCount; ++nPropsIndex)
-			{
-				private_ReadPropRemove(oProps[nPropsIndex], oNode, oGameTree);
-				private_ReadPropRemove(oProps[nPropsIndex], oNodeOrigin, oGameTree);
-			}
-		}
-		else
-		{
-			console.log(sgfEvent);
-		}
-	}
-
-	function private_ReadProp(oProp, oNode, oGameTree)
-	{
-		if ("MOVE" === oProp.name)
-		{
-			if ("PASS" === oProp.loc)
-			{
-				if ("black" === oProp.color)
-					oNode.Add_Move(0, 0, BOARD_BLACK);
-				else if ("white" === oProp.color)
-					oNode.Add_Move(0, 0, BOARD_WHITE);
-			}
-			else
-			{
-				var nX = oProp.loc.x + 1;
-				var nY = oProp.loc.y + 1;
-
-				if ("black" === oProp.color)
-					oNode.Add_Move(nX, nY, BOARD_BLACK);
-				else if ("white" === oProp.color)
-					oNode.Add_Move(nX, nY, BOARD_WHITE);
-			}
-		}
-		else if ("ADDSTONE" === oProp.name)
-		{
-			var nX = oProp.loc.x + 1;
-			var nY = oProp.loc.y + 1;
-
-			if ("black" === oProp.color)
-				oNode.AddOrRemove_Stones(BOARD_BLACK, [Common_XYtoValue(nX, nY)]);
-			else if ("white" === oProp.color)
-				oNode.AddOrRemove_Stones(BOARD_WHITE, [Common_XYtoValue(nX, nY)]);
-			else if ("empty" === oProp.color)
-				oNode.AddOrRemove_Stones(BOARD_EMPTY, [Common_XYtoValue(nX, nY)]);
-		}
-		else if ("COMMENT" === oProp.name)
-		{
-			oNode.Add_Comment(oProp.text);
-			if (oGame.CommentsHandler)
-			{
-				oGameTree.Get_MovesCount();
-
-				if (true === oGame.Demo)
-					oGame.CommentsHandler.AddComment(oProp.text, oNode, "" !== oGameTree.Get_Result());
-				else
-					oGame.CommentsHandler.AddComment(oProp.text, oNode, false);
-			}
-		}
-		else if ("RULES" === oProp.name)
-		{
-			if (oProp.size)
-				oGameTree.Set_BoardSize(oProp.size, oProp.size);
-
-			if (oProp.komi)
-				oGameTree.Set_Komi(oProp.komi);
-
-			if (oProp.rules)
-				oGameTree.Set_Rules(oProp.rules);
-
-			if (oProp.handicap)
-				oGameTree.Set_Handicap(oProp.handicap);
-
-			if (oProp.timeSystem)
-			{
-				var sTimeType = oProp.timeSystem;
-				if ("absolute" === sTimeType)
-				{
-					oGame.BlackTime.SetAbsolute(oProp.mainTime);
-					oGame.WhiteTime.SetAbsolute(oProp.mainTime);
-				}
-				else if ("byo_yomi" === sTimeType)
-				{
-					oGame.BlackTime.SetByoYomi(oProp.mainTime, oProp.byoYomiTime, oProp.byoYomiPeriods);
-					oGame.WhiteTime.SetByoYomi(oProp.mainTime, oProp.byoYomiTime, oProp.byoYomiPeriods);
-				}
-				else if ("canadian" === sTimeType)
-				{
-					oGame.BlackTime.SetCanadian(oProp.mainTime, oProp.byoYomiTime, oProp.byoYomiStones);
-					oGame.WhiteTime.SetCanadian(oProp.mainTime, oProp.byoYomiTime, oProp.byoYomiStones);
-				}
-			}
-		}
-		else if ("PLAYERNAME" === oProp.name)
-		{
-			if ("white" === oProp.color)
-				oGameTree.Set_White(oProp.text);
-			else if ("black" === oProp.color)
-				oGameTree.Set_Black(oProp.text);
-		}
-		else if ("PLAYERRANK" === oProp.name)
-		{
-			if ("white" === oProp.color)
-				oGameTree.Set_WhiteRating(private_GetRank(oProp.int));
-			else if ("black" === oProp.color)
-				oGameTree.Set_BlackRating(private_GetRank(oProp.int));
-		}
-		else if ("DATE" === oProp.name)
-		{
-			if (oProp.text)
-				oGameTree.Set_DateTime(oProp.text);
-		}
-		else if ("EVENT" === oProp.name)
-		{
-			if (oProp.text)
-				oGameTree.Set_GameEvent(oProp.text);
-		}
-		else if ("ROUND" === oProp.name)
-		{
-			if (oProp.text)
-				oGameTree.Set_GameRound(oProp.text);
-		}
-		else if ("PLACE" === oProp.name)
-		{
-			if (oProp.text)
-				oGameTree.Set_GamePlace(oProp.text);
-		}
-		else if ("TIMELEFT" === oProp.name)
-		{
-			// В GameTree информацию не пишем.
-		}
-		else if ("TRIANGLE" === oProp.name)
-		{
-			var nX = oProp.loc.x + 1;
-			var nY = oProp.loc.y + 1;
-			oNode.Add_Mark(EDrawingMark.Tr, [Common_XYtoValue(nX, nY)]);
-		}
-		else if ("SQUARE" === oProp.name)
-		{
-			var nX = oProp.loc.x + 1;
-			var nY = oProp.loc.y + 1;
-			oNode.Add_Mark(EDrawingMark.Sq, [Common_XYtoValue(nX, nY)]);
-		}
-		else if ("LABEL" === oProp.name)
-		{
-			var nX = oProp.loc.x + 1;
-			var nY = oProp.loc.y + 1;
-			oNode.Add_TextMark(oProp.text, Common_XYtoValue(nX, nY));
-		}
-		else if ("CIRCLE" === oProp.name)
-		{
-			var nX = oProp.loc.x + 1;
-			var nY = oProp.loc.y + 1;
-			oNode.Add_Mark(EDrawingMark.Cr, [Common_XYtoValue(nX, nY)]);
-		}
-		else if ("CROSS" === oProp.name)
-		{
-			var nX = oProp.loc.x + 1;
-			var nY = oProp.loc.y + 1;
-			oNode.Add_Mark(EDrawingMark.X, [Common_XYtoValue(nX, nY)]);
-		}
-		else if ("PHANTOMCLEAR" === oProp.name)
-		{
-			// Нам это не нужно
-		}
-		else if ("GAMENAME" === oProp.name)
-		{
-			oGameTree.Set_GameName(oProp.text);
-		}
-		else if ("TERRITORY" === oProp.name)
-		{
-			oNode.Set_TerritoryForceUse(true);
-
-			var nX = oProp.loc.x + 1;
-			var nY = oProp.loc.y + 1;
-
-			if ("black" === oProp.color)
-				oNode.Add_TerritoryPoint(Common_XYtoValue(nX, nY), BOARD_BLACK);
-			else if ("white" === oProp.color)
-				oNode.Add_TerritoryPoint(Common_XYtoValue(nX, nY), BOARD_WHITE);
-		}
-		else if ("DEAD" === oProp.name)
-		{
-			// Нам это не нужно
-		}
-		else if ("SETWHOSEMOVE" === oProp.name)
-		{
-			if ("black" === oProp.color)
-				oNode.Set_NextMove(BOARD_BLACK);
-			else if ("white" === oProp.color)
-				oNode.Set_NextMove(BOARD_WHITE);
-		}
-		else if ("ARROW" === oProp.name || "LINE" === oProp.name)
-		{
-			// Ничего не делаем
-		}
-		else if ("RESULT" === oProp.name)
-		{
-			oGameTree.Set_Result(oProp.text);
-		}
-		else if ("TRANSCRIBER" === oProp.name)
-		{
-			oGameTree.Set_GameTranscriber(oProp.text);
-		}
-		else if ("SOURCE" === oProp.name)
-		{
-			oGameTree.Set_GameSource(oProp.text);
-		}
-		else
-		{
-			console.log("PROP_ADD/PROP_CHANGE");
-			console.log(oProp);
-		}
-	}
-
-	function private_ReadPropRemove(oProp, oNode, oGameTree)
-	{
-		if ("ADDSTONE" === oProp.name)
-		{
-			// Пропускаем, т.к. добавление/удаление камней полностью регулируется в PROP_ADDED/PROP_CHANGED
-		}
-		if ("TRIANGLE" === oProp.name || "SQUARE" === oProp.name || "LABEL" === oProp.name || "CIRCLE" === oProp.name || "CROSS" === oProp.name)
-		{
-			var nX = oProp.loc.x + 1;
-			var nY = oProp.loc.y + 1;
-			oNode.Add_Mark(ECommand.RM, [Common_XYtoValue(nX, nY)]);
-		}
-		else if ("TERRITORY" === oProp.name)
-		{
-			oNode.Set_TerritoryForceUse(true);
-
-			var nX = oProp.loc.x + 1;
-			var nY = oProp.loc.y + 1;
-
-			if ("black" === oProp.color || "white" === oProp.color)
-				oNode.Remove_TerritoryPoint(Common_XYtoValue(nX, nY));
-		}
-		else if ("ARROW" === oProp.name || "LINE" === oProp.name)
-		{
-			// Ничего не делаем
-		}
-		else if ("TRANSCRIBER" === oProp.name)
-		{
-			oGameTree.Set_GameTranscriber("");
-		}
-		else if ("SOURCE" === oProp.name)
-		{
-			oGameTree.Set_GameSource("");
-		}
-		else
-		{
-			console.log("PROP_REMOVE");
-			console.log(oProp);
-		}
-	}
-
-	function private_GetRank(nRank)
-	{
-		if (undefined === nRank || null === nRank)
-			return "?";
-		else if (nRank <= 30)
-			return (31 - nRank) + "k";
-		else if (nRank <= 39)
-			return (nRank - 30) + "d";
-		else
-			return (nRank - 39) + "p";
-	}
-
-	return oActivatedNode;
 };
 CKGSClient.prototype.private_UpdatePlayersList = function()
 {
@@ -2262,304 +1639,5 @@ CKGSClient.prototype.private_UpdateGamesList = function()
 	}
 
 	this.m_oGamesListView.Update_Size();
-};
-CKGSClient.prototype.private_HandleGameActions = function(arrActions, oGame)
-{
-	if (!arrActions || !oGame)
-		return;
-
-	for (var nIndex = 0, nCount = arrActions.length; nIndex < nCount; ++nIndex)
-	{
-		var oAction = arrActions[nIndex];
-		var sAction = oAction["action"];
-		if ("EDIT" === sAction)
-		{
-			var oListObject = oGame.PlayersList.GetListObject();
-
-			var oEditor = this.private_HandleUserRecord2(oAction["user"]);
-			oListObject.SetEditor(oEditor);
-			oGame.PlayersList.Update_Size();
-
-			if (oEditor.GetName() === this.GetUserName())
-			{
-				if (false === oGame.Editor)
-				{
-					oGame.Editor = true;
-					this.private_EndSgfEvent(oGame.GameRoomId);
-					var oGameTree = oGame.GameTree;
-					var oHandler = new CKGSEditorHandler(this, oGame);
-					oGameTree.Set_Handler(oHandler);
-				}
-			}
-			else if (true === oGame.Editor)
-			{
-				oGame.Editor = false;
-				this.private_EndSgfEvent(oGame.GameRoomId);
-			}
-		}
-		else if ("MOVE" === sAction)
-		{
-
-		}
-	}
-};
-CKGSClient.prototype.SendSgfEventChangeCurrentNode = function(nGameRoomId, nNodeId, nPrevNodeId)
-{
-	if (true !== this.private_BeginSgfEvent(nGameRoomId))
-		return;
-
-	this.private_SendMessage({
-		"type"      : "KGS_SGF_CHANGE",
-		"channelId" : nGameRoomId,
-		"sgfEvents" : [{
-			"type"       : "ACTIVATED",
-			"nodeId"     : nNodeId,
-			"prevNodeId" : nPrevNodeId
-		}]
-	});
-};
-CKGSClient.prototype.SendSgfEventNewNodeWithMove = function(nGameRoomId, nNodeId, nNewNodeId, X, Y, Value)
-{
-	if (true !== this.private_BeginSgfEvent(nGameRoomId))
-		return;
-
-	this.private_SendMessage({
-		"type"      : "KGS_SGF_CHANGE",
-		"channelId" : nGameRoomId,
-		"sgfEvents" : [{
-			"type"        : "CHILD_ADDED",
-			"nodeId"      : nNodeId,
-			"childNodeId" : nNewNodeId
-		}, {
-			"type"       : "ACTIVATED",
-			"nodeId"     : nNewNodeId,
-			"prevNodeId" : nNodeId
-		}, {
-			"type"   : "PROP_ADDED",
-			"nodeId" : nNewNodeId,
-			"prop"   : {
-				"name"  : "MOVE",
-				"color" : BOARD_BLACK === Value ? "black" : "white",
-				"loc"   : {
-					"x" : X - 1,
-					"y" : Y - 1
-				}
-			}
-		}]
-	});
-};
-CKGSClient.prototype.private_IsSgfEventInProgress = function(nGameRoomId)
-{
-	if (!this.m_aGames[nGameRoomId])
-		return true;
-
-	return this.m_aGames[nGameRoomId].SgfEventInProgress;
-};
-CKGSClient.prototype.private_BeginSgfEvent = function(nGameRoomId)
-{
-	if (this.private_IsSgfEventInProgress(nGameRoomId))
-		return false;
-
-	this.m_aGames[nGameRoomId].SgfEventInProgress = true;
-
-	return true;
-};
-CKGSClient.prototype.private_EndSgfEvent = function(nGameRoomId)
-{
-	if (!this.m_aGames[nGameRoomId])
-		return;
-
-	this.m_aGames[nGameRoomId].SgfEventInProgress = false;
-};
-CKGSClient.prototype.SendSgfEventNewNodeWithAddOrRemoveStone = function(nGameRoomId, nNodeId, nNewNodeId, X, Y, Value)
-{
-	if (true !== this.private_BeginSgfEvent(nGameRoomId))
-		return;
-
-	this.private_SendMessage({
-		"type"      : "KGS_SGF_CHANGE",
-		"channelId" : nGameRoomId,
-		"sgfEvents" : [{
-			"type"        : "CHILD_ADDED",
-			"nodeId"      : nNodeId,
-			"childNodeId" : nNewNodeId
-		}, {
-			"type"       : "ACTIVATED",
-			"nodeId"     : nNewNodeId,
-			"prevNodeId" : nNodeId
-		}, {
-			"type"   : "PROP_ADDED",
-			"nodeId" : nNewNodeId,
-			"prop"   : {
-				"name"  : "ADDSTONE",
-				"color" : (BOARD_BLACK === Value ? "black" : (BOARD_WHITE === Value ? "white" : "empty")),
-				"loc"   : {
-					"x" : X - 1,
-					"y" : Y - 1
-				}
-			}
-		}]
-	});
-};
-CKGSClient.prototype.SendSgfEventAddOrRemoveStone = function(nGameRoomId, nNodeId, X, Y, Value)
-{
-	if (true !== this.private_BeginSgfEvent(nGameRoomId))
-		return;
-
-	this.private_SendMessage({
-		"type"      : "KGS_SGF_CHANGE",
-		"channelId" : nGameRoomId,
-		"sgfEvents" : [{
-			"type"   : "PROP_ADDED",
-			"nodeId" : nNodeId,
-			"prop"   : {
-				"name"  : "ADDSTONE",
-				"color" : (BOARD_BLACK === Value ? "black" : (BOARD_WHITE === Value ? "white" : "empty")),
-				"loc"   : {
-					"x" : X - 1,
-					"y" : Y - 1
-				}
-			}
-		}]
-	});
-};
-CKGSClient.prototype.SendSgfEventAddOrRemoveMark = function(nGameRoomId, nNodeId, isAdd, X, Y, Type, Text)
-{
-	var sType = null;
-
-	switch(Type)
-	{
-		case EDrawingMark.Tr:
-			sType = "TRIANGLE";
-			break;
-		case EDrawingMark.Sq:
-			sType = "SQUARE";
-			break;
-		case EDrawingMark.Cr:
-			sType = "CIRCLE";
-			break;
-		case EDrawingMark.X:
-			sType = "CROSS";
-			break;
-		case EDrawingMark.Tx:
-			sType = "LABEL";
-			break;
-	}
-
-	if (null === sType)
-		return;
-
-
-	if (true !== this.private_BeginSgfEvent(nGameRoomId))
-		return;
-
-	if (EDrawingMark.Tx === Type)
-	{
-		this.private_SendMessage({
-			"type"      : "KGS_SGF_CHANGE",
-			"channelId" : nGameRoomId,
-			"sgfEvents" : [{
-				"type"   : true == isAdd ? "PROP_ADDED" : "PROP_REMOVED",
-				"nodeId" : nNodeId,
-				"prop"   : {
-					"name" : sType,
-					"loc"  : {
-						"x" : X - 1,
-						"y" : Y - 1
-					},
-					"text" : Text
-				}
-			}]
-		});
-	}
-	else
-	{
-		this.private_SendMessage({
-			"type"      : "KGS_SGF_CHANGE",
-			"channelId" : nGameRoomId,
-			"sgfEvents" : [{
-				"type"   : true == isAdd ? "PROP_ADDED" : "PROP_REMOVED",
-				"nodeId" : nNodeId,
-				"prop"   : {
-					"name" : sType,
-					"loc"  : {
-						"x" : X - 1,
-						"y" : Y - 1
-					}
-				}
-			}]
-		});
-	}
-};
-
-function CKGSEditorHandler(oClient, oGame)
-{
-	this.m_oClient = oClient;
-	this.m_oGame   = oGame;
-	this.m_nGameId = oGame.GameRoomId;
-}
-CKGSEditorHandler.prototype.GoToNode = function(oNode)
-{
-	var sPrevNodeId = this.private_GetNodeId();
-	var sNodeId     = this.private_GetNodeId(oNode);
-	if (null === sPrevNodeId || null === sNodeId || sPrevNodeId == sNodeId)
-		return;
-
-	this.m_oClient.SendSgfEventChangeCurrentNode(this.m_nGameId, sNodeId, sPrevNodeId);
-};
-CKGSEditorHandler.prototype.AddNewNodeWithMove = function(oNode, X, Y, Value)
-{
-	var sNodeId = this.private_GetNodeId(oNode);
-	if (null === sNodeId)
-		return;
-
-	this.m_oClient.SendSgfEventNewNodeWithMove(this.m_nGameId, sNodeId, this.private_GetNewNodeId(), X, Y, Value);
-};
-CKGSEditorHandler.prototype.RemoveNode = function(oNode)
-{
-};
-CKGSEditorHandler.prototype.AddOrRemoveStone = function(isAddNewNode, X, Y, Value)
-{
-	var sNodeId = this.private_GetNodeId();
-	if (null === sNodeId)
-		return;
-
-	if (true === isAddNewNode)
-		this.m_oClient.SendSgfEventNewNodeWithAddOrRemoveStone(this.m_nGameId, sNodeId, this.private_GetNewNodeId(), X, Y, Value);
-	else
-		this.m_oClient.SendSgfEventAddOrRemoveStone(this.m_nGameId, sNodeId, X, Y, Value);
-};
-CKGSEditorHandler.prototype.AddOrRemoveMark = function(isAdd, X, Y, Type, Text)
-{
-	var sNodeId = this.private_GetNodeId();
-	if (null === sNodeId)
-		return;
-
-	this.m_oClient.SendSgfEventAddOrRemoveMark(this.m_nGameId, sNodeId, isAdd, X, Y, Type, Text);
-};
-CKGSEditorHandler.prototype.private_GetNodeId = function(oNode)
-{
-	if (!oNode)
-		oNode = this.m_oGame.CurNode;
-
-	for (var sNodeId in this.m_oGame.Nodes)
-	{
-		if (this.m_oGame.Nodes[sNodeId] === oNode)
-		{
-			return sNodeId;
-		}
-	}
-
-	return null;
-};
-CKGSEditorHandler.prototype.private_GetNewNodeId = function()
-{
-	var nId = 1;
-	while (this.m_oGame.Nodes[nId])
-	{
-		nId++;
-	}
-
-	return nId;
 };
 

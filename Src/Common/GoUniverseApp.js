@@ -423,10 +423,10 @@ CGoUniverseApplication.prototype.OnAddChatMessage = function(nChatRoomId, sUserN
 	if (null !== sUserName && sUserName !== this.m_oClient.GetUserName() && oTab && oTab.IsSoundOn() && (nChatRoomId !== this.m_oChatRoomTabs.GetCurrentId() || -1 !== this.m_oGameRoomTabs.GetCurrentId() || false === this.IsFocused()))
 		this.private_AddNotification(sUserName);
 };
-CGoUniverseApplication.prototype.AddGameRoom = function(nGameRoomId, oGameTree, bDemonstration, sWhiteAvatar, sBlackAvatar, oWhiteTime, oBlackTime, oGame)
+CGoUniverseApplication.prototype.AddGameRoom = function(oGame)
 {
 	var oTab = new CVisualGameRoomTab(this);
-	var oGameRoomControl = oTab.InitGameRoom(nGameRoomId, oGameTree, "divMainId", bDemonstration, sWhiteAvatar, sBlackAvatar, oWhiteTime, oBlackTime, oGame);
+	var oGameRoomControl = oTab.InitGameRoom("divMainId", oGame);
 	this.m_oGameRoomTabs.AddTab(oTab);
 
 	oGameRoomControl.Bounds.SetParams(0, 50, 1000, 1000, false, true, false, false, -1, -1);

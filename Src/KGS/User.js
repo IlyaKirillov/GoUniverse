@@ -197,3 +197,10 @@ CKGSUser.prototype.private_ParseLevel = function(sLevel)
 	else //if ("normal" === sLevel)
 	 	this.m_nLevel = KGSUSER_LEVEL_USER;
 };
+
+function GetKGSUser(oUserRecord)
+{
+	var oUser = new CKGSUser(this);
+	oUser.Update(oUserRecord);
+	return oUser;
+}
