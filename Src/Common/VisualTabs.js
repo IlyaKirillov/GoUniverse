@@ -425,7 +425,7 @@ CVisualGameRoomTab.prototype.OnClick = function()
 	{
 		if (oThis.m_oGameTree && null !== oThis.m_oGameHandler)
 		{
-			oThis.m_oGameHandler.CommentsHandler.ScrollChatAreaToBottom();
+			oThis.m_oGameHandler.GetCommentsHandler().ScrollChatAreaToBottom();
 		}
 		else if (null === oThis.m_oGameTree)
 		{

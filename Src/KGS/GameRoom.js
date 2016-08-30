@@ -72,6 +72,10 @@ CKGSGameRoom.prototype.GetResult = function()
 {
 	return this.m_sResult;
 };
+CKGSGameRoom.prototype.GetCommentsHandler = function()
+{
+	return this.m_oCommentsHandler;
+};
 CKGSGameRoom.prototype.SetStateHandler = function(oHandler)
 {
 	this.m_oStateHandler = oHandler;
@@ -145,11 +149,6 @@ CKGSGameRoom.prototype.SetPlayers = function(oGameRecord)
 			else
 				this.m_sWhiteAvatar = "Files/DefaultUserWhite.png";
 		}
-
-		var oListObject = this.m_oPlayersList.GetListObject();
-		oListObject.SetBlack(this.m_oBlack);
-		oListObject.SetWhite(this.m_oWhite);
-		oListObject.SetOwner(this.m_oOwner);
 	}
 };
 CKGSGameRoom.prototype.UpdateClocks = function(oClocks, isStopUndfined)
@@ -166,9 +165,9 @@ CKGSGameRoom.prototype.UpdateClocks = function(oClocks, isStopUndfined)
 };
 CKGSGameRoom.prototype.StopClocks = function()
 {
-	this.m_oBlackTime.Stop();
-	this.m_oWhiteTime.Stop();
-}
+	this.m_oBlackTime.Stop(true);
+	this.m_oWhiteTime.Stop(true);
+};
 CKGSGameRoom.prototype.private_HandleGameClocks = function(oClocks)
 {
 	if (oClocks.black)
@@ -272,7 +271,7 @@ CKGSGameRoom.prototype.HandleGameActions = function(arrActions)
 			oListObject.SetEditor(oEditor);
 			this.m_oPlayersList.Update_Size();
 
-			if (oEditor.GetName() === this.GetUserName())
+			if (oEditor.GetName() === this.m_oClient.GetUserName())
 			{
 				if (false === this.m_bEditor)
 				{
@@ -352,6 +351,11 @@ CKGSGameRoom.prototype.ReadSgfEvents = function(arrSgfEvents, isOnLoad)
 };
 CKGSGameRoom.prototype.UpdatePlayersList = function(arrUsers)
 {
+	var oListObject = this.m_oPlayersList.GetListObject();
+	oListObject.SetBlack(this.m_oBlack);
+	oListObject.SetWhite(this.m_oWhite);
+	oListObject.SetOwner(this.m_oOwner);
+
 	if (arrUsers)
 	{
 		for (var nIndex = 0, nCount = arrUsers.length; nIndex < nCount; ++nIndex)
@@ -404,7 +408,6 @@ CKGSGameRoom.prototype.private_ReadSgfEvents = function(arrSgfEvents)
 	var oNode          = null;
 	var oNodeOrigin    = null;
 	var oActivatedNode = null;
-	var oThis          = this;
 
 	for (var nIndex = 0, nCount = arrSgfEvents.length; nIndex < nCount; ++nIndex)
 	{
@@ -431,18 +434,18 @@ CKGSGameRoom.prototype.private_ReadSgfEvents = function(arrSgfEvents)
 			var oProps = sgfEvent.props;
 			for (var nPropsIndex = 0, nPropsCount = oProps.length; nPropsIndex < nPropsCount; ++nPropsIndex)
 			{
-				private_ReadProp(oProps[nPropsIndex], oNode, oGameTree);
+				this.private_ReadProp(oProps[nPropsIndex], oNode, oGameTree);
 
 				if ("COMMENT" !== oProps[nPropsIndex].name)
-					private_ReadProp(oProps[nPropsIndex], oNodeOrigin, oGameTree);
+					this.private_ReadProp(oProps[nPropsIndex], oNodeOrigin, oGameTree);
 			}
 		}
 		else if ("PROP_ADDED" === sgfEvent.type)
 		{
-			private_ReadProp(sgfEvent.prop, oNode, oGameTree);
+			this.private_ReadProp(sgfEvent.prop, oNode, oGameTree);
 
 			if ("COMMENT" !== sgfEvent.prop.name)
-				private_ReadProp(sgfEvent.prop, oNodeOrigin, oGameTree);
+				this.private_ReadProp(sgfEvent.prop, oNodeOrigin, oGameTree);
 		}
 		else if ("CHILD_ADDED" === sgfEvent.type)
 		{
@@ -463,23 +466,23 @@ CKGSGameRoom.prototype.private_ReadSgfEvents = function(arrSgfEvents)
 		}
 		else if ("PROP_CHANGED" === sgfEvent.type)
 		{
-			private_ReadProp(sgfEvent.prop, oNode, oGameTree);
+			this.private_ReadProp(sgfEvent.prop, oNode, oGameTree);
 
 			if ("COMMENT" !== sgfEvent.prop.name)
-				private_ReadProp(sgfEvent.prop, oNodeOrigin, oGameTree);
+				this.private_ReadProp(sgfEvent.prop, oNodeOrigin, oGameTree);
 		}
 		else if ("PROP_REMOVED" === sgfEvent.type)
 		{
-			private_ReadPropRemove(sgfEvent.prop, oNode, oGameTree);
-			private_ReadPropRemove(sgfEvent.prop, oNodeOrigin, oGameTree);
+			this.private_ReadPropRemove(sgfEvent.prop, oNode, oGameTree);
+			this.private_ReadPropRemove(sgfEvent.prop, oNodeOrigin, oGameTree);
 		}
 		else if ("PROP_GROUP_REMOVED" === sgfEvent.type)
 		{
 			var oProps = sgfEvent.props;
 			for (var nPropsIndex = 0, nPropsCount = oProps.length; nPropsIndex < nPropsCount; ++nPropsIndex)
 			{
-				private_ReadPropRemove(oProps[nPropsIndex], oNode, oGameTree);
-				private_ReadPropRemove(oProps[nPropsIndex], oNodeOrigin, oGameTree);
+				this.private_ReadPropRemove(oProps[nPropsIndex], oNode, oGameTree);
+				this.private_ReadPropRemove(oProps[nPropsIndex], oNodeOrigin, oGameTree);
 			}
 		}
 		else
@@ -488,263 +491,260 @@ CKGSGameRoom.prototype.private_ReadSgfEvents = function(arrSgfEvents)
 		}
 	}
 
-	function private_ReadProp(oProp, oNode, oGameTree)
-	{
-		if ("MOVE" === oProp.name)
-		{
-			if ("PASS" === oProp.loc)
-			{
-				if ("black" === oProp.color)
-					oNode.Add_Move(0, 0, BOARD_BLACK);
-				else if ("white" === oProp.color)
-					oNode.Add_Move(0, 0, BOARD_WHITE);
-			}
-			else
-			{
-				var nX = oProp.loc.x + 1;
-				var nY = oProp.loc.y + 1;
-
-				if ("black" === oProp.color)
-					oNode.Add_Move(nX, nY, BOARD_BLACK);
-				else if ("white" === oProp.color)
-					oNode.Add_Move(nX, nY, BOARD_WHITE);
-			}
-		}
-		else if ("ADDSTONE" === oProp.name)
-		{
-			var nX = oProp.loc.x + 1;
-			var nY = oProp.loc.y + 1;
-
-			if ("black" === oProp.color)
-				oNode.AddOrRemove_Stones(BOARD_BLACK, [Common_XYtoValue(nX, nY)]);
-			else if ("white" === oProp.color)
-				oNode.AddOrRemove_Stones(BOARD_WHITE, [Common_XYtoValue(nX, nY)]);
-			else if ("empty" === oProp.color)
-				oNode.AddOrRemove_Stones(BOARD_EMPTY, [Common_XYtoValue(nX, nY)]);
-		}
-		else if ("COMMENT" === oProp.name)
-		{
-			oNode.Add_Comment(oProp.text);
-			if (this.m_oCommentsHandler)
-			{
-				oGameTree.Get_MovesCount();
-
-				if (true === this.m_bDemo)
-					this.m_oCommentsHandler.AddComment(oProp.text, oNode, "" !== oGameTree.Get_Result());
-				else
-					this.m_oCommentsHandler.AddComment(oProp.text, oNode, false);
-			}
-		}
-		else if ("RULES" === oProp.name)
-		{
-			if (oProp.size)
-				oGameTree.Set_BoardSize(oProp.size, oProp.size);
-
-			if (oProp.komi)
-				oGameTree.Set_Komi(oProp.komi);
-
-			if (oProp.rules)
-				oGameTree.Set_Rules(oProp.rules);
-
-			if (oProp.handicap)
-				oGameTree.Set_Handicap(oProp.handicap);
-
-			if (oProp.timeSystem)
-			{
-				var sTimeType = oProp.timeSystem;
-				if ("absolute" === sTimeType)
-				{
-					this.m_oBlackTime.SetAbsolute(oProp.mainTime);
-					this.m_oWhiteTime.SetAbsolute(oProp.mainTime);
-				}
-				else if ("byo_yomi" === sTimeType)
-				{
-					this.m_oBlackTime.SetByoYomi(oProp.mainTime, oProp.byoYomiTime, oProp.byoYomiPeriods);
-					this.m_oWhiteTime.SetByoYomi(oProp.mainTime, oProp.byoYomiTime, oProp.byoYomiPeriods);
-				}
-				else if ("canadian" === sTimeType)
-				{
-					this.m_oBlackTime.SetCanadian(oProp.mainTime, oProp.byoYomiTime, oProp.byoYomiStones);
-					this.m_oWhiteTime.SetCanadian(oProp.mainTime, oProp.byoYomiTime, oProp.byoYomiStones);
-				}
-			}
-		}
-		else if ("PLAYERNAME" === oProp.name)
-		{
-			if ("white" === oProp.color)
-				oGameTree.Set_White(oProp.text);
-			else if ("black" === oProp.color)
-				oGameTree.Set_Black(oProp.text);
-		}
-		else if ("PLAYERRANK" === oProp.name)
-		{
-			if ("white" === oProp.color)
-				oGameTree.Set_WhiteRating(private_GetRank(oProp.int));
-			else if ("black" === oProp.color)
-				oGameTree.Set_BlackRating(private_GetRank(oProp.int));
-		}
-		else if ("DATE" === oProp.name)
-		{
-			if (oProp.text)
-				oGameTree.Set_DateTime(oProp.text);
-		}
-		else if ("EVENT" === oProp.name)
-		{
-			if (oProp.text)
-				oGameTree.Set_GameEvent(oProp.text);
-		}
-		else if ("ROUND" === oProp.name)
-		{
-			if (oProp.text)
-				oGameTree.Set_GameRound(oProp.text);
-		}
-		else if ("PLACE" === oProp.name)
-		{
-			if (oProp.text)
-				oGameTree.Set_GamePlace(oProp.text);
-		}
-		else if ("TIMELEFT" === oProp.name)
-		{
-			// В GameTree информацию не пишем.
-		}
-		else if ("TRIANGLE" === oProp.name)
-		{
-			var nX = oProp.loc.x + 1;
-			var nY = oProp.loc.y + 1;
-			oNode.Add_Mark(EDrawingMark.Tr, [Common_XYtoValue(nX, nY)]);
-		}
-		else if ("SQUARE" === oProp.name)
-		{
-			var nX = oProp.loc.x + 1;
-			var nY = oProp.loc.y + 1;
-			oNode.Add_Mark(EDrawingMark.Sq, [Common_XYtoValue(nX, nY)]);
-		}
-		else if ("LABEL" === oProp.name)
-		{
-			var nX = oProp.loc.x + 1;
-			var nY = oProp.loc.y + 1;
-			oNode.Add_TextMark(oProp.text, Common_XYtoValue(nX, nY));
-		}
-		else if ("CIRCLE" === oProp.name)
-		{
-			var nX = oProp.loc.x + 1;
-			var nY = oProp.loc.y + 1;
-			oNode.Add_Mark(EDrawingMark.Cr, [Common_XYtoValue(nX, nY)]);
-		}
-		else if ("CROSS" === oProp.name)
-		{
-			var nX = oProp.loc.x + 1;
-			var nY = oProp.loc.y + 1;
-			oNode.Add_Mark(EDrawingMark.X, [Common_XYtoValue(nX, nY)]);
-		}
-		else if ("PHANTOMCLEAR" === oProp.name)
-		{
-			// Нам это не нужно
-		}
-		else if ("GAMENAME" === oProp.name)
-		{
-			oGameTree.Set_GameName(oProp.text);
-		}
-		else if ("TERRITORY" === oProp.name)
-		{
-			oNode.Set_TerritoryForceUse(true);
-
-			var nX = oProp.loc.x + 1;
-			var nY = oProp.loc.y + 1;
-
-			if ("black" === oProp.color)
-				oNode.Add_TerritoryPoint(Common_XYtoValue(nX, nY), BOARD_BLACK);
-			else if ("white" === oProp.color)
-				oNode.Add_TerritoryPoint(Common_XYtoValue(nX, nY), BOARD_WHITE);
-		}
-		else if ("DEAD" === oProp.name)
-		{
-			// Нам это не нужно
-		}
-		else if ("SETWHOSEMOVE" === oProp.name)
-		{
-			if ("black" === oProp.color)
-				oNode.Set_NextMove(BOARD_BLACK);
-			else if ("white" === oProp.color)
-				oNode.Set_NextMove(BOARD_WHITE);
-		}
-		else if ("ARROW" === oProp.name || "LINE" === oProp.name)
-		{
-			// Ничего не делаем
-		}
-		else if ("RESULT" === oProp.name)
-		{
-			oGameTree.Set_Result(oProp.text);
-		}
-		else if ("TRANSCRIBER" === oProp.name)
-		{
-			oGameTree.Set_GameTranscriber(oProp.text);
-		}
-		else if ("SOURCE" === oProp.name)
-		{
-			oGameTree.Set_GameSource(oProp.text);
-		}
-		else
-		{
-			console.log("PROP_ADD/PROP_CHANGE");
-			console.log(oProp);
-		}
-	}
-
-	function private_ReadPropRemove(oProp, oNode, oGameTree)
-	{
-		if ("ADDSTONE" === oProp.name)
-		{
-			// Пропускаем, т.к. добавление/удаление камней полностью регулируется в PROP_ADDED/PROP_CHANGED
-		}
-		if ("TRIANGLE" === oProp.name || "SQUARE" === oProp.name || "LABEL" === oProp.name || "CIRCLE" === oProp.name || "CROSS" === oProp.name)
-		{
-			var nX = oProp.loc.x + 1;
-			var nY = oProp.loc.y + 1;
-			oNode.Add_Mark(ECommand.RM, [Common_XYtoValue(nX, nY)]);
-		}
-		else if ("TERRITORY" === oProp.name)
-		{
-			oNode.Set_TerritoryForceUse(true);
-
-			var nX = oProp.loc.x + 1;
-			var nY = oProp.loc.y + 1;
-
-			if ("black" === oProp.color || "white" === oProp.color)
-				oNode.Remove_TerritoryPoint(Common_XYtoValue(nX, nY));
-		}
-		else if ("ARROW" === oProp.name || "LINE" === oProp.name)
-		{
-			// Ничего не делаем
-		}
-		else if ("TRANSCRIBER" === oProp.name)
-		{
-			oGameTree.Set_GameTranscriber("");
-		}
-		else if ("SOURCE" === oProp.name)
-		{
-			oGameTree.Set_GameSource("");
-		}
-		else
-		{
-			console.log("PROP_REMOVE");
-			console.log(oProp);
-		}
-	}
-
-	function private_GetRank(nRank)
-	{
-		if (undefined === nRank || null === nRank)
-			return "?";
-		else if (nRank <= 30)
-			return (31 - nRank) + "k";
-		else if (nRank <= 39)
-			return (nRank - 30) + "d";
-		else
-			return (nRank - 39) + "p";
-	}
-
 	return oActivatedNode;
+};
+CKGSGameRoom.prototype.private_ReadProp = function(oProp, oNode, oGameTree)
+{
+	if ("MOVE" === oProp.name)
+	{
+		if ("PASS" === oProp.loc)
+		{
+			if ("black" === oProp.color)
+				oNode.Add_Move(0, 0, BOARD_BLACK);
+			else if ("white" === oProp.color)
+				oNode.Add_Move(0, 0, BOARD_WHITE);
+		}
+		else
+		{
+			var nX = oProp.loc.x + 1;
+			var nY = oProp.loc.y + 1;
+
+			if ("black" === oProp.color)
+				oNode.Add_Move(nX, nY, BOARD_BLACK);
+			else if ("white" === oProp.color)
+				oNode.Add_Move(nX, nY, BOARD_WHITE);
+		}
+	}
+	else if ("ADDSTONE" === oProp.name)
+	{
+		var nX = oProp.loc.x + 1;
+		var nY = oProp.loc.y + 1;
+
+		if ("black" === oProp.color)
+			oNode.AddOrRemove_Stones(BOARD_BLACK, [Common_XYtoValue(nX, nY)]);
+		else if ("white" === oProp.color)
+			oNode.AddOrRemove_Stones(BOARD_WHITE, [Common_XYtoValue(nX, nY)]);
+		else if ("empty" === oProp.color)
+			oNode.AddOrRemove_Stones(BOARD_EMPTY, [Common_XYtoValue(nX, nY)]);
+	}
+	else if ("COMMENT" === oProp.name)
+	{
+		oNode.Add_Comment(oProp.text);
+		if (this.m_oCommentsHandler)
+		{
+			oGameTree.Get_MovesCount();
+
+			if (true === this.m_bDemo)
+				this.m_oCommentsHandler.AddComment(oProp.text, oNode, "" !== oGameTree.Get_Result());
+			else
+				this.m_oCommentsHandler.AddComment(oProp.text, oNode, false);
+		}
+	}
+	else if ("RULES" === oProp.name)
+	{
+		if (oProp.size)
+			oGameTree.Set_BoardSize(oProp.size, oProp.size);
+
+		if (oProp.komi)
+			oGameTree.Set_Komi(oProp.komi);
+
+		if (oProp.rules)
+			oGameTree.Set_Rules(oProp.rules);
+
+		if (oProp.handicap)
+			oGameTree.Set_Handicap(oProp.handicap);
+
+		if (oProp.timeSystem)
+		{
+			var sTimeType = oProp.timeSystem;
+			if ("absolute" === sTimeType)
+			{
+				this.m_oBlackTime.SetAbsolute(oProp.mainTime);
+				this.m_oWhiteTime.SetAbsolute(oProp.mainTime);
+			}
+			else if ("byo_yomi" === sTimeType)
+			{
+				this.m_oBlackTime.SetByoYomi(oProp.mainTime, oProp.byoYomiTime, oProp.byoYomiPeriods);
+				this.m_oWhiteTime.SetByoYomi(oProp.mainTime, oProp.byoYomiTime, oProp.byoYomiPeriods);
+			}
+			else if ("canadian" === sTimeType)
+			{
+				this.m_oBlackTime.SetCanadian(oProp.mainTime, oProp.byoYomiTime, oProp.byoYomiStones);
+				this.m_oWhiteTime.SetCanadian(oProp.mainTime, oProp.byoYomiTime, oProp.byoYomiStones);
+			}
+		}
+	}
+	else if ("PLAYERNAME" === oProp.name)
+	{
+		if ("white" === oProp.color)
+			oGameTree.Set_White(oProp.text);
+		else if ("black" === oProp.color)
+			oGameTree.Set_Black(oProp.text);
+	}
+	else if ("PLAYERRANK" === oProp.name)
+	{
+		if ("white" === oProp.color)
+			oGameTree.Set_WhiteRating(this.private_GetRank(oProp.int));
+		else if ("black" === oProp.color)
+			oGameTree.Set_BlackRating(this.private_GetRank(oProp.int));
+	}
+	else if ("DATE" === oProp.name)
+	{
+		if (oProp.text)
+			oGameTree.Set_DateTime(oProp.text);
+	}
+	else if ("EVENT" === oProp.name)
+	{
+		if (oProp.text)
+			oGameTree.Set_GameEvent(oProp.text);
+	}
+	else if ("ROUND" === oProp.name)
+	{
+		if (oProp.text)
+			oGameTree.Set_GameRound(oProp.text);
+	}
+	else if ("PLACE" === oProp.name)
+	{
+		if (oProp.text)
+			oGameTree.Set_GamePlace(oProp.text);
+	}
+	else if ("TIMELEFT" === oProp.name)
+	{
+		// В GameTree информацию не пишем.
+	}
+	else if ("TRIANGLE" === oProp.name)
+	{
+		var nX = oProp.loc.x + 1;
+		var nY = oProp.loc.y + 1;
+		oNode.Add_Mark(EDrawingMark.Tr, [Common_XYtoValue(nX, nY)]);
+	}
+	else if ("SQUARE" === oProp.name)
+	{
+		var nX = oProp.loc.x + 1;
+		var nY = oProp.loc.y + 1;
+		oNode.Add_Mark(EDrawingMark.Sq, [Common_XYtoValue(nX, nY)]);
+	}
+	else if ("LABEL" === oProp.name)
+	{
+		var nX = oProp.loc.x + 1;
+		var nY = oProp.loc.y + 1;
+		oNode.Add_TextMark(oProp.text, Common_XYtoValue(nX, nY));
+	}
+	else if ("CIRCLE" === oProp.name)
+	{
+		var nX = oProp.loc.x + 1;
+		var nY = oProp.loc.y + 1;
+		oNode.Add_Mark(EDrawingMark.Cr, [Common_XYtoValue(nX, nY)]);
+	}
+	else if ("CROSS" === oProp.name)
+	{
+		var nX = oProp.loc.x + 1;
+		var nY = oProp.loc.y + 1;
+		oNode.Add_Mark(EDrawingMark.X, [Common_XYtoValue(nX, nY)]);
+	}
+	else if ("PHANTOMCLEAR" === oProp.name)
+	{
+		// Нам это не нужно
+	}
+	else if ("GAMENAME" === oProp.name)
+	{
+		oGameTree.Set_GameName(oProp.text);
+	}
+	else if ("TERRITORY" === oProp.name)
+	{
+		oNode.Set_TerritoryForceUse(true);
+
+		var nX = oProp.loc.x + 1;
+		var nY = oProp.loc.y + 1;
+
+		if ("black" === oProp.color)
+			oNode.Add_TerritoryPoint(Common_XYtoValue(nX, nY), BOARD_BLACK);
+		else if ("white" === oProp.color)
+			oNode.Add_TerritoryPoint(Common_XYtoValue(nX, nY), BOARD_WHITE);
+	}
+	else if ("DEAD" === oProp.name)
+	{
+		// Нам это не нужно
+	}
+	else if ("SETWHOSEMOVE" === oProp.name)
+	{
+		if ("black" === oProp.color)
+			oNode.Set_NextMove(BOARD_BLACK);
+		else if ("white" === oProp.color)
+			oNode.Set_NextMove(BOARD_WHITE);
+	}
+	else if ("ARROW" === oProp.name || "LINE" === oProp.name)
+	{
+		// Ничего не делаем
+	}
+	else if ("RESULT" === oProp.name)
+	{
+		oGameTree.Set_Result(oProp.text);
+	}
+	else if ("TRANSCRIBER" === oProp.name)
+	{
+		oGameTree.Set_GameTranscriber(oProp.text);
+	}
+	else if ("SOURCE" === oProp.name)
+	{
+		oGameTree.Set_GameSource(oProp.text);
+	}
+	else
+	{
+		console.log("PROP_ADD/PROP_CHANGE");
+		console.log(oProp);
+	}
+};
+CKGSGameRoom.prototype.private_ReadPropRemove = function(oProp, oNode, oGameTree)
+{
+	if ("ADDSTONE" === oProp.name)
+	{
+		// Пропускаем, т.к. добавление/удаление камней полностью регулируется в PROP_ADDED/PROP_CHANGED
+	}
+	if ("TRIANGLE" === oProp.name || "SQUARE" === oProp.name || "LABEL" === oProp.name || "CIRCLE" === oProp.name || "CROSS" === oProp.name)
+	{
+		var nX = oProp.loc.x + 1;
+		var nY = oProp.loc.y + 1;
+		oNode.Add_Mark(ECommand.RM, [Common_XYtoValue(nX, nY)]);
+	}
+	else if ("TERRITORY" === oProp.name)
+	{
+		oNode.Set_TerritoryForceUse(true);
+
+		var nX = oProp.loc.x + 1;
+		var nY = oProp.loc.y + 1;
+
+		if ("black" === oProp.color || "white" === oProp.color)
+			oNode.Remove_TerritoryPoint(Common_XYtoValue(nX, nY));
+	}
+	else if ("ARROW" === oProp.name || "LINE" === oProp.name)
+	{
+		// Ничего не делаем
+	}
+	else if ("TRANSCRIBER" === oProp.name)
+	{
+		oGameTree.Set_GameTranscriber("");
+	}
+	else if ("SOURCE" === oProp.name)
+	{
+		oGameTree.Set_GameSource("");
+	}
+	else
+	{
+		console.log("PROP_REMOVE");
+		console.log(oProp);
+	}
+};
+CKGSGameRoom.prototype.private_GetRank = function(nRank)
+{
+	if (undefined === nRank || null === nRank)
+		return "?";
+	else if (nRank <= 30)
+		return (31 - nRank) + "k";
+	else if (nRank <= 39)
+		return (nRank - 30) + "d";
+	else
+		return (nRank - 39) + "p";
 };
 CKGSGameRoom.prototype.private_BeginSgfEvent = function()
 {

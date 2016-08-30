@@ -999,7 +999,7 @@ function CGoUniverseButtonEditorControl(oDrawing)
 	this.private_CreateMenuItem(oMenuElementWrapper, "Back to game", function()
 	{
 		var oGameRoom = oDrawing.m_oGameRoom;
-		if (!oGame)
+		if (!oGameRoom)
 			return;
 
 		oGameRoom.BackToGame();
@@ -1007,7 +1007,7 @@ function CGoUniverseButtonEditorControl(oDrawing)
 	this.private_CreateMenuItem(oMenuElementWrapper, "Remove own changes", function()
 	{
 		var oGameRoom = oDrawing.m_oGameRoom;
-		if (!oGame)
+		if (!oGameRoom)
 			return;
 		
 		oGameRoom.RemoveOwnChanges();

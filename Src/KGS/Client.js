@@ -106,8 +106,8 @@ CKGSClient.prototype.LeaveGameRoom = function(nGameRoomId)
 {
 	if (this.m_aGames[nGameRoomId])
 	{
-		this.m_aGames[nGameRoomId].BlackTime.Stop(true);
-		this.m_aGames[nGameRoomId].WhiteTime.Stop(true);
+		var oGame = this.m_aGames[nGameRoomId];
+		oGame.StopClocks();
 		delete this.m_aGames[nGameRoomId];
 	}
 
