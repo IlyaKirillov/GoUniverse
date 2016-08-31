@@ -13,16 +13,17 @@ function CKGSUserInfoWindow()
 {
 	CKGSUserInfoWindow.superclass.constructor.call(this);
 
-	this.m_sUserName      = "";
-	this.m_oClient        = null;
-	this.m_oContainerDiv  = null;
-	this.m_oInfoScroll    = null;
-	this.m_oGamesListView = new CListView();
-	this.m_oTabs          = new CVisualUserInfoTabs();
-	this.m_oRankCanvas    = null;
-	this.m_oRankData      = [];
-	this.m_arrPoints      = [];
-	this.m_nStepX         = 0;
+	this.m_sUserName        = "";
+	this.m_oClient          = null;
+	this.m_oContainerDiv    = null;
+	this.m_oInfoScroll      = null;
+	this.m_oGamesListView   = new CListView();
+	this.m_oTabs            = new CVisualUserInfoTabs();
+	this.m_oRankCanvas      = null;
+	this.m_oRankCanvasEvent = null;
+	this.m_oRankData        = [];
+	this.m_arrPoints        = [];
+	this.m_nStepX           = 0;
 
 	this.m_oInfoTable = {
 		UserName    : null,
@@ -467,6 +468,7 @@ CKGSUserInfoWindow.prototype.private_DrawRank = function()
 		}
 	}
 
+	this.m_arrSpline = arrSpline;
 	this.m_arrPoints = arrPoints;
 	this.m_nStepX    = nStepX;
 };
@@ -621,6 +623,7 @@ CKGSUserInfoWindow.prototype.private_CreateRankPage = function(oDiv, oControl)
 	var oCanvas = document.createElement("canvas");
 	oCanvas.id = sCanvasId;
 	oDiv.appendChild(oCanvas);
+	oCanvas.style.position = "absolute";
 
 	var oCanvasControl = CreateControlContainer(sCanvasId);
 	oCanvasControl.Bounds.SetParams(0, 0, 0, 0, true, false, true, true, -1, -1);
@@ -630,15 +633,28 @@ CKGSUserInfoWindow.prototype.private_CreateRankPage = function(oDiv, oControl)
 
 	this.m_oRankCanvas = oCanvas;
 
+	var sCanvasEventId = oDiv.id + "E";
+	var oCanvasEvent = document.createElement("canvas");
+	oCanvasEvent.id = sCanvasEventId;
+	oDiv.appendChild(oCanvasEvent);
+	oCanvasEvent.style.position = "absolute";
+
+	var oCanvasEventControl = CreateControlContainer(sCanvasEventId);
+	oCanvasEventControl.Bounds.SetParams(0, 0, 0, 0, true, false, true, true, -1, -1);
+	oCanvasEventControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
+	oControl.AddControl(oCanvasEventControl);
+
+	this.m_oRankCanvasEvent = oCanvasEvent;
+
 	var oThis = this;
-	oCanvas.addEventListener("mousemove", function(e)
+	oCanvasEvent.addEventListener("mousemove", function(e)
 	{
 		check_MouseMoveEvent(e);
 		var oPos = oThis.private_UpdateMousePosOnRankGraph(global_mouseEvent.X, global_mouseEvent.Y);
 		oThis.private_OnMouseMoveRankGraph(oPos.X, oPos.Y);
 	}, false);
 
-	oCanvas.addEventListener("mouseout", function(e)
+	oCanvasEvent.addEventListener("mouseout", function(e)
 	{
 		check_MouseMoveEvent(e);
 		var oPos = oThis.private_UpdateMousePosOnRankGraph(global_mouseEvent.X, global_mouseEvent.Y);
@@ -656,10 +672,12 @@ CKGSUserInfoWindow.prototype.private_OnMouseMoveRankGraph = function(X, Y)
 	for (var nPointIndex = 0, nPointsCount = this.m_arrPoints.length; nPointIndex < nPointsCount; ++nPointIndex)
 	{
 		var oPoint = this.m_arrPoints[nPointIndex];
+		var oPrevPoint = 0 === nPointIndex ? null : this.m_arrPoints[nPointIndex - 1];
 
-		if (oPoint.x - nDiffX < X
-			&& X < oPoint.x + nDiffX
-			&& (Y >= this.m_oRankCanvas.height - 30 || (oPoint.y - 7 < Y && Y < oPoint.y + 7)))
+		if (oPoint.x - this.m_nStepX < X && X < oPoint.x + 1 &&
+			(Y >= this.m_oRankCanvas.height - 30
+			|| (0 === nPointIndex && oPoint.y - 7 < Y && Y < oPoint.y + 7)
+			|| (0 !== nPointIndex && ((oPoint.y - 7 < Y && Y < oPrevPoint.y + 7) || (oPrevPoint.y - 7 < Y && Y < oPoint.y + 7)))))
 		{
 			var oPos = Common_FindPosition(this.m_oRankCanvas);
 
@@ -673,6 +691,28 @@ CKGSUserInfoWindow.prototype.private_OnMouseMoveRankGraph = function(X, Y)
 			var oDate = new Date(oPoint.time);
 
 			this.private_ShowRankHint(oPoint.x + oPos.X, oPoint.y + oPos.Y, sRank + " " + oDate.toLocaleDateString());
+
+			if (nPointIndex > 0)
+			{
+				var oContext = this.m_oRankCanvasEvent.getContext("2d");
+				var nW = this.m_oRankCanvasEvent.width;
+				var nH = this.m_oRankCanvasEvent.height;
+				oContext.clearRect(0, 0, nW, nH);
+
+				oContext.strokeStyle = "rgb(255, 0, 0)";
+				oContext.lineWidth   = 2;
+
+				var oSegment = this.m_arrSpline[nPointIndex - 1];
+
+				oContext.beginPath();
+				oContext.moveTo(oSegment.points[0].x, oSegment.points[0].y);
+				oContext.bezierCurveTo(
+					oSegment.points[1].x, oSegment.points[1].y,
+					oSegment.points[2].x, oSegment.points[2].y,
+					oSegment.points[3].x, oSegment.points[3].y);
+				oContext.stroke();
+			}
+
 			return;
 		}
 	}
@@ -767,6 +807,14 @@ CKGSUserInfoWindow.prototype.private_ShowRankHint = function(X, Y, sText)
 };
 CKGSUserInfoWindow.prototype.private_HideRankHint = function()
 {
+	if (this.m_oRankCanvasEvent)
+	{
+		var oContext = this.m_oRankCanvasEvent.getContext("2d");
+		var nW = this.m_oRankCanvasEvent.width;
+		var nH = this.m_oRankCanvasEvent.height;
+		oContext.clearRect(0, 0, nW, nH);
+	}
+
 	if (!this.m_oRankHint)
 		return;
 
@@ -778,6 +826,7 @@ CKGSUserInfoWindow.prototype.private_HideRankHint = function()
 		oParent.removeChild(this.m_oRankHint.Canvas);
 
 	this.m_oRankHint = null;
+
 };
 
 
