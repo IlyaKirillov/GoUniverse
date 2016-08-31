@@ -28,6 +28,7 @@ function CKGSClient(oApp)
 	this.m_aAllRooms      = {};
 	this.m_oAllUsers      = {};
 	this.m_oAllGames      = {};
+	this.m_oGameNotify    = {};
 	this.m_oRoomCategory  = {};
 	this.m_oUserInfo      = {}; // Список открытых окон с информацией пользователя
 	this.m_oCurrentUser   = new CKGSUser(this);
@@ -687,6 +688,18 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
 	{
 		this.private_HandleArchiveGamesChanged(oMessage);
 	}
+	else if ("GAME_NOTIFY" === oMessage.type)
+	{
+		this.private_HandleGameNotify(oMessage);
+	}
+	else if ("ARCHIVE_GAME_REMOVED" === oMessage.type)
+	{
+		this.private_HandleArchiveGameRemoved(oMessage);
+	}
+	else if ("DETAILS_UPDATE" === oMessage.type)
+	{
+		this.private_HandleDetailsUpdate(oMessage);
+	}
 	else
 	{
 		console.log(oMessage);
@@ -956,14 +969,25 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 	var oGame = new CKGSGameRoom(this, nGameRoomId);
 	this.m_aGames[nGameRoomId] = oGame;
 
+	var oGameRecord;
+	if (this.m_oAllGames[nGameRoomId])
+	{
+		oGameRecord = this.m_oAllGames[nGameRoomId];
+	}
+	else if (this.m_oGameNotify[nGameRoomId])
+	{
+		oGameRecord = this.m_oGameNotify[nGameRoomId];
+		delete this.m_oGameNotify[nGameRoomId];
+	}
+
 	oGame.InitGameTree(oMessage.gameSummary);
-	oGame.SetPlayers(this.m_oAllGames[nGameRoomId]);
+	oGame.SetPlayers(oGameRecord);
 
 	this.m_oApp.AddGameRoom(oGame);
 	this.m_oApp.SetCurrentGameRoomTab(nGameRoomId);
 
-	oGame.UpdateClocks(oMessage["clocks"], true);
 	oGame.ReadSgfEvents(oMessage["sgfEvents"], true);
+	oGame.UpdateClocks(oMessage["clocks"], true);
 	oGame.HandleGameActions(oMessage["actions"]);
 	oGame.HandleScore(oMessage["score"] ? this.private_ParseScore(oMessage["score"]) : null);
 	oGame.UpdatePlayersList(oMessage["users"]);
@@ -1352,6 +1376,10 @@ CKGSClient.prototype.private_HandlePrivateKeepOut = function(oMessage)
 		else
 			sRoomName = "\"" + oRecord.m_sWhiteName + " vs. " + oRecord.m_sBlackName + "\"";
 	}
+	else if (undefined !== this.m_oGameNotify[nChannelId])
+	{
+		delete this.m_oGameNotify[nChannelId];
+	}
 
 	CreateKGSWindow(EKGSWindowType.Information, {Client : this, App : this.m_oApp, Caption : "Error", Text : "Sorry, " + sRoomName + " is private. You cannot enter.", Image : "WarningSpanNoEntry", W : 485, H : 144});
 };
@@ -1421,6 +1449,42 @@ CKGSClient.prototype.private_HandleArchiveGamesChanged = function(oMessage)
 		if (oInfo.ArchiveChannel === oMessage.channelId && oInfo.Window)
 		{
 			oInfo.Window.OnUserGameArchiveUpdate(oMessage);
+		}
+	}
+};
+CKGSClient.prototype.private_HandleGameNotify = function(oMessage)
+{
+	var oRecord = oMessage.game;
+	if (!oRecord)
+		return;
+
+	var nGameId = oRecord.channelId;
+
+	var oGameRecord = new CKGSGameListRecord(this);
+	oGameRecord.Update(oRecord);
+	this.m_oGameNotify[nGameId] = oGameRecord;
+};
+CKGSClient.prototype.private_HandleArchiveGameRemoved = function(oMessage)
+{
+	var nChannelId = oMessage.channelId;
+	for (var sUserName in this.m_oUserInfo)
+	{
+		var oInfo = this.m_oUserInfo[sUserName];
+		if (oInfo.ArchiveChannel === nChannelId && oInfo.Window)
+		{
+			oInfo.Window.OnUserArchiveGameRemove(oMessage);
+		}
+	}
+};
+CKGSClient.prototype.private_HandleDetailsUpdate = function(oMessage)
+{
+	var nChannelId = oMessage.channelId;
+	for (var sUserName in this.m_oUserInfo)
+	{
+		var oInfo = this.m_oUserInfo[sUserName];
+		if (oInfo.DetailsChannel === nChannelId && oInfo.Window)
+		{
+			oInfo.Window.OnDetailsUpdate(oMessage);
 		}
 	}
 };

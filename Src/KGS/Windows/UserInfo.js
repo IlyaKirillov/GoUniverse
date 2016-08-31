@@ -32,7 +32,9 @@ function CKGSUserInfoWindow()
 		Locale      : null,
 		Name        : null,
 		Games       : null,
-		RecentGames : null
+		RecentGames : null,
+		RegisteredOn: null,
+		Email       : null
 	};
 
 	this.m_oRankHint = null;
@@ -176,11 +178,7 @@ CKGSUserInfoWindow.prototype.OnUserDetails = function(oDetails)
 			this.m_oInfoTable.LastOn.textContent = oTimeStamp.GetDifferenceString() + " (" + oTimeStamp.ToLocaleString() + ")";
 		}
 
-
-		this.m_oInfoTable.Locale.textContent = oDetails.locale;
-		this.m_oInfoTable.Name.textContent   = oDetails.personalName;
-
-		this.private_AddInfo(oDetails.personalInfo);
+		this.OnDetailsUpdate(oDetails);
 	}
 };
 CKGSUserInfoWindow.prototype.OnUserAvatar = function()
@@ -253,6 +251,33 @@ CKGSUserInfoWindow.prototype.OnUserGameArchiveUpdate = function(oMessage)
 
 	this.private_UpdateGameArchiveStats();
 	this.private_UpdateGameArchiveListView();
+};
+CKGSUserInfoWindow.prototype.OnUserArchiveGameRemove = function(oMessage)
+{
+	var sTimeStamp = oMessage.timestamp;
+	for (var nIndex = 0, nCount = this.m_arrGameArchive.length; nIndex < nCount; ++nIndex)
+	{
+		var oArchiveRecord = this.m_arrGameArchive[nIndex];
+		if (sTimeStamp === oArchiveRecord.GetTimeStamp())
+		{
+			this.m_arrGameArchive.splice(nIndex, 1);
+			break;
+		}
+	}
+
+	this.private_UpdateGameArchiveStats();
+	this.private_UpdateGameArchiveListView();
+};
+CKGSUserInfoWindow.prototype.OnDetailsUpdate = function(oMessage)
+{
+	this.m_oInfoTable.Locale.textContent = oMessage.locale;
+	this.m_oInfoTable.Name.textContent   = oMessage.personalName;
+
+	var oRegisterTimeStamp = new CTimeStamp(oMessage.regStartDate);
+	this.m_oInfoTable.RegisteredOn.textContent = oRegisterTimeStamp.ToLocaleDate();
+
+	this.private_AddEmail(oMessage.email);
+	this.private_AddInfo(oMessage.personalInfo);
 };
 CKGSUserInfoWindow.prototype.private_UpdateGameArchiveStats = function()
 {
@@ -507,13 +532,15 @@ CKGSUserInfoWindow.prototype.private_AddMainInfo = function()
 
 	oDiv.appendChild(this.m_oMainInfoTable);
 
-	this.m_oInfoTable.UserName    = this.private_AddConsoleMessage("UserName", "");
-	this.m_oInfoTable.Rank        = this.private_AddConsoleMessage("Rank", "");
-	this.m_oInfoTable.LastOn      = this.private_AddConsoleMessage("Last on", "");
-	this.m_oInfoTable.Locale      = this.private_AddConsoleMessage("Locale", "");
-	this.m_oInfoTable.Name        = this.private_AddConsoleMessage("Name", "");
-	this.m_oInfoTable.Games       = this.private_AddConsoleMessage("Games", "");
-	this.m_oInfoTable.RecentGames = this.private_AddConsoleMessage("Recent games", "");
+	this.m_oInfoTable.UserName     = this.private_AddConsoleMessage("User name", "");
+	this.m_oInfoTable.Name         = this.private_AddConsoleMessage("Real name", "");
+	this.m_oInfoTable.Rank         = this.private_AddConsoleMessage("Rank", "");
+	this.m_oInfoTable.LastOn       = this.private_AddConsoleMessage("Last on", "");
+	this.m_oInfoTable.RegisteredOn = this.private_AddConsoleMessage("Registered on", "");
+	this.m_oInfoTable.Locale       = this.private_AddConsoleMessage("Locale", "");
+	this.m_oInfoTable.Email        = this.private_AddConsoleMessage("Email", "Private");
+	this.m_oInfoTable.Games        = this.private_AddConsoleMessage("Games", "");
+	this.m_oInfoTable.RecentGames  = this.private_AddConsoleMessage("Recent games", "");
 };
 CKGSUserInfoWindow.prototype.private_AddConsoleMessage = function(sField, sText)
 {
@@ -541,9 +568,34 @@ CKGSUserInfoWindow.prototype.private_AddConsoleMessage = function(sField, sText)
 
 	return oTextSpan;
 };
+CKGSUserInfoWindow.prototype.private_AddEmail = function(sEmail)
+{
+	var oSpan = this.m_oInfoTable.Email;
+
+	while (oSpan.firstChild)
+	{
+		oSpan.removeChild(oSpan.firstChild);
+	}
+
+	if (!sEmail)
+	{
+		oSpan.textContent = "Private";
+	}
+	else
+	{
+		var oLink = document.createElement("a");
+		oLink.href = "mailto:" + sEmail;
+		oLink.textContent = sEmail;
+		oSpan.appendChild(oLink);
+	}
+};
 CKGSUserInfoWindow.prototype.private_AddInfo = function(sText)
 {
 	var oDiv = this.m_oExtensionDiv;
+	while (oDiv.firstChild)
+	{
+		oDiv.removeChild(oDiv.firstChild);
+	}
 
 	var oTextDiv = document.createElement("div");
 	oTextDiv.style.height = "100%";
@@ -585,19 +637,19 @@ CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
 
 	this.m_oMainInfoDiv = this.protected_CreateDivElement(oDiv, sMainInfo);
 	var oMainInfoControl = CreateControlContainer(sMainInfo);
-	oMainInfoControl.Bounds.SetParams(5, 5, 155, 0, true, true, true, false, -1, 200);
+	oMainInfoControl.Bounds.SetParams(5, 5, 155, 0, true, true, true, false, -1, 210);
 	oMainInfoControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left);
 	oControl.AddControl(oMainInfoControl);
 
 	this.m_oAvatarDiv = this.protected_CreateDivElement(oDiv, sAvatar);
 	var oAvatarControl = CreateControlContainer(sAvatar);
-	oAvatarControl.Bounds.SetParams(0, 5, 5, 0, false, true, true, false, 150, 200);
+	oAvatarControl.Bounds.SetParams(0, 10, 5, 0, false, true, true, false, 150, 200);
 	oAvatarControl.Anchor = (g_anchor_top | g_anchor_right);
 	oControl.AddControl(oAvatarControl);
 
 	this.m_oExtensionDiv = this.protected_CreateDivElement(oDiv, sExtension);
 	var oExtensionControl = CreateControlContainer(sExtension);
-	oExtensionControl.Bounds.SetParams(5, 210, 5, 7, true, true, true, true, -1, -1);
+	oExtensionControl.Bounds.SetParams(5, 220, 5, 7, true, true, true, true, -1, -1);
 	oExtensionControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left | g_anchor_bottom);
 	oControl.AddControl(oExtensionControl);
 

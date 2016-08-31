@@ -182,6 +182,10 @@ CTimeStamp.prototype.ToLocaleString = function()
 {
 	return this.m_oDate.toLocaleString();
 };
+CTimeStamp.prototype.ToLocaleDate = function()
+{
+	return this.m_oDate.toLocaleDateString();
+};
 CTimeStamp.prototype.GetDifferenceString = function()
 {
 	var nTime = this.m_oDate.getTime();
