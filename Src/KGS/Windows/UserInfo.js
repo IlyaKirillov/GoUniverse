@@ -35,6 +35,8 @@ function CKGSUserInfoWindow()
 	};
 
 	this.m_oRankHint = null;
+
+	this.m_arrGameArchive = [];
 }
 CommonExtend(CKGSUserInfoWindow, CKGSWindowBase);
 
@@ -195,6 +197,64 @@ CKGSUserInfoWindow.prototype.OnUserGameArchive = function(oMessage)
 	if (!arrGames)
 		return;
 
+	for (var nIndex = arrGames.length - 1; nIndex >= 0; --nIndex)
+	{
+		var oGame          = arrGames[nIndex];
+		var oArchiveRecord = new CKGSUserInfoGameArchiveRecord(this.m_oClient, oGame);
+		this.m_arrGameArchive.push(oArchiveRecord);
+	}
+
+	this.private_UpdateGameArchiveStats();
+	this.private_UpdateGameArchiveListView();
+};
+CKGSUserInfoWindow.prototype.OnRankGraph = function(arrRankData)
+{
+	while (arrRankData.length > 0 && 0x7fff === arrRankData[0])
+		arrRankData.splice(0, 1);
+
+	for (var nPointIndex = 0, nPointsCount = arrRankData.length; nPointIndex < nPointsCount; ++nPointIndex)
+	{
+		if (0x7fff === arrRankData[nPointIndex] && nPointIndex > 0)
+			arrRankData[nPointIndex] = arrRankData[nPointIndex - 1];
+	}
+
+	this.m_oRankData = arrRankData;
+	this.m_arrPoints = [];
+	this.private_DrawRank();
+};
+CKGSUserInfoWindow.prototype.OnUserGameArchiveUpdate = function(oMessage)
+{
+	var arrGames = oMessage.games;
+	if (!arrGames)
+		return;
+
+	for (var nIndex = 0, nCount = arrGames.length; nIndex < nCount; ++nIndex)
+	{
+		var oGame = arrGames[nIndex];
+		var oArchiveRecord = new CKGSUserInfoGameArchiveRecord(this.m_oClient, oGame);
+
+		var bExist = false;
+		var sTimeStamp = oArchiveRecord.GetTimeStamp();
+		for (var nArchiveIndex = 0, nArchiveLen = this.m_arrGameArchive.length; nArchiveIndex < nArchiveLen; ++nArchiveIndex)
+		{
+			var oArchiveRecord2 = this.m_arrGameArchive[nArchiveIndex];
+			if (sTimeStamp === oArchiveRecord2.GetTimeStamp())
+			{
+				this.m_arrGameArchive.splice(nArchiveIndex, 1, oArchiveRecord);
+				bExist = true;
+				break;
+			}
+		}
+
+		if (!bExist)
+			this.m_arrGameArchive.splice(0, 0, oArchiveRecord);
+	}
+
+	this.private_UpdateGameArchiveStats();
+	this.private_UpdateGameArchiveListView();
+};
+CKGSUserInfoWindow.prototype.private_UpdateGameArchiveStats = function()
+{
 	var nWins = 0, nLoses = 0, nUnfinished = 0;
 
 	var nRecentGamesCount = 20;
@@ -202,34 +262,16 @@ CKGSUserInfoWindow.prototype.OnUserGameArchive = function(oMessage)
 
 	var sUserName = this.m_sUserName.toLocaleLowerCase();
 
-	this.m_oGamesListView.Clear();
-	for (var nIndex = arrGames.length - 1; nIndex >= 0; --nIndex)
+	for (var nIndex = 0, nCount = this.m_arrGameArchive.length; nIndex < nCount; ++nIndex)
 	{
-		var oGame  = arrGames[nIndex];
-		var sType  = oGame.gameType;
+		var oArchiveRecord = this.m_arrGameArchive[nIndex];
 
-		if ("ranked" === sType || "free" === sType)
+		var nType = oArchiveRecord.GetType();
+		if (EKGSGameType.Ranked === nType || EKGSGameType.Free === nType)
 		{
-			var sBlack = oGame.players.black.name.toLowerCase();
-			var sWhite = oGame.players.white.name.toLowerCase();
-			var sScore = "" + oGame.score;
-
-			var bBlackWon = false;
-
-			if (-1 !== sScore.indexOf("B+"))
-				bBlackWon = true;
-			else if (-1 !== sScore.indexOf("W+"))
-				bBlackWon = false;
-			else if (-1 !== sScore.indexOf("UNFINISHED"))
-				bBlackWon = null;
-			else
-			{
-				var dScore = parseFloat(sScore);
-				if (dScore < 0)
-					bBlackWon = false;
-				else
-					bBlackWon = true;
-			}
+			var sBlack = oArchiveRecord.GetBlackName().toLowerCase();
+			var sWhite = oArchiveRecord.GetWhiteName().toLowerCase();
+			var bBlackWon = oArchiveRecord.IsBlackWon();
 
 			if (null === bBlackWon)
 			{
@@ -256,33 +298,20 @@ CKGSUserInfoWindow.prototype.OnUserGameArchive = function(oMessage)
 				}
 			}
 		}
-
-		this.m_oGamesListView.Handle_Record([0, oGame.timestamp, oGame]);
 	}
-
-	this.m_oGamesListView.Update_Size();
 
 	this.m_oInfoTable.Games.textContent       = "" + nWins + "-" + nLoses + "-" + nUnfinished;
 	this.m_oInfoTable.RecentGames.textContent = sRecentGames;
 };
-CKGSUserInfoWindow.prototype.OnRankGraph = function(arrRankData)
+CKGSUserInfoWindow.prototype.private_UpdateGameArchiveListView = function()
 {
-	while (arrRankData.length > 0 && 0x7fff === arrRankData[0])
-		arrRankData.splice(0, 1);
-
-	for (var nPointIndex = 0, nPointsCount = arrRankData.length; nPointIndex < nPointsCount; ++nPointIndex)
+	this.m_oGamesListView.Clear();
+	for (var nIndex = 0, nCount = this.m_arrGameArchive.length; nIndex < nCount; ++nIndex)
 	{
-		if (0x7fff === arrRankData[nPointIndex] && nPointIndex > 0)
-			arrRankData[nPointIndex] = arrRankData[nPointIndex - 1];
+		var oArchiveRecord = this.m_arrGameArchive[nIndex];
+		this.m_oGamesListView.Handle_Record([0, oArchiveRecord.GetTimeStamp(), oArchiveRecord]);
 	}
-
-	this.m_oRankData = arrRankData;
-	this.m_arrPoints = [];
-	this.private_DrawRank();
-};
-CKGSUserInfoWindow.prototype.OnUserGameArchiveUpdate = function(oMessage)
-{
-
+	this.m_oGamesListView.Update_Size();
 };
 CKGSUserInfoWindow.prototype.private_DrawRank = function()
 {
@@ -1128,45 +1157,22 @@ CKGSUserInfoGamesListRecord.prototype.Get_Key = function()
 };
 CKGSUserInfoGamesListRecord.prototype.Update = function(aLine)
 {
-	var oRecord = aLine[2];
+	var oArchiveRecord = aLine[2];
 
-	this.private_ParseGameType(oRecord.gameType);
-	this.m_nHandicap = oRecord.handicap ? parseInt(oRecord.handicap) : 0;
-	this.m_nKomi     = oRecord.komi ? parseFloat(oRecord.komi) : 0;
-	this.m_oBlack    = null;
-	this.m_oWhite    = null;
-	this.m_oOwner    = null;
-
-	if (oRecord.players)
-	{
-		if (oRecord.players.black)
-		{
-			this.m_oBlack = new CKGSUser(this.m_oClient);
-			this.m_oBlack.Update(oRecord.players.black);
-		}
-
-		if (oRecord.players.white)
-		{
-			this.m_oWhite = new CKGSUser(this.m_oClient);
-			this.m_oWhite.Update(oRecord.players.white);
-		}
-
-		if (oRecord.players.owner)
-		{
-			this.m_oOwner = new CKGSUser(this.m_oClient);
-			this.m_oOwner.Update(oRecord.players.owner);
-		}
-	}
-
-	this.m_bPrivate   = true === oRecord.private ? true : false;
-	this.m_sScore     = oRecord.score ? this.m_oClient.private_ParseScore(oRecord.score) : "";
-	this.m_nSize      = oRecord.size ? parseInt(oRecord.size) : 19;
-	this.m_sTimeStamp = oRecord.timestamp;
+	this.m_nGameType  = oArchiveRecord.GetType();
+	this.m_nHandicap  = oArchiveRecord.GetHandicap();
+	this.m_nKomi      = oArchiveRecord.GetKomi();
+	this.m_oBlack     = oArchiveRecord.GetBlack();
+	this.m_oWhite     = oArchiveRecord.GetWhite();
+	this.m_oOwner     = oArchiveRecord.GetOwner();
+	this.m_bPrivate   = oArchiveRecord.IsPrivate();
+	this.m_sScore     = oArchiveRecord.GetScore();
+	this.m_nSize      = oArchiveRecord.GetBoardSize();
+	this.m_sTimeStamp = oArchiveRecord.GetTimeStamp();
 	this.m_oDate      = new Date(Date.parse(this.m_sTimeStamp));
-	this.m_bInPlay    = true === oRecord.inPlay ? true : false;
-
-	this.private_ParseAbjourned(oRecord.score);
-	this.private_ParseUrl(oRecord.revision);
+	this.m_bInPlay    = oArchiveRecord.IsInPlay();
+	this.m_bAdjourned = oArchiveRecord.IsAbjourned();
+	this.m_sUrl       = oArchiveRecord.GetUrl();
 };
 CKGSUserInfoGamesListRecord.prototype.GetTimeStamp = function()
 {
@@ -1218,29 +1224,6 @@ CKGSUserInfoGamesListRecord.prototype.IsDemo = function()
 		return true;
 
 	return false;
-};
-CKGSUserInfoGamesListRecord.prototype.private_ParseGameType = function(sGameType)
-{
-	if ("challenge" === sGameType)
-		this.m_nGameType = EKGSGameType.Challenge;
-	else if ("demonstration" === sGameType)
-		this.m_nGameType = EKGSGameType.Demonstration;
-	else if ("review" === sGameType)
-		this.m_nGameType = EKGSGameType.Review;
-	else if ("rengo_review" === sGameType)
-		this.m_nGameType = EKGSGameType.RengoReview;
-	else if ("teaching" === sGameType)
-		this.m_nGameType = EKGSGameType.Teaching;
-	else if ("simul" === sGameType)
-		this.m_nGameType = EKGSGameType.Simul;
-	else if ("rengo" === sGameType)
-		this.m_nGameType = EKGSGameType.Rengo;
-	else if ("free" === sGameType)
-		this.m_nGameType = EKGSGameType.Free;
-	else if ("ranked" === sGameType)
-		this.m_nGameType = EKGSGameType.Ranked;
-	else if ("tournament" === sGameType)
-		this.m_nGameType = EKGSGameType.Tournament;
 };
 CKGSUserInfoGamesListRecord.prototype.private_GetGameType = function()
 {
@@ -1327,48 +1310,6 @@ CKGSUserInfoGamesListRecord.prototype.private_GetKomi = function()
 CKGSUserInfoGamesListRecord.prototype.private_GetTimeStamp = function()
 {
 	return this.m_oDate.toLocaleString();
-};
-CKGSUserInfoGamesListRecord.prototype.private_ParseAbjourned = function(sScore)
-{
-	if (true !== this.m_bInPlay
-		&& true !== this.m_bPrivate
-		&& EKGSGameType.Challenge !== this.m_nGameType
-		&& EKGSGameType.Demonstration !== this.m_nGameType
-		&& EKGSGameType.Review !== this.m_nGameType
-		&& EKGSGameType.RengoReview !== this.m_nGameType
-	&& "UNFINISHED" === sScore)
-		this.m_bAdjourned = true;
-	else
-		this.m_bAdjourned = false;
-};
-CKGSUserInfoGamesListRecord.prototype.private_ParseUrl = function(nRevision)
-{
-	// http://files.gokgs.com/games/year/month/day/white-black-revision.sgf
-
-	var sUrl = "http://files.gokgs.com/games/";
-
-	var sYear  = this.m_oDate.getUTCFullYear();
-	var sMonth = this.m_oDate.getUTCMonth() + 1;
-	var sDay   = this.m_oDate.getUTCDate();
-
-	var sPlayers = "";
-	if (this.m_oOwner)
-	{
-		sPlayers = this.m_oOwner.GetName();
-	}
-	else if (this.m_oWhite && this.m_oBlack)
-	{
-		sPlayers = this.m_oWhite.GetName() + "-" + this.m_oBlack.GetName();
-	}
-	else
-	{
-		this.m_sUrl = "";
-		return;
-	}
-
-	sUrl += sYear + '/' + sMonth + '/' + sDay + '/' + sPlayers + (undefined !== nRevision ? '-' + (nRevision + 1) : "") + ".sgf";
-
-	this.m_sUrl = sUrl;
 };
 
 function CVisualUserInfoTabs()
@@ -1597,4 +1538,222 @@ CKGSSgfViewerWindow.prototype.Close = function()
 {
 	CKGSSgfViewerWindow.superclass.Close.call(this);
 	RemoveWindow(this);
+};
+
+function CKGSUserInfoGameArchiveRecord(oClient, oRecord)
+{
+	this.m_oClient = oClient;
+
+	this.m_nGameType      = EKGSGameType.Free;
+	this.m_nHandicap      = 0;
+	this.m_nKomi          = 0;
+	this.m_oBlack         = null;
+	this.m_oWhite         = null;
+	this.m_oOwner         = null;
+	this.m_bPrivate       = false;
+	this.m_sScore         = "";
+	this.m_sScoreOriginal = "";
+	this.m_nSize          = 19;
+	this.m_sTimeStamp     = "";
+	this.m_oDate          = new Date();
+	this.m_bInPlay        = false;
+	this.m_bAdjourned     = false;
+	this.m_sUrl           = "";
+
+	this.Parse(oRecord);
+}
+CKGSUserInfoGameArchiveRecord.prototype.Parse = function(oRecord)
+{
+	this.private_ParseGameType(oRecord.gameType);
+	this.m_nHandicap = oRecord.handicap ? parseInt(oRecord.handicap) : 0;
+	this.m_nKomi     = oRecord.komi ? parseFloat(oRecord.komi) : 0;
+	this.m_oBlack    = null;
+	this.m_oWhite    = null;
+	this.m_oOwner    = null;
+
+	if (oRecord.players)
+	{
+		if (oRecord.players.black)
+			this.m_oBlack = GetKGSUser(oRecord.players.black, this.m_oClient);
+
+		if (oRecord.players.white)
+			this.m_oWhite = GetKGSUser(oRecord.players.white, this.m_oClient);
+
+		if (oRecord.players.owner)
+			this.m_oOwner = GetKGSUser(oRecord.players.owner, this.m_oClient);
+	}
+
+	this.m_bPrivate       = true === oRecord.private ? true : false;
+	this.m_sScore         = oRecord.score ? this.m_oClient.private_ParseScore(oRecord.score) : "";
+	this.m_sScoreOriginal = oRecord.score;
+	this.m_nSize          = oRecord.size ? parseInt(oRecord.size) : 19;
+	this.m_sTimeStamp     = oRecord.timestamp;
+	this.m_oDate          = new Date(Date.parse(this.m_sTimeStamp));
+	this.m_bInPlay        = true === oRecord.inPlay ? true : false;
+
+	this.private_ParseAbjourned(oRecord.score);
+	this.private_ParseUrl(oRecord.revision);
+};
+CKGSUserInfoGameArchiveRecord.prototype.private_ParseGameType = function(sGameType)
+{
+	if ("challenge" === sGameType)
+		this.m_nGameType = EKGSGameType.Challenge;
+	else if ("demonstration" === sGameType)
+		this.m_nGameType = EKGSGameType.Demonstration;
+	else if ("review" === sGameType)
+		this.m_nGameType = EKGSGameType.Review;
+	else if ("rengo_review" === sGameType)
+		this.m_nGameType = EKGSGameType.RengoReview;
+	else if ("teaching" === sGameType)
+		this.m_nGameType = EKGSGameType.Teaching;
+	else if ("simul" === sGameType)
+		this.m_nGameType = EKGSGameType.Simul;
+	else if ("rengo" === sGameType)
+		this.m_nGameType = EKGSGameType.Rengo;
+	else if ("free" === sGameType)
+		this.m_nGameType = EKGSGameType.Free;
+	else if ("ranked" === sGameType)
+		this.m_nGameType = EKGSGameType.Ranked;
+	else if ("tournament" === sGameType)
+		this.m_nGameType = EKGSGameType.Tournament;
+};
+CKGSUserInfoGameArchiveRecord.prototype.private_ParseAbjourned = function(sScore)
+{
+	if (true !== this.m_bInPlay
+		&& true !== this.m_bPrivate
+		&& EKGSGameType.Challenge !== this.m_nGameType
+		&& EKGSGameType.Demonstration !== this.m_nGameType
+		&& EKGSGameType.Review !== this.m_nGameType
+		&& EKGSGameType.RengoReview !== this.m_nGameType
+		&& "UNFINISHED" === sScore)
+		this.m_bAdjourned = true;
+	else
+		this.m_bAdjourned = false;
+};
+CKGSUserInfoGameArchiveRecord.prototype.private_ParseUrl = function(nRevision)
+{
+	// http://files.gokgs.com/games/year/month/day/white-black-revision.sgf
+
+	var sUrl = "http://files.gokgs.com/games/";
+
+	var sYear  = this.m_oDate.getUTCFullYear();
+	var sMonth = this.m_oDate.getUTCMonth() + 1;
+	var sDay   = this.m_oDate.getUTCDate();
+
+	var sPlayers = "";
+	if (this.m_oOwner)
+	{
+		sPlayers = this.m_oOwner.GetName();
+	}
+	else if (this.m_oWhite && this.m_oBlack)
+	{
+		sPlayers = this.m_oWhite.GetName() + "-" + this.m_oBlack.GetName();
+	}
+	else
+	{
+		this.m_sUrl = "";
+		return;
+	}
+
+	sUrl += sYear + '/' + sMonth + '/' + sDay + '/' + sPlayers + (undefined !== nRevision ? '-' + (nRevision + 1) : "") + ".sgf";
+
+	this.m_sUrl = sUrl;
+};
+CKGSUserInfoGameArchiveRecord.prototype.GetType = function()
+{
+	return this.m_nGameType;
+};
+CKGSUserInfoGameArchiveRecord.prototype.GetTimeStamp = function()
+{
+	return this.m_sTimeStamp;
+};
+CKGSUserInfoGameArchiveRecord.prototype.GetBlackName = function()
+{
+	if (this.m_oBlack)
+		return this.m_oBlack.GetName();
+
+	return "";
+};
+CKGSUserInfoGameArchiveRecord.prototype.GetWhiteName = function()
+{
+	if (this.m_oWhite)
+		return this.m_oWhite.GetName();
+
+	return "";
+};
+CKGSUserInfoGameArchiveRecord.prototype.GetScore = function()
+{
+	return this.m_sScore;
+};
+CKGSUserInfoGameArchiveRecord.prototype.IsBlackWon = function()
+{
+	var sScore = "" + this.m_sScoreOriginal;
+
+	var bBlackWon = false;
+
+	if (-1 !== sScore.indexOf("B+"))
+		bBlackWon = true;
+	else if (-1 !== sScore.indexOf("W+"))
+		bBlackWon = false;
+	else if (-1 !== sScore.indexOf("UNFINISHED"))
+		bBlackWon = null;
+	else
+	{
+		var dScore = parseFloat(sScore);
+		if (dScore < 0)
+			bBlackWon = false;
+		else
+			bBlackWon = true;
+	}
+
+	return bBlackWon;
+};
+CKGSUserInfoGameArchiveRecord.prototype.IsWhiteWon = function()
+{
+	var bBlackWon = this.IsBlackWon();
+
+	if (null == bBlackWon)
+		return null;
+
+	return !bBlackWon;
+};
+CKGSUserInfoGameArchiveRecord.prototype.GetHandicap = function()
+{
+	return this.m_nHandicap;
+};
+CKGSUserInfoGameArchiveRecord.prototype.GetKomi = function()
+{
+	return this.m_nKomi;
+};
+CKGSUserInfoGameArchiveRecord.prototype.GetBlack = function()
+{
+	return this.m_oBlack;
+};
+CKGSUserInfoGameArchiveRecord.prototype.GetWhite = function()
+{
+	return this.m_oWhite;
+};
+CKGSUserInfoGameArchiveRecord.prototype.GetOwner = function()
+{
+	return this.m_oOwner;
+};
+CKGSUserInfoGameArchiveRecord.prototype.GetBoardSize = function()
+{
+	return this.m_nSize;
+};
+CKGSUserInfoGameArchiveRecord.prototype.IsPrivate = function()
+{
+	return this.m_bPrivate;
+};
+CKGSUserInfoGameArchiveRecord.prototype.IsInPlay = function()
+{
+	return this.m_bInPlay;
+};
+CKGSUserInfoGameArchiveRecord.prototype.IsAbjourned = function()
+{
+	return this.m_bAdjourned;
+};
+CKGSUserInfoGameArchiveRecord.prototype.GetUrl = function()
+{
+	return this.m_sUrl;
 };

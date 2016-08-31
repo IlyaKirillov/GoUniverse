@@ -1420,7 +1420,7 @@ CKGSClient.prototype.private_HandleArchiveGamesChanged = function(oMessage)
 		var oInfo = this.m_oUserInfo[sUserName];
 		if (oInfo.ArchiveChannel === oMessage.channelId && oInfo.Window)
 		{
-			oInfo.Window.OnRankGraph(oMessage.data);
+			oInfo.Window.OnUserGameArchiveUpdate(oMessage);
 		}
 	}
 };

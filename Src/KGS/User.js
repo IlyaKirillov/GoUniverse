@@ -198,9 +198,9 @@ CKGSUser.prototype.private_ParseLevel = function(sLevel)
 	 	this.m_nLevel = KGSUSER_LEVEL_USER;
 };
 
-function GetKGSUser(oUserRecord)
+function GetKGSUser(oUserRecord, oClient)
 {
-	var oUser = new CKGSUser(oApp.GetClient());
+	var oUser = new CKGSUser(oClient ? oClient : oApp.GetClient());
 	oUser.Update(oUserRecord);
 	return oUser;
 }
