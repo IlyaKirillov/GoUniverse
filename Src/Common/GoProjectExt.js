@@ -1014,7 +1014,11 @@ function CGoUniverseButtonEditorControl(oDrawing)
 	});
 	this.private_CreateMenuItem(oMenuElementWrapper, "Return control", function()
 	{
+		var oGameRoom = oDrawing.m_oGameRoom;
+		if (!oGameRoom)
+			return;
 
+		oGameRoom.ReturnControlToOwner();
 	});
 
 	this.m_oMenuElement  = oMenuElementWrapper;

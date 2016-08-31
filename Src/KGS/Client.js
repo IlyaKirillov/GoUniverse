@@ -963,8 +963,8 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 	this.m_oApp.SetCurrentGameRoomTab(nGameRoomId);
 
 	oGame.UpdateClocks(oMessage["clocks"], true);
-	oGame.HandleGameActions(oMessage["actions"]);
 	oGame.ReadSgfEvents(oMessage["sgfEvents"], true);
+	oGame.HandleGameActions(oMessage["actions"]);
 	oGame.HandleScore(oMessage["score"] ? this.private_ParseScore(oMessage["score"]) : null);
 	oGame.UpdatePlayersList(oMessage["users"]);
 };

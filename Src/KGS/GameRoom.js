@@ -275,6 +275,8 @@ CKGSGameRoom.prototype.HandleGameActions = function(arrActions)
 			{
 				if (false === this.m_bEditor)
 				{
+					this.RemoveOwnChanges();
+					this.BackToGame();
 					this.m_bEditor = true;
 					this.private_EndSgfEvent();
 					var oHandler = new CKGSEditorHandler(this.m_oClient, this);
@@ -285,6 +287,7 @@ CKGSGameRoom.prototype.HandleGameActions = function(arrActions)
 			{
 				this.m_bEditor = false;
 				this.private_EndSgfEvent();
+				this.m_oGameTree.Set_Handler(null);
 			}
 		}
 		else if ("MOVE" === sAction)
@@ -977,6 +980,11 @@ CKGSGameRoom.prototype.RemoveOwnChanges = function()
 		oDrawingNavigator.Update_Current(true);
 		oDrawingNavigator.Update_GameCurrent();
 	}
+};
+CKGSGameRoom.prototype.ReturnControlToOwner = function()
+{
+	if (true === this.m_bEditor && this.m_oOwner)
+		this.m_oClient.GiveGameControl(this.m_nGameRoomId, this.m_oOwner.GetName());
 };
 
 function CKGSEditorHandler(oClient, oGame)
