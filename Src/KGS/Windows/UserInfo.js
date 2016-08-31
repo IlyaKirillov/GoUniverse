@@ -668,7 +668,6 @@ CKGSUserInfoWindow.prototype.private_UpdateMousePosOnRankGraph = function(X, Y)
 };
 CKGSUserInfoWindow.prototype.private_OnMouseMoveRankGraph = function(X, Y)
 {
-	var nDiffX = Math.min(7, this.m_nStepX);
 	for (var nPointIndex = 0, nPointsCount = this.m_arrPoints.length; nPointIndex < nPointsCount; ++nPointIndex)
 	{
 		var oPoint = this.m_arrPoints[nPointIndex];
@@ -1599,6 +1598,8 @@ function CKGSUserInfoGameArchiveRecord(oClient, oRecord)
 	this.m_oBlack         = null;
 	this.m_oWhite         = null;
 	this.m_oOwner         = null;
+	this.m_oBlack2        = null;
+	this.m_oWhite2        = null;
 	this.m_bPrivate       = false;
 	this.m_sScore         = "";
 	this.m_sScoreOriginal = "";
@@ -1630,6 +1631,12 @@ CKGSUserInfoGameArchiveRecord.prototype.Parse = function(oRecord)
 
 		if (oRecord.players.owner)
 			this.m_oOwner = GetKGSUser(oRecord.players.owner, this.m_oClient);
+
+		if (oRecord.players.black_2)
+			this.m_oBlack2 = GetKGSUser(oRecord.players.black_2, this.m_oClient);
+
+		if (oRecord.players.white_2)
+			this.m_oWhite2 = GetKGSUser(oRecord.players.white_2, this.m_oClient);
 	}
 
 	this.m_bPrivate       = true === oRecord.private ? true : false;
@@ -1693,6 +1700,10 @@ CKGSUserInfoGameArchiveRecord.prototype.private_ParseUrl = function(nRevision)
 	if (this.m_oOwner)
 	{
 		sPlayers = this.m_oOwner.GetName();
+	}
+	else if (this.m_oWhite2 && this.m_oBlack2 && this.m_oWhite && this.m_oBlack)
+	{
+		sPlayers = this.m_oWhite.GetName() + "-" + this.m_oWhite2.GetName() + "-" + this.m_oBlack.GetName() + "-" + this.m_oBlack2.GetName();
 	}
 	else if (this.m_oWhite && this.m_oBlack)
 	{
