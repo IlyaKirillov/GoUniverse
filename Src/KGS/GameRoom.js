@@ -304,6 +304,9 @@ CKGSGameRoom.prototype.HandleScore = function(sScore)
 
 		if (this.m_oCommentsHandler)
 			this.m_oCommentsHandler.AddGameOver(this.m_oCurNode, sScore);
+
+		if (this.m_oStateHandler)
+			this.m_oStateHandler.Update();
 	}
 
 	if (this.m_oCommentsHandler)

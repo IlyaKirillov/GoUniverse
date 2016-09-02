@@ -9,6 +9,14 @@
  * Time     1:24
  */
 
+if (!String.prototype.splice)
+{
+	String.prototype.splice = function(nStart, nDelCount, sNewSubStr)
+	{
+		return this.slice(0, nStart) + sNewSubStr + this.slice(nStart + Math.abs(nDelCount));
+	};
+}
+
 var urlRegEx = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-]*)?\??(?:[\-\+=&;%@\.\w]*)#?(?:[\.\!\/\\\w]*))?)/g;
 function SplitTextToLines(sText)
 {
@@ -33,6 +41,46 @@ function SplitTextToLines(sText)
 	for (var nIndex = 0, nCount = aLines.length; nIndex < nCount; ++nIndex)
 	{
 		aLines[nIndex] = aLines[nIndex].replace(urlRegEx, "<a href='$1' target='_blank'>$1</a>");
+
+		var nPos = 0;
+		while (nPos < aLines[nIndex].length && -1 !== nPos)
+		{
+			nPos = aLines[nIndex].indexOf("\<gmt\>", nPos);
+			if (-1 === nPos)
+				break;
+
+			var nEndPos = aLines[nIndex].indexOf("\<\/gmt\>", nPos);
+			if (-1 === nEndPos)
+				break;
+
+			// На КГС <gmt> идет в одном из форматов
+			// <gmt>YYYY-MM-DD</gmt> или <gmt>YYYY-MM-DD HH:MM</gmt>
+
+			//YYYY-MM-DDTHH:MM:SS.sssZ
+			var sTimeString = aLines[nIndex].substr(nPos + 5, nEndPos - nPos - 5);
+			if (10 === sTimeString.length)
+			{
+				sTimeString += "T00:00:00.000Z";
+			}
+			else if (16 === sTimeString.length)
+			{
+				sTimeString = sTimeString.splice(10, 1, 'T');
+				sTimeString += ":00.000Z";
+			}
+			else
+			{
+				// Ничего не делаем
+			}
+			var oDate = new Date(sTimeString);
+			// TODO: Когда сделаем выбор языка тут надо будет сделать меняющуюся локаль
+			sTimeString = oDate.toLocaleString();
+
+			console.log(aLines[nIndex]);
+			aLines[nIndex] = aLines[nIndex].splice(nPos, nEndPos + 6 - nPos, sTimeString);
+			console.log(aLines[nIndex]);
+
+			nPos = nPos + sTimeString.length;
+		}
 	}
 
 	return aLines;
