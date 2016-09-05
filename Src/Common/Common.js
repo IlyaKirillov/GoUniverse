@@ -281,3 +281,55 @@ CTextMeasurer.prototype.Measure = function(sText)
 	return oMetrics.width;
 };
 
+
+window.requestAnimFrame = (function(){
+	return  window.requestAnimationFrame       ||
+		window.webkitRequestAnimationFrame ||
+		window.mozRequestAnimationFrame    ||
+		window.oRequestAnimationFrame      ||
+		window.msRequestAnimationFrame     ||
+		function(/* function */ callback, /* DOMElement */ element){
+			window.setTimeout(callback, 1000 / 60);
+		};
+})();
+
+(function()
+{
+	var nState   = 0;
+
+	function Animate()
+	{
+		var oCanvas  = document.getElementById("animatedLogoId");
+		var oContext = oCanvas.getContext("2d");
+
+		var nW = oCanvas.width;
+		var nH = oCanvas.height;
+
+		var nRad = Math.min(nW, nH) * 0.4;
+
+		oContext.clearRect(0, 0, nW, nH);
+
+		oContext.strokeStyle = "rgb(0, 0, 0)";
+		oContext.fillStyle   = "rgb(255, 255, 255)";
+
+		oContext.lineWidth = 3;
+		oContext.beginPath();
+		oContext.arc(nW / 2, nH / 2, nRad, 0, 2 * Math.PI, false);
+		oContext.stroke();
+		oContext.fill();
+
+		// oContext.beginPath();
+		// oContext.arc(oCanvas.width / 2, oCanvas.height / 2, oCanvas.width * 0.5, 0, 2 * Math.PI, false);
+		// oContext.stroke();
+
+
+		nState++;
+		if (nState >= 100)
+			nState = 0;
+
+		requestAnimFrame(Animate);
+	}
+
+	window["GoUniverseLogoAnimate"] = Animate;
+
+})();
