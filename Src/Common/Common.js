@@ -281,21 +281,10 @@ CTextMeasurer.prototype.Measure = function(sText)
 	return oMetrics.width;
 };
 
-
-window.requestAnimFrame = (function(){
-	return  window.requestAnimationFrame       ||
-		window.webkitRequestAnimationFrame ||
-		window.mozRequestAnimationFrame    ||
-		window.oRequestAnimationFrame      ||
-		window.msRequestAnimationFrame     ||
-		function(/* function */ callback, /* DOMElement */ element){
-			window.setTimeout(callback, 1000 / 60);
-		};
-})();
-
 (function()
 {
 	var nState   = 0;
+	var nTimerId = null;
 
 	function Animate()
 	{
@@ -309,27 +298,124 @@ window.requestAnimFrame = (function(){
 
 		oContext.clearRect(0, 0, nW, nH);
 
-		oContext.strokeStyle = "rgb(0, 0, 0)";
-		oContext.fillStyle   = "rgb(255, 255, 255)";
+		oContext.lineWidth = 2;
 
-		oContext.lineWidth = 3;
-		oContext.beginPath();
-		oContext.arc(nW / 2, nH / 2, nRad, 0, 2 * Math.PI, false);
-		oContext.stroke();
-		oContext.fill();
+		oContext.save();
+		oContext.translate(nW / 2, nH / 2);
 
-		// oContext.beginPath();
-		// oContext.arc(oCanvas.width / 2, oCanvas.height / 2, oCanvas.width * 0.5, 0, 2 * Math.PI, false);
-		// oContext.stroke();
+		if (nState < 100)
+		{
+			oContext.strokeStyle = "rgb(0, 0, 0)";
+			oContext.fillStyle   = "rgb(255, 255, 255)";
+			oContext.beginPath();
+			oContext.arc(0, 0, nRad, 0, 2 * Math.PI, false);
+			oContext.stroke();
+			oContext.fill();
 
+			oContext.fillStyle = "rgb(0, 0, 0)";
+
+			oContext.beginPath();
+			oContext.arc(0, 0, nRad, 1.5 * Math.PI, 0.5 * Math.PI, false);
+			oContext.scale(1 - nState / 100, 1);
+			oContext.arc(0, 0, nRad, 0.5 * Math.PI, 1.5 * Math.PI, false);
+
+			oContext.stroke();
+			oContext.fill();
+		}
+		else if (nState < 200)
+		{
+			oContext.strokeStyle = "rgb(0, 0, 0)";
+			oContext.fillStyle   = "rgb(0, 0, 0)";
+			oContext.beginPath();
+			oContext.arc(0, 0, nRad, 0, 2 * Math.PI, false);
+			oContext.stroke();
+			oContext.fill();
+
+			oContext.fillStyle = "rgb(255, 255, 255)";
+
+			oContext.beginPath();
+			oContext.arc(0, 0, nRad, 0.5 * Math.PI, 1.5 * Math.PI, false);
+
+			if (100 !== nState)
+			{
+				oContext.scale(nState / 100 - 1, 1);
+				oContext.arc(0, 0, nRad, 1.5 * Math.PI, 0.5 * Math.PI, false);
+			}
+			else
+			{
+				oContext.closePath();
+			}
+
+			oContext.stroke();
+			oContext.fill();
+		}
+		else if (nState < 300)
+		{
+			oContext.strokeStyle = "rgb(0, 0, 0)";
+			oContext.fillStyle   = "rgb(0, 0, 0)";
+			oContext.beginPath();
+			oContext.arc(0, 0, nRad, 0, 2 * Math.PI, false);
+			oContext.stroke();
+			oContext.fill();
+
+			oContext.fillStyle = "rgb(255, 255, 255)";
+
+			oContext.beginPath();
+			oContext.arc(0, 0, nRad, 1.5 * Math.PI, 0.5 * Math.PI, false);
+			oContext.scale(3 - nState / 100, 1);
+			oContext.arc(0, 0, nRad, 0.5 * Math.PI, 1.5 * Math.PI, false);
+
+			oContext.stroke();
+			oContext.fill();
+		}
+		else if (nState < 400)
+		{
+			oContext.strokeStyle = "rgb(0, 0, 0)";
+			oContext.fillStyle   = "rgb(255, 255, 255)";
+			oContext.beginPath();
+			oContext.arc(0, 0, nRad, 0, 2 * Math.PI, false);
+			oContext.stroke();
+			oContext.fill();
+
+			oContext.fillStyle = "rgb(0, 0, 0)";
+
+			oContext.beginPath();
+			oContext.arc(0, 0, nRad, 0.5 * Math.PI, 1.5 * Math.PI, false);
+
+			if (300 !== nState)
+			{
+				oContext.scale(nState / 100 - 3, 1);
+				oContext.arc(0, 0, nRad, 1.5 * Math.PI, 0.5 * Math.PI, false);
+			}
+			else
+			{
+				oContext.closePath();
+			}
+
+			oContext.stroke();
+			oContext.fill();
+		}
+
+		oContext.restore();
 
 		nState++;
-		if (nState >= 100)
+		if (nState >= 400)
 			nState = 0;
 
-		requestAnimFrame(Animate);
+		nTimerId = Common_RequestAnimationFrame(Animate);
 	}
 
-	window["GoUniverseLogoAnimate"] = Animate;
+	function StopAnimate()
+	{
+		if (null !== nTimerId)
+		{
+			Common_CancelAnimationFrame(nTimerId);
+			nTimerId = null;
+			nState   = 0;
+		}
+	}
+
+	window["GoUniverseLogoAnimate"]     = Animate;
+	window["GoUniverseLogoStopAnimate"] = StopAnimate;
 
 })();

@@ -141,6 +141,8 @@ CGoUniverseApplication.prototype.ConnectToKGS = function()
 	g_oFadeEffect.Out(document.getElementById("divIdConnection"), 200);
 	g_oFadeEffect.Out(document.getElementById("divIdConnectionError"), 200);
 	g_oFadeEffect.Out(document.getElementById("divIdAbout"), 200);
+
+	this.private_ShowAnimatedLogo();
 };
 CGoUniverseApplication.prototype.OnConnect = function()
 {
@@ -148,6 +150,7 @@ CGoUniverseApplication.prototype.OnConnect = function()
 	document.getElementById("divIdClientNameText").innerHTML = this.m_oClient.GetUserName();
 
 	g_oFadeEffect.In(document.getElementById("divMainId"), 200);
+	this.private_HideAnimatedLogo();
 	this.OnResize();
 	this.m_oGlobalSettings.ParseUserSettings();
 };
@@ -164,6 +167,10 @@ CGoUniverseApplication.prototype.OnResize = function(bSkipChatHandler)
 	var AboutDiv        = document.getElementById("divIdAbout");
 	AboutDiv.style.left = (document.body.clientWidth - 250) / 2 + "px";
 	AboutDiv.style.top  = (document.body.clientHeight - 90 - 20) + "px";
+
+	var Logo = document.getElementById("animatedLogoId");
+	Logo.style.left = (document.body.clientWidth - Logo.width) / 2 + "px";
+	Logo.style.top  = (document.body.clientHeight - Logo.height) / 2 + "px";
 
 	if (this.m_oClientControl)
 	{
@@ -228,6 +235,8 @@ CGoUniverseApplication.prototype.Logout = function(sText)
 	g_oFadeEffect.In(document.getElementById("divIdConnection"), -1);
 	g_oFadeEffect.In(document.getElementById("divIdAbout"), -1);
 	document.getElementById("inputPasswordId").focus();
+
+	this.private_HideAnimatedLogo();
 
 	document.title = "KGS: Login";
 	
@@ -871,6 +880,7 @@ CGoUniverseApplication.prototype.private_GotoLoginPage = function(bShowError)
 	document.getElementById("divMainId").style.display       = "none";
 	document.getElementById("divIdConnection").style.display = "block";
 	document.getElementById("divIdAbout").style.display      = "block";
+	this.private_HideAnimatedLogo();
 
 	if (true === bShowError)
 		document.getElementById("divIdConnectionError").style.display = "block";
@@ -1257,6 +1267,18 @@ CGoUniverseApplication.prototype.private_InitChatDragHandler = function ()
 CGoUniverseApplication.prototype.GetGlobalSettings = function()
 {
 	return this.m_oGlobalSettings;
+};
+CGoUniverseApplication.prototype.private_ShowAnimatedLogo = function()
+{
+	document.getElementById("animatedLogoId").style.display = "block";
+	if (window.GoUniverseLogoAnimate)
+		window.GoUniverseLogoAnimate();
+};
+CGoUniverseApplication.prototype.private_HideAnimatedLogo = function()
+{
+	document.getElementById("animatedLogoId").style.display = "none";
+	if (window.GoUniverseLogoStopAnimate)
+		window.GoUniverseLogoStopAnimate();
 };
 
 function CGoUniverseGlobalSettings(oApp)

@@ -14,9 +14,6 @@ function OnDocumentReady()
 {
 	oApp = new CGoUniverseApplication();
 	oApp.Init();
-
-	// if (window.GoUniverseLogoAnimate)
-	// 	window.GoUniverseLogoAnimate();
 }
 
 function OnDocumentClose()
