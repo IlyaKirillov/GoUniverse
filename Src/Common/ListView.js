@@ -496,10 +496,12 @@ CListView.prototype.private_UpdateScrollSize = function()
     oVerScroll.onDragStart = function()
     {
         oVerScroll.className = "VerScroll VerScrollActive";
+        global_mouseEvent.LockMouse();
     };
     oVerScroll.onDragEnd = function()
     {
         oVerScroll.className = "VerScroll";
+        global_mouseEvent.UnLockMouse();
     };
 };
 
