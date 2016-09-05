@@ -122,7 +122,9 @@ function CListView()
 		if (true === oThis.IsFreezedSelection())
 			return;
 
-        check_MouseMoveEvent(e);
+        if (true !== check_MouseMoveEvent(e))
+           return;
+
         var oPos = oThis.private_UpdateMousePos(global_mouseEvent.X, global_mouseEvent.Y);
 
         if (-1 !== oThis.m_nTrackBorder)

@@ -36,6 +36,10 @@ function CGoUniverseApplication()
 	this.m_oGameTabsScroll = null;
 	this.m_oChatTabsScroll = null;
 	this.m_oChatScroll     = null;
+
+	this.m_oGamesListWrapperControl = null;
+	this.m_oChatWrapperControl      = null;
+	this.m_oMainRoomLeftPartControl = null;
 }
 CGoUniverseApplication.prototype.Init = function()
 {
@@ -45,76 +49,76 @@ CGoUniverseApplication.prototype.Init = function()
 	this.private_GotoLoginPage(false);
 	this.OnResize();
 
-	 // //TEST
-	 // this.m_oClient = new CKGSClient(this);
-	 // //this.OnConnect();
-	 // //
-	 //
-	 // document.getElementById("divMainId").style.display = "block";
-	 // this.OnResize();
-	 //
-	 // var nRoomId = 0;
-	 // var oThis = this;
-	 // function TEST_AddChatRoom()
-	 // {
-	 // 	oThis.AddChatRoom(nRoomId++, "Room " + nRoomId);
-	 // }
-	 //
-	 // for (var nIndex = 0; nIndex < 100; nIndex++)
-	 // {
-	 // 	TEST_AddChatRoom();
-	 // }
-	 //
-	 // //this.AddGameRoom(1, new CGameTree(), false, "", "", new CTimeSettings(), new CTimeSettings(), {PlayersList : new CListView()});
-	 // // this.AddGameRoom(2, new CGameTree());
-	 // // this.AddGameRoom(3, new CGameTree());
-	 // // this.AddGameRoom(4, new CGameTree());
-	 //
-	 // var nGameRoomId = 0;
-	 // function TEST_AddGameRoom()
-	 // {
-	 // 	oThis.AddGameRoom(nGameRoomId++, null);
-	 // }
-	 //
-	 //
-	 // for (var nIndex = 0; nIndex < 100; nIndex++)
-	 // {
-	 // 	TEST_AddGameRoom();
-	 // }
-	 //
-	 // this.SetCurrentChatRoom(0);
-	 //
-	 // function TEST_AddChatMessage(nIndex)
-	 // {
-	 // 	oThis.OnAddChatMessage(0, "Test", "Test message " + nIndex);
-	 // }
-	 //
-	 // for (var nIndex = 0; nIndex < 100; nIndex++)
-	 // {
-	 // 	TEST_AddChatMessage(nIndex);
-	 // }
-	 //
-	 // function TEST_AddGameRecord(nGameId)
-	 // {
-	 // 	oThis.m_oGamesListView.Handle_Record([0, nGameId, "R", 0, "", "White " + nGameId, 30, "", "Black", 25, "", 15, false, 15, false, false, false, "19x19"]);
-	 // }
-	 //
-	 // for (var nIndex = 0; nIndex < 100; nIndex++)
-	 // {
-	 // 	TEST_AddGameRecord(nIndex);
-	 // }
-	 //
-	 // this.m_oGamesListView.Update();
-	 // this.m_oGamesListView.Update_Size();
-	 //
-	 //
-	 // // this.m_oClient.private_HandleDetailsNonExistant({name : "WWWWWWWW"});
-	 // // this.m_oClient.private_HandlePrivateKeepOut({channelId : -1});
-	 // // this.m_oClient.private_HandleIdleWarning({});
-
-
-
-	//_____________
+	//  //TEST
+	//  this.m_oClient = new CKGSClient(this);
+	//  //this.OnConnect();
+	//  //
+	//
+	//  document.getElementById("divMainId").style.display = "block";
+	//  this.OnResize();
+	//
+	//  var nRoomId = 0;
+	//  var oThis = this;
+	//  function TEST_AddChatRoom()
+	//  {
+	//  	oThis.AddChatRoom(nRoomId++, "Room " + nRoomId);
+	//  }
+	//
+	//  for (var nIndex = 0; nIndex < 100; nIndex++)
+	//  {
+	//  	TEST_AddChatRoom();
+	//  }
+	//
+	//  //this.AddGameRoom(1, new CGameTree(), false, "", "", new CTimeSettings(), new CTimeSettings(), {PlayersList : new CListView()});
+	//  // this.AddGameRoom(2, new CGameTree());
+	//  // this.AddGameRoom(3, new CGameTree());
+	//  // this.AddGameRoom(4, new CGameTree());
+	//
+	//  var nGameRoomId = 0;
+	//  function TEST_AddGameRoom()
+	//  {
+	//  	oThis.AddGameRoom(nGameRoomId++, null);
+	//  }
+	//
+	//
+	//  for (var nIndex = 0; nIndex < 100; nIndex++)
+	//  {
+	//  	TEST_AddGameRoom();
+	//  }
+	//
+	//  this.SetCurrentChatRoom(0);
+	//
+	//  function TEST_AddChatMessage(nIndex)
+	//  {
+	//  	oThis.OnAddChatMessage(0, "Test", "Test message " + nIndex);
+	//  }
+	//
+	//  for (var nIndex = 0; nIndex < 100; nIndex++)
+	//  {
+	//  	TEST_AddChatMessage(nIndex);
+	//  }
+	//
+	//  function TEST_AddGameRecord(nGameId)
+	//  {
+	//  	oThis.m_oGamesListView.Handle_Record([0, nGameId, "R", 0, "", "White " + nGameId, 30, "", "Black", 25, "", 15, false, 15, false, false, false, "19x19"]);
+	//  }
+	//
+	//  for (var nIndex = 0; nIndex < 100; nIndex++)
+	//  {
+	//  	TEST_AddGameRecord(nIndex);
+	//  }
+	//
+	//  this.m_oGamesListView.Update();
+	//  this.m_oGamesListView.Update_Size();
+	//
+	//
+	//  // this.m_oClient.private_HandleDetailsNonExistant({name : "WWWWWWWW"});
+	//  // this.m_oClient.private_HandlePrivateKeepOut({channelId : -1});
+	//  // this.m_oClient.private_HandleIdleWarning({});
+	//
+	//
+	//
+	// //_____________
 };
 CGoUniverseApplication.prototype.Close = function()
 {
@@ -145,7 +149,7 @@ CGoUniverseApplication.prototype.OnConnect = function()
 	g_oFadeEffect.In(document.getElementById("divMainId"), 200);
 	this.OnResize();
 };
-CGoUniverseApplication.prototype.OnResize = function()
+CGoUniverseApplication.prototype.OnResize = function(bSkipChatHandler)
 {
 	var ConnectionDiv        = document.getElementById("divIdConnection");
 	ConnectionDiv.style.left = (document.body.clientWidth - 250) / 2 + "px";
@@ -180,6 +184,9 @@ CGoUniverseApplication.prototype.OnResize = function()
 	this.private_CollapseGameTabs();
 	this.UpdateDropDownChatTabsButton();
 	this.UpdateDropDownGameTabsButton();
+
+	if (true !== bSkipChatHandler)
+		this.private_InitChatDragHandler();
 };
 CGoUniverseApplication.prototype.OpenRoomList = function()
 {
@@ -639,12 +646,14 @@ CGoUniverseApplication.prototype.private_InitMainRoom = function()
 	oLeftPartControl.Bounds.SetParams(0, 0, nPlayersListW, 1000, false, false, true, false, -1, -1);
 	oLeftPartControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
 	oMainRoomControl.AddControl(oLeftPartControl);
+	this.m_oMainRoomLeftPartControl = oLeftPartControl;
 
 	// Список игровых комнат
 	var oGamesListWrapperControl = CreateControlContainer("divIdLGamesWrapper");
 	oGamesListWrapperControl.Bounds.SetParams(0, 0, 1000, 500, false, false, false, false, -1, -1);
 	oGamesListWrapperControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
 	oLeftPartControl.AddControl(oGamesListWrapperControl);
+	this.m_oGamesListWrapperControl = oGamesListWrapperControl;
 
 	var oGamesListControl = this.m_oGamesListView.Init("divIdLGames", new CKGSGamesList(this));
 	oGamesListControl.Bounds.SetParams(0, 0, 2, 0, true, false, true, true, -1, -1);
@@ -657,6 +666,15 @@ CGoUniverseApplication.prototype.private_InitMainRoom = function()
 	oChatControl.Bounds.SetParams(0, 500, 1000, 1000, false, false, false, false, -1, -1);
 	oChatControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
 	oLeftPartControl.AddControl(oChatControl);
+	this.m_oChatWrapperControl = oChatControl;
+
+	// Полоска для переноса
+	var oChatDragHandlerControl = CreateControlContainer("divIdLChatDragHandler");
+	oChatDragHandlerControl.Bounds.SetParams(0, 500, 1000, 1000, false, false, false, false, -1, 5);
+	oChatDragHandlerControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left);
+	oLeftPartControl.AddControl(oChatDragHandlerControl);
+	this.m_oChatDragHandlerControl = oChatDragHandlerControl;
+
 	this.private_InitChats(oChatControl);
 };
 CGoUniverseApplication.prototype.private_InitChats = function(oChatControl)
@@ -1183,35 +1201,43 @@ CGoUniverseApplication.prototype.ShowGamesListContextMenu = function(nX, nY, nGa
 
 	return oContextMenu;
 };
+CGoUniverseApplication.prototype.private_InitChatDragHandler = function ()
+{
+	var nH = this.m_oMainRoomLeftPartControl.height;
+	if (nH <= 100)
+		return;
 
+	var nYLimit      = nH - 100;
+	var oDragElement = this.m_oChatDragHandlerControl.HtmlElement;
+	Common_DragHandler.Init(oDragElement, null, -1, -1, 0, nH - 100);
 
-// var g_nGameRoomId = 0;
-//
-// function AddGR()
-// {
-// 	oApp.AddGameRoom(g_nGameRoomId++, new CGameTree(), false, "", "", new CTimeSettings(), new CTimeSettings(), {PlayersList : new CListView()});
-// }
-//
-// function AddGR_Count(nCount)
-// {
-// 	for (var nIndex = 0; nIndex < nCount; ++nIndex)
-// 	{
-// 		AddGR();
-// 	}
-//
-// 	for (var nIndex = 0; nIndex < nCount; ++nIndex)
-// 	{
-// 		oApp.SetCurrentGameRoomTab(nIndex);
-// 	}
-// }
-//
-// function RemoveAllGR()
-// {
-// 	for (var nIndex = g_nGameRoomId - 1; nIndex >= 0; --nIndex)
-// 	{
-// 		var oTab = oApp.m_oGameRoomTabs.GetTab(nIndex);
-// 		oTab.OnClickClose();
-// 	}
-//
-// 	g_nGameRoomId = 0;
-// }
+	var oThis = this;
+	function privateOnDrag(nY)
+	{
+		console.log(nY);
+		oThis.m_oGamesListWrapperControl.Bounds.SetParams(0, 0, 1000, 0, false, false, false, false, -1, nY);
+		oThis.m_oGamesListWrapperControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right);
+		oThis.m_oChatWrapperControl.Bounds.SetParams(0, nY, 1000, 1000, false, true, false, false, -1, -1);
+		oThis.m_oChatDragHandlerControl.Bounds.SetParams(0, nY, 1000, 1000, false, true, false, false, -1, 5);
+		oThis.OnResize(true);
+		oThis.m_oGamesListView.private_ScrollByY(0);
+	}
+
+	oDragElement.onDrag = function (nX, nY)
+	{
+		privateOnDrag(nY);
+	};
+	oDragElement.onDragStart = function(nX, nY)
+	{
+		global_mouseEvent.LockMouse();
+	};
+	oDragElement.onDragEnd = function(nX, nY)
+	{
+		global_mouseEvent.UnLockMouse();
+	};
+
+	if (parseInt(oThis.m_oChatDragHandlerControl.HtmlElement.style.top) > nYLimit)
+	{
+		privateOnDrag(nYLimit);
+	}
+};
