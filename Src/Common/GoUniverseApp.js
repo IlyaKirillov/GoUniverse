@@ -15,7 +15,7 @@ function CGoUniverseApplication()
 	this.m_oClientControl      = null;
 	this.m_oMainRoomControl    = null;
 
-	this.m_oGlobalSettings     = new CGoUniverseGlobalSettings();
+	this.m_oGlobalSettings     = new CGoUniverseGlobalSettings(this);
 	this.m_oPlayersListView    = new CListView();
 	this.m_oPlayersListView.Set_BGColor(243, 243, 243);
 
@@ -149,6 +149,7 @@ CGoUniverseApplication.prototype.OnConnect = function()
 
 	g_oFadeEffect.In(document.getElementById("divMainId"), 200);
 	this.OnResize();
+	this.m_oGlobalSettings.ParseUserSettings();
 };
 CGoUniverseApplication.prototype.OnResize = function(bSkipChatHandler)
 {
@@ -1258,8 +1259,10 @@ CGoUniverseApplication.prototype.GetGlobalSettings = function()
 	return this.m_oGlobalSettings;
 };
 
-function CGoUniverseGlobalSettings()
+function CGoUniverseGlobalSettings(oApp)
 {
+	this.m_oApp = oApp;
+
 	// Common
 	this.m_dChatSplitterPosition = 500;
 
@@ -1268,9 +1271,15 @@ function CGoUniverseGlobalSettings()
 	this.m_nKGSChatRoomId    = -1;
 
 	this.private_ParseChatSplitterPosition();
+}
+CGoUniverseGlobalSettings.prototype.ParseUserSettings = function()
+{
+	// Здесь мы парсим только те параметры, которые зависят от пользователя
+
+	// KGS
 	this.private_ParseKGSGamesListType();
 	this.private_ParseKGSChatRoomId();
-}
+};
 CGoUniverseGlobalSettings.prototype.SetChatSplitterPosition = function(dValue)
 {
 	this.m_dChatSplitterPosition = dValue;
@@ -1294,7 +1303,7 @@ CGoUniverseGlobalSettings.prototype.private_ParseChatSplitterPosition = function
 CGoUniverseGlobalSettings.prototype.SetKGSGamesListType = function(nValue)
 {
 	this.m_nKGSGamesListType = nValue;
-	this.private_SetValue("KGSGamesListType", "" + nValue);
+	this.private_SetValueForUser("KGSGamesListType", "" + nValue);
 };
 CGoUniverseGlobalSettings.prototype.GetKGSGamesListType = function()
 {
@@ -1302,7 +1311,7 @@ CGoUniverseGlobalSettings.prototype.GetKGSGamesListType = function()
 };
 CGoUniverseGlobalSettings.prototype.private_ParseKGSGamesListType = function()
 {
-	this.m_nKGSGamesListType = parseInt(this.private_GetValue("KGSGamesListType"));
+	this.m_nKGSGamesListType = parseInt(this.private_GetValueForUser("KGSGamesListType"));
 
 	if (isNaN(this.m_nKGSGamesListType)
 		|| null === this.m_nKGSGamesListType
@@ -1314,7 +1323,7 @@ CGoUniverseGlobalSettings.prototype.private_ParseKGSGamesListType = function()
 CGoUniverseGlobalSettings.prototype.SetKGSChatRoomId = function(nRoomId)
 {
 	this.m_nKGSChatRoomId = nRoomId;
-	this.private_SetValue("KGSChatRoomId", "" + nRoomId);
+	this.private_SetValueForUser("KGSChatRoomId", "" + nRoomId);
 };
 CGoUniverseGlobalSettings.prototype.GetKGSChatRoomId = function()
 {
@@ -1322,7 +1331,7 @@ CGoUniverseGlobalSettings.prototype.GetKGSChatRoomId = function()
 };
 CGoUniverseGlobalSettings.prototype.private_ParseKGSChatRoomId = function()
 {
-	this.m_nKGSChatRoomId = parseInt(this.private_GetValue("KGSChatRoomId"));
+	this.m_nKGSChatRoomId = parseInt(this.private_GetValueForUser("KGSChatRoomId"));
 	if (isNaN(this.m_nKGSChatRoomId)
 		|| null === this.m_nKGSChatRoomId
 		|| undefined === this.m_nKGSChatRoomId)
@@ -1337,6 +1346,24 @@ CGoUniverseGlobalSettings.prototype.private_GetValue = function(sType)
 {
 	if (undefined !== window.localStorage)
 		return localStorage.getItem("GoUniverseSettings_" + sType);
+
+	return "";
+};
+CGoUniverseGlobalSettings.prototype.private_SetValueForUser = function(sType, sValue)
+{
+	var oClient = this.m_oApp.GetClient();
+	var sUserName = oClient ? oClient.GetUserName() : "";
+
+	if (undefined !== window.localStorage)
+		localStorage.setItem("GoUniverseSettings_" + sUserName + "_" + sType, sValue);
+};
+CGoUniverseGlobalSettings.prototype.private_GetValueForUser = function(sType)
+{
+	var oClient = this.m_oApp.GetClient();
+	var sUserName = oClient ? oClient.GetUserName() : "";
+
+	if (undefined !== window.localStorage)
+		return localStorage.getItem("GoUniverseSettings_" + sUserName + "_" + sType);
 
 	return "";
 };

@@ -43,7 +43,7 @@ function CKGSClient(oApp)
 	this.m_oPlayersListView = oApp.GetPlayersListView();
 	this.m_oGamesListView   = oApp.GetGamesListView();
 
-	this.m_eGamesListType           = this.m_oGlobalSettings.GetKGSGamesListType();
+	this.m_eGamesListType           = EKGSGamesListType.All;
 	this.m_nGlobalGamesChannelId    = -1;
 	this.m_nFollowersGamesChannelId = -1;
 	this.m_oFollowersGames          = {};
@@ -75,7 +75,7 @@ CKGSClient.prototype.Clear = function()
 	this.m_oPrivateChats           = {};
 	this.m_oPrivateChatsByUserName = {};
 
-	this.m_eGamesListType           = this.m_oGlobalSettings.GetKGSGamesListType();
+	this.m_eGamesListType           = EKGSGamesListType.All;
 	this.m_nGlobalGamesChannelId    = -1;
 	this.m_nFollowersGamesChannelId = -1;
 	this.m_oFollowersGames          = {};
@@ -753,7 +753,6 @@ CKGSClient.prototype.private_HandleRoomJoin = function(oMessage)
 
 	this.m_oApp.AddChatRoom(oMessage.channelId, this.m_aAllRooms[oMessage.channelId].Name, false);
 
-
 	if (this.m_oEnterChatRoomRequest[oMessage.channelId])
 	{
 		this.m_nChatChannelId = oMessage.channelId;
@@ -767,6 +766,10 @@ CKGSClient.prototype.private_HandleRoomJoin = function(oMessage)
 		this.m_nChatChannelId = oMessage.channelId;
 		this.m_oApp.SetCurrentChatRoomTab(oMessage.channelId);
 		this.m_oGlobalSettings.SetKGSChatRoomId(nOldSavedId);
+	}
+	else
+	{
+		this.m_oApp.ScrollChatTabsToCurrent();
 	}
 
 	var Games = oMessage.games;
@@ -880,6 +883,8 @@ CKGSClient.prototype.private_HandleLoginSuccess = function(oMessage)
 	});
 
 	this.m_oApp.OnConnect();
+
+	this.m_eGamesListType = this.m_oGlobalSettings.GetKGSGamesListType();
 };
 CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
 {
