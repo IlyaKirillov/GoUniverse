@@ -75,9 +75,7 @@ function SplitTextToLines(sText)
 			// TODO: Когда сделаем выбор языка тут надо будет сделать меняющуюся локаль
 			sTimeString = oDate.toLocaleString();
 
-			console.log(aLines[nIndex]);
 			aLines[nIndex] = aLines[nIndex].splice(nPos, nEndPos + 6 - nPos, sTimeString);
-			console.log(aLines[nIndex]);
 
 			nPos = nPos + sTimeString.length;
 		}

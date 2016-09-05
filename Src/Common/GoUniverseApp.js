@@ -15,6 +15,7 @@ function CGoUniverseApplication()
 	this.m_oClientControl      = null;
 	this.m_oMainRoomControl    = null;
 
+	this.m_oGlobalSettings     = new CGoUniverseGlobalSettings();
 	this.m_oPlayersListView    = new CListView();
 	this.m_oPlayersListView.Set_BGColor(243, 243, 243);
 
@@ -648,10 +649,11 @@ CGoUniverseApplication.prototype.private_InitMainRoom = function()
 	oMainRoomControl.AddControl(oLeftPartControl);
 	this.m_oMainRoomLeftPartControl = oLeftPartControl;
 
+	var dSplitterPosition = this.m_oGlobalSettings.GetChatSplitterPosition();
 	// Список игровых комнат
 	var oGamesListWrapperControl = CreateControlContainer("divIdLGamesWrapper");
-	oGamesListWrapperControl.Bounds.SetParams(0, 0, 1000, 500, false, false, false, false, -1, -1);
-	oGamesListWrapperControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
+	oGamesListWrapperControl.Bounds.SetParams(0, 0, 1000, dSplitterPosition, false, false, false, false, -1, -1);
+	oGamesListWrapperControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left);
 	oLeftPartControl.AddControl(oGamesListWrapperControl);
 	this.m_oGamesListWrapperControl = oGamesListWrapperControl;
 
@@ -663,14 +665,14 @@ CGoUniverseApplication.prototype.private_InitMainRoom = function()
 
 	// Часть под чат
 	var oChatControl = CreateControlContainer("divIdLChat");
-	oChatControl.Bounds.SetParams(0, 500, 1000, 1000, false, false, false, false, -1, -1);
+	oChatControl.Bounds.SetParams(0, dSplitterPosition, 1000, 1000, false, false, false, false, -1, -1);
 	oChatControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
 	oLeftPartControl.AddControl(oChatControl);
 	this.m_oChatWrapperControl = oChatControl;
 
 	// Полоска для переноса
 	var oChatDragHandlerControl = CreateControlContainer("divIdLChatDragHandler");
-	oChatDragHandlerControl.Bounds.SetParams(0, 500, 1000, 1000, false, false, false, false, -1, 5);
+	oChatDragHandlerControl.Bounds.SetParams(0, dSplitterPosition, 1000, 1000, false, false, false, false, -1, 5);
 	oChatDragHandlerControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left);
 	oLeftPartControl.AddControl(oChatDragHandlerControl);
 	this.m_oChatDragHandlerControl = oChatDragHandlerControl;
@@ -1212,20 +1214,29 @@ CGoUniverseApplication.prototype.private_InitChatDragHandler = function ()
 	Common_DragHandler.Init(oDragElement, null, -1, -1, 0, nH - 100);
 
 	var oThis = this;
-	function privateOnDrag(nY)
+	function privateOnDrag(nY, isKoef)
 	{
-		console.log(nY);
-		oThis.m_oGamesListWrapperControl.Bounds.SetParams(0, 0, 1000, 0, false, false, false, false, -1, nY);
-		oThis.m_oGamesListWrapperControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right);
-		oThis.m_oChatWrapperControl.Bounds.SetParams(0, nY, 1000, 1000, false, true, false, false, -1, -1);
-		oThis.m_oChatDragHandlerControl.Bounds.SetParams(0, nY, 1000, 1000, false, true, false, false, -1, 5);
+		if (true === isKoef)
+		{
+			var dPosition = 1000 * nY / nH;
+			oThis.m_oGamesListWrapperControl.Bounds.SetParams(0, 0, 1000, dPosition, false, false, false, false, -1, -1);
+			oThis.m_oChatWrapperControl.Bounds.SetParams(0, dPosition, 1000, 1000, false, false, false, false, -1, -1);
+			oThis.m_oChatDragHandlerControl.Bounds.SetParams(0, dPosition, 1000, 1000, false, false, false, false, -1, 5);
+			oThis.m_oGlobalSettings.SetChatSplitterPosition(dPosition);
+		}
+		else
+		{
+			oThis.m_oGamesListWrapperControl.Bounds.SetParams(0, 0, 1000, 0, false, false, false, false, -1, nY);
+			oThis.m_oChatWrapperControl.Bounds.SetParams(0, nY, 1000, 1000, false, true, false, false, -1, -1);
+			oThis.m_oChatDragHandlerControl.Bounds.SetParams(0, nY, 1000, 1000, false, true, false, false, -1, 5);
+		}
 		oThis.OnResize(true);
 		oThis.m_oGamesListView.private_ScrollByY(0);
 	}
 
 	oDragElement.onDrag = function (nX, nY)
 	{
-		privateOnDrag(nY);
+		privateOnDrag(nY, false);
 	};
 	oDragElement.onDragStart = function(nX, nY)
 	{
@@ -1234,10 +1245,98 @@ CGoUniverseApplication.prototype.private_InitChatDragHandler = function ()
 	oDragElement.onDragEnd = function(nX, nY)
 	{
 		global_mouseEvent.UnLockMouse();
+		privateOnDrag(nY, true);
 	};
 
 	if (parseInt(oThis.m_oChatDragHandlerControl.HtmlElement.style.top) > nYLimit)
 	{
-		privateOnDrag(nYLimit);
+		privateOnDrag(nYLimit, true);
 	}
+};
+CGoUniverseApplication.prototype.GetGlobalSettings = function()
+{
+	return this.m_oGlobalSettings;
+};
+
+function CGoUniverseGlobalSettings()
+{
+	// Common
+	this.m_dChatSplitterPosition = 500;
+
+	// KGS specific
+	this.m_nKGSGamesListType = EKGSGamesListType.All;
+	this.m_nKGSChatRoomId    = -1;
+
+	this.private_ParseChatSplitterPosition();
+	this.private_ParseKGSGamesListType();
+	this.private_ParseKGSChatRoomId();
+}
+CGoUniverseGlobalSettings.prototype.SetChatSplitterPosition = function(dValue)
+{
+	this.m_dChatSplitterPosition = dValue;
+	this.private_SetValue("ChatSplitterPosition", "" + dValue);
+};
+CGoUniverseGlobalSettings.prototype.GetChatSplitterPosition = function()
+{
+	return this.m_dChatSplitterPosition;
+};
+CGoUniverseGlobalSettings.prototype.private_ParseChatSplitterPosition = function()
+{
+	this.m_dChatSplitterPosition = parseFloat(this.private_GetValue("ChatSplitterPosition"));
+
+	if (isNaN(this.m_dChatSplitterPosition)
+		|| null === this.m_dChatSplitterPosition
+		|| undefined === this.m_dChatSplitterPosition
+		|| this.m_dChatSplitterPosition < 0
+		|| this.m_dChatSplitterPosition > 1000)
+		this.m_dChatSplitterPosition = 500;
+};
+CGoUniverseGlobalSettings.prototype.SetKGSGamesListType = function(nValue)
+{
+	this.m_nKGSGamesListType = nValue;
+	this.private_SetValue("KGSGamesListType", "" + nValue);
+};
+CGoUniverseGlobalSettings.prototype.GetKGSGamesListType = function()
+{
+	return this.m_nKGSGamesListType;
+};
+CGoUniverseGlobalSettings.prototype.private_ParseKGSGamesListType = function()
+{
+	this.m_nKGSGamesListType = parseInt(this.private_GetValue("KGSGamesListType"));
+
+	if (isNaN(this.m_nKGSGamesListType)
+		|| null === this.m_nKGSGamesListType
+		|| undefined === this.m_nKGSGamesListType
+		|| this.m_nKGSGamesListType < EKGSGamesListType.Min
+		|| this.m_nKGSGamesListType > EKGSGamesListType.Max)
+		this.m_nKGSGamesListType = EKGSGamesListType.All;
+};
+CGoUniverseGlobalSettings.prototype.SetKGSChatRoomId = function(nRoomId)
+{
+	this.m_nKGSChatRoomId = nRoomId;
+	this.private_SetValue("KGSChatRoomId", "" + nRoomId);
+};
+CGoUniverseGlobalSettings.prototype.GetKGSChatRoomId = function()
+{
+	return this.m_nKGSChatRoomId;
+};
+CGoUniverseGlobalSettings.prototype.private_ParseKGSChatRoomId = function()
+{
+	this.m_nKGSChatRoomId = parseInt(this.private_GetValue("KGSChatRoomId"));
+	if (isNaN(this.m_nKGSChatRoomId)
+		|| null === this.m_nKGSChatRoomId
+		|| undefined === this.m_nKGSChatRoomId)
+		this.m_nKGSChatRoomId = -1;
+};
+CGoUniverseGlobalSettings.prototype.private_SetValue = function(sType, sValue)
+{
+	if (undefined !== window.localStorage)
+		localStorage.setItem("GoUniverseSettings_" + sType, sValue);
+};
+CGoUniverseGlobalSettings.prototype.private_GetValue = function(sType)
+{
+	if (undefined !== window.localStorage)
+		return localStorage.getItem("GoUniverseSettings_" + sType);
+
+	return "";
 };

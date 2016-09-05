@@ -12,12 +12,16 @@
 var EKGSGamesListType = {
 	All      : 0,
 	Room     : 1,
-	Follower : 2
+	Follower : 2,
+
+	Min : 0,
+	Max : 2
 };
 
 function CKGSClient(oApp)
 {
 	this.m_oApp           = oApp;
+	this.m_oGlobalSettings= oApp.GetGlobalSettings();
 	this.m_bLoggedIn      = false;
 	this.m_aGames         = {};
 	this.m_oFriendList    = [];
@@ -39,10 +43,12 @@ function CKGSClient(oApp)
 	this.m_oPlayersListView = oApp.GetPlayersListView();
 	this.m_oGamesListView   = oApp.GetGamesListView();
 
-	this.m_eGamesListType           = EKGSGamesListType.All;
+	this.m_eGamesListType           = this.m_oGlobalSettings.GetKGSGamesListType();
 	this.m_nGlobalGamesChannelId    = -1;
 	this.m_nFollowersGamesChannelId = -1;
 	this.m_oFollowersGames          = {};
+
+	this.m_oEnterChatRoomRequest = {}; // Список комнат, в которые мы сделали запрос на вход, нужно для определения RoomJoin начальный или по запросу
 }
 CKGSClient.prototype.Clear = function()
 {
@@ -69,6 +75,7 @@ CKGSClient.prototype.Clear = function()
 	this.m_oPrivateChats           = {};
 	this.m_oPrivateChatsByUserName = {};
 
+	this.m_eGamesListType           = this.m_oGlobalSettings.GetKGSGamesListType();
 	this.m_nGlobalGamesChannelId    = -1;
 	this.m_nFollowersGamesChannelId = -1;
 	this.m_oFollowersGames          = {};
@@ -155,6 +162,8 @@ CKGSClient.prototype.EnterChatRoom = function(nChatRoomId)
 		"type"      : "JOIN_REQUEST",
 		"channelId" : nChatRoomId
 	});
+
+	this.m_oEnterChatRoomRequest[nChatRoomId] = nChatRoomId;
 };
 CKGSClient.prototype.LeaveChatRoom = function(nChatRoomId)
 {
@@ -274,6 +283,10 @@ CKGSClient.prototype.CloseUserInfo = function(sUserName)
 CKGSClient.prototype.SetCurrentChatRoom = function(nChatRoomId)
 {
 	this.m_nChatChannelId = nChatRoomId;
+
+	if (true !== this.IsPrivateChat(nChatRoomId))
+		this.m_oGlobalSettings.SetKGSChatRoomId(nChatRoomId);
+
 	this.private_UpdatePlayersList();
 
 	if (EKGSGamesListType.Room === this.m_eGamesListType)
@@ -740,8 +753,21 @@ CKGSClient.prototype.private_HandleRoomJoin = function(oMessage)
 
 	this.m_oApp.AddChatRoom(oMessage.channelId, this.m_aAllRooms[oMessage.channelId].Name, false);
 
-	this.m_nChatChannelId = oMessage.channelId;
-	this.m_oApp.SetCurrentChatRoomTab(oMessage.channelId);
+
+	if (this.m_oEnterChatRoomRequest[oMessage.channelId])
+	{
+		this.m_nChatChannelId = oMessage.channelId;
+		this.m_oApp.SetCurrentChatRoomTab(oMessage.channelId);
+		delete this.m_oEnterChatRoomRequest[oMessage.channelId];
+	}
+	else if (-1 === this.m_nChatChannelId || this.m_oGlobalSettings.GetKGSChatRoomId() === oMessage.channelId)
+	{
+		// Здесь не портим сохраненный идентефикатор чата
+		var nOldSavedId = this.m_oGlobalSettings.GetKGSChatRoomId();
+		this.m_nChatChannelId = oMessage.channelId;
+		this.m_oApp.SetCurrentChatRoomTab(oMessage.channelId);
+		this.m_oGlobalSettings.SetKGSChatRoomId(nOldSavedId);
+	}
 
 	var Games = oMessage.games;
 	if (Games && Games.length > 0)
@@ -1368,6 +1394,8 @@ CKGSClient.prototype.private_HandlePrivateKeepOut = function(oMessage)
 	if (undefined !== this.m_aAllRooms[nChannelId])
 	{
 		sRoomName = "\"" + this.m_aAllRooms[nChannelId].Name + "\"";
+		if (undefined !== this.m_oEnterChatRoomRequest[nChannelId])
+			delete this.m_oEnterChatRoomRequest[nChannelId];
 	}
 	else if (null !== (oRecord = this.m_oGamesListView.Get_RecordById(nChannelId)))
 	{
@@ -1666,6 +1694,7 @@ CKGSClient.prototype.SetGamesListType = function(eType)
 	if (eType !== this.m_eGamesListType)
 	{
 		this.m_eGamesListType = eType;
+		this.m_oApp.GetGlobalSettings().SetKGSGamesListType(eType);
 		this.private_UpdateGamesList();
 	}
 };
