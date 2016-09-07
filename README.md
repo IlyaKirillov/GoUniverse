@@ -6,5 +6,5 @@ Supported servers:
 
 KGS (Kiseido Go Server) www.gokgs.com
 
-Current version: 1.2.0
+Current version: 1.2.2
 
