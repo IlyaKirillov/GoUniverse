@@ -190,11 +190,13 @@ CKGSGameListRecord.prototype.GetComment = function()
 {
 	return this.m_sComment;
 };
+CKGSGameListRecord.prototype.IsChallenge = function()
+{
+	return (this.m_nGameType === EKGSGameType.Challenge ? true : false);
+};
 
 function CKGSChallengeProposal(oGameRecord)
 {
-	console.log(oGameRecord);
-
 	this.m_nGameType  = EKGSGameType.free;
 	this.m_sRules     = "japanese";
 	this.m_sKomi      = "6.5";

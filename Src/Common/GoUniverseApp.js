@@ -1190,7 +1190,9 @@ CGoUniverseApplication.prototype.ShowGamesListContextMenu = function(nX, nY, nGa
 
 	if (null !== nGameId)
 	{
-		oContextMenu.AddCheckBoxItem(false, "Observe", function ()
+		var oGameRecord = this.m_oClient.GetGame(nGameId);
+		var bChallenge = oGameRecord && oGameRecord.IsChallenge() ? true : false;
+		oContextMenu.AddCheckBoxItem(false, bChallenge ? "Join" : "Observe", function ()
 		{
 			oThis.SetCurrentGameRoomTab(nGameId);
 		});
@@ -1198,9 +1200,13 @@ CGoUniverseApplication.prototype.ShowGamesListContextMenu = function(nX, nY, nGa
 	}
 
 	var nGamesListType = oClient.GetGamesListType();
-	oContextMenu.AddCheckBoxItem(EKGSGamesListType.All === nGamesListType ? true : false, "All", function ()
+	oContextMenu.AddCheckBoxItem(EKGSGamesListType.AllGames === nGamesListType ? true : false, "All games", function ()
 	{
-		oClient.SetGamesListType(EKGSGamesListType.All);
+		oClient.SetGamesListType(EKGSGamesListType.AllGames);
+	});
+	oContextMenu.AddCheckBoxItem(EKGSGamesListType.AllChallenges === nGamesListType ? true : false, "All challenges", function ()
+	{
+		oClient.SetGamesListType(EKGSGamesListType.AllChallenges);
 	});
 	oContextMenu.AddCheckBoxItem(EKGSGamesListType.Room === nGamesListType ? true : false, "Rooms", function ()
 	{
@@ -1289,7 +1295,7 @@ function CGoUniverseGlobalSettings(oApp)
 	this.m_dChatSplitterPosition = 500;
 
 	// KGS specific
-	this.m_nKGSGamesListType = EKGSGamesListType.All;
+	this.m_nKGSGamesListType = EKGSGamesListType.AllGames;
 	this.m_nKGSChatRoomId    = -1;
 
 	this.private_ParseChatSplitterPosition();
@@ -1340,7 +1346,7 @@ CGoUniverseGlobalSettings.prototype.private_ParseKGSGamesListType = function()
 		|| undefined === this.m_nKGSGamesListType
 		|| this.m_nKGSGamesListType < EKGSGamesListType.Min
 		|| this.m_nKGSGamesListType > EKGSGamesListType.Max)
-		this.m_nKGSGamesListType = EKGSGamesListType.All;
+		this.m_nKGSGamesListType = EKGSGamesListType.AllGames;
 };
 CGoUniverseGlobalSettings.prototype.SetKGSChatRoomId = function(nRoomId)
 {

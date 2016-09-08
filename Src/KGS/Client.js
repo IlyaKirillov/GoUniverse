@@ -10,12 +10,13 @@
  */
 
 var EKGSGamesListType = {
-	All      : 0,
-	Room     : 1,
-	Follower : 2,
+	AllGames      : 0,
+	Room          : 1,
+	Follower      : 2,
+	AllChallenges : 3,
 
 	Min : 0,
-	Max : 2
+	Max : 3
 };
 
 function CKGSClient(oApp)
@@ -43,7 +44,7 @@ function CKGSClient(oApp)
 	this.m_oPlayersListView = oApp.GetPlayersListView();
 	this.m_oGamesListView   = oApp.GetGamesListView();
 
-	this.m_eGamesListType           = EKGSGamesListType.All;
+	this.m_eGamesListType           = EKGSGamesListType.AllGames;
 	this.m_nGlobalGamesChannelId    = -1;
 	this.m_nFollowersGamesChannelId = -1;
 	this.m_oFollowersGames          = {};
@@ -75,7 +76,7 @@ CKGSClient.prototype.Clear = function()
 	this.m_oPrivateChats           = {};
 	this.m_oPrivateChatsByUserName = {};
 
-	this.m_eGamesListType           = EKGSGamesListType.All;
+	this.m_eGamesListType           = EKGSGamesListType.AllGames;
 	this.m_nGlobalGamesChannelId    = -1;
 	this.m_nFollowersGamesChannelId = -1;
 	this.m_oFollowersGames          = {};
@@ -801,7 +802,7 @@ CKGSClient.prototype.private_HandleRoomJoin = function(oMessage)
 	if (oMessage.channelId == this.m_nChatChannelId)
 		this.private_UpdatePlayersList();
 
-	if (EKGSGamesListType.All === this.m_eGamesListType || (EKGSGamesListType.Room === this.m_eGamesListType && oMessage.channelId == this.m_nChatChannelId))
+	if (EKGSGamesListType.AllGames === this.m_eGamesListType || EKGSGamesListType.AllChallenges === this.m_eGamesListType ||  (EKGSGamesListType.Room === this.m_eGamesListType && oMessage.channelId == this.m_nChatChannelId))
 		this.private_UpdateGamesList();
 };
 CKGSClient.prototype.private_HandleLoginSuccess = function(oMessage)
@@ -846,6 +847,11 @@ CKGSClient.prototype.private_HandleLoginSuccess = function(oMessage)
 		"list" : "FANS"
 	});
 
+	this.private_SendMessage({
+		"type" : "GLOBAL_LIST_JOIN_REQUEST",
+		"list" : "CHALLENGES"
+	});
+
 	var oRoomCategoryId = oMessage.roomCategoryChannelIds;
 	for (var sCategoryId in oRoomCategoryId)
 	{
@@ -884,7 +890,7 @@ CKGSClient.prototype.private_HandleLoginSuccess = function(oMessage)
 
 	this.m_oApp.OnConnect();
 
-	this.m_eGamesListType = this.m_oGlobalSettings.GetKGSGamesListType();
+	this.SetGamesListType(this.m_oGlobalSettings.GetKGSGamesListType());
 };
 CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
 {
@@ -933,6 +939,9 @@ CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
 		sGameName    = oGameRecord.GetComment();
 		sSizeHandi   = oProposal.GetBoardSize() + "x" + oProposal.GetBoardSize() + ",   "  + oProposal.GetKomi() + ",   " + oProposal.GetRules()
 		sTime        = oProposal.GetTimeSettingsString();
+
+		if (oCreator && oCreator.IsRobot())
+			sWhite += "(robot)";
 	}
 
 	if (EKGSGameType.Demonstration === nGameType)
@@ -1122,8 +1131,10 @@ CKGSClient.prototype.private_HandleGameList = function(oMessage)
 		var oEntry = Games[Pos];
 
 		var oGameRecord = this.private_OnAddGameListRecord(oMessage.channelId, oEntry);
+		var bChallenge = oGameRecord.IsChallenge();
 
-		if (EKGSGamesListType.All === this.m_eGamesListType
+		if ((EKGSGamesListType.AllGames === this.m_eGamesListType && true !== bChallenge)
+			|| (EKGSGamesListType.AllChallenges === this.m_eGamesListType && true === bChallenge)
 			|| (EKGSGamesListType.Room === this.m_eGamesListType && oMessage.channelId == this.m_nChatChannelId)
 			|| (EKGSGamesListType.Follower === this.m_eGamesListType && oMessage.channelId === this.m_nFollowersGamesChannelId))
 			this.private_HandleGameRecord(oGameRecord, true);
@@ -1132,9 +1143,14 @@ CKGSClient.prototype.private_HandleGameList = function(oMessage)
 };
 CKGSClient.prototype.private_HandleGameContainerRemoveGame = function(oMessage)
 {
-	this.private_OnRemoveGameListRecord(oMessage.channelId, oMessage.gameId);
+	var oGameRecord = this.private_OnRemoveGameListRecord(oMessage.channelId, oMessage.gameId);
+	if (!oGameRecord)
+		return;
 
-	if ((EKGSGamesListType.All === this.m_eGamesListType && !this.m_oAllGames[oMessage.gameId])
+	var bIsChallenge = oGameRecord.IsChallenge();
+
+	if ((EKGSGamesListType.AllGames === this.m_eGamesListType && !this.m_oAllGames[oMessage.gameId] && true !== bIsChallenge)
+		|| (EKGSGamesListType.AllChallenges === this.m_eGamesListType && !this.m_oAllGames[oMessage.gameId] && true === bIsChallenge)
 		|| (EKGSGamesListType.Room === this.m_eGamesListType && oMessage.channelId === this.m_nChatChannelId)
 		|| (EKGSGamesListType.Follower === this.m_eGamesListType && oMessage.channelId === this.m_nFollowersGamesChannelId))
 	{
@@ -1246,7 +1262,8 @@ CKGSClient.prototype.private_HandleGlobalGamesJoin = function(oMessage)
 		this.private_OnAddGameListRecord(oMessage.channelId, oEntry);
 	}
 
-	if (EKGSGamesListType.All === this.m_eGamesListType
+	if (EKGSGamesListType.AllGames === this.m_eGamesListType
+		|| (EKGSGamesListType.AllChallenges === this.m_eGamesListType && "CHALLENGES" === oMessage.containerType)
 		|| (EKGSGamesListType.Follower === this.m_eGamesListType && "FANS" === oMessage.containerType))
 		this.private_UpdateGamesList();
 };
@@ -1709,6 +1726,8 @@ CKGSClient.prototype.private_OnRemoveGameListRecord = function(nRoomId, nGameId)
 		else if (nRoomId === this.m_nFollowersGamesChannelId)
 			delete this.m_oFollowersGames[nGameId];
 	}
+
+	return oGameRecord;
 };
 CKGSClient.prototype.GetGamesListType = function()
 {
@@ -1718,6 +1737,15 @@ CKGSClient.prototype.SetGamesListType = function(eType)
 {
 	if (eType !== this.m_eGamesListType)
 	{
+		if (eType === EKGSGamesListType.AllChallenges)
+		{
+			this.m_oGamesListView.GetListObject().ResetToChallangesList();
+		}
+		else if (this.m_eGamesListType === EKGSGamesListType.AllChallenges)
+		{
+			this.m_oGamesListView.GetListObject().ResetToGamesList();
+		}
+
 		this.m_eGamesListType = eType;
 		this.m_oApp.GetGlobalSettings().SetKGSGamesListType(eType);
 		this.private_UpdateGamesList();
@@ -1727,12 +1755,22 @@ CKGSClient.prototype.private_UpdateGamesList = function()
 {
 	this.m_oGamesListView.Clear();
 
-	if (EKGSGamesListType.All === this.m_eGamesListType)
+	if (EKGSGamesListType.AllGames === this.m_eGamesListType)
 	{
 		for (var nGameId in this.m_oAllGames)
 		{
 			var oGameRecord = this.m_oAllGames[nGameId];
-			this.private_HandleGameRecord(oGameRecord, true);
+			if (!oGameRecord.IsChallenge())
+				this.private_HandleGameRecord(oGameRecord, true);
+		}
+	}
+	else if (EKGSGamesListType.AllChallenges === this.m_eGamesListType)
+	{
+		for (var nGameId in this.m_oAllGames)
+		{
+			var oGameRecord = this.m_oAllGames[nGameId];
+			if (oGameRecord.IsChallenge())
+				this.private_HandleGameRecord(oGameRecord, true);
 		}
 	}
 	else if (EKGSGamesListType.Room === this.m_eGamesListType)
@@ -1757,5 +1795,13 @@ CKGSClient.prototype.private_UpdateGamesList = function()
 	}
 
 	this.m_oGamesListView.Update_Size();
+};
+CKGSClient.prototype.GetGame = function(nGameId)
+{
+	if (!this.m_oAllGames[nGameId])
+		return null;
+
+	return this.m_oAllGames[nGameId];
+
 };
 
