@@ -329,6 +329,32 @@ CTimeSettings.prototype.private_SecondsToString = function(_seconds)
 	else
 		return sSeconds + "." + sMSeconds;
 };
+CTimeSettings.prototype.private_SecondsToString2 = function(_seconds)
+{
+	var nHours    = Math.floor(_seconds / 3600);
+	var nMinutes  = Math.floor((_seconds - (nHours * 3600)) / 60);
+	var nSeconds  = Math.floor(_seconds - (nHours * 3600) - (nMinutes * 60));
+	var sHours    = "" + nHours;
+	var sMinutes  = (nMinutes < 10 ? "0" + nMinutes : "" + nMinutes);
+	var sSeconds  = (nSeconds < 10 ? "0" + nSeconds : "" + nSeconds);
+
+	if (nHours > 0)
+		return sHours + ':' + sMinutes + ':' + sSeconds;
+	else
+		return sMinutes + ':' + sSeconds;
+};
+CTimeSettings.prototype.private_SecondsToString3 = function(_seconds)
+{
+	var nMinutes  = Math.floor(_seconds / 60);
+	var nSeconds  = Math.floor(_seconds - (nMinutes * 60));
+	var sMinutes  = "" + nMinutes;
+	var sSeconds  = (nSeconds < 10 ? "0" + nSeconds : "" + nSeconds);
+
+	if (nMinutes > 0)
+		return sMinutes + ':' + sSeconds;
+	else
+		return sSeconds;
+};
 CTimeSettings.prototype.ToString = function()
 {
 	switch (this.m_nType)
@@ -371,4 +397,28 @@ CTimeSettings.prototype.ToString = function()
 	}
 
 	return "--:--";
+};
+CTimeSettings.prototype.GetTimeSystemString = function()
+{
+	switch (this.m_nType)
+	{
+		case ETimeSettings.None:
+		{
+			return "no time limit";
+		}
+		case ETimeSettings.Absolute:
+		{
+			return this.private_SecondsToString2(this.m_nMainTime) + " absolute";
+		}
+		case ETimeSettings.ByoYomi:
+		{
+			return this.private_SecondsToString2(this.m_nMainTime) + ", " + (this.private_SecondsToString3(this.m_nOverTimeCur) + " (" + this.m_nOverCountCur + ")");
+		}
+		case ETimeSettings.Canadian:
+		{
+			return this.private_SecondsToString2(this.m_nMainTime) + ", " + (this.private_SecondsToString3(this.m_nOverTimeCur) + "/" + this.m_nOverCountCur);
+		}
+	}
+
+	return "No time limit";
 };

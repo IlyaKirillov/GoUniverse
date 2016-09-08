@@ -20,22 +20,22 @@ var EKGSGamesListType = {
 
 function CKGSClient(oApp)
 {
-	this.m_oApp           = oApp;
-	this.m_oGlobalSettings= oApp.GetGlobalSettings();
-	this.m_bLoggedIn      = false;
-	this.m_aGames         = {};
-	this.m_oFriendList    = [];
-	this.m_oBlackList     = {};
-	this.m_oFollowerList  = {};
-	this.m_aRooms         = {};
-	this.m_nChatChannelId = -1;
-	this.m_aAllRooms      = {};
-	this.m_oAllUsers      = {};
-	this.m_oAllGames      = {};
-	this.m_oGameNotify    = {};
-	this.m_oRoomCategory  = {};
-	this.m_oUserInfo      = {}; // Список открытых окон с информацией пользователя
-	this.m_oCurrentUser   = new CKGSUser(this);
+	this.m_oApp            = oApp;
+	this.m_oGlobalSettings = oApp.GetGlobalSettings();
+	this.m_bLoggedIn       = false;
+	this.m_aGames          = {};
+	this.m_oFriendList     = [];
+	this.m_oBlackList      = {};
+	this.m_oFollowerList   = {};
+	this.m_aRooms          = {};
+	this.m_nChatChannelId  = -1;
+	this.m_aAllRooms       = {};
+	this.m_oAllUsers       = {};
+	this.m_oAllGames       = {};
+	this.m_oGameNotify     = {};
+	this.m_oRoomCategory   = {};
+	this.m_oUserInfo       = {}; // Список открытых окон с информацией пользователя
+	this.m_oCurrentUser    = new CKGSUser(this);
 
 	this.m_oPrivateChats           = {};
 	this.m_oPrivateChatsByUserName = {};
@@ -889,8 +889,6 @@ CKGSClient.prototype.private_HandleLoginSuccess = function(oMessage)
 CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
 {
 	var nGameType = oGameRecord.GetGameType();
-	if (EKGSGameType.Challenge === nGameType)
-		return;
 
 	var nGameId     = oGameRecord.GetGameId();
 	var sGameType   = "";
@@ -913,6 +911,29 @@ CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
 	var bDemo       = false;
 	var nSize       = oGameRecord.GetBoardSize();
 	var nHandi      = oGameRecord.GetHandicap();
+	var bChallenge  = false;
+	var sGameName   = "";
+	var sTime       = "";
+	var sSizeHandi  = nSize + "x" + nSize + (0 !== nHandi ? " H" + nHandi : "");
+
+	if (EKGSGameType.Challenge === nGameType)
+	{
+		bChallenge = true;
+
+		var oProposal = oGameRecord.GetProposal();
+
+		nGameType = oProposal.GetGameType();
+		bDemo = false;
+
+		var oCreator = oGameRecord.GetChallengeCreator();
+		sWhite       = oCreator ? oCreator.GetName() : "";
+		nWhiteR      = oCreator ? oCreator.GetRank() : -3;
+		sBlack       = "";
+		nBlackR      = -3;
+		sGameName    = oGameRecord.GetComment();
+		sSizeHandi   = oProposal.GetBoardSize() + "x" + oProposal.GetBoardSize() + ",   "  + oProposal.GetKomi() + ",   " + oProposal.GetRules()
+		sTime        = oProposal.GetTimeSettingsString();
+	}
 
 	if (EKGSGameType.Demonstration === nGameType)
 	{
@@ -964,11 +985,10 @@ CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
 	else if (EKGSGameType.Tournament === nGameType)
 		sGameType = "*";
 
-	var sSizeHandi = nSize + "x" + nSize + (0 !== nHandi ? " H" + nHandi : "");
 	if (true === bPrivate)
 		sGameType = "P";
 
-	this.m_oGamesListView.Handle_Record([nAdd, nGameId, sGameType, nObservers, "", sWhite, nWhiteR, "", sBlack, nBlackR, sComment, nMoveNumber, bPrivate, nRoomId, bAdjourned, bEvent, bDemo, sSizeHandi]);
+	this.m_oGamesListView.Handle_Record([nAdd, nGameId, sGameType, nObservers, "", sWhite, nWhiteR, "", sBlack, nBlackR, sComment, nMoveNumber, bPrivate, nRoomId, bAdjourned, bEvent, bDemo, sSizeHandi, bChallenge, sGameName, sTime]);
 };
 CKGSClient.prototype.private_HandleUserRecord = function(oUserRecord, bUpdateUserInfo)
 {

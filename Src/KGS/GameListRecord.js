@@ -41,16 +41,21 @@ function CKGSGameListRecord(oClient)
 	this.m_bAdjourned  = false;
 	this.m_bEvent      = false;
 	this.m_bPrivate    = false;
+
+	this.m_oChallengeCreator = null;
+	this.m_oProposal         = null;
+	this.m_sComment          = "";
 }
 CKGSGameListRecord.prototype.Update = function(oGameRecord)
 {
 	this.private_ParseGameType(oGameRecord.gameType);
 
-	this.m_nGameId = oGameRecord.channelId;
-	this.m_nRoomId = oGameRecord.roomId;
-	
+	this.m_nGameId  = oGameRecord.channelId;
+	this.m_nRoomId  = oGameRecord.roomId;
+	this.m_bPrivate = true === oGameRecord.private ? true : false;
+
 	if (EKGSGameType.Challenge === this.m_nGameType)
-		return;
+		return this.private_ParseChallenge(oGameRecord);
 
 	this.m_nMoveNumber = oGameRecord.moveNum;
 	this.m_nObservers  = undefined !== oGameRecord.observers ? oGameRecord.observers : 0;
@@ -70,7 +75,6 @@ CKGSGameListRecord.prototype.Update = function(oGameRecord)
 
 	this.m_bAdjourned  = oGameRecord.adjourned ? oGameRecord.adjourned : false;
 	this.m_bEvent      = oGameRecord.event ? oGameRecord.event : false;
-	this.m_bPrivate    = true === oGameRecord.private ? true : false;
 };
 CKGSGameListRecord.prototype.AddRoom = function(nRoomId)
 {
@@ -165,4 +169,89 @@ CKGSGameListRecord.prototype.GetBoardSize = function()
 CKGSGameListRecord.prototype.GetHandicap = function()
 {
 	return this.m_nHandicap;
+};
+CKGSGameListRecord.prototype.private_ParseChallenge = function(oGameRecord)
+{
+	if (oGameRecord.players.challengeCreator)
+		this.m_oChallengeCreator = GetKGSUser(oGameRecord.players.challengeCreator);
+
+	this.m_oProposal = new CKGSChallengeProposal(oGameRecord.initialProposal);
+	this.m_sComment  = oGameRecord.name ? oGameRecord.name : "";
+};
+CKGSGameListRecord.prototype.GetProposal = function()
+{
+	return this.m_oProposal;
+};
+CKGSGameListRecord.prototype.GetChallengeCreator = function()
+{
+	return this.m_oChallengeCreator;
+};
+CKGSGameListRecord.prototype.GetComment = function()
+{
+	return this.m_sComment;
+};
+
+function CKGSChallengeProposal(oGameRecord)
+{
+	console.log(oGameRecord);
+
+	this.m_nGameType  = EKGSGameType.free;
+	this.m_sRules     = "japanese";
+	this.m_sKomi      = "6.5";
+	this.m_nSize      = 19;
+	this.m_oTime      = new CTimeSettings();
+	this.m_bNigiri    = true === oGameRecord.nigiri ? true : false;
+	this.m_arrPlayers = [];
+
+	this.private_ParseGameType(oGameRecord.gameType);
+	this.private_ParseRules(oGameRecord.rules);
+}
+CKGSChallengeProposal.prototype.private_ParseGameType = function(sGameType)
+{
+	if ("teaching" === sGameType)
+		this.m_nGameType = EKGSGameType.Teaching;
+	else if ("simul" === sGameType)
+		this.m_nGameType = EKGSGameType.Simul;
+	else if ("rengo" === sGameType)
+		this.m_nGameType = EKGSGameType.Rengo;
+	else if ("free" === sGameType)
+		this.m_nGameType = EKGSGameType.Free;
+	else if ("ranked" === sGameType)
+		this.m_nGameType = EKGSGameType.Ranked;
+	else if ("tournament" === sGameType)
+		this.m_nGameType = EKGSGameType.Tournament;
+};
+CKGSChallengeProposal.prototype.GetGameType = function()
+{
+	return this.m_nGameType;
+};
+CKGSChallengeProposal.prototype.GetRules = function()
+{
+	return this.m_sRules;
+};
+CKGSChallengeProposal.prototype.GetKomi = function()
+{
+	return this.m_sKomi;
+};
+CKGSChallengeProposal.prototype.GetBoardSize = function()
+{
+	return this.m_nSize;
+};
+CKGSChallengeProposal.prototype.private_ParseRules = function(oRules)
+{
+	this.m_sRules = oRules.rules ? oRules.rules : "japanese";
+	this.m_sKomi  = "" + oRules.komi;
+	this.m_nSize  = oRules.size ? oRules.size : 19;
+
+	var sTimeType = oRules.timeSystem;
+	if ("absolute" === sTimeType)
+		this.m_oTime.SetAbsolute(oRules.mainTime);
+	else if ("byo_yomi" === sTimeType)
+		this.m_oTime.SetByoYomi(oRules.mainTime, oRules.byoYomiTime, oRules.byoYomiPeriods);
+	else if ("canadian" === sTimeType)
+		this.m_oTime.SetCanadian(oRules.mainTime, oRules.byoYomiTime, oRules.byoYomiStones);
+};
+CKGSChallengeProposal.prototype.GetTimeSettingsString = function()
+{
+	return this.m_oTime.GetTimeSystemString();
 };
