@@ -18,7 +18,8 @@ var EKGSWindowType = {
 	RoomInfo    : 2,
 	Information : 3,
 	Idle        : 4,
-	SgfViewer   : 5
+	SgfViewer   : 5,
+	Challenge   : 6
 };
 
 var g_aKGSWindows      = {};
@@ -44,6 +45,7 @@ function CreateKGSWindow(nWindowType, oPr)
 	case EKGSWindowType.Information     : sApp = "Information" + (new Date()).getTime(); break;
 	case EKGSWindowType.Idle            : sApp = "Idle"; break;
 	case EKGSWindowType.SgfViewer       : sApp = "SgfViewer_" + oPr.Url; break;
+	case EKGSWindowType.Challenge       : sApp = "Challenge_" + oPr.ChannelId; break;
 	}
 	var sId = sParentId + sApp;
 
@@ -74,6 +76,7 @@ function CreateKGSWindow(nWindowType, oPr)
 		case EKGSWindowType.Information     : oWindow = new CKGSInformationWindow(); break;
 		case EKGSWindowType.Idle            : oWindow = new CKGSInformationIdleWindow(); break;
 		case EKGSWindowType.SgfViewer       : oWindow = new CKGSSgfViewerWindow(); break;
+		case EKGSWindowType.Challenge       : oWindow = new CKGSChallengeWindow(); break;
 		}
 
 		oWindows[sId] = oWindow;
@@ -142,7 +145,8 @@ function CKGSWindowBase()
 {
 	CKGSWindowBase.superclass.constructor.call(this);
 
-	this.m_oApp = null;
+	this.m_oApp    = null;
+	this.m_oClient = null;
 }
 CommonExtend(CKGSWindowBase, CDrawingWindow);
 CKGSWindowBase.prototype.Init = function(sDivId, oPr, bResizeble)

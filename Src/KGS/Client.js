@@ -37,6 +37,7 @@ function CKGSClient(oApp)
 	this.m_oRoomCategory   = {};
 	this.m_oUserInfo       = {}; // Список открытых окон с информацией пользователя
 	this.m_oCurrentUser    = new CKGSUser(this);
+	this.m_oChallenges     = {};
 
 	this.m_oPrivateChats           = {};
 	this.m_oPrivateChatsByUserName = {};
@@ -279,6 +280,19 @@ CKGSClient.prototype.CloseUserInfo = function(sUserName)
 		}
 
 		delete this.m_oUserInfo[sUserName];
+	}
+};
+CKGSClient.prototype.CloseChallenge = function(nChannelId)
+{
+	if (this.m_oChallenges[nChannelId])
+	{
+		this.private_SendMessage({
+			"type"     : "UNJOIN_REQUEST",
+			"channelId": nChannelId
+		});
+
+		RemoveWindow(this.m_oChallenges[nChannelId]);
+		delete this.m_oChallenges[nChannelId];
 	}
 };
 CKGSClient.prototype.SetCurrentChatRoom = function(nChatRoomId)
@@ -713,6 +727,10 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
 	else if ("DETAILS_UPDATE" === oMessage.type)
 	{
 		this.private_HandleDetailsUpdate(oMessage);
+	}
+	else if ("CHALLENGE_JOIN" === oMessage.type)
+	{
+		this.private_HandleChallengeJoin(oMessage);
 	}
 	else
 	{
@@ -1557,6 +1575,16 @@ CKGSClient.prototype.private_HandleDetailsUpdate = function(oMessage)
 			oInfo.Window.OnDetailsUpdate(oMessage);
 		}
 	}
+};
+CKGSClient.prototype.private_HandleChallengeJoin = function(oMessage)
+{
+	var nChannelId = oMessage.channelId;
+	var oGameRecord = this.m_oAllGames[nChannelId];
+	if (this.m_oChallenges[nChannelId] || !oGameRecord)
+		return;
+
+	var oWindow = CreateKGSWindow(EKGSWindowType.Challenge, {ChannelId : nChannelId, GameRecord : oGameRecord, Client : this, App: this.m_oApp});
+	this.m_oChallenges[nChannelId] = oWindow;
 };
 CKGSClient.prototype.private_AddUserToRoom = function(oUser, oRoom)
 {
