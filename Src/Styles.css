@@ -444,3 +444,28 @@ span.InGameChatMoveRef {
 span.InGameChatMoveRef:hover {
 	text-decoration : underline;
 }
+
+input.challengeInput {
+	border          : none;
+	outline         : none;
+	-moz-appearance : none;
+	resize          : none;
+	font-family     : 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif;
+
+	background      : rgb(243, 243, 243);
+    color           : black;
+}
+
+select.challengeSelect {
+	border          : none;
+	outline         : none;
+	-moz-appearance : none;
+	resize          : none;
+	font-family     : 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif;
+
+    background      : rgb(243, 243, 243);
+    color           : black;
+
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
