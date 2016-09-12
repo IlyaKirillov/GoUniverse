@@ -17,6 +17,14 @@ function CKGSChallengeWindow()
 	this.m_oGameRecord = null;
 
 	this.m_bCanEdit = false;
+
+	this.m_bNigiri       = true;
+	this.m_bCreatorBlack = false;
+
+	this.m_nHeaderHeight  = 30;
+	this.m_oPlayersHeight = 30;
+
+	this.m_oPlayersColorsCanvas = null;
 }
 CommonExtend(CKGSChallengeWindow, CKGSWindowBase);
 
@@ -37,7 +45,8 @@ CKGSChallengeWindow.prototype.Init = function(sDivId, oPr)
 	this.Set_Caption(oChallengeCreator ? "New game vs. " + oChallengeCreator.GetName() : "New game");
 
 
-	this.private_CreateName(this.m_oGameRecord.GetComment());
+	this.private_CreateName();
+	this.private_CreatePlayers();
 
 	this.Update_Size();
 };
@@ -45,6 +54,7 @@ CKGSChallengeWindow.prototype.Update_Size = function(bForce)
 {
 	CKGSChallengeWindow.superclass.Update_Size.call(this, bForce);
 
+	this.private_DrawPlayerColor();
 };
 CKGSChallengeWindow.prototype.Get_DefaultWindowSize = function()
 {
@@ -62,7 +72,7 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 
 	var oWrapperDiv     = this.protected_CreateDivElement(oMainDiv);
 	var oWrapperControl = CreateControlContainterByElement(oWrapperDiv);
-	oWrapperControl.SetParams(100, 0, 1000, 1000, true, false, false, false, -1, 30);
+	oWrapperControl.SetParams(100, 0, 1000, 1000, true, false, false, false, -1, this.m_nHeaderHeight);
 	oWrapperControl.SetAnchor(false, true, true, false);
 	oMainControl.AddControl(oWrapperControl);
 
@@ -83,7 +93,7 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 
 	var oWrapperTypeDiv     = this.protected_CreateDivElement(oMainDiv);
 	var oWrapperTypeControl = CreateControlContainterByElement(oWrapperTypeDiv);
-	oWrapperTypeControl.SetParams(0, 0, -1, -1, true, true, false, false, 100, 30);
+	oWrapperTypeControl.SetParams(0, 0, -1, -1, true, true, false, false, 100, this.m_nHeaderHeight);
 	oWrapperTypeControl.SetAnchor(true, true, false, false);
 	oMainControl.AddControl(oWrapperTypeControl);
 
@@ -134,5 +144,119 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 };
 CKGSChallengeWindow.prototype.private_CreatePlayers = function()
 {
+	var nTop = this.m_nHeaderHeight;
+
+	var oMainDiv     = this.HtmlElement.InnerDiv;
+	var oMainControl = this.HtmlElement.InnerControl;
+
+	var oPlayersColor        = this.protected_CreateDivElement(oMainDiv, null, "canvas");
+	var oPlayersColorControl = CreateControlContainterByElement(oPlayersColor);
+	oPlayersColorControl.SetParams(10, nTop, 0, 0, true, true, false, false, 50, 2 * this.m_oPlayersHeight);
+	oPlayersColorControl.SetAnchor(true, true, false, false);
+	oMainControl.AddControl(oPlayersColorControl);
+	this.m_oPlayersColorsCanvas = oPlayersColor;
+
+	oPlayersColor.style.cursor = "pointer";
+	var oThis = this;
+	oPlayersColor.addEventListener("click", function (e)
+	{
+		if (true === oThis.m_bNigiri)
+		{
+			oThis.m_bNigiri       = false;
+			oThis.m_bCreatorBlack = true;
+		}
+		else if (true === oThis.m_bCreatorBlack)
+		{
+			oThis.m_bCreatorBlack = false;
+		}
+		else
+		{
+			oThis.m_bNigiri = true;
+		}
+
+		oThis.private_DrawPlayerColor();
+	}, false);
+};
+CKGSChallengeWindow.prototype.private_DrawPlayerColor = function()
+{
+	var oCanvas  = this.m_oPlayersColorsCanvas;
+	var oContext = oCanvas.getContext("2d");
+	var nW = oCanvas.width;
+	var nH = oCanvas.height;
+
+	oContext.clearRect(0, 0, nW, nH);
+
+	var nSize = this.m_oPlayersHeight;
+
+	var nRad = nSize / 2  * 0.7;
+	var nY1 = nSize / 2;
+	var nY2 = nSize * 1.5;
+	var nX = 25;
+
+	oContext.lineWidth   = 2;
+	oContext.strokeStyle = "rgb(0, 0, 0)";
+
+	if (true === this.m_bNigiri)
+	{
+		oContext.fillStyle = "rgb(255, 255, 255)";
+		oContext.beginPath();
+		oContext.arc(nX, nY1, nRad, 0, 2 * Math.PI, false);
+		oContext.closePath();
+		oContext.stroke();
+		oContext.fill();
+
+		oContext.fillStyle = "rgb(0, 0, 0)";
+		oContext.beginPath();
+		oContext.arc(nX, nY1, nRad, 1.75 * Math.PI, 0.75 * Math.PI, false);
+		oContext.closePath();
+		oContext.stroke();
+		oContext.fill();
+
+		oContext.fillStyle = "rgb(255, 255, 255)";
+		oContext.beginPath();
+		oContext.arc(nX, nY2, nRad, 0, 2 * Math.PI, false);
+		oContext.closePath();
+		oContext.stroke();
+		oContext.fill();
+
+		oContext.fillStyle = "rgb(0, 0, 0)";
+		oContext.beginPath();
+		oContext.arc(nX, nY2, nRad, 1.75 * Math.PI, 0.75 * Math.PI, false);
+		oContext.closePath();
+		oContext.stroke();
+		oContext.fill();
+	}
+	else if (true === this.m_bCreatorBlack)
+	{
+		oContext.fillStyle = "rgb(0, 0, 0)";
+
+		oContext.beginPath();
+		oContext.arc(nX, nY1, nRad, 0, 2 * Math.PI, false);
+		oContext.stroke();
+		oContext.fill();
+
+		oContext.fillStyle = "rgb(255, 255, 255)";
+
+		oContext.beginPath();
+		oContext.arc(nX, nY2, nRad, 0, 2 * Math.PI, false);
+		oContext.stroke();
+		oContext.fill();
+	}
+	else
+	{
+		oContext.fillStyle = "rgb(255, 255, 255)";
+
+		oContext.beginPath();
+		oContext.arc(nX, nY1, nRad, 0, 2 * Math.PI, false);
+		oContext.stroke();
+		oContext.fill();
+
+		oContext.fillStyle = "rgb(0, 0, 0)";
+
+		oContext.beginPath();
+		oContext.arc(nX, nY2, nRad, 0, 2 * Math.PI, false);
+		oContext.stroke();
+		oContext.fill();
+	}
 
 };
