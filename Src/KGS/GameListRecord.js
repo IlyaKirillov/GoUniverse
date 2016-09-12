@@ -257,3 +257,7 @@ CKGSChallengeProposal.prototype.GetTimeSettingsString = function()
 {
 	return this.m_oTime.GetTimeSystemString();
 };
+CKGSChallengeProposal.prototype.GetTimeSettings = function()
+{
+	return this.m_oTime;
+};

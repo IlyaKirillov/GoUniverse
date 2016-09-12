@@ -422,3 +422,15 @@ CTimeSettings.prototype.GetTimeSystemString = function()
 
 	return "No time limit";
 };
+CTimeSettings.prototype.GetMainTimeString = function()
+{
+	return this.private_SecondsToString2(this.m_nMainTime);
+};
+CTimeSettings.prototype.GetByoYomiTimeString = function()
+{
+	return this.private_SecondsToString2(this.m_nOverTimeCur);
+};
+CTimeSettings.prototype.GetOverCount = function()
+{
+	return this.m_nOverCount;
+};

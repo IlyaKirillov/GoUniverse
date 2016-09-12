@@ -446,7 +446,7 @@ span.InGameChatMoveRef:hover {
 }
 
 input.challengeInput {
-	border          : none;
+	border          : 1px transparent;
 	outline         : none;
 	-moz-appearance : none;
 	resize          : none;
@@ -457,17 +457,49 @@ input.challengeInput {
     color           : black;
 }
 
+input.challengeInputEditable {
+	border     : 1px solid #969696;
+	background : rgb(255, 255, 255);
+}
+
 select.challengeSelect {
-	border          : none;
-	outline         : none;
-	-moz-appearance : none;
-	resize          : none;
-	font-family     : 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif;
-    font-size       : 16px;
+	border             : 1px transparent;
+	outline            : none;
+	-moz-appearance    : none;
+	resize             : none;
+	font-family        : 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif;
+	font-size          : 16px;
 
-    background      : rgb(243, 243, 243);
-    color           : black;
+	background         : rgb(243, 243, 243);
+	color              : black;
+}
 
-    -webkit-appearance: none;
-    -moz-appearance: none;
+select.challengeSelectDisabled {
+	-webkit-appearance : none;
+	-moz-appearance    : none;
+}
+
+select.challengeSelectEditable {
+	border             : 1px solid #969696;
+	background         : rgb(255, 255, 255);
+}
+
+div.challengePlayer {
+
+	line-height : 30px;
+	font-family : 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif;
+	font-size   : 16px;
+
+	background  : rgb(243, 243, 243);
+	color       : black;
+	cursor      : pointer;
+}
+div.challengePlayer:hover {
+	text-decoration : underline;
+}
+
+div.challengeField {
+	line-height : 30px;
+	font-family : 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif;
+	font-size   : 16px;
 }

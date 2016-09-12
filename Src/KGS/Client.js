@@ -1832,4 +1832,8 @@ CKGSClient.prototype.GetGame = function(nGameId)
 	return this.m_oAllGames[nGameId];
 
 };
+CKGSClient.prototype.GetCurrentUser = function()
+{
+	return this.m_oCurrentUser;
+};
 
