@@ -289,7 +289,7 @@ CKGSInGamePlayersListRecord.prototype.Draw = function(oContext, dX, dY, eType)
 
 	if (oClient)
 	{
-		if (true === oClient.IsUserInBlackList(this.m_sName) && eType === EPlayersListRecord.Name)
+		if (true === oClient.IsUserInBlackList(this.m_sName) && eType === EKGSInGamePlayersListRecord.Name)
 		{
 			var dOldLineWidth   = oContext.lineWidth;
 			var sOldStrokeStyle = oContext.strokeStyle;
