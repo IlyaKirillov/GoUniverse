@@ -491,6 +491,7 @@ CKGSChallengeWindow.prototype.private_AddRulesField = function(nLeftWidth, nTop,
 	oTitleElement.className += " challengeField";
 
 	var oElement = this.protected_CreateDivElement(oMainDiv, "", sTag);
+	oElement.style.paddingLeft= "3px";
 	var oControl = CreateControlContainterByElement(oElement);
 	oControl.SetParams(20 + nLeftWidth, nTop + 1, 10, 0, true, true, true, false, -1, this.m_nFieldHeight - 2);
 	oControl.SetAnchor(true, true, true, false);

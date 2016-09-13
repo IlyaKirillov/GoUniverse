@@ -474,11 +474,41 @@ CKGSClient.prototype.GiveGameControl = function(nGameId, sUserName)
 		"owner"    : sUserName
 	});
 };
+CKGSClient.prototype.CreateChallenge = function(nChannelId, sComment, sRules, nSize)
+{
+	this.private_SendMessage({
+		"channelId"  : nChannelId,
+		"type"       : "CHALLENGE_CREATE",
+		"callbackKey": -1,
+		"text"       : sComment,
+		"global"     : true,
+
+		"proposal": {
+
+			"gameType": "free",
+			"nigiri"  : true,
+
+			"rules": {
+				"rules"     : sRules,
+				"size"      : nSize,
+				"komi"      : 6.5,
+				"timeSystem": "none"
+			},
+
+			"players": [{
+				"role": "white",
+				"name": this.m_oCurrentUser.GetName()
+			}, {
+				"role": "black"
+			}]
+		}
+	});
+};
 CKGSClient.prototype.private_SendMessage = function(oMessage)
 {
-	// console.log("Send:");
-	// console.log(oMessage);
-	// console.log(new Date().toString());
+	console.log("Send:");
+	console.log(oMessage);
+	console.log(new Date().toString());
 
 	var oThis = this;
 	var req = new XMLHttpRequest();
@@ -560,9 +590,9 @@ CKGSClient.prototype.private_RecieveMessage = function()
 };
 CKGSClient.prototype.private_HandleMessage = function(oMessage)
 {
-	// console.log("Receive:");
-	// console.log(oMessage);
-	// console.log(new Date().toString());
+	console.log("Receive:");
+	console.log(oMessage);
+	console.log(new Date().toString());
 
 	if (oMessage.type == "LOGOUT")
 	{
@@ -855,20 +885,20 @@ CKGSClient.prototype.private_HandleLoginSuccess = function(oMessage)
 		}
 	}
 
-	this.private_SendMessage({
-		"type" : "GLOBAL_LIST_JOIN_REQUEST",
-		"list" : "ACTIVES"
-	});
-
-	this.private_SendMessage({
-		"type" : "GLOBAL_LIST_JOIN_REQUEST",
-		"list" : "FANS"
-	});
-
-	this.private_SendMessage({
-		"type" : "GLOBAL_LIST_JOIN_REQUEST",
-		"list" : "CHALLENGES"
-	});
+	// this.private_SendMessage({
+	// 	"type" : "GLOBAL_LIST_JOIN_REQUEST",
+	// 	"list" : "ACTIVES"
+	// });
+	//
+	// this.private_SendMessage({
+	// 	"type" : "GLOBAL_LIST_JOIN_REQUEST",
+	// 	"list" : "FANS"
+	// });
+	//
+	// this.private_SendMessage({
+	// 	"type" : "GLOBAL_LIST_JOIN_REQUEST",
+	// 	"list" : "CHALLENGES"
+	// });
 
 	var oRoomCategoryId = oMessage.roomCategoryChannelIds;
 	for (var sCategoryId in oRoomCategoryId)
@@ -1493,7 +1523,14 @@ CKGSClient.prototype.private_HandleGameReview = function(oMessage)
 };
 CKGSClient.prototype.private_HandleClose = function(oMessage)
 {
-	// Ничего не делаем. Пока известно, что данное сообщение приходит после GAME_REVIEW, вся обработка происходит там
+	// Если данное сообщение приходит из GAME_REVIEW, вся обработка происходит там
+	// Кроме того данное сообщение происходит, если создатель вызова закрывает вызов.
+	var nChannelId = oMessage.channelId;
+	if (this.m_oChallenges[nChannelId])
+	{
+		RemoveWindow(this.m_oChallenges[nChannelId]);
+		delete this.m_oChallenges[nChannelId];
+	}
 };
 CKGSClient.prototype.private_HandleGameOver = function(oMessage)
 {
@@ -1836,4 +1873,5 @@ CKGSClient.prototype.GetCurrentUser = function()
 {
 	return this.m_oCurrentUser;
 };
+
 
