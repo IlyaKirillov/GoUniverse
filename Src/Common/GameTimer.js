@@ -430,6 +430,18 @@ CTimeSettings.prototype.GetByoYomiTimeString = function()
 {
 	return this.private_SecondsToString2(this.m_nOverTimeCur);
 };
+CTimeSettings.prototype.GetTypeInKGSString = function()
+{
+	return KGSCommon.TimeSystemToString(this);
+};
+CTimeSettings.prototype.GetMainTime = function()
+{
+	return this.m_nMainTime;
+};
+CTimeSettings.prototype.GetOverTime = function()
+{
+	return this.m_nOverTime;
+};
 CTimeSettings.prototype.GetOverCount = function()
 {
 	return this.m_nOverCount;

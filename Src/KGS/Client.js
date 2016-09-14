@@ -474,41 +474,95 @@ CKGSClient.prototype.GiveGameControl = function(nGameId, sUserName)
 		"owner"    : sUserName
 	});
 };
-CKGSClient.prototype.CreateChallenge = function(nChannelId, sComment, sRules, nSize)
+CKGSClient.prototype.CreateChallenge = function()
 {
+	var nCallBackKey = -1;
+
+	if (this.m_oChallenges[nCallBackKey])
+	{
+		// TODO: Вывести ошибку, что вызов уже существует
+		return;
+	}
+
+	var oGameRecord = new CKGSGameListRecord(this);
+	oGameRecord.Update({
+		gameType        : "challenge",
+		channelId       : -1,
+		roomId          : this.m_nChatChannelId,
+		private         : false,
+		players         : {
+			challengeCreator : {
+				name : this.m_oCurrentUser.GetName(),
+				rank : this.m_oCurrentUser.GetStringRank()
+			}
+		},
+		name            : "",
+		initialProposal : {
+			gameType : "free",
+			rules    : {
+				rules          : "japanese",
+				komi           : "6.5",
+				size           : 19,
+				timeSystem     : "byo_yomi",
+				mainTime       : 600,
+				byoYomiTime    : 30,
+				byoYomiPeriods : 5
+			}
+		}
+	});
+
+	var oWindow = CreateKGSWindow(EKGSWindowType.Challenge, {GameRecord : oGameRecord, Client : this, App: this.m_oApp, Create : true, ChannelId : nCallBackKey, RoomId : this.m_nChatChannelId});
+	this.m_oChallenges[nCallBackKey] = oWindow;
+};
+CKGSClient.prototype.SendCreateChallenge = function(nChannelId, nCallBackKey, nGameType, sComment, nRules, nSize, oTimeSettings)
+{
+	var oRules = {
+		"rules"      : KGSCommon.GameRulesToString(nRules),
+		"size"       : nSize,
+		"komi"       : 6.5,
+		"timeSystem" : oTimeSettings.GetTypeInKGSString(),
+		"mainTime"   : oTimeSettings.GetMainTime()
+	};
+
+	if (oTimeSettings.IsByoYomi())
+	{
+		oRules["byoYomiTime"]    = oTimeSettings.GetOverTime();
+		oRules["byoYomiPeriods"] = oTimeSettings.GetOverCount();
+	}
+	else if (oTimeSettings.IsCanadian())
+	{
+		oRules["byoYomiTime"]   = oTimeSettings.GetOverTime();
+		oRules["byoYomiStones"] = oTimeSettings.GetOverCount();
+	}
+
 	this.private_SendMessage({
-		"channelId"  : nChannelId,
-		"type"       : "CHALLENGE_CREATE",
-		"callbackKey": -1,
-		"text"       : sComment,
-		"global"     : true,
+		"channelId"   : nChannelId,
+		"type"        : "CHALLENGE_CREATE",
+		"callbackKey" : nCallBackKey,
+		"text"        : sComment,
+		"global"      : true,
 
-		"proposal": {
+		"proposal" : {
 
-			"gameType": "free",
-			"nigiri"  : true,
+			"gameType" : KGSCommon.GameTypeToString(nGameType),
+			"nigiri"   : true,
 
-			"rules": {
-				"rules"     : sRules,
-				"size"      : nSize,
-				"komi"      : 6.5,
-				"timeSystem": "none"
-			},
+			"rules" : oRules,
 
-			"players": [{
-				"role": "white",
-				"name": this.m_oCurrentUser.GetName()
+			"players" : [{
+				"role" : "white",
+				"name" : this.m_oCurrentUser.GetName()
 			}, {
-				"role": "black"
+				"role" : "black"
 			}]
 		}
 	});
 };
 CKGSClient.prototype.private_SendMessage = function(oMessage)
 {
-	console.log("Send:");
-	console.log(oMessage);
-	console.log(new Date().toString());
+	// console.log("Send:");
+	// console.log(oMessage);
+	// console.log(new Date().toString());
 
 	var oThis = this;
 	var req = new XMLHttpRequest();
@@ -590,9 +644,9 @@ CKGSClient.prototype.private_RecieveMessage = function()
 };
 CKGSClient.prototype.private_HandleMessage = function(oMessage)
 {
-	console.log("Receive:");
-	console.log(oMessage);
-	console.log(new Date().toString());
+	// console.log("Receive:");
+	// console.log(oMessage);
+	// console.log(new Date().toString());
 
 	if (oMessage.type == "LOGOUT")
 	{
@@ -1873,5 +1927,4 @@ CKGSClient.prototype.GetCurrentUser = function()
 {
 	return this.m_oCurrentUser;
 };
-
 

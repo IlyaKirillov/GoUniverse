@@ -15,6 +15,7 @@ function CKGSChallengeWindow()
 
 	this.m_nChannelId = -1;
 	this.m_oGameRecord = null;
+	this.m_nRoomId    = -1;
 
 	this.m_bCanEdit = false;
 
@@ -27,6 +28,19 @@ function CKGSChallengeWindow()
 	this.m_nFieldHeight   = 30;
 
 	this.m_oPlayersColorsCanvas = null;
+
+	this.m_arrButtons = [];
+
+	this.m_oCommentInput      = null;
+	this.m_oGameTypeSelect    = null;
+	this.m_oRulesSelect       = null;
+	this.m_oSizeInput         = null;
+	this.m_oKomiInput         = null;
+	this.m_oHandicapInput     = null;
+	this.m_oTimeSystemSelect  = null;
+	this.m_oMainTimeInput     = null;
+	this.m_oByoYomiTimeInput  = null;
+	this.m_oByoYomiCountInput = null;
 }
 CommonExtend(CKGSChallengeWindow, CKGSWindowBase);
 
@@ -34,23 +48,27 @@ CKGSChallengeWindow.prototype.Init = function(sDivId, oPr)
 {
 	CKGSChallengeWindow.superclass.Init.apply(this, arguments);
 
-	this.m_nChannelId = oPr.ChannelId;
+	this.m_nChannelId  = oPr.ChannelId;
 	this.m_oGameRecord = oPr.GameRecord;
+	this.m_nRoomId     = oPr.RoomId;
 
 	var oMainDiv     = this.HtmlElement.InnerDiv;
 	var oMainControl = this.HtmlElement.InnerControl;
 	oMainDiv.style.background = "rgb(243, 243, 243)";
 
-	var oProposal = this.m_oGameRecord.GetProposal();
 	var oChallengeCreator = this.m_oGameRecord.GetChallengeCreator();
 
-	this.Set_Caption(oChallengeCreator ? "New game vs. " + oChallengeCreator.GetName() : "New game");
+	this.m_bCanEdit = true === oPr.Create ? true : false;
 
+	if (true !== this.m_bCanEdit)
+		this.Set_Caption(oChallengeCreator ? "New game vs. " + oChallengeCreator.GetName() : "New game");
+	else
+		this.Set_Caption("Create a new challenge");
 
 	this.private_CreateName();
 	this.private_CreatePlayers();
 	this.private_CreateRules();
-
+	this.private_CreateButtons();
 	this.Update_Size();
 };
 CKGSChallengeWindow.prototype.Update_Size = function(bForce)
@@ -58,6 +76,10 @@ CKGSChallengeWindow.prototype.Update_Size = function(bForce)
 	CKGSChallengeWindow.superclass.Update_Size.call(this, bForce);
 
 	this.private_DrawPlayerColor();
+	for (var nIndex = 0, nCount = this.m_arrButtons.length; nIndex < nCount; ++nIndex)
+	{
+		this.m_arrButtons[nIndex].Update_Size();
+	}
 };
 CKGSChallengeWindow.prototype.Get_DefaultWindowSize = function()
 {
@@ -109,20 +131,7 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 	this.private_AddOptionToSelect(oTypeList, "Free");
 	this.private_AddOptionToSelect(oTypeList, "Rengo");
 	this.private_AddOptionToSelect(oTypeList, "Simulation");
-
-	var oProposal = this.m_oGameRecord.GetProposal();
-	if (oProposal)
-	{
-		var nType = oProposal.GetGameType();
-		if (EKGSGameType.Ranked === nType)
-			oTypeList.selectedIndex = 0;
-		else if (EKGSGameType.Free === nType)
-			oTypeList.selectedIndex = 1;
-		else if (EKGSGameType.Rengo === nType)
-			oTypeList.selectedIndex = 2;
-		else if (EKGSGameType.Simul === nType)
-			oTypeList.selectedIndex = 3;
-	}
+	this.private_AddOptionToSelect(oTypeList, "Demo");
 
 	var oTypeListControl = CreateControlContainterByElement(oTypeList);
 	oTypeListControl.SetParams(5, 5, 5, 0, true, true, true, true, -1, -1);
@@ -142,6 +151,16 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 
 
 	this.m_nTop = this.m_nHeaderHeight;
+
+	this.m_oCommentInput   = oInput;
+	this.m_oGameTypeSelect = oTypeList;
+
+	var oProposal = this.m_oGameRecord.GetProposal();
+	if (oProposal)
+	{
+		var nType = oProposal.GetGameType();
+		this.private_SetSelectedGameType(nType);
+	}
 };
 CKGSChallengeWindow.prototype.private_CreatePlayers = function()
 {
@@ -317,7 +336,7 @@ CKGSChallengeWindow.prototype.private_CreateRules = function()
 	this.private_AddOptionToSelect(oRulesSelectElement, "Japanese");
 	this.private_AddOptionToSelect(oRulesSelectElement, "Chinese");
 	this.private_AddOptionToSelect(oRulesSelectElement, "AGA");
-	this.private_AddOptionToSelect(oRulesSelectElement, "New Zeland");
+	this.private_AddOptionToSelect(oRulesSelectElement, "New Zealand");
 	if (true !== this.m_bCanEdit)
 	{
 		oRulesSelectElement.disabled = "disabled";
@@ -327,19 +346,7 @@ CKGSChallengeWindow.prototype.private_CreateRules = function()
 	{
 		oRulesSelectElement.className += " challengeSelectEditable";
 	}
-
-	if (oProposal)
-	{
-		var sRules = oProposal.GetRules();
-		if ("japanese" == sRules)
-			oRulesSelectElement.selectedIndex = 0;
-		else if ("chinese" == sRules)
-			oRulesSelectElement.selectedIndex = 1;
-		else if ("aga" == sRules)
-			oRulesSelectElement.selectedIndex = 2;
-		else if ("new zeland" == sRules)
-			oRulesSelectElement.selectedIndex = 3;
-	}
+	this.m_oRulesSelect = oRulesSelectElement;
 
 	nTop += this.m_nFieldHeight;
 
@@ -352,34 +359,21 @@ CKGSChallengeWindow.prototype.private_CreateRules = function()
 	else
 		oBoardElement.className += " challengeInputEditable";
 
-	if (oProposal)
-	{
-		oBoardElement.value = oProposal.GetBoardSize();
-	}
-
+	this.m_oSizeInput = oBoardElement;
 	nTop += this.m_nFieldHeight;
 
 	// Handicap
 	var oHandicapElement = this.private_AddRulesField(nLeftWidth, nTop, "input", "Handicap:");
 	oHandicapElement.className += " challengeInput challengeInputEditable";
 	oHandicapElement.value = "0";
-
-	if (oProposal)
-	{
-	}
-
+	this.m_oHandicapInput = oHandicapElement;
 	nTop += this.m_nFieldHeight;
 
 	// Komi
 	var oKomiElement = this.private_AddRulesField(nLeftWidth, nTop, "input", "Komi:");
 	oKomiElement.className += " challengeInput challengeInputEditable";
 	oKomiElement.value = "6.5";
-
-	if (oProposal)
-	{
-		oKomiElement.value = oProposal.GetKomi();
-	}
-
+	this.m_oKomiInput = oKomiElement;
 	nTop += this.m_nFieldHeight;
 
 	// TimeSystem
@@ -398,7 +392,7 @@ CKGSChallengeWindow.prototype.private_CreateRules = function()
 	{
 		oTimeSystemElement.className += " challengeSelectEditable";
 	}
-
+	this.m_oTimeSystemSelect = oTimeSystemElement;
 	nTop += this.m_nFieldHeight;
 
 	// MainTime
@@ -409,7 +403,7 @@ CKGSChallengeWindow.prototype.private_CreateRules = function()
 		oMainTimeElement.disabled = "disabled";
 	else
 		oMainTimeElement.className += " challengeInputEditable";
-
+	this.m_oMainTimeInput = oMainTimeElement;
 	nTop += this.m_nFieldHeight;
 
 	// ByoYomi time
@@ -420,7 +414,7 @@ CKGSChallengeWindow.prototype.private_CreateRules = function()
 		oByoTimeElement.disabled = "disabled";
 	else
 		oByoTimeElement.className += " challengeInputEditable";
-
+	this.m_oByoYomiTimeInput = oByoTimeElement;
 	nTop += this.m_nFieldHeight;
 
 	// ByoYomi count
@@ -431,39 +425,44 @@ CKGSChallengeWindow.prototype.private_CreateRules = function()
 		oByoCountElement.disabled = "disabled";
 	else
 		oByoCountElement.className += " challengeInputEditable";
-
+	this.m_oByoYomiCountInput = oByoCountElement;
 	nTop += this.m_nFieldHeight;
 
 	if (oProposal)
 	{
+		var nRules = oProposal.GetRules();
+		this.private_SetSelectedRules(nRules);
+		oBoardElement.value = oProposal.GetBoardSize();
+		oKomiElement.value  = oProposal.GetKomi();
+
 		var oTimeSettings = oProposal.GetTimeSettings();
 		if (oTimeSettings.IsNone())
 		{
 			oTimeSystemElement.selectedIndex = 3;
-			oMainTimeElement.value = "--:--";
-			oByoTimeElement.value  = "--:--";
-			oByoCountElement.value = "";
+			oMainTimeElement.value           = "--:--";
+			oByoTimeElement.value            = "--:--";
+			oByoCountElement.value           = "";
 		}
 		else if (oTimeSettings.IsAbsolute())
 		{
 			oTimeSystemElement.selectedIndex = 0;
-			oMainTimeElement.value = oTimeSettings.GetMainTimeString();
-			oByoTimeElement.value  = "--:--";
-			oByoCountElement.value = "";
+			oMainTimeElement.value           = oTimeSettings.GetMainTimeString();
+			oByoTimeElement.value            = "--:--";
+			oByoCountElement.value           = "";
 		}
 		else if (oTimeSettings.IsByoYomi())
 		{
 			oTimeSystemElement.selectedIndex = 1;
-			oMainTimeElement.value = oTimeSettings.GetMainTimeString();
-			oByoTimeElement.value  = oTimeSettings.GetByoYomiTimeString();
-			oByoCountElement.value = oTimeSettings.GetOverCount();
+			oMainTimeElement.value           = oTimeSettings.GetMainTimeString();
+			oByoTimeElement.value            = oTimeSettings.GetByoYomiTimeString();
+			oByoCountElement.value           = oTimeSettings.GetOverCount();
 		}
 		else if (oTimeSettings.IsCanadian())
 		{
 			oTimeSystemElement.selectedIndex = 2;
-			oMainTimeElement.value = oTimeSettings.GetMainTimeString();
-			oByoTimeElement.value  = oTimeSettings.GetByoYomiTimeString();
-			oByoCountElement.value = oTimeSettings.GetOverCount();
+			oMainTimeElement.value           = oTimeSettings.GetMainTimeString();
+			oByoTimeElement.value            = oTimeSettings.GetByoYomiTimeString();
+			oByoCountElement.value           = oTimeSettings.GetOverCount();
 		}
 	}
 
@@ -497,4 +496,114 @@ CKGSChallengeWindow.prototype.private_AddRulesField = function(nLeftWidth, nTop,
 	oControl.SetAnchor(true, true, true, false);
 	oMainControl.AddControl(oControl);
 	return oElement;
+};
+CKGSChallengeWindow.prototype.private_CreateButtons = function()
+{
+	var oMainDiv     = this.HtmlElement.InnerDiv;
+	var oMainControl = this.HtmlElement.InnerControl;
+	var oThis        = this;
+
+	var nButtonW = 70;
+	var nButtonH = 25;
+
+	if (this.m_bCanEdit)
+	{
+
+		var oCreateButtonElement = this.protected_CreateDivElement(oMainDiv, oMainDiv.id + "C");
+		var oCreateButtonControl = CreateControlContainterByElement(oCreateButtonElement);
+		oCreateButtonControl.SetParams(0, 0, 5 + nButtonW + 5, 5, false, false, true, true, nButtonW, nButtonH);
+		oCreateButtonControl.SetAnchor(false, false, true, true);
+		oMainControl.AddControl(oCreateButtonControl);
+		var oCreateButton = new CDrawingButtonSimpleText("Create", function()
+		{
+			oThis.private_CreateChallenge();
+		}, "Create a new challenge");
+		oCreateButton.Init(oMainDiv.id + "C");
+
+		var oCloseButtonElement = this.protected_CreateDivElement(oMainDiv, oMainDiv.id + "S");
+		var oCloseButtonControl = CreateControlContainterByElement(oCloseButtonElement);
+		oCloseButtonControl.SetParams(0, 0, 5, 5, false, false, true, true, nButtonW, nButtonH);
+		oCloseButtonControl.SetAnchor(false, false, true, true);
+		oMainControl.AddControl(oCloseButtonControl);
+		var oCloseButton = new CDrawingButtonSimpleText("Close", function()
+		{
+			oThis.Close();
+		}, "Close challenge");
+		oCloseButton.Init(oMainDiv.id + "S");
+
+		this.m_arrButtons.push(oCreateButton);
+		this.m_arrButtons.push(oCloseButton);
+	}
+};
+CKGSChallengeWindow.prototype.private_CreateChallenge = function()
+{
+	var sComment    = this.m_oCommentInput.value;
+	var nGameType   = this.private_GetSelectedGameType();
+	var nRules      = this.private_GetSelectedRules();
+	var nSize       = this.m_oSizeInput.value;
+	var oTimeSystem = this.m_oGameRecord.GetProposal().GetTimeSettings();
+
+	this.m_oClient.SendCreateChallenge(this.m_nRoomId, this.m_nChannelId, nGameType, sComment, nRules, nSize, oTimeSystem);
+};
+CKGSChallengeWindow.prototype.private_GetSelectedGameType = function()
+{
+	var nGameType = EKGSGameType.Free;
+	var nSelectedIndex = this.m_oGameTypeSelect.selectedIndex;
+	if (0 === nSelectedIndex)
+		nGameType = EKGSGameType.Ranked;
+	else if (1 === nSelectedIndex)
+		nGameType = EKGSGameType.Free;
+	else if (2 === nSelectedIndex)
+		nGameType = EKGSGameType.Rengo;
+	else if (3 === nSelectedIndex)
+		nGameType = EKGSGameType.Simul;
+	else if (4 === nSelectedIndex)
+		nGameType = EKGSGameType.Demonstration;
+
+	return nGameType;
+};
+CKGSChallengeWindow.prototype.private_SetSelectedGameType = function(nGameType)
+{
+	var nSelectedIndex = 0;
+	if (EKGSGameType.Ranked === nGameType)
+		nSelectedIndex = 0;
+	else if (EKGSGameType.Free === nGameType)
+		nSelectedIndex = 1;
+	else if (EKGSGameType.Rengo === nGameType)
+		nSelectedIndex = 2;
+	else if (EKGSGameType.Simul === nGameType)
+		nSelectedIndex = 3;
+	else if (EKGSGameType.Demonstration === nGameType)
+		nSelectedIndex = 4;
+
+	this.m_oGameTypeSelect.selectedIndex = nSelectedIndex;
+};
+CKGSChallengeWindow.prototype.private_GetSelectedRules = function()
+{
+	var nRules = EKGSGameRules.Japanese;
+	var nSelectedIndex = this.m_oRulesSelect.selectedIndex;
+	if (0 === nSelectedIndex)
+		nRules = EKGSGameRules.JapanesenSelectedIndex;
+	else if (1 === nSelectedIndex)
+		nRules = EKGSGameRules.Chinese;
+	else if (2 === nSelectedIndex)
+		nRules = EKGSGameRules.Aga;
+	else if (3 === nSelectedIndex)
+		nRules = EKGSGameRules.NewZealand;
+
+	return nRules;
+};
+CKGSChallengeWindow.prototype.private_SetSelectedRules = function(nRules)
+{
+	var nSelectedIndex = 0;
+	if (EKGSGameRules.Japanese === nRules)
+		nSelectedIndex = 0;
+	else if (EKGSGameRules.Chinese === nRules)
+		nSelectedIndex = 1;
+	else if (EKGSGameRules.Aga === nRules)
+		nSelectedIndex = 2;
+	else if (EKGSGameRules.NewZealand === nRules)
+		nSelectedIndex = 3;
+
+	this.m_oRulesSelect.selectedIndex = nSelectedIndex;
 };

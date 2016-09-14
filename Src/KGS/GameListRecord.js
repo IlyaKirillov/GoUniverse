@@ -9,19 +9,6 @@
  * Time     1:05
  */
 
-var EKGSGameType = {
-	Challenge     : 0,
-	Demonstration : 1,
-	Review        : 2,
-	RengoReview   : 3,
-	Teaching      : 4,
-	Simul         : 5,
-	Rengo         : 6,
-	Free          : 7,
-	Ranked        : 8,
-	Tournament    : 9
-};
-
 function CKGSGameListRecord(oClient)
 {
 	this.m_oClient = oClient;
@@ -113,26 +100,7 @@ CKGSGameListRecord.prototype.GetGameType = function()
 };
 CKGSGameListRecord.prototype.private_ParseGameType = function(sGameType)
 {
-	if ("challenge" === sGameType)
-		this.m_nGameType = EKGSGameType.Challenge;
-	else if ("demonstration" === sGameType)
-		this.m_nGameType = EKGSGameType.Demonstration;
-	else if ("review" === sGameType)
-		this.m_nGameType = EKGSGameType.Review;
-	else if ("rengo_review" === sGameType)
-		this.m_nGameType = EKGSGameType.RengoReview;
-	else if ("teaching" === sGameType)
-		this.m_nGameType = EKGSGameType.Teaching;
-	else if ("simul" === sGameType)
-		this.m_nGameType = EKGSGameType.Simul;
-	else if ("rengo" === sGameType)
-		this.m_nGameType = EKGSGameType.Rengo;
-	else if ("free" === sGameType)
-		this.m_nGameType = EKGSGameType.Free;
-	else if ("ranked" === sGameType)
-		this.m_nGameType = EKGSGameType.Ranked;
-	else if ("tournament" === sGameType)
-		this.m_nGameType = EKGSGameType.Tournament;
+	this.m_nGameType = KGSCommon.GetGameType(sGameType);
 };
 CKGSGameListRecord.prototype.GetGameId = function()
 {
@@ -197,8 +165,8 @@ CKGSGameListRecord.prototype.IsChallenge = function()
 
 function CKGSChallengeProposal(oGameRecord)
 {
-	this.m_nGameType  = EKGSGameType.free;
-	this.m_sRules     = "japanese";
+	this.m_nGameType  = EKGSGameType.Free;
+	this.m_nRules     = EKGSGameRules.Japanese;
 	this.m_sKomi      = "6.5";
 	this.m_nSize      = 19;
 	this.m_oTime      = new CTimeSettings();
@@ -210,18 +178,7 @@ function CKGSChallengeProposal(oGameRecord)
 }
 CKGSChallengeProposal.prototype.private_ParseGameType = function(sGameType)
 {
-	if ("teaching" === sGameType)
-		this.m_nGameType = EKGSGameType.Teaching;
-	else if ("simul" === sGameType)
-		this.m_nGameType = EKGSGameType.Simul;
-	else if ("rengo" === sGameType)
-		this.m_nGameType = EKGSGameType.Rengo;
-	else if ("free" === sGameType)
-		this.m_nGameType = EKGSGameType.Free;
-	else if ("ranked" === sGameType)
-		this.m_nGameType = EKGSGameType.Ranked;
-	else if ("tournament" === sGameType)
-		this.m_nGameType = EKGSGameType.Tournament;
+	this.m_nGameType = KGSCommon.GetGameType(sGameType);
 };
 CKGSChallengeProposal.prototype.GetGameType = function()
 {
@@ -229,7 +186,7 @@ CKGSChallengeProposal.prototype.GetGameType = function()
 };
 CKGSChallengeProposal.prototype.GetRules = function()
 {
-	return this.m_sRules;
+	return this.m_nRules;
 };
 CKGSChallengeProposal.prototype.GetKomi = function()
 {
@@ -241,7 +198,7 @@ CKGSChallengeProposal.prototype.GetBoardSize = function()
 };
 CKGSChallengeProposal.prototype.private_ParseRules = function(oRules)
 {
-	this.m_sRules = oRules.rules ? oRules.rules : "japanese";
+	this.m_nRules = KGSCommon.GetGameRules(oRules.rules);
 	this.m_sKomi  = "" + oRules.komi;
 	this.m_nSize  = oRules.size ? oRules.size : 19;
 
