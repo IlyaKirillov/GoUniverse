@@ -939,20 +939,20 @@ CKGSClient.prototype.private_HandleLoginSuccess = function(oMessage)
 		}
 	}
 
-	// this.private_SendMessage({
-	// 	"type" : "GLOBAL_LIST_JOIN_REQUEST",
-	// 	"list" : "ACTIVES"
-	// });
-	//
-	// this.private_SendMessage({
-	// 	"type" : "GLOBAL_LIST_JOIN_REQUEST",
-	// 	"list" : "FANS"
-	// });
-	//
-	// this.private_SendMessage({
-	// 	"type" : "GLOBAL_LIST_JOIN_REQUEST",
-	// 	"list" : "CHALLENGES"
-	// });
+	this.private_SendMessage({
+		"type" : "GLOBAL_LIST_JOIN_REQUEST",
+		"list" : "ACTIVES"
+	});
+
+	this.private_SendMessage({
+		"type" : "GLOBAL_LIST_JOIN_REQUEST",
+		"list" : "FANS"
+	});
+
+	this.private_SendMessage({
+		"type" : "GLOBAL_LIST_JOIN_REQUEST",
+		"list" : "CHALLENGES"
+	});
 
 	var oRoomCategoryId = oMessage.roomCategoryChannelIds;
 	for (var sCategoryId in oRoomCategoryId)
