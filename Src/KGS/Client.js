@@ -1326,7 +1326,24 @@ CKGSClient.prototype.private_HandleDetailsJoin = function(oMessage)
 };
 CKGSClient.prototype.private_HandleUnjoin = function(oMessage)
 {
-	// Ничего не делаем
+	var nChannelId = oMessage.channelId;
+	var oRoom = this.m_aAllRooms[nChannelId];
+	if (oRoom)
+	{
+		for (var nGameId in this.m_oAllGames)
+		{
+			var oGameRecord = this.m_oAllGames[nGameId];
+
+			if (oGameRecord.RemoveRoom(nChannelId))
+				delete this.m_oAllGames[nGameId];
+		}
+
+		oRoom.Games = [];
+		oRoom.Users = [];
+
+		this.private_UpdateGamesList();
+		this.private_UpdatePlayersList();
+	}
 };
 CKGSClient.prototype.private_HandleRoomDesc = function(oMessage)
 {
