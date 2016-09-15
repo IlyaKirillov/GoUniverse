@@ -41,6 +41,7 @@ function CKGSChallengeWindow()
 	this.m_oMainTimeInput     = null;
 	this.m_oByoYomiTimeInput  = null;
 	this.m_oByoYomiCountInput = null;
+	this.m_oOverCountLabel    = null;
 
 	var oThis = this;
 	this.private_OnChangeRules = function()
@@ -48,13 +49,7 @@ function CKGSChallengeWindow()
 		if (!oThis.m_oKomiInput)
 			return;
 
-		var nRules = oThis.private_GetSelectedRules();
-		if (EKGSGameRules.Japanese === nRules)
-			oThis.m_oKomiInput.value = 6.5;
-		else if (EKGSGameRules.Chinese === nRules || EKGSGameRules.Aga === nRules)
-			oThis.m_oKomiInput.value = 7.5;
-		else if (EKGSGameRules.NewZealand === nRules)
-			oThis.m_oKomiInput.value = 7;
+		oThis.m_oKomiInput.value = oThis.private_GetDefaultKomi();
 	};
 	this.private_OnChangeBoardSize = function()
 	{
@@ -105,6 +100,38 @@ function CKGSChallengeWindow()
 	this.private_OnChangeOverCount = function()
 	{
 		oThis.private_UpdateTimeSystem();
+	};
+	this.private_OnChangeKomi = function()
+	{
+		if (!oThis.m_oKomiInput)
+			return;
+
+		var sValue = oThis.m_oKomiInput.value;
+		var dValue = parseFloat(sValue);
+
+		if (isNaN(dValue))
+			dValue = oThis.private_GetDefaultKomi();
+
+		dValue = ((dValue * 2) | 0) / 2;
+
+		oThis.m_oKomiInput.value = dValue;
+	};
+	this.private_OnChangeHandicap = function()
+	{
+		if (!oThis.m_oHandicapInput)
+			return;
+
+		var sValue = oThis.m_oHandicapInput.value;
+		var nValue = parseInt(sValue);
+
+		if (isNaN(nValue))
+			nValue = oThis.private_GetDefaultHandicap();
+		else if (nValue < 0)
+			nValue = 0;
+		else if (nValue > 50)
+			nValue = 50;
+
+		oThis.m_oHandicapInput.value = nValue;
 	};
 }
 CommonExtend(CKGSChallengeWindow, CKGSWindowBase);
@@ -506,7 +533,8 @@ CKGSChallengeWindow.prototype.private_CreateRules = function()
 	nTop += this.m_nFieldHeight;
 
 	// ByoYomi count
-	var oByoCountElement = this.private_AddRulesField(nLeftWidth, nTop, "input", "Count:");
+	var oTemp = this.private_AddRulesField(nLeftWidth, nTop, "input", "Count:", true);
+	var oByoCountElement = oTemp.Field;
 	oByoCountElement.className += " challengeInput";
 	oByoCountElement.value = "5";
 	if (true !== this.m_bCreation)
@@ -514,6 +542,7 @@ CKGSChallengeWindow.prototype.private_CreateRules = function()
 	else
 		oByoCountElement.className += " challengeInputEditable";
 	this.m_oByoYomiCountInput = oByoCountElement;
+	this.m_oOverCountLabel    = oTemp.Title;
 	nTop += this.m_nFieldHeight;
 
 	if (oProposal)
@@ -553,6 +582,8 @@ CKGSChallengeWindow.prototype.private_CreateRules = function()
 	this.private_AddEventsForInput(this.private_OnChangeMainTime, oMainTimeElement);
 	this.private_AddEventsForInput(this.private_OnChangeOverTime, oByoTimeElement);
 	this.private_AddEventsForInput(this.private_OnChangeOverCount, oByoCountElement);
+	this.private_AddEventsForInput(this.private_OnChangeKomi, oKomiElement);
+	this.private_AddEventsForInput(this.private_OnChangeHandicap, oHandicapElement);
 };
 CKGSChallengeWindow.prototype.private_AddOptionToSelect = function(oSelect, sName)
 {
@@ -561,7 +592,7 @@ CKGSChallengeWindow.prototype.private_AddOptionToSelect = function(oSelect, sNam
 	oOption.textContent = sName;
 	oSelect.appendChild(oOption);
 };
-CKGSChallengeWindow.prototype.private_AddRulesField = function(nLeftWidth, nTop, sTag, sFieldName)
+CKGSChallengeWindow.prototype.private_AddRulesField = function(nLeftWidth, nTop, sTag, sFieldName, isReturnLabel)
 {
 	var oMainDiv     = this.HtmlElement.InnerDiv;
 	var oMainControl = this.HtmlElement.InnerControl;
@@ -580,9 +611,16 @@ CKGSChallengeWindow.prototype.private_AddRulesField = function(nLeftWidth, nTop,
 		oElement.style.paddingLeft = "3px";
 
 	var oControl = CreateControlContainterByElement(oElement);
-	oControl.SetParams(20 + nLeftWidth, nTop + 1, 10, 0, true, true, true, false, -1, this.m_nFieldHeight - 2);
+	oControl.SetParams(20 + nLeftWidth, nTop + 1, 5, 0, true, true, true, false, -1, this.m_nFieldHeight - 2);
 	oControl.SetAnchor(true, true, true, false);
 	oMainControl.AddControl(oControl);
+
+	if (true === isReturnLabel)
+		return {
+			Title : oTitleElement,
+			Field : oElement
+		};
+
 	return oElement;
 };
 CKGSChallengeWindow.prototype.private_CreateButtons = function()
@@ -837,6 +875,11 @@ CKGSChallengeWindow.prototype.private_UpdateTimeSystemFields = function()
 			this.m_oByoYomiTimeInput.disabled  = "disabled";
 			this.m_oByoYomiCountInput.disabled = "disabled";
 		}
+
+		if (oTimeSettings.IsByoYomi())
+			this.m_oOverCountLabel.innerHTML = "Periods:";
+		else
+			this.m_oOverCountLabel.innerHTML = "Stones:";
 	}
 	else if (oTimeSettings.IsNone())
 	{
@@ -852,4 +895,19 @@ CKGSChallengeWindow.prototype.private_UpdateTimeSystemFields = function()
 		this.m_oByoYomiTimeInput.disabled  = "disabled";
 		this.m_oByoYomiCountInput.disabled = "disabled";
 	}
+};
+CKGSChallengeWindow.prototype.private_GetDefaultHandicap = function()
+{
+	// TODO: Сделать зависимость от противника
+	return 0;
+};
+CKGSChallengeWindow.prototype.private_GetDefaultKomi = function()
+{
+	var nRules = this.private_GetSelectedRules();
+	if (EKGSGameRules.Japanese === nRules)
+		return 6.5;
+	else if (EKGSGameRules.Chinese === nRules || EKGSGameRules.Aga === nRules)
+		return 7.5;
+	else if (EKGSGameRules.NewZealand === nRules)
+		return 7;
 };
