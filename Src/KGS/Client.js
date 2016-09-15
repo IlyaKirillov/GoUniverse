@@ -77,10 +77,11 @@ CKGSClient.prototype.Clear = function()
 	this.m_oPrivateChats           = {};
 	this.m_oPrivateChatsByUserName = {};
 
-	this.m_eGamesListType           = EKGSGamesListType.AllGames;
-	this.m_nGlobalGamesChannelId    = -1;
-	this.m_nFollowersGamesChannelId = -1;
-	this.m_oFollowersGames          = {};
+	this.m_eGamesListType             = EKGSGamesListType.AllGames;
+	this.m_nGlobalGamesChannelId      = -1;
+	this.m_nGlobalChallengesChannelId = -1;
+	this.m_nFollowersGamesChannelId   = -1;
+	this.m_oFollowersGames            = {};
 };
 CKGSClient.prototype.GetUserName = function()
 {
@@ -1368,8 +1369,8 @@ CKGSClient.prototype.private_HandleRoomDesc = function(oMessage)
 CKGSClient.prototype.private_HandleGlobalGamesJoin = function(oMessage)
 {
 	if ("CHALLENGES" === oMessage.containerType)
-		return;
-	else if ("ACTIVES" === oMessage.containerType)
+		this.m_nGlobalChallengesChannelId = oMessage.channelId;
+	if ("ACTIVES" === oMessage.containerType)
 		this.m_nGlobalGamesChannelId = oMessage.channelId;
 	else if ("FANS" === oMessage.containerType)
 		this.m_nFollowersGamesChannelId = oMessage.channelId;
