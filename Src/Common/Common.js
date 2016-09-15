@@ -419,3 +419,46 @@ CTextMeasurer.prototype.Measure = function(sText)
 	window["GoUniverseLogoStopAnimate"] = StopAnimate;
 
 })();
+
+/**
+ * Convert string hh:mm:ss or mm:ss or ss into a seconds.
+ * @param {string} sString
+ * @return {number}
+ */
+function StringToSeconds(sString)
+{
+	var nPos1 = sString.indexOf(":");
+	var nPos2 = sString.indexOf(":", nPos1 + 1);
+
+	var sHours = "0", sMinutes = "0", sSeconds = "0";
+	if (-1 === nPos1)
+	{
+		sSeconds = sString;
+	}
+	else if (-1 === nPos2)
+	{
+		sMinutes = sString.substr(0, nPos1);
+		sSeconds = sString.substr(nPos1 + 1);
+	}
+	else
+	{
+		sHours   = sString.substr(0, nPos1);
+		sMinutes = sString.substr(nPos1 + 1, nPos2 - nPos1 - 1);
+		sSeconds = sString.substr(nPos2 + 1);
+	}
+
+	var nHours   = parseInt(sHours);
+	var nMinutes = parseInt(sMinutes);
+	var nSeconds = parseInt(sSeconds);
+
+	if (isNaN(nHours))
+		nHours = 0;
+
+	if (isNaN(sMinutes))
+		nMinutes = 0;
+
+	if (isNaN(sSeconds))
+		nSeconds = 0;
+
+	return (nSeconds + 60 * nMinutes + 3600 * nHours);
+}
