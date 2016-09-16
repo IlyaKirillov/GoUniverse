@@ -351,6 +351,8 @@ CKGSChallengeWindow.prototype.private_CreatePlayers = function()
 	oMainControl.AddControl(oChallengerListControl);
 	this.m_oPlayersSelect = oChallengerListElement;
 
+	this.private_AddOptionToSelect(oChallengerListElement, "");
+
 	if (true === this.m_bOwner)
 	{
 		oChallengerListElement.className = "challengeSelect challengeSelectEditable";
