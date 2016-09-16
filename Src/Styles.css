@@ -485,21 +485,43 @@ select.challengeSelectEditable {
 }
 
 div.challengePlayer {
+	line-height  : 30px;
+	font-family  : 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif;
+	font-size    : 16px;
 
-	line-height : 30px;
-	font-family : 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif;
-	font-size   : 16px;
-
-	background  : rgb(243, 243, 243);
-	color       : black;
-	cursor      : pointer;
-}
-div.challengePlayer:hover {
-	text-decoration : underline;
+	background   : rgb(243, 243, 243);
+	color        : black;
 }
 
 div.challengeField {
 	line-height : 30px;
 	font-family : 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif;
 	font-size   : 16px;
+}
+
+div.challengePlayerDiv {
+	border          : 1px transparent;
+	line-height     : 28px;
+	outline         : none;
+	-moz-appearance : none;
+	resize          : none;
+	font-family     : 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif;
+	font-size       : 16px;
+
+	background      : rgb(243, 243, 243);
+	color           : black;
+}
+
+span.challengePlayerSpan {
+	cursor : pointer;
+}
+
+span.challengePlayerSpan:hover {
+	text-decoration : underline;
+}
+
+div.challengePlayerDivEditable {
+	border       : 1px solid #969696;
+	border-right : 1px transparent;
+	background   : rgb(255, 255, 255);
 }

@@ -559,6 +559,43 @@ CKGSClient.prototype.SendCreateChallenge = function(nChannelId, nCallBackKey, nG
 		}
 	});
 };
+CKGSClient.prototype.SendSubmitChallenge = function(nRoomId, nChannelId, nGameType, nRules, nSize, oTimeSettings, nHandicap, dKomi, bNigiri, bOwnerBlack, sOwnerName)
+{
+	var oRules = {
+		"rules"      : KGSCommon.GameRulesToString(nRules),
+		"size"       : nSize,
+		"handicap"   : nHandicap,
+		"komi"       : dKomi,
+		"timeSystem" : oTimeSettings.GetTypeInKGSString(),
+		"mainTime"   : oTimeSettings.GetMainTime()
+	};
+
+	if (oTimeSettings.IsByoYomi())
+	{
+		oRules["byoYomiTime"]    = oTimeSettings.GetOverTime();
+		oRules["byoYomiPeriods"] = oTimeSettings.GetOverCount();
+	}
+	else if (oTimeSettings.IsCanadian())
+	{
+		oRules["byoYomiTime"]   = oTimeSettings.GetOverTime();
+		oRules["byoYomiStones"] = oTimeSettings.GetOverCount();
+	}
+
+	this.private_SendMessage({
+		"channelId" : nChannelId,
+		"type"      : "CHALLENGE_SUBMIT",
+		"gameType"  : KGSCommon.GameTypeToString(nGameType),
+		"nigiri"    : bNigiri,
+		"rules"     : oRules,
+		"players"   : [{
+			"role" : bOwnerBlack ? "black" : "white",
+			"name" : sOwnerName
+		}, {
+			"role" : bOwnerBlack ? "white" : "black",
+			"name" : this.GetUserName()
+		}],
+	});
+};
 CKGSClient.prototype.private_SendMessage = function(oMessage)
 {
 	// console.log("Send:");
@@ -1709,7 +1746,7 @@ CKGSClient.prototype.private_HandleChallengeSubmit = function(oMessage)
 	if (!oWindow)
 		return;
 
-	oWindow.Submit(oUser, oProposal);
+	oWindow.OnSubmit(oUser, oProposal);
 };
 CKGSClient.prototype.private_AddUserToRoom = function(oUser, oRoom)
 {

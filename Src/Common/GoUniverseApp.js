@@ -169,6 +169,14 @@ CGoUniverseApplication.prototype.OnConnect = function()
 	document.title = "KGS: " + this.m_oClient.GetUserName();
 	document.getElementById("divIdClientNameText").innerHTML = this.m_oClient.GetUserName();
 
+	//TEST
+	var oThis = this;
+	document.getElementById("divIdClientNameText").onclick = function()
+	{
+		oThis.m_oClient.CreateChallenge();
+	};
+	//TEST
+
 	g_oFadeEffect.In(document.getElementById("divMainId"), 200);
 	this.private_HideAnimatedLogo();
 	this.OnResize();
@@ -865,7 +873,7 @@ CGoUniverseApplication.prototype.private_InitOmnibox = function()
 	{
 		var event    = e || window.event;
 		var charCode = event.which || event.keyCode;
-		if (13 === charCode)
+		if (13 === charCode && this.value !== "")
 		{
 			oThis.m_oClient.LoadUserInfo(this.value);
 			this.value = "";
