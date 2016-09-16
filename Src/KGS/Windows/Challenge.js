@@ -21,6 +21,8 @@ function CKGSChallengeWindow()
 
 	this.m_bNigiri       = true;
 	this.m_bCreatorBlack = false;
+	this.m_nHandicap     = 0;
+	this.m_dKomi         = 6.5;
 
 	this.m_nTop           = 0;
 	this.m_nHeaderHeight  = 30;
@@ -181,6 +183,24 @@ CKGSChallengeWindow.prototype.Close = function()
 {
 	CKGSChallengeWindow.superclass.Close.call(this);
 	this.m_oClient.CloseChallenge(this.m_nChannelId);
+};
+CKGSChallengeWindow.prototype.Submit = function(oUser, oProposal)
+{
+	this.m_bNigiri = oProposal.IsNigiri();
+
+	if (true !== this.m_bNigiri)
+	{
+		var oBlackUser = oProposal.GetBlack();
+		if (oBlackUser && oBlackUser.GetName() === oUser.GetName())
+			this.m_bCreatorBlack = false;
+		else
+			this.m_bCreatorBlack = true;
+	}
+
+	this.private_DrawPlayerColor();
+
+	this.m_oKomiInput.value     = oProposal.GetKomi();
+	this.m_oHandicapInput.value = oProposal.GetHandicap();
 };
 CKGSChallengeWindow.prototype.private_CreateName = function()
 {

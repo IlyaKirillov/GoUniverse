@@ -168,13 +168,17 @@ function CKGSChallengeProposal(oGameRecord)
 	this.m_nGameType  = EKGSGameType.Free;
 	this.m_nRules     = EKGSGameRules.Japanese;
 	this.m_sKomi      = "6.5";
+	this.m_nHandicap  = 0;
 	this.m_nSize      = 19;
 	this.m_oTime      = new CTimeSettings();
 	this.m_bNigiri    = true === oGameRecord.nigiri ? true : false;
 	this.m_arrPlayers = [];
+	this.m_oWhite     = null;
+	this.m_oBlack     = null;
 
 	this.private_ParseGameType(oGameRecord.gameType);
 	this.private_ParseRules(oGameRecord.rules);
+	this.private_ParsePlayers(oGameRecord.players);
 }
 CKGSChallengeProposal.prototype.private_ParseGameType = function(sGameType)
 {
@@ -192,15 +196,24 @@ CKGSChallengeProposal.prototype.GetKomi = function()
 {
 	return this.m_sKomi;
 };
+CKGSChallengeProposal.prototype.GetHandicap = function()
+{
+	return this.m_nHandicap;
+};
 CKGSChallengeProposal.prototype.GetBoardSize = function()
 {
 	return this.m_nSize;
 };
+CKGSChallengeProposal.prototype.IsNigiri = function()
+{
+	return this.m_bNigiri;
+};
 CKGSChallengeProposal.prototype.private_ParseRules = function(oRules)
 {
-	this.m_nRules = KGSCommon.GetGameRules(oRules.rules);
-	this.m_sKomi  = "" + oRules.komi;
-	this.m_nSize  = oRules.size ? oRules.size : 19;
+	this.m_nRules    = KGSCommon.GetGameRules(oRules.rules);
+	this.m_sKomi     = "" + oRules.komi;
+	this.m_nSize     = oRules.size ? oRules.size : 19;
+	this.m_nHandicap = oRules.handicap ? oRules.handicap : 0;
 
 	var sTimeType = oRules.timeSystem;
 	if ("absolute" === sTimeType)
@@ -210,6 +223,24 @@ CKGSChallengeProposal.prototype.private_ParseRules = function(oRules)
 	else if ("canadian" === sTimeType)
 		this.m_oTime.SetCanadian(oRules.mainTime, oRules.byoYomiTime, oRules.byoYomiStones);
 };
+CKGSChallengeProposal.prototype.private_ParsePlayers = function(arrPlayers)
+{
+	if (!arrPlayers || !arrPlayers.length)
+		return;
+
+	for (var nIndex = 0, nCount = arrPlayers.length; nIndex < nCount; ++nIndex)
+	{
+		var oRecord = arrPlayers[nIndex];
+		if ("white" === oRecord["role"] && oRecord["user"])
+		{
+			this.m_oWhite = GetKGSUser(oRecord["user"]);
+		}
+		else if ("black" === oRecord["role"] && oRecord["user"])
+		{
+			this.m_oBlack = GetKGSUser(oRecord["user"]);
+		}
+	}
+};
 CKGSChallengeProposal.prototype.GetTimeSettingsString = function()
 {
 	return this.m_oTime.GetTimeSystemString();
@@ -217,4 +248,8 @@ CKGSChallengeProposal.prototype.GetTimeSettingsString = function()
 CKGSChallengeProposal.prototype.GetTimeSettings = function()
 {
 	return this.m_oTime;
+};
+CKGSChallengeProposal.prototype.GetBlack = function()
+{
+	return this.m_oBlack;
 };

@@ -817,6 +817,10 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
 	{
 		this.private_HandleChallengeJoin(oMessage);
 	}
+	else if ("CHALLENGE_SUBMIT" === oMessage.type)
+	{
+		this.private_HandleChallengeSubmit(oMessage);
+	}
 	else
 	{
 		console.log(oMessage);
@@ -1694,6 +1698,18 @@ CKGSClient.prototype.private_HandleChallengeJoin = function(oMessage)
 
 	var oWindow = CreateKGSWindow(EKGSWindowType.Challenge, {ChannelId : nChannelId, GameRecord : oGameRecord, Client : this, App: this.m_oApp});
 	this.m_oChallenges[nChannelId] = oWindow;
+};
+CKGSClient.prototype.private_HandleChallengeSubmit = function(oMessage)
+{
+	var nChannelId = oMessage.channelId;
+	var oUser      = new GetKGSUser(oMessage.user, this);
+	var oProposal  = new CKGSChallengeProposal(oMessage.proposal);
+
+	var oWindow = this.m_oChallenges[nChannelId];
+	if (!oWindow)
+		return;
+
+	oWindow.Submit(oUser, oProposal);
 };
 CKGSClient.prototype.private_AddUserToRoom = function(oUser, oRoom)
 {
