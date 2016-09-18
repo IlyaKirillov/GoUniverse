@@ -9,6 +9,12 @@
  * Time     23:29
  */
 
+var KGS_MAX_TIME         = 2147483;
+var KGS_OVER_MAX_COUNT   = 255;
+var KGS_MAX_KOMI         = 100;
+var KGS_MAX_HANDICAP     = 50;
+var KGS_MAX_BYOYOMI_TIME = 36000;
+
 function CKGSChallengeWindow()
 {
 	CKGSChallengeWindow.superclass.constructor.call(this);
@@ -119,6 +125,10 @@ function CKGSChallengeWindow()
 
 		if (isNaN(dValue))
 			dValue = oThis.private_GetDefaultKomi();
+		else if (dValue < -KGS_MAX_KOMI)
+			dValue = -KGS_MAX_KOMI;
+		else if (dValue > KGS_MAX_KOMI)
+			dValue = KGS_MAX_KOMI;
 
 		dValue = ((dValue * 2) | 0) / 2;
 
@@ -136,8 +146,8 @@ function CKGSChallengeWindow()
 			nValue = oThis.private_GetDefaultHandicap();
 		else if (nValue < 0)
 			nValue = 0;
-		else if (nValue > 50)
-			nValue = 50;
+		else if (nValue > KGS_MAX_HANDICAP)
+			nValue = KGS_MAX_HANDICAP;
 
 		oThis.m_oHandicapInput.value = nValue;
 	};
@@ -877,6 +887,8 @@ CKGSChallengeWindow.prototype.private_UpdateTimeSystem = function()
 
 		if (nMainTime < 60)
 			nMainTime = 60;
+		else if (nMainTime > KGS_MAX_TIME)
+			nMainTime = KGS_MAX_TIME;
 
 		oTimeSettings.SetAbsolute(nMainTime);
 	}
@@ -886,11 +898,24 @@ CKGSChallengeWindow.prototype.private_UpdateTimeSystem = function()
 		var nByoTime  = StringToSeconds(this.m_oByoYomiTimeInput.value);
 		var nByoCount = parseInt(this.m_oByoYomiCountInput.value);
 
-		if (nByoTime < 1)
-			nByoTime = 1;
+		var _KGS_MAX_TIME = KGS_MAX_TIME / 2;
 
 		if (isNaN(nByoCount) || nByoCount < 1)
 			nByoCount = 1;
+		else if (nByoCount > KGS_OVER_MAX_COUNT)
+			nByoCount = KGS_OVER_MAX_COUNT;
+
+		if (nByoTime < 1)
+			nByoTime = 1;
+
+		if (nByoTime > KGS_MAX_BYOYOMI_TIME)
+			nByoTime = KGS_MAX_BYOYOMI_TIME;
+
+		if (nByoTime * nByoCount > _KGS_MAX_TIME)
+			nByoTime = _KGS_MAX_TIME / (nByoCount + 1);
+
+		if (nMainTime + nByoTime * nByoCount > _KGS_MAX_TIME)
+			nMainTime = _KGS_MAX_TIME - nByoTime * nByoCount;
 
 		oTimeSettings.SetByoYomi(nMainTime, nByoTime, nByoCount);
 	}
@@ -900,11 +925,18 @@ CKGSChallengeWindow.prototype.private_UpdateTimeSystem = function()
 		var nByoTime  = StringToSeconds(this.m_oByoYomiTimeInput.value);
 		var nByoCount = parseInt(this.m_oByoYomiCountInput.value);
 
+		if (nMainTime > KGS_MAX_TIME)
+			nMainTime = KGS_MAX_TIME;
+
 		if (nByoTime < 1)
 			nByoTime = 1;
+		else if (nByoTime > KGS_MAX_TIME)
+			nByoTime = KGS_MAX_TIME;
 
 		if (isNaN(nByoCount) || nByoCount < 1)
 			nByoCount = 1;
+		else if (nByoCount > KGS_OVER_MAX_COUNT)
+			nByoCount = KGS_OVER_MAX_COUNT;
 
 		oTimeSettings.SetCanadian(nMainTime, nByoTime, nByoCount);
 	}
