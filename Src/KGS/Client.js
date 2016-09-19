@@ -858,6 +858,10 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
 	{
 		this.private_HandleChallengeSubmit(oMessage);
 	}
+	else if ("CHALLENGE_CREATED" === oMessage.type)
+	{
+		this.private_ChallengeCreated(oMessage);
+	}
 	else
 	{
 		console.log(oMessage);
@@ -1747,6 +1751,25 @@ CKGSClient.prototype.private_HandleChallengeSubmit = function(oMessage)
 		return;
 
 	oWindow.OnSubmit(oUser, oProposal);
+};
+CKGSClient.prototype.private_ChallengeCreated = function(oMessage)
+{
+	var oWindow = this.m_oChallenges[-1];
+	if (oWindow)
+	{
+		var nChannelId = oMessage.game.channelId;
+
+		// Если так случилось, что сообщение ChallengeJoin пришло раньше, и мы создали второе окно, то его просто убираем
+		if (this.m_oChallenges[nChannelId])
+		{
+			RemoveWindow(this.m_oChallenges[nChannelId]);
+			delete this.m_oChallenges[nChannelId];
+		}
+
+		oWindow.OnChallengeCreated(nChannelId);
+		this.m_oChallenges[nChannelId] = oWindow;
+		delete this.m_oChallenges[-1];
+	}
 };
 CKGSClient.prototype.private_AddUserToRoom = function(oUser, oRoom)
 {

@@ -4,7 +4,7 @@
  * Copyright 2016 the GoUniverse project authors.
  * All rights reserved.
  * Project  GoUniverse
- * Author   Ilya Kirillov
+ * Author   Ilya Kirillovhandled the situation when a reference footnote lies inside a table.
  * Date     08.09.2016
  * Time     23:29
  */
@@ -15,9 +15,21 @@ var KGS_MAX_KOMI         = 100;
 var KGS_MAX_HANDICAP     = 50;
 var KGS_MAX_BYOYOMI_TIME = 36000;
 
+var EKGSChallengeWindowState = {
+
+	Unknown        : 0,
+	Creation       : 1,
+	OwnChallenge   : 2,
+	OtherChallenge : 3,
+	Recreate       : 4,
+	Waiting        : 5
+};
+
 function CKGSChallengeWindow()
 {
 	CKGSChallengeWindow.superclass.constructor.call(this);
+
+	this.m_nState      = EKGSChallengeWindowState.Unknown;
 
 	this.m_nChannelId  = -1;
 	this.m_oGameRecord = null;
@@ -172,17 +184,30 @@ CKGSChallengeWindow.prototype.Init = function(sDivId, oPr)
 	this.m_bOwner    = oChallengeCreator.GetName() === this.m_oClient.GetUserName() ? true : false;
 	this.m_oOwner    = oChallengeCreator;
 
-	if (true !== this.m_bCreation)
-		this.Set_Caption(oChallengeCreator ? "New game vs. " + oChallengeCreator.GetName() : "New game");
-	else
+	if (true === oPr.Create)
+	{
+		this.m_nState = EKGSChallengeWindowState.Creation;
 		this.Set_Caption("Create a new challenge");
+	}
+	else
+	{
+		if (oChallengeCreator.GetName() === this.m_oClient.GetUserName())
+		{
+			this.m_nState = EKGSChallengeWindowState.OwnChallenge;
+			this.Set_Caption("Your challenge");
+		}
+		else
+		{
+			this.m_nState = EKGSChallengeWindowState.OtherChallenge;
+			this.Set_Caption(oChallengeCreator ? "New game vs. " + oChallengeCreator.GetName() : "New game");
+		}
+	}
 
 	this.private_CreateName();
 	this.private_CreatePlayers();
 	this.private_CreateRules();
 	this.private_CreateButtons();
-	this.private_UpdateChallengersList();
-	this.Update_Size();
+	this.private_UpdateOnStateChange();
 };
 CKGSChallengeWindow.prototype.Update_Size = function(bForce)
 {
@@ -217,6 +242,12 @@ CKGSChallengeWindow.prototype.OnSubmit = function(oUser, oProposal)
 
 	this.private_UpdateChallengersList();
 };
+CKGSChallengeWindow.prototype.OnChallengeCreated = function(nChannelId)
+{
+	this.m_nChannelId = nChannelId;
+	this.Set_Caption("Your challenge");
+	this.private_SetState(EKGSChallengeWindowState.OwnChallenge);
+};
 CKGSChallengeWindow.prototype.private_CreateName = function()
 {
 	var nLeftWidth = 120;
@@ -230,7 +261,6 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 	oMainControl.AddControl(oWrapperControl);
 
 	var oInput = this.protected_CreateDivElement(oWrapperDiv, null, "input");
-	oInput.className += " challengeInput";
 	var oInputControl = CreateControlContainterByElement(oInput);
 	oInputControl.SetParams(5, 5, 5, 0, true, true, true, true, -1, -1);
 	oInputControl.SetAnchor(true, true, true, true);
@@ -241,11 +271,6 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 	if (sComment)
 		oInput.value = sComment;
 
-	if (true !== this.m_bCreation)
-		oInput.disabled = "disabled";
-	else
-		oInput.className += " challengeInputEditable";
-
 	var oWrapperTypeDiv     = this.protected_CreateDivElement(oMainDiv);
 	var oWrapperTypeControl = CreateControlContainterByElement(oWrapperTypeDiv);
 	oWrapperTypeControl.SetParams(0, 0, -1, -1, true, true, false, false, nLeftWidth, this.m_nHeaderHeight);
@@ -253,7 +278,6 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 	oMainControl.AddControl(oWrapperTypeControl);
 
 	var oTypeList       = this.protected_CreateDivElement(oWrapperTypeDiv, null, "select");
-	oTypeList.className += " challengeSelect";
 	oTypeList.style.fontWeight = "bold";
 	this.private_AddOptionToSelect(oTypeList, "Ranked");
 	this.private_AddOptionToSelect(oTypeList, "Free");
@@ -265,18 +289,6 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 	oTypeListControl.SetParams(5, 5, 5, 0, true, true, true, true, -1, -1);
 	oTypeListControl.SetAnchor(true, true, true, true);
 	oWrapperTypeControl.AddControl(oTypeListControl);
-
-
-	if (true !== this.m_bCreation)
-	{
-		oTypeList.disabled = "disabled";
-		oTypeList.className += " challengeSelectDisabled";
-	}
-	else
-	{
-		oTypeList.className += " challengeSelectEditable";
-	}
-
 
 	this.m_nTop = this.m_nHeaderHeight;
 
@@ -360,18 +372,7 @@ CKGSChallengeWindow.prototype.private_CreatePlayers = function()
 	oChallengerListControl.SetAnchor(true, true, true, false);
 	oMainControl.AddControl(oChallengerListControl);
 	this.m_oPlayersSelect = oChallengerListElement;
-
 	this.private_AddOptionToSelect(oChallengerListElement, "");
-
-	if (true === this.m_bOwner)
-	{
-		oChallengerListElement.className = "challengeSelect challengeSelectEditable";
-	}
-	else
-	{
-		oChallengerListElement.className = "challengeSelect";
-		oChallengerListElement.disabled  = "disabled";
-	}
 
 	var oChallengerPlayer = this.protected_CreateDivElement(oMainDiv);
 	var oChallengerControl = CreateControlContainterByElement(oChallengerPlayer);
@@ -380,20 +381,15 @@ CKGSChallengeWindow.prototype.private_CreatePlayers = function()
 	oMainControl.AddControl(oChallengerControl);
 	oChallengerPlayer.style.paddingLeft = "3px";
 
-	if (true === this.m_bOwner)
-		oChallengerPlayer.className = "challengePlayerDiv challengePlayerDivEditable";
-	else
-		oChallengerPlayer.className = "challengePlayerDiv";
-
 	var oCurrentUserName = this.m_oClient.GetCurrentUser();
 	if (oCurrentUserName)
 	{
 		var oSpan = document.createElement("span");
 		oSpan.className = "challengePlayerSpan";
-		oSpan.innerHTML = oCurrentUserName.GetName() + "[" + oCurrentUserName.GetStringRank() + "]";
+		oSpan.innerHTML = "";
 		oSpan.addEventListener("click", function()
 		{
-			oThis.m_oClient.LoadUserInfo(oCurrentUserName.GetName());
+			//oThis.m_oClient.LoadUserInfo();
 		}, false);
 		oSpan.title = "View user info";
 		oChallengerPlayer.appendChild(oSpan);
@@ -496,48 +492,23 @@ CKGSChallengeWindow.prototype.private_CreateRules = function()
 
 	// Rules
 	var oRulesSelectElement = this.private_AddRulesField(nLeftWidth, nTop, "select", "Rules:");
-	oRulesSelectElement.className += "challengeSelect";
 	this.private_AddOptionToSelect(oRulesSelectElement, "Japanese");
 	this.private_AddOptionToSelect(oRulesSelectElement, "Chinese");
 	this.private_AddOptionToSelect(oRulesSelectElement, "AGA");
 	this.private_AddOptionToSelect(oRulesSelectElement, "New Zealand");
-	if (true !== this.m_bCreation)
-	{
-		oRulesSelectElement.disabled = "disabled";
-		oRulesSelectElement.className += " challengeSelectDisabled";
-	}
-	else
-	{
-		oRulesSelectElement.className += " challengeSelectEditable";
-	}
 	this.m_oRulesSelect = oRulesSelectElement;
 
 	nTop += this.m_nFieldHeight;
 
 	// BoardSize
 	var oBoardElement = this.private_AddRulesField(nLeftWidth, nTop, "input", "Board size:");
-	oBoardElement.className += " challengeInput";
 	oBoardElement.value = "19";
-	if (true !== this.m_bCreation)
-		oBoardElement.disabled = "disabled";
-	else
-		oBoardElement.className += " challengeInputEditable";
-
 	this.m_oSizeInput = oBoardElement;
 	nTop += this.m_nFieldHeight;
 
 	// Handicap
 	var oHandicapElement = this.private_AddRulesField(nLeftWidth, nTop, "input", "Handicap:");
 	oHandicapElement.value = "0";
-	if (true == this.m_bCreation)
-	{
-		oHandicapElement.className = "challengeInput";
-		oHandicapElement.disabled  = "disabled";
-	}
-	else
-	{
-		oHandicapElement.className = "challengeInput challengeInputEditable";
-	}
 	this.m_oHandicapInput = oHandicapElement;
 
 	nTop += this.m_nFieldHeight;
@@ -545,69 +516,34 @@ CKGSChallengeWindow.prototype.private_CreateRules = function()
 	// Komi
 	var oKomiElement = this.private_AddRulesField(nLeftWidth, nTop, "input", "Komi:");
 	oKomiElement.value = "6.5";
-	if (true == this.m_bCreation)
-	{
-		oKomiElement.className = "challengeInput";
-		oKomiElement.disabled  = "disabled";
-	}
-	else
-	{
-		oKomiElement.className = "challengeInput challengeInputEditable";
-	}
-
 	this.m_oKomiInput = oKomiElement;
 	nTop += this.m_nFieldHeight;
 
 	// TimeSystem
 	var oTimeSystemElement = this.private_AddRulesField(nLeftWidth, nTop, "select", "Time system:");
-	oTimeSystemElement.className += "challengeSelect";
 	this.private_AddOptionToSelect(oTimeSystemElement, "Absolute");
 	this.private_AddOptionToSelect(oTimeSystemElement, "Byo-Yomi");
 	this.private_AddOptionToSelect(oTimeSystemElement, "Canadian");
 	this.private_AddOptionToSelect(oTimeSystemElement, "No time limit");
-	if (true !== this.m_bCreation)
-	{
-		oTimeSystemElement.disabled = "disabled";
-		oTimeSystemElement.className += " challengeSelectDisabled";
-	}
-	else
-	{
-		oTimeSystemElement.className += " challengeSelectEditable";
-	}
 	this.m_oTimeSystemSelect = oTimeSystemElement;
 	nTop += this.m_nFieldHeight;
 
 	// MainTime
 	var oMainTimeElement = this.private_AddRulesField(nLeftWidth, nTop, "input", "Main time:");
-	oMainTimeElement.className += " challengeInput";
 	oMainTimeElement.value = "10:00";
-	if (true !== this.m_bCreation)
-		oMainTimeElement.disabled = "disabled";
-	else
-		oMainTimeElement.className += " challengeInputEditable";
 	this.m_oMainTimeInput = oMainTimeElement;
 	nTop += this.m_nFieldHeight;
 
 	// ByoYomi time
 	var oByoTimeElement = this.private_AddRulesField(nLeftWidth, nTop, "input", "Byo-yomi:");
-	oByoTimeElement.className += " challengeInput";
 	oByoTimeElement.value = "00:30";
-	if (true !== this.m_bCreation)
-		oByoTimeElement.disabled = "disabled";
-	else
-		oByoTimeElement.className += " challengeInputEditable";
 	this.m_oByoYomiTimeInput = oByoTimeElement;
 	nTop += this.m_nFieldHeight;
 
 	// ByoYomi count
 	var oTemp = this.private_AddRulesField(nLeftWidth, nTop, "input", "Count:", true);
 	var oByoCountElement = oTemp.Field;
-	oByoCountElement.className += " challengeInput";
 	oByoCountElement.value = "5";
-	if (true !== this.m_bCreation)
-		oByoCountElement.disabled = "disabled";
-	else
-		oByoCountElement.className += " challengeInputEditable";
 	this.m_oByoYomiCountInput = oByoCountElement;
 	this.m_oOverCountLabel    = oTemp.Title;
 	nTop += this.m_nFieldHeight;
@@ -641,7 +577,6 @@ CKGSChallengeWindow.prototype.private_CreateRules = function()
 	}
 
 	this.m_nTop = nTop;
-
 
 	this.private_AddEventsForSelect(this.private_OnChangeRules, oRulesSelectElement);
 	this.private_AddEventsForInput(this.private_OnChangeBoardSize, oBoardElement);
@@ -764,6 +699,8 @@ CKGSChallengeWindow.prototype.private_CreateChallenge = function()
 	var oTimeSystem = this.m_oGameRecord.GetProposal().GetTimeSettings();
 
 	this.m_oClient.SendCreateChallenge(this.m_nRoomId, this.m_nChannelId, nGameType, sComment, nRules, nSize, oTimeSystem);
+
+	this.private_SetState(EKGSChallengeWindowState.Waiting);
 };
 CKGSChallengeWindow.prototype.private_SubmitChallenge = function()
 {
@@ -775,6 +712,8 @@ CKGSChallengeWindow.prototype.private_SubmitChallenge = function()
 	var dKomi       = this.private_GetKomi();
 
 	this.m_oClient.SendSubmitChallenge(this.m_nRoomId, this.m_nChannelId, nGameType, nRules, nSize, oTimeSystem, nHandicap, dKomi, this.m_bNigiri, this.m_bCreatorBlack, this.m_oOwner.GetName());
+
+	this.private_SetState(EKGSChallengeWindowState.Waiting);
 };
 CKGSChallengeWindow.prototype.private_GetSelectedGameType = function()
 {
@@ -953,11 +892,13 @@ CKGSChallengeWindow.prototype.private_UpdateTimeSystemFields = function()
 	var oProposal     = oGameRecord.GetProposal();
 	var oTimeSettings = oProposal.GetTimeSettings();
 
+	var bCanEdit = this.m_nState === EKGSChallengeWindowState.Creation || this.m_nState === EKGSChallengeWindowState.Recreate ? true : false;
+
 	if (oTimeSettings.IsAbsolute())
 	{
 		this.m_oMainTimeInput.value = oTimeSettings.GetMainTimeString();
 
-		if (true === this.m_bCreation)
+		if (bCanEdit)
 		{
 			this.m_oMainTimeInput.className = "challengeInput challengeInputEditable";
 			this.m_oMainTimeInput.disabled  = "";
@@ -982,7 +923,7 @@ CKGSChallengeWindow.prototype.private_UpdateTimeSystemFields = function()
 		this.m_oByoYomiTimeInput.value  = oTimeSettings.GetByoYomiTimeString();
 		this.m_oByoYomiCountInput.value = oTimeSettings.GetOverCount();
 
-		if (true === this.m_bCreation)
+		if (bCanEdit)
 		{
 			this.m_oMainTimeInput.className     = "challengeInput challengeInputEditable";
 			this.m_oByoYomiTimeInput.className  = "challengeInput challengeInputEditable";
@@ -1081,4 +1022,97 @@ CKGSChallengeWindow.prototype.private_UpdateChallengersList = function()
 		this.m_oKomiInput.value     = oProposal.GetKomi();
 		this.m_oHandicapInput.value = oProposal.GetHandicap();
 	}
+};
+CKGSChallengeWindow.prototype.private_UpdateButtons = function()
+{
+
+};
+CKGSChallengeWindow.prototype.private_UpdateOnStateChange = function()
+{
+	if (EKGSChallengeWindowState.Unknown === this.m_nState || EKGSChallengeWindowState.Waiting === this.m_nState)
+	{
+		this.m_oGameTypeSelect.className   = "challengeSelect challengeSelectDisabled";
+		this.m_oGameTypeSelect.disabled    = "disabled";
+		this.m_oCommentInput.className     = "challengeInput";
+		this.m_oCommentInput.disabled      = "disabled";
+		this.m_oRulesSelect.className      = "challengeSelect challengeSelectDisabled";
+		this.m_oRulesSelect.disabled       = "disabled";
+		this.m_oSizeInput.className        = "challengeInput";
+		this.m_oSizeInput.disabled         = "disabled";
+		this.m_oKomiInput.className        = "challengeInput";
+		this.m_oKomiInput.disabled         = "disabled";
+		this.m_oHandicapInput.className    = "challengeInput";
+		this.m_oHandicapInput.disabled     = "disabled";
+		this.m_oTimeSystemSelect.className = "challengeSelect challengeSelectDisabled";
+		this.m_oTimeSystemSelect.disabled  = "disabled";
+		this.m_oPlayersSelect.className    = "challengeSelect challengeSelectDisabled";
+		this.m_oPlayersSelect.disabled     = "disabled";
+	}
+	else if (EKGSChallengeWindowState.Creation === this.m_nState || EKGSChallengeWindowState.Recreate === this.m_nState)
+	{
+		this.m_oGameTypeSelect.className   = "challengeSelect challengeSelectEditable";
+		this.m_oGameTypeSelect.disabled    = "";
+		this.m_oCommentInput.className     = "challengeInput challengeInputEditable";
+		this.m_oCommentInput.disabled      = "";
+		this.m_oRulesSelect.className      = "challengeSelect challengeSelectEditable";
+		this.m_oRulesSelect.disabled       = "";
+		this.m_oSizeInput.className        = "challengeInput challengeInputEditable";
+		this.m_oSizeInput.disabled         = "";
+		this.m_oKomiInput.className        = "challengeInput";
+		this.m_oKomiInput.disabled         = "disabled";
+		this.m_oHandicapInput.className    = "challengeInput";
+		this.m_oHandicapInput.disabled     = "disabled";
+		this.m_oTimeSystemSelect.className = "challengeSelect challengeSelectEditable";
+		this.m_oTimeSystemSelect.disabled  = "";
+		this.m_oPlayersSelect.className    = "challengeSelect challengeSelectDisabled";
+		this.m_oPlayersSelect.disabled     = "disabled";
+	}
+	else if (EKGSChallengeWindowState.OwnChallenge === this.m_nState)
+	{
+		this.m_oGameTypeSelect.className   = "challengeSelect challengeSelectDisabled";
+		this.m_oGameTypeSelect.disabled    = "disabled";
+		this.m_oCommentInput.className     = "challengeInput";
+		this.m_oCommentInput.disabled      = "disabled";
+		this.m_oRulesSelect.className      = "challengeSelect challengeSelectDisabled";
+		this.m_oRulesSelect.disabled       = "disabled";
+		this.m_oSizeInput.className        = "challengeInput";
+		this.m_oSizeInput.disabled         = "disabled";
+		this.m_oKomiInput.className        = "challengeInput";
+		this.m_oKomiInput.disabled         = "disabled";
+		this.m_oHandicapInput.className    = "challengeInput";
+		this.m_oHandicapInput.disabled     = "disabled";
+		this.m_oTimeSystemSelect.className = "challengeSelect challengeSelectDisabled";
+		this.m_oTimeSystemSelect.disabled  = "disabled";
+		this.m_oPlayersSelect.className    = "challengeSelect challengeSelectEditable";
+		this.m_oPlayersSelect.disabled     = "";
+	}
+	else if (EKGSChallengeWindowState.OtherChallenge === this.m_nState)
+	{
+		this.m_oGameTypeSelect.className   = "challengeSelect challengeSelectDisabled";
+		this.m_oGameTypeSelect.disabled    = "disabled";
+		this.m_oCommentInput.className     = "challengeInput";
+		this.m_oCommentInput.disabled      = "disabled";
+		this.m_oRulesSelect.className      = "challengeSelect challengeSelectDisabled";
+		this.m_oRulesSelect.disabled       = "disabled";
+		this.m_oSizeInput.className        = "challengeInput";
+		this.m_oSizeInput.disabled         = "disabled";
+		this.m_oKomiInput.className        = "challengeInput challengeInputEditable";
+		this.m_oKomiInput.disabled         = "";
+		this.m_oHandicapInput.className    = "challengeInput challengeInputEditable";
+		this.m_oHandicapInput.disabled     = "";
+		this.m_oTimeSystemSelect.className = "challengeSelect challengeSelectDisabled";
+		this.m_oTimeSystemSelect.disabled  = "disabled";
+		this.m_oPlayersSelect.className    = "challengeSelect challengeSelectDisabled";
+		this.m_oPlayersSelect.disabled     = "disabled";
+	}
+
+	this.private_UpdateChallengersList();
+	this.private_UpdateTimeSystemFields();
+	this.private_UpdateButtons();
+	this.Update_Size();
+};
+CKGSChallengeWindow.prototype.private_SetState = function(nState)
+{
+	this.m_nState = nState;
+	this.private_UpdateOnStateChange();
 };
