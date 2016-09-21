@@ -593,7 +593,43 @@ CKGSClient.prototype.SendSubmitChallenge = function(nRoomId, nChannelId, nGameTy
 		}, {
 			"role" : bOwnerBlack ? "white" : "black",
 			"name" : this.GetUserName()
-		}],
+		}]
+	});
+};
+CKGSClient.prototype.SendModifyChallenge = function(nChannelId, nGameType, nRules, nSize, oTimeSettings)
+{
+	var oRules = {
+		"rules"      : KGSCommon.GameRulesToString(nRules),
+		"size"       : nSize,
+		"komi"       : 6.5,
+		"timeSystem" : oTimeSettings.GetTypeInKGSString(),
+		"mainTime"   : oTimeSettings.GetMainTime()
+	};
+
+	if (oTimeSettings.IsByoYomi())
+	{
+		oRules["byoYomiTime"]    = oTimeSettings.GetOverTime();
+		oRules["byoYomiPeriods"] = oTimeSettings.GetOverCount();
+	}
+	else if (oTimeSettings.IsCanadian())
+	{
+		oRules["byoYomiTime"]   = oTimeSettings.GetOverTime();
+		oRules["byoYomiStones"] = oTimeSettings.GetOverCount();
+	}
+
+	this.private_SendMessage({
+		"channelId" : nChannelId,
+		"type"      : "CHALLENGE_PROPOSAL",
+
+		"gameType" : KGSCommon.GameTypeToString(nGameType),
+		"nigiri"   : true,
+		"rules"    : oRules,
+		"players"  : [{
+			"role" : "white",
+			"name" : this.m_oCurrentUser.GetName()
+		}, {
+			"role" : "black"
+		}]
 	});
 };
 CKGSClient.prototype.private_SendMessage = function(oMessage)
@@ -1253,9 +1289,10 @@ CKGSClient.prototype.private_HandleUserRemoved = function(oMessage)
 	if (!oMessage || !oMessage.user)
 		return;
 
-	var oUser = this.private_HandleUserRecord(oMessage.user, false);
-	var oRoom = this.m_aAllRooms[oMessage.channelId];
-	var oGame = this.m_aGames[oMessage.channelId];
+	var oUser      = this.private_HandleUserRecord(oMessage.user, false);
+	var oRoom      = this.m_aAllRooms[oMessage.channelId];
+	var oGame      = this.m_aGames[oMessage.channelId];
+	var oChallenge = this.m_oChallenges[oMessage.channelId];
 	if (oRoom)
 	{
 		delete oRoom.Users[oUser.GetName()];
@@ -1269,6 +1306,10 @@ CKGSClient.prototype.private_HandleUserRemoved = function(oMessage)
 	else if (oGame)
 	{
 		oGame.HandleUserRemoved(oUser);
+	}
+	else if (oChallenge)
+	{
+		oChallenge.OnUserRemoved(oUser);
 	}
 };
 CKGSClient.prototype.private_HandleGameList = function(oMessage)

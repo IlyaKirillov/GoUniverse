@@ -446,35 +446,38 @@ span.InGameChatMoveRef:hover {
 }
 
 input.challengeInput {
+	border          : 1px solid transparent;
+	outline         : none;
+	-moz-appearance : none;
+	resize          : none;
+	font-family     : 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif;
+	font-size       : 16px;
+	padding-left    : 3px;
+
+	background      : rgb(243, 243, 243);
+	color           : black;
+}
+
+input.challengeInputEditable {
+	border       : 1px solid #969696;
+	background   : rgb(255, 255, 255);
+}
+
+select.challengeSelect {
 	border          : 1px transparent;
 	outline         : none;
 	-moz-appearance : none;
 	resize          : none;
 	font-family     : 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif;
-    font-size       : 16px;
+	font-size       : 16px;
+	padding-left    : 0px;
 
 	background      : rgb(243, 243, 243);
-    color           : black;
-}
-
-input.challengeInputEditable {
-	border     : 1px solid #969696;
-	background : rgb(255, 255, 255);
-}
-
-select.challengeSelect {
-	border             : 1px transparent;
-	outline            : none;
-	-moz-appearance    : none;
-	resize             : none;
-	font-family        : 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif;
-	font-size          : 16px;
-
-	background         : rgb(243, 243, 243);
-	color              : black;
+	color           : black;
 }
 
 select.challengeSelectDisabled {
+	padding-left       : 5px;
 	-webkit-appearance : none;
 	-moz-appearance    : none;
 }
@@ -491,6 +494,10 @@ div.challengePlayer {
 
 	background   : rgb(243, 243, 243);
 	color        : black;
+}
+
+div.challengePlayerSelect {
+	background   : rgb(255, 255, 255);
 }
 
 div.challengeField {
