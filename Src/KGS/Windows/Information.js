@@ -26,7 +26,7 @@ CKGSInformationWindow.prototype.Init = function(sDivId, oPr)
 	if (oPr.W)
 		this.m_nDefW = oPr.W;
 
-	CKGSInformationWindow.superclass.Init.apply(this, arguments);
+	CKGSInformationWindow.superclass.Init.call(this, sDivId, oPr, false);
 
 	this.Set_Caption(oPr.Caption);
 

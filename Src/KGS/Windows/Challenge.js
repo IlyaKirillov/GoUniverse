@@ -346,6 +346,14 @@ CKGSChallengeWindow.prototype.OnSubmit = function(oUser, oProposal)
 		this.private_OnChangeChallenger();
 	}
 };
+CKGSChallengeWindow.prototype.OnDecline = function()
+{
+	var oChallengeCreator = this.m_oOwner;
+	this.Set_Caption(oChallengeCreator ? "New game vs. " + oChallengeCreator.GetName() : "New game");
+	this.private_SetState(EKGSChallengeWindowState.OtherChallenge);
+
+	CreateKGSWindow(EKGSWindowType.Information, {Client : this.m_oClient, App : this.m_oClient.m_oApp, Caption : "Warning", Text : "Your challenge has been declined.", Image : "WarningSpanWarning", W : 315, H : 145});
+};
 CKGSChallengeWindow.prototype.OnChallengeCreated = function(nChannelId)
 {
 	this.m_nChannelId = nChannelId;

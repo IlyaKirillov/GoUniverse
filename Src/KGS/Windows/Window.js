@@ -230,9 +230,9 @@ function CKGSWindowOKBase()
 	this.m_oApp = null;
 }
 CommonExtend(CKGSWindowOKBase, CDrawingConfirmWindow);
-CKGSWindowOKBase.prototype.Init = function(sDivId, oPr)
+CKGSWindowOKBase.prototype.Init = function(sDivId, oPr, bResizeable)
 {
-	CKGSWindowOKBase.superclass.Init.call(this, sDivId, true);
+	CKGSWindowOKBase.superclass.Init.call(this, sDivId, bResizeable);
 	this.m_oApp    = oPr.App;
 	this.m_oClient = oPr.Client;
 	this.private_UpdatePosition();

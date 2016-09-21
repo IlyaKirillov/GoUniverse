@@ -906,6 +906,10 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
 	{
 		this.private_ChallengeCreated(oMessage);
 	}
+	else if ("CHALLENGE_DECLINE" === oMessage.type)
+	{
+		this.private_ChallengeDecline(oMessage);
+	}
 	else
 	{
 		console.log(oMessage);
@@ -1819,6 +1823,16 @@ CKGSClient.prototype.private_ChallengeCreated = function(oMessage)
 		this.m_oChallenges[nChannelId] = oWindow;
 		delete this.m_oChallenges[-1];
 	}
+};
+CKGSClient.prototype.private_ChallengeDecline = function(oMessage)
+{
+	var nChannelId = oMessage.channelId;
+
+	var oWindow = this.m_oChallenges[nChannelId];
+	if (!oWindow)
+		return;
+
+	oWindow.OnDecline();
 };
 CKGSClient.prototype.private_AddUserToRoom = function(oUser, oRoom)
 {
