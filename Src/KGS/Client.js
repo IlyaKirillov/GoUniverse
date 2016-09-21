@@ -632,6 +632,14 @@ CKGSClient.prototype.SendModifyChallenge = function(nChannelId, nGameType, nRule
 		}]
 	});
 };
+CKGSClient.prototype.DeclineChallenge = function(nChannelId, sUserName)
+{
+	this.private_SendMessage({
+		"channelId": nChannelId,
+		"type"     : "CHALLENGE_DECLINE",
+		"name"     : sUserName
+	});
+};
 CKGSClient.prototype.private_SendMessage = function(oMessage)
 {
 	// console.log("Send:");

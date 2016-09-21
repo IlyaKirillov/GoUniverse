@@ -527,6 +527,15 @@ span.challengePlayerSpan:hover {
 	text-decoration : underline;
 }
 
+span.challengePlayerRejectSpan {
+	color      : silver;
+	font-style : italic;
+}
+
+span.challengePlayerRejectSpan:hover {
+	color      : black;
+}
+
 div.challengePlayerDivEditable {
 	border       : 1px solid #969696;
 	border-right : 1px transparent;

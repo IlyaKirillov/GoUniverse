@@ -194,6 +194,8 @@ function CKGSChallengeWindow()
 			oThis.m_oKomiInput.disabled      = "disabled";
 			oThis.m_oHandicapInput.className = "challengeInput";
 			oThis.m_oHandicapInput.disabled  = "disabled";
+
+			oThis.m_oChallengerReject.style.display = "none";
 		}
 		else
 		{
@@ -228,6 +230,8 @@ function CKGSChallengeWindow()
 				oThis.m_oHandicapInput.className = "challengeInput";
 				oThis.m_oHandicapInput.disabled  = "disabled";
 			}
+
+			oThis.m_oChallengerReject.style.display = "block";
 		}
 
 		oThis.private_DrawPlayerColor();
@@ -474,28 +478,43 @@ CKGSChallengeWindow.prototype.private_CreatePlayers = function()
 
 	var oChallengerPlayer = this.protected_CreateDivElement(oMainDiv);
 	var oChallengerControl = CreateControlContainterByElement(oChallengerPlayer);
-	oChallengerControl.SetParams(70 + 1, nTop + this.m_nPlayersHeight + 1, 30, 0, true, true, true, false, -1, this.m_nPlayersHeight - 2);
+	oChallengerControl.SetParams(70 + 1, nTop + this.m_nPlayersHeight + 1, 50, 0, true, true, true, false, -1, this.m_nPlayersHeight - 2);
 	oChallengerControl.SetAnchor(true, true, true, false);
 	oMainControl.AddControl(oChallengerControl);
 	oChallengerPlayer.style.paddingLeft = "3px";
 	oChallengerPlayer.className += "challengePlayer";
 
-	var oChallengerSpan       = document.createElement("span");
-	oChallengerSpan.className += "challengePlayerSpan";
-	oChallengerSpan.innerHTML = "";
-	oChallengerSpan.title     = "";
-	oChallengerSpan.onclick   = function()
+	var oChallengerSpan            = document.createElement("span");
+	oChallengerSpan.style["float"] = "left";
+	oChallengerSpan.className      = "challengePlayerSpan";
+	oChallengerSpan.innerHTML      = "";
+	oChallengerSpan.title          = "";
+	oChallengerSpan.onclick        = function ()
 	{
 		if (oThis.m_oCurrentChallenger)
 			oThis.m_oClient.LoadUserInfo(oThis.m_oCurrentChallenger.GetName());
 	};
 	oChallengerPlayer.appendChild(oChallengerSpan);
 
+	var oChallengerRejectSpan            = document.createElement("span");
+	oChallengerRejectSpan.className      = "challengePlayerSpan challengePlayerRejectSpan";
+	oChallengerRejectSpan.style["float"] = "right";
+	oChallengerRejectSpan.style.display  = "none";
+	oChallengerRejectSpan.innerHTML      = "decline";
+	oChallengerRejectSpan.title          = "Decline this player";
+	oChallengerRejectSpan.onclick = function ()
+	{
+		oThis.private_RejectChallenge();
+	};
+	oChallengerPlayer.appendChild(oChallengerRejectSpan);
+
+
 	this.m_nTop = nTop + 2 * this.m_nPlayersHeight;
 
 	this.m_oChallengerDiv    = oChallengerPlayer;
 	this.m_oChallengerSelect = oChallengerListElement;
 	this.m_oChallengerSpan   = oChallengerSpan;
+	this.m_oChallengerReject = oChallengerRejectSpan;
 
 	this.private_AddEventsForSelect(this.private_OnChangeChallenger, oChallengerListElement);
 };
@@ -836,6 +855,11 @@ CKGSChallengeWindow.prototype.private_ModifyChallenge = function()
 {
 	this.Set_Caption("Modify your challenge");
 	this.private_SetState(EKGSChallengeWindowState.Recreate);
+
+	this.m_oClient.private_SendMessage({
+		"channelId" : this.m_nChannelId,
+		"type"      : "CHALLENGE_RETRY"
+	});
 };
 CKGSChallengeWindow.prototype.private_ApplyModifications = function()
 {
@@ -844,7 +868,7 @@ CKGSChallengeWindow.prototype.private_ApplyModifications = function()
 	var nSize       = this.m_oSizeInput.value;
 	var oTimeSystem = this.m_oGameRecord.GetProposal().GetTimeSettings();
 
-	this.m_oClient.SendModifyChallenge(this.m_nRoomId, nGameType, nRules, nSize, oTimeSystem);
+	this.m_oClient.SendModifyChallenge(this.m_nChannelId, nGameType, nRules, nSize, oTimeSystem);
 
 	this.private_SetState(EKGSChallengeWindowState.Waiting);
 };
@@ -1281,5 +1305,14 @@ CKGSChallengeWindow.prototype.private_UpdateKomiAndHandicapFields = function()
 		this.m_oKomiInput.disabled      = "disabled";
 		this.m_oHandicapInput.className = "challengeInput";
 		this.m_oHandicapInput.disabled  = "disabled";
+	}
+};
+CKGSChallengeWindow.prototype.private_RejectChallenge = function()
+{
+	if (this.m_oCurrentChallenger)
+	{
+		var oUser = this.m_oCurrentChallenger;
+		this.OnUserRemoved(oUser);
+		this.m_oClient.DeclineChallenge(this.m_nChannelId, oUser.GetName());
 	}
 };
