@@ -632,6 +632,43 @@ CKGSClient.prototype.SendModifyChallenge = function(nChannelId, nGameType, nRule
 		}]
 	});
 };
+CKGSClient.prototype.SendChallengeProposal = function(nChannelId, nGameType, nRules, nSize, oTimeSettings, dKomi, nHandicap, bNigiri, bCreatorBlack, sCreator, sChallenger)
+{
+	var oRules = {
+		"rules"      : KGSCommon.GameRulesToString(nRules),
+		"size"       : nSize,
+		"handicap"   : nHandicap,
+		"komi"       : dKomi,
+		"timeSystem" : oTimeSettings.GetTypeInKGSString(),
+		"mainTime"   : oTimeSettings.GetMainTime()
+	};
+
+	if (oTimeSettings.IsByoYomi())
+	{
+		oRules["byoYomiTime"]    = oTimeSettings.GetOverTime();
+		oRules["byoYomiPeriods"] = oTimeSettings.GetOverCount();
+	}
+	else if (oTimeSettings.IsCanadian())
+	{
+		oRules["byoYomiTime"]   = oTimeSettings.GetOverTime();
+		oRules["byoYomiStones"] = oTimeSettings.GetOverCount();
+	}
+
+	this.private_SendMessage({
+		"channelId" : nChannelId,
+		"type"      : "CHALLENGE_PROPOSAL",
+		"gameType"  : KGSCommon.GameTypeToString(nGameType),
+		"nigiri"    : bNigiri,
+		"rules"     : oRules,
+		"players"   : [{
+			"role" : bCreatorBlack ? "black" : "white",
+			"name" : sCreator
+		}, {
+			"role" : bCreatorBlack ? "white" : "black",
+			"name" : sChallenger
+		}]
+	});
+};
 CKGSClient.prototype.DeclineChallenge = function(nChannelId, sUserName)
 {
 	this.private_SendMessage({

@@ -47,6 +47,8 @@ function CKGSChallengeWindow()
 	this.m_nPlayersHeight = 30;
 	this.m_nFieldHeight   = 32;
 
+	this.m_bSubmitted = false;
+
 	this.m_oPlayersColorsCanvas = null;
 
 	this.m_oButtons = {
@@ -82,6 +84,8 @@ function CKGSChallengeWindow()
 			return;
 
 		oThis.m_oKomiInput.value = oThis.private_GetDefaultKomi();
+
+		oThis.private_GetGlobalSettings().SetKGSChallengeRules(oThis.private_GetSelectedRules());
 	};
 	this.private_OnChangeBoardSize = function()
 	{
@@ -99,6 +103,8 @@ function CKGSChallengeWindow()
 			nValue = 38;
 
 		oThis.m_oSizeInput.value = nValue;
+
+		oThis.private_GetGlobalSettings().SetKGSChallengeBoardSize(nValue);
 	};
 	this.private_OnChangeTimeSettings = function()
 	{
@@ -258,6 +264,14 @@ function CKGSChallengeWindow()
 			oThis.private_DrawPlayerColor();
 		}
 	};
+	this.private_OnChangeGameType = function()
+	{
+		oThis.private_GetGlobalSettings().SetKGSChallengeGameType(oThis.private_GetSelectedGameType());
+	};
+	this.private_OnChangeComment = function()
+	{
+		oThis.private_GetGlobalSettings().SetKGSChallengeComment(oThis.m_oCommentInput.value);
+	};
 }
 CommonExtend(CKGSChallengeWindow, CKGSWindowBase);
 
@@ -299,6 +313,10 @@ CKGSChallengeWindow.prototype.Init = function(sDivId, oPr)
 	this.private_CreatePlayers();
 	this.private_CreateRules();
 	this.private_CreateButtons();
+
+	if (true === oPr.Create)
+		this.private_FillDefaultValues();
+
 	this.private_UpdateOnStateChange();
 };
 CKGSChallengeWindow.prototype.Update_Size = function(bForce)
@@ -353,12 +371,15 @@ CKGSChallengeWindow.prototype.OnDecline = function()
 	this.private_SetState(EKGSChallengeWindowState.OtherChallenge);
 
 	CreateKGSWindow(EKGSWindowType.Information, {Client : this.m_oClient, App : this.m_oClient.m_oApp, Caption : "Warning", Text : "Your challenge has been declined.", Image : "WarningSpanWarning", W : 315, H : 145});
+
+	this.m_bSubmitted = false;
 };
 CKGSChallengeWindow.prototype.OnChallengeCreated = function(nChannelId)
 {
 	this.m_nChannelId = nChannelId;
 	this.Set_Caption("Your challenge");
 	this.private_SetState(EKGSChallengeWindowState.OwnChallenge);
+	this.m_bSubmitted = true;
 };
 CKGSChallengeWindow.prototype.OnUserRemoved = function(oUser)
 {
@@ -432,6 +453,9 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 		var nType = oProposal.GetGameType();
 		this.private_SetSelectedGameType(nType);
 	}
+
+	this.private_AddEventsForSelect(this.private_OnChangeGameType, oTypeList);
+	this.private_AddEventsForInput(this.private_OnChangeComment, oInput);
 };
 CKGSChallengeWindow.prototype.private_CreatePlayers = function()
 {
@@ -855,9 +879,17 @@ CKGSChallengeWindow.prototype.private_SubmitChallenge = function()
 	var nHandicap   = this.private_GetHandicap();
 	var dKomi       = this.private_GetKomi();
 
-	this.m_oClient.SendSubmitChallenge(this.m_nRoomId, this.m_nChannelId, nGameType, nRules, nSize, oTimeSystem, nHandicap, dKomi, this.m_bNigiri, this.m_bCreatorBlack, this.m_oOwner.GetName());
-
-	this.private_SetState(EKGSChallengeWindowState.Waiting);
+	if (false === this.m_bSubmitted)
+	{
+		this.m_oClient.SendSubmitChallenge(this.m_nRoomId, this.m_nChannelId, nGameType, nRules, nSize, oTimeSystem, nHandicap, dKomi, this.m_bNigiri, this.m_bCreatorBlack, this.m_oOwner.GetName());
+		this.private_SetState(EKGSChallengeWindowState.Waiting);
+		this.m_bSubmitted = true;
+	}
+	else
+	{
+		this.m_oClient.SendChallengeProposal(this.m_nChannelId, nGameType, nRules, nSize, oTimeSystem, nHandicap, dKomi, this.m_bNigiri, this.m_bCreatorBlack, this.m_oOwner.GetName(), this.m_oCurrentChallenger.GetName());
+		this.private_SetState(EKGSChallengeWindowState.Waiting);
+	}
 };
 CKGSChallengeWindow.prototype.private_ModifyChallenge = function()
 {
@@ -956,6 +988,20 @@ CKGSChallengeWindow.prototype.private_GetSelectedTimeSystem = function()
 
 	return ETimeSettings.None;
 };
+CKGSChallengeWindow.prototype.private_SetSelectedTimeSystem = function(nSystem)
+{
+	var nSelectedIndex = this.m_oTimeSystemSelect.selectedIndex;
+	if (ETimeSettings.Absolute === nSystem)
+		nSelectedIndex = 0;
+	else if (ETimeSettings.ByoYomi === nSystem)
+		nSelectedIndex = 1;
+	else if (ETimeSettings.Canadian === nSystem)
+		nSelectedIndex = 2;
+	else if (ETimeSettings.None === nSystem)
+		nSelectedIndex = 3;
+
+	this.m_oTimeSystemSelect.selectedIndex = nSelectedIndex;
+};
 CKGSChallengeWindow.prototype.private_AddEventsForInput = function(fOnChange, oInput)
 {
 	oInput.addEventListener("keyup", function(e)
@@ -980,6 +1026,8 @@ CKGSChallengeWindow.prototype.private_AddEventsForSelect = function(fOnChange, o
 };
 CKGSChallengeWindow.prototype.private_UpdateTimeSystem = function()
 {
+	var oGlobalSettings = this.private_GetGlobalSettings();
+
 	var nTimeSystem   = this.private_GetSelectedTimeSystem();
 	var oGameRecord   = this.m_oGameRecord;
 	var oProposal     = oGameRecord.GetProposal();
@@ -995,6 +1043,9 @@ CKGSChallengeWindow.prototype.private_UpdateTimeSystem = function()
 			nMainTime = KGS_MAX_TIME;
 
 		oTimeSettings.SetAbsolute(nMainTime);
+
+		oGlobalSettings.SetKGSChallengeTimeSystem(ETimeSettings.Absolute);
+		oGlobalSettings.SetKGSChallengeMainTime(nMainTime);
 	}
 	else if (ETimeSettings.ByoYomi === nTimeSystem)
 	{
@@ -1022,6 +1073,11 @@ CKGSChallengeWindow.prototype.private_UpdateTimeSystem = function()
 			nMainTime = _KGS_MAX_TIME - nByoTime * nByoCount;
 
 		oTimeSettings.SetByoYomi(nMainTime, nByoTime, nByoCount);
+
+		oGlobalSettings.SetKGSChallengeTimeSystem(ETimeSettings.ByoYomi);
+		oGlobalSettings.SetKGSChallengeMainTime(nMainTime);
+		oGlobalSettings.SetKGSChallengeOverTime(nByoTime);
+		oGlobalSettings.SetKGSChallengeOverCount(nByoCount);
 	}
 	else if (ETimeSettings.Canadian === nTimeSystem)
 	{
@@ -1043,10 +1099,17 @@ CKGSChallengeWindow.prototype.private_UpdateTimeSystem = function()
 			nByoCount = KGS_OVER_MAX_COUNT;
 
 		oTimeSettings.SetCanadian(nMainTime, nByoTime, nByoCount);
+
+		oGlobalSettings.SetKGSChallengeTimeSystem(ETimeSettings.Canadian);
+		oGlobalSettings.SetKGSChallengeMainTime(nMainTime);
+		oGlobalSettings.SetKGSChallengeOverTime(nByoTime);
+		oGlobalSettings.SetKGSChallengeOverCount(nByoCount);
 	}
 	else if (ETimeSettings.None === nTimeSystem)
 	{
 		oTimeSettings.SetNone();
+
+		oGlobalSettings.SetKGSChallengeTimeSystem(ETimeSettings.None);
 	}
 
 	this.private_UpdateTimeSystemFields();
@@ -1323,4 +1386,36 @@ CKGSChallengeWindow.prototype.private_RejectChallenge = function()
 		this.OnUserRemoved(oUser);
 		this.m_oClient.DeclineChallenge(this.m_nChannelId, oUser.GetName());
 	}
+};
+CKGSChallengeWindow.prototype.private_FillDefaultValues = function()
+{
+	var oGlobalSettings = this.private_GetGlobalSettings();
+
+	var sComment    = oGlobalSettings.GetKGSChallengeComment();
+	var nGameType   = oGlobalSettings.GetKGSChallengeGameType();
+	var nRules      = oGlobalSettings.GetKGSChallengeRules();
+	var nSize       = oGlobalSettings.GetKGSChallengeBoardSize();
+	var nTimeSystem = oGlobalSettings.GetKGSChallengeTimeSystem();
+	var nMainTime   = oGlobalSettings.GetKGSChallengeMainTime();
+	var nOverTime   = oGlobalSettings.GetKGSChallengeOverTime();
+	var nOverCount  = oGlobalSettings.GetKGSChallengeOverCount();
+
+	this.private_SetSelectedGameType(nGameType);
+	this.m_oCommentInput.value = sComment;
+	this.private_SetSelectedRules(nRules);
+	this.m_oSizeInput.value = nSize;
+	this.private_SetSelectedTimeSystem(nTimeSystem);
+	this.m_oMainTimeInput.value     = nMainTime;
+	this.m_oByoYomiTimeInput.value  = nOverTime;
+	this.m_oByoYomiCountInput.value = nOverCount;
+
+	this.private_OnChangeGameType();
+	this.private_OnChangeComment();
+	this.private_OnChangeRules();
+	this.private_OnChangeBoardSize();
+	this.private_UpdateTimeSystem();
+};
+CKGSChallengeWindow.prototype.private_GetGlobalSettings = function()
+{
+	return this.m_oClient.m_oApp.GetGlobalSettings();
 };
