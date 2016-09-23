@@ -281,144 +281,153 @@ CTextMeasurer.prototype.Measure = function(sText)
 	return oMetrics.width;
 };
 
-(function()
+function CGoUniverseAnimatedLogo(oCanvas)
 {
-	var nState   = 0;
-	var nTimerId = null;
+	this.m_oCanvas  = oCanvas;
+	this.m_nState   = 0;
+	this.m_nTimerId = null;
+}
+CGoUniverseAnimatedLogo.prototype.Start = function()
+{
+	var oCanvas  = this.m_oCanvas;
+	var oContext = oCanvas.getContext("2d");
 
-	function Animate()
+	var nW = oCanvas.width;
+	var nH = oCanvas.height;
+
+	var nRad = Math.min(nW, nH) * 0.4;
+
+	oContext.clearRect(0, 0, nW, nH);
+
+	oContext.lineWidth = 2;
+
+	oContext.save();
+	oContext.translate(nW / 2, nH / 2);
+
+	if (this.m_nState < 100)
 	{
-		var oCanvas  = document.getElementById("animatedLogoId");
-		var oContext = oCanvas.getContext("2d");
+		oContext.strokeStyle = "rgb(0, 0, 0)";
+		oContext.fillStyle   = "rgb(255, 255, 255)";
+		oContext.beginPath();
+		oContext.arc(0, 0, nRad, 0, 2 * Math.PI, false);
+		oContext.stroke();
+		oContext.fill();
 
-		var nW = oCanvas.width;
-		var nH = oCanvas.height;
+		oContext.fillStyle = "rgb(0, 0, 0)";
 
-		var nRad = Math.min(nW, nH) * 0.4;
+		oContext.beginPath();
+		oContext.arc(0, 0, nRad, 1.5 * Math.PI, 0.5 * Math.PI, false);
+		oContext.scale(1 - this.m_nState / 100, 1);
+		oContext.arc(0, 0, nRad, 0.5 * Math.PI, 1.5 * Math.PI, false);
 
-		oContext.clearRect(0, 0, nW, nH);
+		oContext.stroke();
+		oContext.fill();
+	}
+	else if (this.m_nState < 200)
+	{
+		oContext.strokeStyle = "rgb(0, 0, 0)";
+		oContext.fillStyle   = "rgb(0, 0, 0)";
+		oContext.beginPath();
+		oContext.arc(0, 0, nRad, 0, 2 * Math.PI, false);
+		oContext.stroke();
+		oContext.fill();
 
-		oContext.lineWidth = 2;
+		oContext.fillStyle = "rgb(255, 255, 255)";
 
-		oContext.save();
-		oContext.translate(nW / 2, nH / 2);
+		oContext.beginPath();
+		oContext.arc(0, 0, nRad, 0.5 * Math.PI, 1.5 * Math.PI, false);
 
-		if (nState < 100)
+		if (100 !== this.m_nState)
 		{
-			oContext.strokeStyle = "rgb(0, 0, 0)";
-			oContext.fillStyle   = "rgb(255, 255, 255)";
-			oContext.beginPath();
-			oContext.arc(0, 0, nRad, 0, 2 * Math.PI, false);
-			oContext.stroke();
-			oContext.fill();
-
-			oContext.fillStyle = "rgb(0, 0, 0)";
-
-			oContext.beginPath();
+			oContext.scale(this.m_nState / 100 - 1, 1);
 			oContext.arc(0, 0, nRad, 1.5 * Math.PI, 0.5 * Math.PI, false);
-			oContext.scale(1 - nState / 100, 1);
-			oContext.arc(0, 0, nRad, 0.5 * Math.PI, 1.5 * Math.PI, false);
-
-			oContext.stroke();
-			oContext.fill();
 		}
-		else if (nState < 200)
+		else
 		{
-			oContext.strokeStyle = "rgb(0, 0, 0)";
-			oContext.fillStyle   = "rgb(0, 0, 0)";
-			oContext.beginPath();
-			oContext.arc(0, 0, nRad, 0, 2 * Math.PI, false);
-			oContext.stroke();
-			oContext.fill();
-
-			oContext.fillStyle = "rgb(255, 255, 255)";
-
-			oContext.beginPath();
-			oContext.arc(0, 0, nRad, 0.5 * Math.PI, 1.5 * Math.PI, false);
-
-			if (100 !== nState)
-			{
-				oContext.scale(nState / 100 - 1, 1);
-				oContext.arc(0, 0, nRad, 1.5 * Math.PI, 0.5 * Math.PI, false);
-			}
-			else
-			{
-				oContext.closePath();
-			}
-
-			oContext.stroke();
-			oContext.fill();
+			oContext.closePath();
 		}
-		else if (nState < 300)
+
+		oContext.stroke();
+		oContext.fill();
+	}
+	else if (this.m_nState < 300)
+	{
+		oContext.strokeStyle = "rgb(0, 0, 0)";
+		oContext.fillStyle   = "rgb(0, 0, 0)";
+		oContext.beginPath();
+		oContext.arc(0, 0, nRad, 0, 2 * Math.PI, false);
+		oContext.stroke();
+		oContext.fill();
+
+		oContext.fillStyle = "rgb(255, 255, 255)";
+
+		oContext.beginPath();
+		oContext.arc(0, 0, nRad, 1.5 * Math.PI, 0.5 * Math.PI, false);
+		oContext.scale(3 - this.m_nState / 100, 1);
+		oContext.arc(0, 0, nRad, 0.5 * Math.PI, 1.5 * Math.PI, false);
+
+		oContext.stroke();
+		oContext.fill();
+	}
+	else if (this.m_nState < 400)
+	{
+		oContext.strokeStyle = "rgb(0, 0, 0)";
+		oContext.fillStyle   = "rgb(255, 255, 255)";
+		oContext.beginPath();
+		oContext.arc(0, 0, nRad, 0, 2 * Math.PI, false);
+		oContext.stroke();
+		oContext.fill();
+
+		oContext.fillStyle = "rgb(0, 0, 0)";
+
+		oContext.beginPath();
+		oContext.arc(0, 0, nRad, 0.5 * Math.PI, 1.5 * Math.PI, false);
+
+		if (300 !== this.m_nState)
 		{
-			oContext.strokeStyle = "rgb(0, 0, 0)";
-			oContext.fillStyle   = "rgb(0, 0, 0)";
-			oContext.beginPath();
-			oContext.arc(0, 0, nRad, 0, 2 * Math.PI, false);
-			oContext.stroke();
-			oContext.fill();
-
-			oContext.fillStyle = "rgb(255, 255, 255)";
-
-			oContext.beginPath();
+			oContext.scale(this.m_nState / 100 - 3, 1);
 			oContext.arc(0, 0, nRad, 1.5 * Math.PI, 0.5 * Math.PI, false);
-			oContext.scale(3 - nState / 100, 1);
-			oContext.arc(0, 0, nRad, 0.5 * Math.PI, 1.5 * Math.PI, false);
-
-			oContext.stroke();
-			oContext.fill();
 		}
-		else if (nState < 400)
+		else
 		{
-			oContext.strokeStyle = "rgb(0, 0, 0)";
-			oContext.fillStyle   = "rgb(255, 255, 255)";
-			oContext.beginPath();
-			oContext.arc(0, 0, nRad, 0, 2 * Math.PI, false);
-			oContext.stroke();
-			oContext.fill();
-
-			oContext.fillStyle = "rgb(0, 0, 0)";
-
-			oContext.beginPath();
-			oContext.arc(0, 0, nRad, 0.5 * Math.PI, 1.5 * Math.PI, false);
-
-			if (300 !== nState)
-			{
-				oContext.scale(nState / 100 - 3, 1);
-				oContext.arc(0, 0, nRad, 1.5 * Math.PI, 0.5 * Math.PI, false);
-			}
-			else
-			{
-				oContext.closePath();
-			}
-
-			oContext.stroke();
-			oContext.fill();
+			oContext.closePath();
 		}
 
-		oContext.restore();
-
-		nState++;
-		if (nState >= 400)
-			nState = 0;
-
-		nTimerId = Common_RequestAnimationFrame(Animate);
+		oContext.stroke();
+		oContext.fill();
 	}
 
-	function StopAnimate()
+	oContext.restore();
+
+	this.m_nState++;
+	if (this.m_nState >= 400)
+		this.m_nState = 0;
+
+	var oThis = this;
+	this.m_nTimerId = Common_RequestAnimationFrame(function()
 	{
-		if (null !== nTimerId)
-		{
-			Common_CancelAnimationFrame(nTimerId);
-			nTimerId = null;
-			nState   = 0;
-		}
+		oThis.Start();
+	});
+};
+CGoUniverseAnimatedLogo.prototype.Stop = function()
+{
+	if (null !== this.m_nTimerId)
+	{
+		Common_CancelAnimationFrame(this.m_nTimerId);
+		this.m_nTimerId = null;
+		this.m_nState   = 0;
 	}
-
-	window["GoUniverseLogoAnimate"]     = Animate;
-	window["GoUniverseLogoStopAnimate"] = StopAnimate;
-
-})();
+};
+CGoUniverseAnimatedLogo.prototype.Show = function()
+{
+	this.m_oCanvas.style.display = "block";
+	this.Start();
+};
+CGoUniverseAnimatedLogo.prototype.Hide = function()
+{
+	this.m_oCanvas.style.display = "none";
+	this.Stop();
+};
 
 /**
  * Convert string hh:mm:ss or mm:ss or ss into a seconds.

@@ -41,9 +41,13 @@ function CGoUniverseApplication()
 	this.m_oGamesListWrapperControl = null;
 	this.m_oChatWrapperControl      = null;
 	this.m_oMainRoomLeftPartControl = null;
+
+	this.m_oAnimatedLogo = null;
 }
 CGoUniverseApplication.prototype.Init = function()
 {
+	this.m_oAnimatedLogo = new CGoUniverseAnimatedLogo(document.getElementById("animatedLogoId"));
+
 	this.private_InitMainDiv();
 	this.private_InitLoginPage();
 	this.private_InitClientPage();
@@ -1304,15 +1308,11 @@ CGoUniverseApplication.prototype.GetGlobalSettings = function()
 };
 CGoUniverseApplication.prototype.private_ShowAnimatedLogo = function()
 {
-	document.getElementById("animatedLogoId").style.display = "block";
-	if (window.GoUniverseLogoAnimate)
-		window.GoUniverseLogoAnimate();
+	this.m_oAnimatedLogo.Show();
 };
 CGoUniverseApplication.prototype.private_HideAnimatedLogo = function()
 {
-	document.getElementById("animatedLogoId").style.display = "none";
-	if (window.GoUniverseLogoStopAnimate)
-		window.GoUniverseLogoStopAnimate();
+	this.m_oAnimatedLogo.Hide();
 };
 
 function CGoUniverseGlobalSettings(oApp)
