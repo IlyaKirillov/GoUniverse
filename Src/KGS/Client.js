@@ -559,28 +559,8 @@ CKGSClient.prototype.SendCreateChallenge = function(nChannelId, nCallBackKey, nG
 		}
 	});
 };
-CKGSClient.prototype.SendSubmitChallenge = function(nRoomId, nChannelId, nGameType, nRules, nSize, oTimeSettings, nHandicap, dKomi, bNigiri, bOwnerBlack, sOwnerName)
+CKGSClient.prototype.SendSubmitChallenge = function(nChannelId, nGameType, oRules, bNigiri, bCreatorBlack, sCreator)
 {
-	var oRules = {
-		"rules"      : KGSCommon.GameRulesToString(nRules),
-		"size"       : nSize,
-		"handicap"   : nHandicap,
-		"komi"       : dKomi,
-		"timeSystem" : oTimeSettings.GetTypeInKGSString(),
-		"mainTime"   : oTimeSettings.GetMainTime()
-	};
-
-	if (oTimeSettings.IsByoYomi())
-	{
-		oRules["byoYomiTime"]    = oTimeSettings.GetOverTime();
-		oRules["byoYomiPeriods"] = oTimeSettings.GetOverCount();
-	}
-	else if (oTimeSettings.IsCanadian())
-	{
-		oRules["byoYomiTime"]   = oTimeSettings.GetOverTime();
-		oRules["byoYomiStones"] = oTimeSettings.GetOverCount();
-	}
-
 	this.private_SendMessage({
 		"channelId" : nChannelId,
 		"type"      : "CHALLENGE_SUBMIT",
@@ -588,72 +568,16 @@ CKGSClient.prototype.SendSubmitChallenge = function(nRoomId, nChannelId, nGameTy
 		"nigiri"    : bNigiri,
 		"rules"     : oRules,
 		"players"   : [{
-			"role" : bOwnerBlack ? "black" : "white",
-			"name" : sOwnerName
+			"role" : bCreatorBlack ? "black" : "white",
+			"name" : sCreator
 		}, {
-			"role" : bOwnerBlack ? "white" : "black",
+			"role" : bCreatorBlack ? "white" : "black",
 			"name" : this.GetUserName()
 		}]
 	});
 };
-CKGSClient.prototype.SendModifyChallenge = function(nChannelId, nGameType, nRules, nSize, oTimeSettings)
+CKGSClient.prototype.SendChallengeProposal = function(nChannelId, nGameType, oRules, bNigiri, bCreatorBlack, sCreator, sChallenger)
 {
-	var oRules = {
-		"rules"      : KGSCommon.GameRulesToString(nRules),
-		"size"       : nSize,
-		"komi"       : 6.5,
-		"timeSystem" : oTimeSettings.GetTypeInKGSString(),
-		"mainTime"   : oTimeSettings.GetMainTime()
-	};
-
-	if (oTimeSettings.IsByoYomi())
-	{
-		oRules["byoYomiTime"]    = oTimeSettings.GetOverTime();
-		oRules["byoYomiPeriods"] = oTimeSettings.GetOverCount();
-	}
-	else if (oTimeSettings.IsCanadian())
-	{
-		oRules["byoYomiTime"]   = oTimeSettings.GetOverTime();
-		oRules["byoYomiStones"] = oTimeSettings.GetOverCount();
-	}
-
-	this.private_SendMessage({
-		"channelId" : nChannelId,
-		"type"      : "CHALLENGE_PROPOSAL",
-
-		"gameType" : KGSCommon.GameTypeToString(nGameType),
-		"nigiri"   : true,
-		"rules"    : oRules,
-		"players"  : [{
-			"role" : "white",
-			"name" : this.m_oCurrentUser.GetName()
-		}, {
-			"role" : "black"
-		}]
-	});
-};
-CKGSClient.prototype.SendChallengeProposal = function(nChannelId, nGameType, nRules, nSize, oTimeSettings, dKomi, nHandicap, bNigiri, bCreatorBlack, sCreator, sChallenger)
-{
-	var oRules = {
-		"rules"      : KGSCommon.GameRulesToString(nRules),
-		"size"       : nSize,
-		"handicap"   : nHandicap,
-		"komi"       : dKomi,
-		"timeSystem" : oTimeSettings.GetTypeInKGSString(),
-		"mainTime"   : oTimeSettings.GetMainTime()
-	};
-
-	if (oTimeSettings.IsByoYomi())
-	{
-		oRules["byoYomiTime"]    = oTimeSettings.GetOverTime();
-		oRules["byoYomiPeriods"] = oTimeSettings.GetOverCount();
-	}
-	else if (oTimeSettings.IsCanadian())
-	{
-		oRules["byoYomiTime"]   = oTimeSettings.GetOverTime();
-		oRules["byoYomiStones"] = oTimeSettings.GetOverCount();
-	}
-
 	this.private_SendMessage({
 		"channelId" : nChannelId,
 		"type"      : "CHALLENGE_PROPOSAL",
@@ -667,6 +591,30 @@ CKGSClient.prototype.SendChallengeProposal = function(nChannelId, nGameType, nRu
 			"role" : bCreatorBlack ? "white" : "black",
 			"name" : sChallenger
 		}]
+	});
+};
+CKGSClient.prototype.SendAcceptChallenge = function(nChannelId, nGameType, oRules, bNigiri, bCreatorBlack, sCreator, sChallenger)
+{
+	this.private_SendMessage({
+		"channelId" : nChannelId,
+		"type"      : "CHALLENGE_ACCEPT",
+		"gameType"  : KGSCommon.GameTypeToString(nGameType),
+		"nigiri"    : bNigiri,
+		"rules"     : oRules,
+		"players"   : [{
+			"role" : bCreatorBlack ? "black" : "white",
+			"name" : sCreator
+		}, {
+			"role" : bCreatorBlack ? "white" : "black",
+			"name" : sChallenger
+		}]
+	});
+};
+CKGSClient.prototype.RetryChallenge = function(nChannelId)
+{
+	this.private_SendMessage({
+		"channelId" : nChannelId,
+		"type"      : "CHALLENGE_RETRY"
 	});
 };
 CKGSClient.prototype.DeclineChallenge = function(nChannelId, sUserName)
@@ -941,11 +889,15 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
 	}
 	else if ("CHALLENGE_CREATED" === oMessage.type)
 	{
-		this.private_ChallengeCreated(oMessage);
+		this.private_HandleChallengeCreated(oMessage);
 	}
 	else if ("CHALLENGE_DECLINE" === oMessage.type)
 	{
-		this.private_ChallengeDecline(oMessage);
+		this.private_HandleChallengeDecline(oMessage);
+	}
+	else if ("CHALLENGE_PROPOSAL" === oMessage.type)
+	{
+		this.private_HandleChallengeProposal(oMessage);
 	}
 	else
 	{
@@ -1842,7 +1794,7 @@ CKGSClient.prototype.private_HandleChallengeSubmit = function(oMessage)
 
 	oWindow.OnSubmit(oUser, oProposal);
 };
-CKGSClient.prototype.private_ChallengeCreated = function(oMessage)
+CKGSClient.prototype.private_HandleChallengeCreated = function(oMessage)
 {
 	var oWindow = this.m_oChallenges[-1];
 	if (oWindow)
@@ -1861,7 +1813,7 @@ CKGSClient.prototype.private_ChallengeCreated = function(oMessage)
 		delete this.m_oChallenges[-1];
 	}
 };
-CKGSClient.prototype.private_ChallengeDecline = function(oMessage)
+CKGSClient.prototype.private_HandleChallengeDecline = function(oMessage)
 {
 	var nChannelId = oMessage.channelId;
 
@@ -1870,6 +1822,16 @@ CKGSClient.prototype.private_ChallengeDecline = function(oMessage)
 		return;
 
 	oWindow.OnDecline();
+};
+CKGSClient.prototype.private_HandleChallengeProposal = function(oMessage)
+{
+	var nChannelId = oMessage.channelId;
+	var oWindow = this.m_oChallenges[nChannelId];
+	if (!oWindow)
+		return;
+
+	var oProposal = new CKGSChallengeProposal(oMessage.proposal);
+	oWindow.OnProposal(oProposal);
 };
 CKGSClient.prototype.private_AddUserToRoom = function(oUser, oRoom)
 {

@@ -463,6 +463,10 @@ input.challengeInputEditable {
 	background   : rgb(255, 255, 255);
 }
 
+input.challengeInputChanged {
+	border : 1px solid red;
+}
+
 select.challengeSelect {
 	border          : 1px transparent;
 	outline         : none;

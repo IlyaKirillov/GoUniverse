@@ -16,14 +16,16 @@ var KGS_MAX_HANDICAP     = 50;
 var KGS_MAX_BYOYOMI_TIME = 36000;
 
 var EKGSChallengeWindowState = {
-
-	Unknown        : 0,
-	Creation       : 1,
-	OwnChallenge   : 2,
-	OtherChallenge : 3,
-	Recreate       : 4,
-	Waiting        : 5
+	Unknown           : 0,
+	Creation          : 1,
+	CreatorProposal   : 2,
+	CreatorWaiting    : 3,
+	ChallengerSubmit  : 4,
+	ChallengerAccept  : 5,
+	Waiting           : 6,
+	ChallengerWaiting : 7
 };
+
 
 function CKGSChallengeWindow()
 {
@@ -39,25 +41,22 @@ function CKGSChallengeWindow()
 
 	this.m_bNigiri       = true;
 	this.m_bCreatorBlack = false;
-	this.m_nHandicap     = 0;
-	this.m_dKomi         = 6.5;
 
 	this.m_nTop           = 0;
 	this.m_nHeaderHeight  = 30;
 	this.m_nPlayersHeight = 30;
 	this.m_nFieldHeight   = 32;
 
-	this.m_bSubmitted = false;
-
 	this.m_oPlayersColorsCanvas = null;
+	this.m_oAnimatedWaiting     = null;
 
 	this.m_oButtons = {
 		Close  : null,
-		Submit : null,
-		Create : null,
-		Modify : null,
-		Apply  : null
+		Ok     : null,
+		Retry  : null,
+		Create : null
 	};
+
 
 	this.m_oCurrentChallenger = null;
 	this.m_arrChallengers     = [];
@@ -183,6 +182,7 @@ function CKGSChallengeWindow()
 		// Ищем выделенного игрока в списке
 		var nSelectedIndex = oChallengerListElement.selectedIndex;
 
+		var bChangedColors = false;
 		// 0 - элемент пустая строка
 		if (0 === nSelectedIndex)
 		{
@@ -237,14 +237,23 @@ function CKGSChallengeWindow()
 				oThis.m_oHandicapInput.disabled  = "disabled";
 			}
 
+			if (oThis.m_bNigiri !== oThis.private_GetDefaultNigiri() || (true !== oThis.m_bNigiri && oThis.m_bCreatorBlack !== oThis.private_GetDefaultIsCreatorBlack()))
+				bChangedColors = true;
+
+			if (oThis.private_GetDefaultHandicap() !== oProposal.GetHandicap())
+				oThis.m_oHandicapInput.className += " challengeInputChanged";
+
+			if (Math.abs(oThis.private_GetDefaultKomi() - oProposal.GetKomi()) > 0.001)
+				oThis.m_oKomiInput.className += " challengeInputChanged";
+
 			oThis.m_oChallengerReject.style.display = "block";
 		}
 
-		oThis.private_DrawPlayerColor();
+		oThis.private_DrawPlayerColor(bChangedColors);
 	};
 	this.private_OnChangeColors = function()
 	{
-		if (EKGSChallengeWindowState.OtherChallenge === oThis.m_nState || (EKGSChallengeWindowState.OwnChallenge === oThis.m_nState && null !== oThis.m_oCurrentChallenger))
+		if (EKGSChallengeWindowState.ChallengerSubmit === oThis.m_nState || (EKGSChallengeWindowState.CreatorProposal === oThis.m_nState && null !== oThis.m_oCurrentChallenger))
 		{
 			if (true === oThis.m_bNigiri)
 			{
@@ -293,19 +302,16 @@ CKGSChallengeWindow.prototype.Init = function(sDivId, oPr)
 	if (true === oPr.Create)
 	{
 		this.m_nState = EKGSChallengeWindowState.Creation;
-		this.Set_Caption("Create a new challenge");
 	}
 	else
 	{
 		if (oChallengeCreator.GetName() === this.m_oClient.GetUserName())
 		{
-			this.m_nState = EKGSChallengeWindowState.OwnChallenge;
-			this.Set_Caption("Your challenge");
+			this.m_nState = EKGSChallengeWindowState.CreatorProposal;
 		}
 		else
 		{
-			this.m_nState = EKGSChallengeWindowState.OtherChallenge;
-			this.Set_Caption(oChallengeCreator ? "New game vs. " + oChallengeCreator.GetName() : "New game");
+			this.m_nState = EKGSChallengeWindowState.ChallengerSubmit;
 		}
 	}
 
@@ -313,6 +319,7 @@ CKGSChallengeWindow.prototype.Init = function(sDivId, oPr)
 	this.private_CreatePlayers();
 	this.private_CreateRules();
 	this.private_CreateButtons();
+	this.private_CreateAnimatedWaiting();
 
 	if (true === oPr.Create)
 		this.private_FillDefaultValues();
@@ -323,22 +330,21 @@ CKGSChallengeWindow.prototype.Update_Size = function(bForce)
 {
 	CKGSChallengeWindow.superclass.Update_Size.call(this, bForce);
 
-	this.private_DrawPlayerColor();
-
 	if (this.m_oButtons.Close)
 		this.m_oButtons.Close.Update_Size();
 
 	if (this.m_oButtons.Create)
 		this.m_oButtons.Create.Update_Size();
 
-	if (this.m_oButtons.Submit)
-		this.m_oButtons.Submit.Update_Size();
+	if (this.m_oButtons.Ok)
+		this.m_oButtons.Ok.Update_Size();
 
-	if (this.m_oButtons.Modify)
-		this.m_oButtons.Modify.Update_Size();
+	if (this.m_oButtons.Retry)
+		this.m_oButtons.Retry.Update_Size();
 
-	if (this.m_oButtons.Apply)
-		this.m_oButtons.Apply.Update_Size();
+
+	if (this.m_oPlayersColorsCanvas)
+		this.private_DrawPlayerColor();
 };
 CKGSChallengeWindow.prototype.Get_DefaultWindowSize = function()
 {
@@ -367,19 +373,76 @@ CKGSChallengeWindow.prototype.OnSubmit = function(oUser, oProposal)
 CKGSChallengeWindow.prototype.OnDecline = function()
 {
 	var oChallengeCreator = this.m_oOwner;
-	this.Set_Caption(oChallengeCreator ? "New game vs. " + oChallengeCreator.GetName() : "New game");
-	this.private_SetState(EKGSChallengeWindowState.OtherChallenge);
+	this.private_SetState(EKGSChallengeWindowState.ChallengerSubmit);
 
 	CreateKGSWindow(EKGSWindowType.Information, {Client : this.m_oClient, App : this.m_oClient.m_oApp, Caption : "Warning", Text : "Your challenge has been declined.", Image : "WarningSpanWarning", W : 315, H : 145});
+};
+CKGSChallengeWindow.prototype.OnProposal = function(oProposal)
+{
+	if (EKGSChallengeWindowState.ChallengerWaiting === this.m_nState)
+	{
+		var bNigiri    = oProposal.IsNigiri();
+		var oBlackUser = oProposal.GetBlack();
+		var bCreatorB  = oBlackUser && oBlackUser.GetName() === this.m_oOwner.GetName() ? true : false;
+		var nHandicap  = oProposal.GetHandicap();
+		var dKomi      = parseFloat(oProposal.GetKomi());
 
-	this.m_bSubmitted = false;
+		if (isNaN(dKomi))
+			dKomi = 0;
+
+		var bCanAccept = true;
+		var bColorsChanged = false;
+		if (bNigiri !== this.m_bNigiri || (true !== this.m_bNigiri && bCreatorB !== this.m_bCreatorBlack))
+		{
+			bCanAccept           = false;
+			bColorsChanged       = true;
+			this.m_bNigiri       = bNigiri;
+			this.m_bCreatorBlack = bCreatorB;
+			this.private_DrawPlayerColor(true);
+		}
+
+		var bHandiChanged = false;
+		if (nHandicap !== this.private_GetHandicap())
+		{
+			bCanAccept                  = false;
+			bHandiChanged               = true;
+			this.m_oHandicapInput.value = nHandicap;
+			this.private_OnChangeHandicap();
+		}
+
+		var bKomiChanged = false;
+		if (Math.abs(dKomi - this.private_GetKomi()) > 0.001)
+		{
+			bCanAccept              = false;
+			bKomiChanged            = true;
+			this.m_oKomiInput.value = dKomi;
+			this.private_OnChangeKomi();
+		}
+
+		if (true === bCanAccept)
+		{
+			this.m_nState = EKGSChallengeWindowState.ChallengerAccept;
+			this.private_OkChallenge();
+		}
+		else
+		{
+			this.private_SetState(EKGSChallengeWindowState.ChallengerAccept);
+
+			if (bHandiChanged)
+				this.m_oHandicapInput.className += " challengeInputChanged";
+
+			if (bKomiChanged)
+				this.m_oKomiInput.className += " challengeInputChanged";
+
+			if (bColorsChanged)
+				this.private_DrawPlayerColor(true);
+		}
+	}
 };
 CKGSChallengeWindow.prototype.OnChallengeCreated = function(nChannelId)
 {
 	this.m_nChannelId = nChannelId;
-	this.Set_Caption("Your challenge");
-	this.private_SetState(EKGSChallengeWindowState.OwnChallenge);
-	this.m_bSubmitted = true;
+	this.private_SetState(EKGSChallengeWindowState.CreatorProposal);
 };
 CKGSChallengeWindow.prototype.OnUserRemoved = function(oUser)
 {
@@ -394,6 +457,7 @@ CKGSChallengeWindow.prototype.OnUserRemoved = function(oUser)
 			{
 				this.m_oChallengerSelect.selectedIndex = 0;
 				this.private_OnChangeChallenger();
+				this.private_SetState(EKGSChallengeWindowState.CreatorProposal);
 			}
 
 			return;
@@ -433,9 +497,7 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 	oTypeList.style.fontWeight = "bold";
 	this.private_AddOptionToSelect(oTypeList, "Ranked");
 	this.private_AddOptionToSelect(oTypeList, "Free");
-	this.private_AddOptionToSelect(oTypeList, "Rengo");
-	this.private_AddOptionToSelect(oTypeList, "Simulation");
-	this.private_AddOptionToSelect(oTypeList, "Demo");
+	this.private_AddOptionToSelect(oTypeList, "Teaching");
 
 	var oTypeListControl = CreateControlContainterByElement(oTypeList);
 	oTypeListControl.SetParams(5, 5, 5, 0, true, true, true, true, -1, -1);
@@ -456,6 +518,17 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 
 	this.private_AddEventsForSelect(this.private_OnChangeGameType, oTypeList);
 	this.private_AddEventsForInput(this.private_OnChangeComment, oInput);
+};
+CKGSChallengeWindow.prototype.private_CreateAnimatedWaiting = function()
+{
+	var oAnimation          = this.protected_CreateDivElement(this.HtmlElement.Caption, null, "canvas");
+	oAnimation.width        = 24;
+	oAnimation.height       = 24;
+	oAnimation.style.left   = "7px";
+	oAnimation.style.top    = "3px";
+	oAnimation.style.width  = "24px";
+	oAnimation.style.height = "24px";
+	this.m_oAnimatedWaiting = new CGoUniverseAnimatedLogo(oAnimation);
 };
 CKGSChallengeWindow.prototype.private_CreatePlayers = function()
 {
@@ -550,7 +623,7 @@ CKGSChallengeWindow.prototype.private_CreatePlayers = function()
 
 	this.private_AddEventsForSelect(this.private_OnChangeChallenger, oChallengerListElement);
 };
-CKGSChallengeWindow.prototype.private_DrawPlayerColor = function()
+CKGSChallengeWindow.prototype.private_DrawPlayerColor = function(bChanged)
 {
 	var oCanvas  = this.m_oPlayersColorsCanvas;
 	var oContext = oCanvas.getContext("2d");
@@ -558,6 +631,19 @@ CKGSChallengeWindow.prototype.private_DrawPlayerColor = function()
 	var nH = oCanvas.height;
 
 	oContext.clearRect(0, 0, nW, nH);
+
+	if (true === bChanged)
+	{
+		oContext.lineWidth   = 1;
+		oContext.strokeStyle = "rgb(255, 0, 0)";
+		oContext.beginPath();
+		oContext.moveTo(0, 0);
+		oContext.lineTo(0, nH);
+		oContext.lineTo(nW, nH);
+		oContext.lineTo(nW, 0);
+		oContext.closePath();
+		oContext.stroke();
+	}
 
 	var nSize = this.m_nPlayersHeight;
 
@@ -816,47 +902,33 @@ CKGSChallengeWindow.prototype.private_CreateButtons = function()
 	oCreateButton.Init(sCreateButtonId);
 	this.m_oButtons.Create = oCreateButton;
 
-	// Submit - кнопка для подтверждения
-	var sSubmitButtonId      = sMainId + "S";
-	var oSubmitButtonElement = this.protected_CreateDivElement(oMainDiv, sSubmitButtonId);
-	var oSubmitButtonControl = CreateControlContainterByElement(oSubmitButtonElement);
-	oSubmitButtonControl.SetParams(0, 0, 5 + nButtonW + 5, 5, false, false, true, true, nButtonW, nButtonH);
-	oSubmitButtonControl.SetAnchor(false, false, true, true);
-	oMainControl.AddControl(oSubmitButtonControl);
-	var oSubmitButton = new CDrawingButtonSimpleText("Submit", function()
+	// Ok - кнопка для подтверждения
+	var sOkButtonId      = sMainId + "O";
+	var oOkButtonElement = this.protected_CreateDivElement(oMainDiv, sOkButtonId);
+	var oOkButtonControl = CreateControlContainterByElement(oOkButtonElement);
+	oOkButtonControl.SetParams(0, 0, 5 + nButtonW + 5, 5, false, false, true, true, nButtonW, nButtonH);
+	oOkButtonControl.SetAnchor(false, false, true, true);
+	oMainControl.AddControl(oOkButtonControl);
+	var oOkButton = new CDrawingButtonSimpleText("OK", function()
 	{
-		oThis.private_SubmitChallenge();
-	}, "Submit");
-	oSubmitButton.Init(sSubmitButtonId);
-	this.m_oButtons.Submit = oSubmitButton;
+		oThis.private_OkChallenge();
+	}, "OK");
+	oOkButton.Init(sOkButtonId);
+	this.m_oButtons.Ok = oOkButton;
 
-	// Modify - кнопка для изменения настроек
-	var sModifyButtonId      = sMainId + "M";
-	var oModifyButtonElement = this.protected_CreateDivElement(oMainDiv, sModifyButtonId);
-	var oModifyButtonControl = CreateControlContainterByElement(oModifyButtonElement);
-	oModifyButtonControl.SetParams(0, 0, 5 + nButtonW + 5 + nButtonW + 5, 5, false, false, true, true, nButtonW, nButtonH);
-	oModifyButtonControl.SetAnchor(false, false, true, true);
-	oMainControl.AddControl(oModifyButtonControl);
-	var oModifyButton = new CDrawingButtonSimpleText("Modify", function()
+	// Retry - кнопка для отмены предложения
+	var sRetryButtonId      = sMainId + "R";
+	var oRetryButtonElement = this.protected_CreateDivElement(oMainDiv, sRetryButtonId);
+	var oRetryButtonControl = CreateControlContainterByElement(oRetryButtonElement);
+	oRetryButtonControl.SetParams(0, 0, 5 + nButtonW + 5, 5, false, false, true, true, nButtonW, nButtonH);
+	oRetryButtonControl.SetAnchor(false, false, true, true);
+	oMainControl.AddControl(oRetryButtonControl);
+	var oRetryButton = new CDrawingButtonSimpleText("Retry", function()
 	{
-		oThis.private_ModifyChallenge();
-	}, "Modify preferences");
-	oModifyButton.Init(sModifyButtonId);
-	this.m_oButtons.Modify = oModifyButton;
-
-	// Apply - кнопка для создания вызова
-	var sApplyButtonId      = sMainId + "A";
-	var oApplyButtonElement = this.protected_CreateDivElement(oMainDiv, sApplyButtonId);
-	var oApplyButtonControl = CreateControlContainterByElement(oApplyButtonElement);
-	oApplyButtonControl.SetParams(0, 0, 5 + nButtonW + 5, 5, false, false, true, true, nButtonW, nButtonH);
-	oApplyButtonControl.SetAnchor(false, false, true, true);
-	oMainControl.AddControl(oApplyButtonControl);
-	var oApplyButton = new CDrawingButtonSimpleText("Apply", function()
-	{
-		oThis.private_ApplyModifications();
-	}, "Apply modifications");
-	oApplyButton.Init(sApplyButtonId);
-	this.m_oButtons.Apply = oApplyButton;
+		oThis.private_RetryChallenge();
+	}, "Cancel current proposal");
+	oRetryButton.Init(sRetryButtonId);
+	this.m_oButtons.Retry = oRetryButton;
 };
 CKGSChallengeWindow.prototype.private_CreateChallenge = function()
 {
@@ -870,7 +942,7 @@ CKGSChallengeWindow.prototype.private_CreateChallenge = function()
 
 	this.private_SetState(EKGSChallengeWindowState.Waiting);
 };
-CKGSChallengeWindow.prototype.private_SubmitChallenge = function()
+CKGSChallengeWindow.prototype.private_OkChallenge = function()
 {
 	var nGameType   = this.private_GetSelectedGameType();
 	var nRules      = this.private_GetSelectedRules();
@@ -879,38 +951,50 @@ CKGSChallengeWindow.prototype.private_SubmitChallenge = function()
 	var nHandicap   = this.private_GetHandicap();
 	var dKomi       = this.private_GetKomi();
 
-	if (false === this.m_bSubmitted)
+	var oRules = {
+		"rules"      : KGSCommon.GameRulesToString(nRules),
+		"size"       : nSize,
+		"handicap"   : nHandicap,
+		"komi"       : dKomi,
+		"timeSystem" : oTimeSystem.GetTypeInKGSString(),
+		"mainTime"   : oTimeSystem.GetMainTime()
+	};
+
+	if (oTimeSystem.IsByoYomi())
 	{
-		this.m_oClient.SendSubmitChallenge(this.m_nRoomId, this.m_nChannelId, nGameType, nRules, nSize, oTimeSystem, nHandicap, dKomi, this.m_bNigiri, this.m_bCreatorBlack, this.m_oOwner.GetName());
-		this.private_SetState(EKGSChallengeWindowState.Waiting);
-		this.m_bSubmitted = true;
+		oRules["byoYomiTime"]    = oTimeSystem.GetOverTime();
+		oRules["byoYomiPeriods"] = oTimeSystem.GetOverCount();
 	}
-	else
+	else if (oTimeSystem.IsCanadian())
 	{
-		this.m_oClient.SendChallengeProposal(this.m_nChannelId, nGameType, nRules, nSize, oTimeSystem, nHandicap, dKomi, this.m_bNigiri, this.m_bCreatorBlack, this.m_oOwner.GetName(), this.m_oCurrentChallenger.GetName());
+		oRules["byoYomiTime"]   = oTimeSystem.GetOverTime();
+		oRules["byoYomiStones"] = oTimeSystem.GetOverCount();
+	}
+
+	if (EKGSChallengeWindowState.CreatorProposal === this.m_nState)
+	{
+		// Proposal отправляется только когда заполнены все роли
+		if (!this.m_oCurrentChallenger)
+			return;
+
+		this.m_oClient.SendChallengeProposal(this.m_nChannelId, nGameType, oRules, this.m_bNigiri, this.m_bCreatorBlack, this.m_oOwner.GetName(), this.m_oCurrentChallenger.GetName());
+		this.private_SetState(EKGSChallengeWindowState.CreatorWaiting);
+	}
+	else if (EKGSChallengeWindowState.ChallengerSubmit === this.m_nState)
+	{
+		this.m_oClient.SendSubmitChallenge(this.m_nChannelId, nGameType, oRules, this.m_bNigiri, this.m_bCreatorBlack, this.m_oOwner.GetName());
+		this.private_SetState(EKGSChallengeWindowState.ChallengerWaiting);
+	}
+	else if (EKGSChallengeWindowState.ChallengerAccept === this.m_nState)
+	{
+		this.m_oClient.SendAcceptChallenge(this.m_nChannelId, nGameType, oRules, this.m_bNigiri, this.m_bCreatorBlack, this.m_oOwner.GetName(), this.m_oCurrentChallenger.GetName());
 		this.private_SetState(EKGSChallengeWindowState.Waiting);
 	}
 };
-CKGSChallengeWindow.prototype.private_ModifyChallenge = function()
+CKGSChallengeWindow.prototype.private_RetryChallenge = function()
 {
-	this.Set_Caption("Modify your challenge");
-	this.private_SetState(EKGSChallengeWindowState.Recreate);
-
-	this.m_oClient.private_SendMessage({
-		"channelId" : this.m_nChannelId,
-		"type"      : "CHALLENGE_RETRY"
-	});
-};
-CKGSChallengeWindow.prototype.private_ApplyModifications = function()
-{
-	var nGameType   = this.private_GetSelectedGameType();
-	var nRules      = this.private_GetSelectedRules();
-	var nSize       = this.m_oSizeInput.value;
-	var oTimeSystem = this.m_oGameRecord.GetProposal().GetTimeSettings();
-
-	this.m_oClient.SendModifyChallenge(this.m_nChannelId, nGameType, nRules, nSize, oTimeSystem);
-
-	this.private_SetState(EKGSChallengeWindowState.Waiting);
+	this.private_SetState(EKGSChallengeWindowState.CreatorProposal);
+	this.m_oClient.RetryChallenge(this.m_nChannelId);
 };
 CKGSChallengeWindow.prototype.private_GetSelectedGameType = function()
 {
@@ -921,11 +1005,7 @@ CKGSChallengeWindow.prototype.private_GetSelectedGameType = function()
 	else if (1 === nSelectedIndex)
 		nGameType = EKGSGameType.Free;
 	else if (2 === nSelectedIndex)
-		nGameType = EKGSGameType.Rengo;
-	else if (3 === nSelectedIndex)
-		nGameType = EKGSGameType.Simul;
-	else if (4 === nSelectedIndex)
-		nGameType = EKGSGameType.Demonstration;
+		nGameType = EKGSGameType.Teaching;
 
 	return nGameType;
 };
@@ -936,12 +1016,8 @@ CKGSChallengeWindow.prototype.private_SetSelectedGameType = function(nGameType)
 		nSelectedIndex = 0;
 	else if (EKGSGameType.Free === nGameType)
 		nSelectedIndex = 1;
-	else if (EKGSGameType.Rengo === nGameType)
+	else if (EKGSGameType.Teaching === nGameType)
 		nSelectedIndex = 2;
-	else if (EKGSGameType.Simul === nGameType)
-		nSelectedIndex = 3;
-	else if (EKGSGameType.Demonstration === nGameType)
-		nSelectedIndex = 4;
 
 	this.m_oGameTypeSelect.selectedIndex = nSelectedIndex;
 };
@@ -1120,7 +1196,7 @@ CKGSChallengeWindow.prototype.private_UpdateTimeSystemFields = function()
 	var oProposal     = oGameRecord.GetProposal();
 	var oTimeSettings = oProposal.GetTimeSettings();
 
-	var bCanEdit = this.m_nState === EKGSChallengeWindowState.Creation || this.m_nState === EKGSChallengeWindowState.Recreate ? true : false;
+	var bCanEdit = this.m_nState === EKGSChallengeWindowState.Creation ? true : false;
 
 	if (oTimeSettings.IsAbsolute())
 	{
@@ -1194,18 +1270,74 @@ CKGSChallengeWindow.prototype.private_UpdateTimeSystemFields = function()
 };
 CKGSChallengeWindow.prototype.private_GetDefaultHandicap = function()
 {
-	// TODO: Сделать зависимость от противника
-	return 0;
+	var bDefaultNigiri = this.private_GetDefaultNigiri();
+	if (true === bDefaultNigiri)
+		return 0;
+
+	var oCreator    = this.m_oOwner;
+	var oChallenger = this.m_oCurrentChallenger;
+
+	var nChallengerRank = oChallenger.GetRank();
+	var nCreatorRank    = oCreator.GetRank();
+
+	return Math.min(Math.abs(nChallengerRank - nCreatorRank), 9);
 };
 CKGSChallengeWindow.prototype.private_GetDefaultKomi = function()
 {
 	var nRules = this.private_GetSelectedRules();
-	if (EKGSGameRules.Japanese === nRules)
-		return 6.5;
-	else if (EKGSGameRules.Chinese === nRules || EKGSGameRules.Aga === nRules)
-		return 7.5;
-	else if (EKGSGameRules.NewZealand === nRules)
-		return 7;
+
+	var bDefaultNigiri = this.private_GetDefaultNigiri();
+	if (true === bDefaultNigiri)
+	{
+		if (EKGSGameRules.Japanese === nRules)
+			return 6.5;
+		else if (EKGSGameRules.Chinese === nRules || EKGSGameRules.Aga === nRules)
+			return 7.5;
+		else if (EKGSGameRules.NewZealand === nRules)
+			return 7;
+	}
+	else
+	{
+		// TODO: Проверить, что в новозеландских правилах коми должно бьть 0
+
+		if (EKGSGameRules.Japanese === nRules)
+			return 0.5;
+		else if (EKGSGameRules.Chinese === nRules || EKGSGameRules.Aga === nRules)
+			return 0.5;
+		else if (EKGSGameRules.NewZealand === nRules)
+			return 0;
+	}
+};
+CKGSChallengeWindow.prototype.private_GetDefaultNigiri = function()
+{
+	var oCreator    = this.m_oOwner;
+	var oChallenger = this.m_oCurrentChallenger;
+
+	if (!oChallenger || !oCreator)
+		return true;
+
+	var nChallengerRank = oChallenger.GetRank();
+	var nCreatorRank    = oCreator.GetRank();
+
+	// [?] или [-]
+	if (nChallengerRank < 0 || nCreatorRank < 0)
+		return true;
+
+	return nChallengerRank === nCreatorRank ? true : false;
+};
+CKGSChallengeWindow.prototype.private_GetDefaultIsCreatorBlack = function()
+{
+	var bDefaultNigiri = this.private_GetDefaultNigiri();
+	if (true === bDefaultNigiri)
+		return false;
+
+	var oCreator    = this.m_oOwner;
+	var oChallenger = this.m_oCurrentChallenger;
+
+	var nChallengerRank = oChallenger.GetRank();
+	var nCreatorRank    = oCreator.GetRank();
+
+	return nChallengerRank > nCreatorRank ? true : false;
 };
 CKGSChallengeWindow.prototype.private_GetHandicap = function()
 {
@@ -1217,50 +1349,80 @@ CKGSChallengeWindow.prototype.private_GetKomi = function()
 };
 CKGSChallengeWindow.prototype.private_UpdateButtons = function()
 {
-	if (EKGSChallengeWindowState.Unknown === this.m_nState || EKGSChallengeWindowState.Waiting === this.m_nState)
+	if (EKGSChallengeWindowState.Unknown === this.m_nState || EKGSChallengeWindowState.Waiting === this.m_nState || EKGSChallengeWindowState.ChallengerWaiting === this.m_nState)
 	{
 		this.m_oButtons.Create.Hide();
-		this.m_oButtons.Modify.Hide();
-		this.m_oButtons.Apply.Hide();
-		this.m_oButtons.Submit.Hide();
+		this.m_oButtons.Ok.Hide();
+		this.m_oButtons.Retry.Hide();
 		this.m_oButtons.Close.Show();
 	}
 	else if (EKGSChallengeWindowState.Creation === this.m_nState)
 	{
 		this.m_oButtons.Create.Show();
-		this.m_oButtons.Modify.Hide();
-		this.m_oButtons.Apply.Hide();
-		this.m_oButtons.Submit.Hide();
+		this.m_oButtons.Ok.Hide();
+		this.m_oButtons.Retry.Hide();
 		this.m_oButtons.Close.Show();
 	}
-	else if (EKGSChallengeWindowState.Recreate === this.m_nState)
+	else if (EKGSChallengeWindowState.CreatorProposal === this.m_nState || EKGSChallengeWindowState.ChallengerSubmit === this.m_nState || EKGSChallengeWindowState.ChallengerAccept === this.m_nState)
 	{
 		this.m_oButtons.Create.Hide();
-		this.m_oButtons.Modify.Hide();
-		this.m_oButtons.Apply.Show();
-		this.m_oButtons.Submit.Hide();
+		this.m_oButtons.Ok.Show();
+		this.m_oButtons.Retry.Hide();
 		this.m_oButtons.Close.Show();
 	}
-	else if (EKGSChallengeWindowState.OwnChallenge === this.m_nState)
+	else if (EKGSChallengeWindowState.CreatorWaiting === this.m_nState)
 	{
 		this.m_oButtons.Create.Hide();
-		this.m_oButtons.Modify.Show();
-		this.m_oButtons.Apply.Hide();
-		this.m_oButtons.Submit.Show();
-		this.m_oButtons.Close.Show();
-	}
-	else if (EKGSChallengeWindowState.OtherChallenge === this.m_nState)
-	{
-		this.m_oButtons.Create.Hide();
-		this.m_oButtons.Modify.Hide();
-		this.m_oButtons.Apply.Hide();
-		this.m_oButtons.Submit.Show();
+		this.m_oButtons.Ok.Hide();
+		this.m_oButtons.Retry.Show();
 		this.m_oButtons.Close.Show();
 	}
 };
+CKGSChallengeWindow.prototype.private_UpdateCaption = function()
+{
+	var bAnimatedWaiting = false;
+	if (EKGSChallengeWindowState.Creation === this.m_nState)
+	{
+		this.Set_Caption("Create a new challenge");
+	}
+	else if (EKGSChallengeWindowState.CreatorProposal === this.m_nState)
+	{
+		this.Set_Caption("Your challenge");
+	}
+	else if (EKGSChallengeWindowState.ChallengerSubmit === this.m_nState)
+	{
+		this.Set_Caption(this.m_oOwner ? "New game vs. " + this.m_oOwner.GetName() : "New game");
+	}
+	else if (EKGSChallengeWindowState.ChallengerAccept === this.m_nState)
+	{
+		this.Set_Caption("Press OK to start the game");
+	}
+	else if (EKGSChallengeWindowState.Waiting === this.m_nState)
+	{
+	}
+	else if (EKGSChallengeWindowState.ChallengerWaiting === this.m_nState)
+	{
+		bAnimatedWaiting = true;
+		this.Set_Caption("waiting...");
+	}
+	else if (EKGSChallengeWindowState.CreatorWaiting === this.m_nState)
+	{
+		bAnimatedWaiting = true;
+		this.Set_Caption("waiting...");
+	}
+	else// if (EKGSChallengeWindowState.Unknown === this.m_nState)
+	{
+		this.Set_Caption("New game");
+	}
+
+	if (!bAnimatedWaiting)
+		this.m_oAnimatedWaiting.Hide();
+	else
+		this.m_oAnimatedWaiting.Show();
+};
 CKGSChallengeWindow.prototype.private_UpdateOnStateChange = function()
 {
-	if (EKGSChallengeWindowState.Unknown === this.m_nState || EKGSChallengeWindowState.Waiting === this.m_nState)
+	if (EKGSChallengeWindowState.Unknown === this.m_nState || EKGSChallengeWindowState.Waiting === this.m_nState || EKGSChallengeWindowState.ChallengerAccept === this.m_nState || EKGSChallengeWindowState.CreatorWaiting === this.m_nState || EKGSChallengeWindowState.ChallengerWaiting === this.m_nState)
 	{
 		this.m_oGameTypeSelect.className   = "challengeSelect challengeSelectDisabled";
 		this.m_oGameTypeSelect.disabled    = "disabled";
@@ -1280,7 +1442,7 @@ CKGSChallengeWindow.prototype.private_UpdateOnStateChange = function()
 		this.m_oChallengerSelect.disabled  = "disabled";
 		this.m_oChallengerDiv.className    = "challengePlayer";
 	}
-	else if (EKGSChallengeWindowState.Creation === this.m_nState || EKGSChallengeWindowState.Recreate === this.m_nState)
+	else if (EKGSChallengeWindowState.Creation === this.m_nState)
 	{
 		this.m_oGameTypeSelect.className   = "challengeSelect challengeSelectEditable";
 		this.m_oGameTypeSelect.disabled    = "";
@@ -1300,7 +1462,7 @@ CKGSChallengeWindow.prototype.private_UpdateOnStateChange = function()
 		this.m_oChallengerSelect.disabled  = "disabled";
 		this.m_oChallengerDiv.className    = "challengePlayer";
 	}
-	else if (EKGSChallengeWindowState.OwnChallenge === this.m_nState)
+	else if (EKGSChallengeWindowState.CreatorProposal === this.m_nState)
 	{
 		this.m_oGameTypeSelect.className   = "challengeSelect challengeSelectDisabled";
 		this.m_oGameTypeSelect.disabled    = "disabled";
@@ -1320,7 +1482,7 @@ CKGSChallengeWindow.prototype.private_UpdateOnStateChange = function()
 		this.m_oChallengerSelect.disabled  = "";
 		this.m_oChallengerDiv.className    = "challengePlayer challengePlayerSelect";
 	}
-	else if (EKGSChallengeWindowState.OtherChallenge === this.m_nState)
+	else if (EKGSChallengeWindowState.ChallengerSubmit === this.m_nState)
 	{
 		this.m_oGameTypeSelect.className   = "challengeSelect challengeSelectDisabled";
 		this.m_oGameTypeSelect.disabled    = "disabled";
@@ -1346,6 +1508,7 @@ CKGSChallengeWindow.prototype.private_UpdateOnStateChange = function()
 		this.m_oChallengerSpan.title     = "View user info";
 	}
 
+	this.private_UpdateCaption();
 	this.private_UpdateKomiAndHandicapFields();
 	this.private_UpdateTimeSystemFields();
 	this.private_UpdateButtons();
@@ -1358,10 +1521,10 @@ CKGSChallengeWindow.prototype.private_SetState = function(nState)
 };
 CKGSChallengeWindow.prototype.private_UpdateKomiAndHandicapFields = function()
 {
-	if (EKGSChallengeWindowState.Waiting === this.m_nState)
+	if (EKGSChallengeWindowState.Waiting === this.m_nState || EKGSChallengeWindowState.CreatorWaiting === this.m_nState || EKGSChallengeWindowState.ChallengerAccept === this.m_nState || EKGSChallengeWindowState.ChallengerWaiting === this.m_nState)
 		return;
 
-	if (true !== this.m_bNigiri && (EKGSChallengeWindowState.OtherChallenge === this.m_nState || (EKGSChallengeWindowState.OwnChallenge === this.m_nState && null !== this.m_oCurrentChallenger)))
+	if (true !== this.m_bNigiri && (EKGSChallengeWindowState.ChallengerSubmit === this.m_nState || (EKGSChallengeWindowState.CreatorProposal === this.m_nState && null !== this.m_oCurrentChallenger)))
 	{
 		this.m_oKomiInput.className     = "challengeInput challengeInputEditable";
 		this.m_oKomiInput.disabled      = "";
