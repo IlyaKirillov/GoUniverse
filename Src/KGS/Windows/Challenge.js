@@ -311,7 +311,8 @@ CKGSChallengeWindow.prototype.Init = function(sDivId, oPr)
 		}
 		else
 		{
-			this.m_nState = EKGSChallengeWindowState.ChallengerSubmit;
+			this.m_nState             = EKGSChallengeWindowState.ChallengerSubmit;
+			this.m_oCurrentChallenger = this.m_oClient.GetCurrentUser();
 		}
 	}
 
@@ -322,7 +323,9 @@ CKGSChallengeWindow.prototype.Init = function(sDivId, oPr)
 	this.private_CreateAnimatedWaiting();
 
 	if (true === oPr.Create)
-		this.private_FillDefaultValues();
+		this.private_FillDefaultCreatorValues();
+	else
+		this.private_FillDefaultChallengerValues();
 
 	this.private_UpdateOnStateChange();
 };
@@ -379,7 +382,7 @@ CKGSChallengeWindow.prototype.OnDecline = function()
 };
 CKGSChallengeWindow.prototype.OnProposal = function(oProposal)
 {
-	if (EKGSChallengeWindowState.ChallengerWaiting === this.m_nState)
+	if (EKGSChallengeWindowState.ChallengerWaiting === this.m_nState || EKGSChallengeWindowState.ChallengerAccept === this.m_nState)
 	{
 		var bNigiri    = oProposal.IsNigiri();
 		var oBlackUser = oProposal.GetBlack();
@@ -1280,7 +1283,11 @@ CKGSChallengeWindow.prototype.private_GetDefaultHandicap = function()
 	var nChallengerRank = oChallenger.GetRank();
 	var nCreatorRank    = oCreator.GetRank();
 
-	return Math.min(Math.abs(nChallengerRank - nCreatorRank), 9);
+	var nHandicap = Math.min(Math.abs(nChallengerRank - nCreatorRank), 9);
+	if (1 === nHandicap)
+		return 0;
+
+	return nHandicap;
 };
 CKGSChallengeWindow.prototype.private_GetDefaultKomi = function()
 {
@@ -1298,14 +1305,7 @@ CKGSChallengeWindow.prototype.private_GetDefaultKomi = function()
 	}
 	else
 	{
-		// TODO: Проверить, что в новозеландских правилах коми должно бьть 0
-
-		if (EKGSGameRules.Japanese === nRules)
-			return 0.5;
-		else if (EKGSGameRules.Chinese === nRules || EKGSGameRules.Aga === nRules)
-			return 0.5;
-		else if (EKGSGameRules.NewZealand === nRules)
-			return 0;
+		return 0.5;
 	}
 };
 CKGSChallengeWindow.prototype.private_GetDefaultNigiri = function()
@@ -1550,7 +1550,7 @@ CKGSChallengeWindow.prototype.private_RejectChallenge = function()
 		this.m_oClient.DeclineChallenge(this.m_nChannelId, oUser.GetName());
 	}
 };
-CKGSChallengeWindow.prototype.private_FillDefaultValues = function()
+CKGSChallengeWindow.prototype.private_FillDefaultCreatorValues = function()
 {
 	var oGlobalSettings = this.private_GetGlobalSettings();
 
@@ -1577,6 +1577,13 @@ CKGSChallengeWindow.prototype.private_FillDefaultValues = function()
 	this.private_OnChangeRules();
 	this.private_OnChangeBoardSize();
 	this.private_UpdateTimeSystem();
+};
+CKGSChallengeWindow.prototype.private_FillDefaultChallengerValues = function()
+{
+	this.m_bNigiri              = this.private_GetDefaultNigiri();
+	this.m_bCreatorBlack        = this.private_GetDefaultIsCreatorBlack();
+	this.m_oKomiInput.value     = this.private_GetDefaultKomi();
+	this.m_oHandicapInput.value = this.private_GetDefaultHandicap();
 };
 CKGSChallengeWindow.prototype.private_GetGlobalSettings = function()
 {
