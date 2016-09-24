@@ -464,7 +464,8 @@ input.challengeInputEditable {
 }
 
 input.challengeInputChanged {
-	border : 1px solid red;
+	color       : rgb(199, 40, 40);
+	font-weight : bold;
 }
 
 select.challengeSelect {
@@ -489,6 +490,11 @@ select.challengeSelectDisabled {
 select.challengeSelectEditable {
 	border             : 1px solid #969696;
 	background         : rgb(255, 255, 255);
+}
+
+select.challengeSelectChanged {
+	color       : rgb(199, 40, 40);
+	font-weight : bold;
 }
 
 div.challengePlayer {

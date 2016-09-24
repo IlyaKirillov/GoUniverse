@@ -12,7 +12,7 @@
 var KGS_MAX_TIME         = 2147483;
 var KGS_OVER_MAX_COUNT   = 255;
 var KGS_MAX_KOMI         = 100;
-var KGS_MAX_HANDICAP     = 50;
+var KGS_MAX_HANDICAP     = 9;
 var KGS_MAX_BYOYOMI_TIME = 36000;
 
 var EKGSChallengeWindowState = {
@@ -26,12 +26,19 @@ var EKGSChallengeWindowState = {
 	ChallengerWaiting : 7
 };
 
+var EKGSChallengeWindowType = {
+	Regular   : 0,
+	Unranked  : 1,
+	Rengo     : 2,
+	Simulation: 3
+};
 
 function CKGSChallengeWindow()
 {
 	CKGSChallengeWindow.superclass.constructor.call(this);
 
 	this.m_nState      = EKGSChallengeWindowState.Unknown;
+	this.m_nType       = EKGSChallengeWindowState.Unranked;
 
 	this.m_nChannelId  = -1;
 	this.m_oGameRecord = null;
@@ -41,6 +48,7 @@ function CKGSChallengeWindow()
 
 	this.m_bNigiri       = true;
 	this.m_bCreatorBlack = false;
+	this.m_nGameType     = EKGSGameType.Free;
 
 	this.m_nTop           = 0;
 	this.m_nHeaderHeight  = 30;
@@ -202,6 +210,8 @@ function CKGSChallengeWindow()
 			oThis.m_oHandicapInput.disabled  = "disabled";
 
 			oThis.m_oChallengerReject.style.display = "none";
+
+			oThis.private_SetSelectedGameType(oThis.private_GetDefaultGameType());
 		}
 		else
 		{
@@ -215,6 +225,7 @@ function CKGSChallengeWindow()
 			oThis.m_oHandicapInput.value = oProposal.GetHandicap();
 			oThis.m_oKomiInput.value     = oProposal.GetKomi();
 			oThis.m_bNigiri              = oProposal.IsNigiri();
+			oThis.private_SetSelectedGameType(oProposal.GetGameType());
 
 			if (true !== oThis.m_bNigiri)
 			{
@@ -245,6 +256,9 @@ function CKGSChallengeWindow()
 
 			if (Math.abs(oThis.private_GetDefaultKomi() - oProposal.GetKomi()) > 0.001)
 				oThis.m_oKomiInput.className += " challengeInputChanged";
+
+			if (oThis.private_GetSelectedGameType() !== oThis.private_GetDefaultGameType())
+				oThis.m_oGameTypeSelect.className += " challengeSelectChanged";
 
 			oThis.m_oChallengerReject.style.display = "block";
 		}
@@ -302,6 +316,10 @@ CKGSChallengeWindow.prototype.Init = function(sDivId, oPr)
 	if (true === oPr.Create)
 	{
 		this.m_nState = EKGSChallengeWindowState.Creation;
+		this.m_nType  = EKGSChallengeWindowType.Unranked;
+
+		if (this.m_oClient.GetCurrentUser().CanPlayRanked())
+			this.m_nType = EKGSChallengeWindowType.Regular;
 	}
 	else
 	{
@@ -314,6 +332,23 @@ CKGSChallengeWindow.prototype.Init = function(sDivId, oPr)
 			this.m_nState             = EKGSChallengeWindowState.ChallengerSubmit;
 			this.m_oCurrentChallenger = this.m_oClient.GetCurrentUser();
 		}
+		this.m_nGameType = this.m_oGameRecord.GetProposal().GetGameType();
+
+		if (EKGSGameType.Free === this.m_nGameType)
+			this.m_nType = EKGSChallengeWindowType.Unranked;
+		else if (EKGSGameType.Rengo === this.m_nGameType)
+			this.m_nType = EKGSChallengeWindowType.Rengo;
+		else if (EKGSGameType.Simul === this.m_nGameType)
+			this.m_nType = EKGSChallengeWindowType.Simulation;
+		else if (EKGSGameType.Teaching === this.m_nGameType)
+			this.m_nType = EKGSChallengeWindowType.Unranked;
+		else if (EKGSGameType.Ranked === this.m_nGameType)
+		{
+			this.m_nType = EKGSChallengeWindowType.Unranked;
+			if (this.m_oOwner && this.m_oOwner.CanPlayRanked() && (!this.m_oCurrentChallenger || this.m_oCurrentChallenger.CanPlayRanked()))
+				this.m_nType = EKGSChallengeWindowType.Regular;
+		}
+
 	}
 
 	this.private_CreateName();
@@ -384,6 +419,7 @@ CKGSChallengeWindow.prototype.OnProposal = function(oProposal)
 {
 	if (EKGSChallengeWindowState.ChallengerWaiting === this.m_nState || EKGSChallengeWindowState.ChallengerAccept === this.m_nState)
 	{
+		var nGameType  = oProposal.GetGameType();
 		var bNigiri    = oProposal.IsNigiri();
 		var oBlackUser = oProposal.GetBlack();
 		var bCreatorB  = oBlackUser && oBlackUser.GetName() === this.m_oOwner.GetName() ? true : false;
@@ -393,7 +429,15 @@ CKGSChallengeWindow.prototype.OnProposal = function(oProposal)
 		if (isNaN(dKomi))
 			dKomi = 0;
 
-		var bCanAccept = true;
+		var bCanAccept       = true;
+		var bGameTypeChanged = false;
+		if (nGameType !== this.private_GetSelectedGameType())
+		{
+			bCanAccept       = false;
+			bGameTypeChanged = true;
+			this.private_SetSelectedGameType(nGameType);
+		}
+
 		var bColorsChanged = false;
 		if (bNigiri !== this.m_bNigiri || (true !== this.m_bNigiri && bCreatorB !== this.m_bCreatorBlack))
 		{
@@ -436,6 +480,9 @@ CKGSChallengeWindow.prototype.OnProposal = function(oProposal)
 
 			if (bKomiChanged)
 				this.m_oKomiInput.className += " challengeInputChanged";
+
+			if (bGameTypeChanged)
+				this.m_oGameTypeSelect.className += " challengeSelectChanged";
 
 			if (bColorsChanged)
 				this.private_DrawPlayerColor(true);
@@ -498,9 +545,33 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 
 	var oTypeList       = this.protected_CreateDivElement(oWrapperTypeDiv, null, "select");
 	oTypeList.style.fontWeight = "bold";
-	this.private_AddOptionToSelect(oTypeList, "Ranked");
-	this.private_AddOptionToSelect(oTypeList, "Free");
-	this.private_AddOptionToSelect(oTypeList, "Teaching");
+
+	switch (this.m_nType)
+	{
+		case EKGSChallengeWindowType.Regular:
+		{
+			this.private_AddOptionToSelect(oTypeList, "Ranked");
+			this.private_AddOptionToSelect(oTypeList, "Free");
+			this.private_AddOptionToSelect(oTypeList, "Teaching");
+			break;
+		}
+		case EKGSChallengeWindowType.Unranked:
+		{
+			this.private_AddOptionToSelect(oTypeList, "Free");
+			this.private_AddOptionToSelect(oTypeList, "Teaching");
+			break;
+		}
+		case EKGSChallengeWindowType.Rengo:
+		{
+			this.private_AddOptionToSelect(oTypeList, "Rengo");
+			break;
+		}
+		case EKGSChallengeWindowType.Simulation:
+		{
+			this.private_AddOptionToSelect(oTypeList, "Simulation");
+			break;
+		}
+	}
 
 	var oTypeListControl = CreateControlContainterByElement(oTypeList);
 	oTypeListControl.SetParams(5, 5, 5, 0, true, true, true, true, -1, -1);
@@ -637,8 +708,8 @@ CKGSChallengeWindow.prototype.private_DrawPlayerColor = function(bChanged)
 
 	if (true === bChanged)
 	{
-		oContext.lineWidth   = 1;
-		oContext.strokeStyle = "rgb(255, 0, 0)";
+		oContext.lineWidth   = 2;
+		oContext.strokeStyle = "rgb(199, 40, 40)";
 		oContext.beginPath();
 		oContext.moveTo(0, 0);
 		oContext.lineTo(0, nH);
@@ -944,6 +1015,7 @@ CKGSChallengeWindow.prototype.private_CreateChallenge = function()
 	this.m_oClient.SendCreateChallenge(this.m_nRoomId, this.m_nChannelId, nGameType, sComment, nRules, nSize, oTimeSystem);
 
 	this.private_SetState(EKGSChallengeWindowState.Waiting);
+	this.m_nGameType = nGameType;
 };
 CKGSChallengeWindow.prototype.private_OkChallenge = function()
 {
@@ -1001,26 +1073,73 @@ CKGSChallengeWindow.prototype.private_RetryChallenge = function()
 };
 CKGSChallengeWindow.prototype.private_GetSelectedGameType = function()
 {
-	var nGameType = EKGSGameType.Free;
 	var nSelectedIndex = this.m_oGameTypeSelect.selectedIndex;
-	if (0 === nSelectedIndex)
-		nGameType = EKGSGameType.Ranked;
-	else if (1 === nSelectedIndex)
-		nGameType = EKGSGameType.Free;
-	else if (2 === nSelectedIndex)
-		nGameType = EKGSGameType.Teaching;
+	switch (this.m_nType)
+	{
+		case EKGSChallengeWindowType.Regular:
+		{
+			if (0 === nSelectedIndex)
+				return EKGSGameType.Ranked;
+			else if (1 === nSelectedIndex)
+				return EKGSGameType.Free;
+			else if (2 === nSelectedIndex)
+				return EKGSGameType.Teaching;
 
-	return nGameType;
+			break;
+		}
+		case EKGSChallengeWindowType.Unranked:
+		{
+			if (0 === nSelectedIndex)
+				return EKGSGameType.Free;
+			else if (1 === nSelectedIndex)
+				return EKGSGameType.Teaching;
+
+			break;
+		}
+		case EKGSChallengeWindowType.Rengo:
+		{
+			return EKGSGameType.Rengo;
+		}
+		case EKGSChallengeWindowType.Simulation:
+		{
+			return EKGSGameType.Simul;
+		}
+	}
+
+	return EKGSGameType.Free;
 };
 CKGSChallengeWindow.prototype.private_SetSelectedGameType = function(nGameType)
 {
 	var nSelectedIndex = 0;
-	if (EKGSGameType.Ranked === nGameType)
-		nSelectedIndex = 0;
-	else if (EKGSGameType.Free === nGameType)
-		nSelectedIndex = 1;
-	else if (EKGSGameType.Teaching === nGameType)
-		nSelectedIndex = 2;
+	switch (this.m_nType)
+	{
+		case EKGSChallengeWindowType.Regular:
+		{
+			if (EKGSGameType.Ranked === nGameType)
+				nSelectedIndex = 0;
+			else if (EKGSGameType.Free === nGameType)
+				nSelectedIndex = 1;
+			else if (EKGSGameType.Teaching === nGameType)
+				nSelectedIndex = 2;
+
+			break;
+		}
+		case EKGSChallengeWindowType.Unranked:
+		{
+			if (EKGSGameType.Free === nGameType)
+				nSelectedIndex = 0;
+			else if (EKGSGameType.Teaching === nGameType)
+				nSelectedIndex = 1;
+
+			break;
+		}
+		case EKGSChallengeWindowType.Rengo:
+		case EKGSChallengeWindowType.Simulation:
+		{
+			nSelectedIndex = 0;
+			break;
+		}
+	}
 
 	this.m_oGameTypeSelect.selectedIndex = nSelectedIndex;
 };
@@ -1338,6 +1457,10 @@ CKGSChallengeWindow.prototype.private_GetDefaultIsCreatorBlack = function()
 	var nCreatorRank    = oCreator.GetRank();
 
 	return nChallengerRank > nCreatorRank ? true : false;
+};
+CKGSChallengeWindow.prototype.private_GetDefaultGameType = function()
+{
+	return this.m_nGameType;
 };
 CKGSChallengeWindow.prototype.private_GetHandicap = function()
 {
