@@ -899,6 +899,10 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
 	{
 		this.private_HandleChallengeProposal(oMessage);
 	}
+	else if ("GAME_TIME_EXPIRED" === oMessage.type)
+	{
+		this.private_HandleGameTimeExpired(oMessage);
+	}
 	else
 	{
 		console.log(oMessage);
@@ -1832,6 +1836,14 @@ CKGSClient.prototype.private_HandleChallengeProposal = function(oMessage)
 
 	var oProposal = new CKGSChallengeProposal(oMessage.proposal);
 	oWindow.OnProposal(oProposal);
+};
+CKGSClient.prototype.private_HandleGameTimeExpired = function(oMessage)
+{
+	var nChannelId = oMessage.channelId;
+	this.private_SendMessage({
+		"type"     : "GAME_TIME_EXPIRED",
+		"channelId": nChannelId
+	});
 };
 CKGSClient.prototype.private_AddUserToRoom = function(oUser, oRoom)
 {

@@ -31,6 +31,7 @@ function CKGSGameRoom(oClient, nGameRoomId)
 	this.m_oOwner              = null;
 	this.m_sWhiteAvatar        = "Files/DefaultUserWhite.png";
 	this.m_sBlackAvatar        = "Files/DefaultUserBlack.png";
+	this.m_bOurMove            = false;
 }
 CKGSGameRoom.prototype.GetRoomId = function()
 {
@@ -148,6 +149,14 @@ CKGSGameRoom.prototype.SetPlayers = function(oGameRecord)
 				this.m_sWhiteAvatar = "Files/Robot.png";
 			else
 				this.m_sWhiteAvatar = "Files/DefaultUserWhite.png";
+		}
+
+
+		if (true === this.IsPlayer())
+		{
+			this.private_OpponentMove();
+			var oHandler = new CKGSMatchHandler(this.m_oClient, this);
+			this.m_oGameTree.Set_Handler(oHandler);
 		}
 	}
 };
@@ -292,7 +301,14 @@ CKGSGameRoom.prototype.HandleGameActions = function(arrActions)
 		}
 		else if ("MOVE" === sAction)
 		{
-
+			var oUser = GetKGSUser(oAction.user);
+			if (this.IsPlayer() && this.m_oGameTree)
+			{
+				if (oUser.GetName() === this.m_oClient.GetUserName())
+					this.private_OurMove();
+				else
+					this.private_OpponentMove();
+			}
 		}
 	}
 };
@@ -989,6 +1005,65 @@ CKGSGameRoom.prototype.ReturnControlToOwner = function()
 	if (true === this.m_bEditor && this.m_oOwner)
 		this.m_oClient.GiveGameControl(this.m_nGameRoomId, this.m_oOwner.GetName());
 };
+CKGSGameRoom.prototype.IsPlayer = function()
+{
+	return this.IsBlackPlayer() || this.IsWhitePlayer() ? true : false;
+};
+CKGSGameRoom.prototype.IsBlackPlayer = function()
+{
+	return (this.m_oBlack && this.m_oBlack.GetName() === this.m_oClient.GetUserName() ? true : false);
+};
+CKGSGameRoom.prototype.IsWhitePlayer = function()
+{
+	return (this.m_oWhite && this.m_oWhite.GetName() === this.m_oClient.GetUserName() ? true : false);
+};
+CKGSGameRoom.prototype.IsOurMove = function()
+{
+	return this.m_bOurMove;
+};
+CKGSGameRoom.prototype.SendMove = function(nGameRoomId, X, Y)
+{
+	if (!this.IsOurMove())
+		return;
+
+	if (!this.IsPlayer())
+		return;
+
+	if (true !== this.private_BeginSgfEvent())
+		return;
+
+	this.m_oClient.private_SendMessage({
+		"type"     : "GAME_MOVE",
+		"channelId": nGameRoomId,
+		"loc"      : {
+			"x": X - 1,
+			"y": Y - 1
+		}
+	});
+
+	this.private_OpponentMove();
+};
+CKGSGameRoom.prototype.private_OurMove = function()
+{
+	if (true === this.IsBlackPlayer() && BOARD_BLACK !== this.m_oGameTree.Get_NextMove())
+		this.m_oGameTree.Set_NextMove(BOARD_BLACK);
+	else if (true === this.IsWhitePlayer() && BOARD_WHITE !== this.m_oGameTree.Get_NextMove())
+		this.m_oGameTree.Set_NextMove(BOARD_WHITE);
+
+
+	this.m_oGameTree.Set_ShowTarget(true, true);
+	this.m_oGameTree.Set_EditingFlags({NewNode : true, Move : true});
+
+	this.m_bOurMove = true;
+};
+CKGSGameRoom.prototype.private_OpponentMove = function()
+{
+	this.m_bOurMove = false;
+
+	this.m_oGameTree.Set_ShowTarget(false, true);
+	this.m_oGameTree.Forbid_All();
+	this.m_oGameTree.Set_EditingFlags({Move : true});
+};
 
 function CKGSEditorHandler(oClient, oGame)
 {
@@ -1034,4 +1109,31 @@ CKGSEditorHandler.prototype.AddOrRemoveMark = function(isAdd, X, Y, Type, Text)
 		return;
 
 	this.m_oGame.SendSgfEventAddOrRemoveMark(this.m_nGameId, sNodeId, isAdd, X, Y, Type, Text);
+};
+
+function CKGSMatchHandler(oClient, oGame)
+{
+	this.m_oClient = oClient;
+	this.m_oGame   = oGame;
+	this.m_nGameId = oGame.GetRoomId();
+}
+CKGSMatchHandler.prototype.GoToNode = function(oNode)
+{
+	// Ничего не делаем
+};
+CKGSMatchHandler.prototype.AddNewNodeWithMove = function(oNode, X, Y, Value)
+{
+	this.m_oGame.SendMove(this.m_nGameId, X, Y);
+};
+CKGSMatchHandler.prototype.RemoveNode = function(oNode)
+{
+	// Ничего не делаем
+};
+CKGSMatchHandler.prototype.AddOrRemoveStone = function(isAddNewNode, X, Y, Value)
+{
+	// Ничего не делаем
+};
+CKGSMatchHandler.prototype.AddOrRemoveMark = function(isAdd, X, Y, Type, Text)
+{
+	// Ничего не делаем
 };
