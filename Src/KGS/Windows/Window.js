@@ -19,7 +19,8 @@ var EKGSWindowType = {
 	Information : 3,
 	Idle        : 4,
 	SgfViewer   : 5,
-	Challenge   : 6
+	Challenge   : 6,
+	ConfirmBase : 7
 };
 
 var g_aKGSWindows      = {};
@@ -46,6 +47,7 @@ function CreateKGSWindow(nWindowType, oPr)
 	case EKGSWindowType.Idle            : sApp = "Idle"; break;
 	case EKGSWindowType.SgfViewer       : sApp = "SgfViewer_" + oPr.Url; break;
 	case EKGSWindowType.Challenge       : sApp = "Challenge_" + oPr.ChannelId; break;
+	case EKGSWindowType.ConfirmBase     : sApp = "ConfirmBase_" + oPr.WindowId; break;
 	}
 	var sId = sParentId + sApp;
 
@@ -77,6 +79,7 @@ function CreateKGSWindow(nWindowType, oPr)
 		case EKGSWindowType.Idle            : oWindow = new CKGSInformationIdleWindow(); break;
 		case EKGSWindowType.SgfViewer       : oWindow = new CKGSSgfViewerWindow(); break;
 		case EKGSWindowType.Challenge       : oWindow = new CKGSChallengeWindow(); break;
+		case EKGSWindowType.ConfirmBase     : oWindow = new CKGSWindowConfirmBase(); break;
 		}
 
 		oWindows[sId] = oWindow;
@@ -267,3 +270,93 @@ CKGSWindowOKBase.prototype.Update_Size = function(bForce)
 };
 CKGSWindowOKBase.prototype.private_UpdatePosition = CKGSWindowBase.prototype.private_UpdatePosition;
 CKGSWindowOKBase.prototype.private_OnFocus        = CKGSWindowBase.prototype.private_OnFocus;
+
+function CKGSWindowConfirmBase()
+{
+	CKGSWindowBase.superclass.constructor.call(this);
+
+	this.m_oApp       = null;
+	this.m_oClient    = null;
+	this.m_fOkHandler = null;
+
+	this.m_nDefW = 200;
+	this.m_nDefH = 100;
+}
+CommonExtend(CKGSWindowConfirmBase, CDrawingConfirmWindow);
+CKGSWindowConfirmBase.prototype.Init = function(sDivId, oPr)
+{
+	if (oPr.H)
+		this.m_nDefH = oPr.H;
+
+	if (oPr.W)
+		this.m_nDefW = oPr.W;
+
+	CKGSWindowOKBase.superclass.Init.call(this, sDivId, oPr.Resizeable);
+	this.m_oApp    = oPr.App;
+	this.m_oClient = oPr.Client;
+	this.private_UpdatePosition();
+	this.HtmlElement.Control.HtmlElement.style.zIndex = g_nKGSWindowsCount;
+
+	this.Set_Caption("Game warning");
+
+	if (oPr.Text)
+	{
+		var oMainDiv                   = this.HtmlElement.ConfirmInnerDiv;
+		var oMainControl               = this.HtmlElement.ConfirmInnerControl;
+		oMainDiv.style.backgroundColor = "rgb(243, 243, 243)";
+
+		var oTextElement           = oMainDiv;
+		oTextElement.style.display = "table";
+		var oInnerText             = document.createElement("div");
+		oInnerText.className       = "WarningText";
+		oTextElement.appendChild(oInnerText);
+		Common.Set_InnerTextToElement(oInnerText, oPr.Text);
+	}
+
+	if (oPr.OkHandler)
+		this.m_fOkHandler = oPr.OkHandler;
+};
+CKGSWindowConfirmBase.prototype.Update_Size = function(bForce)
+{
+	CKGSWindowConfirmBase.superclass.Update_Size.call(this, bForce);
+
+	// Проверяем, чтобы окно не вышло за пределы родительского окна
+	if (this.m_oApp)
+	{
+		var nWidth  = this.m_oApp.GetWidth();
+		var nHeight = this.m_oApp.GetHeight();
+
+		var nLeft = parseInt(this.HtmlElement.Control.HtmlElement.style.left);
+		var nTop  = parseInt(this.HtmlElement.Control.HtmlElement.style.top);
+
+		if (nLeft <= 0)
+			this.HtmlElement.Control.HtmlElement.style.left = "0px";
+		else if (nLeft >= nWidth - 20)
+			this.HtmlElement.Control.HtmlElement.style.left = (nLeft - 20) + "px";
+
+		if (nTop <= 0)
+			this.HtmlElement.Control.HtmlElement.style.top = "0px";
+		else if (nTop >= nHeight - 20)
+			this.HtmlElement.Control.HtmlElement.style.top = (nHeight - 20) + "px";
+	}
+};
+CKGSWindowConfirmBase.prototype.Handle_OK = function()
+{
+	if (this.m_fOkHandler)
+		this.m_fOkHandler();
+
+	this.Close();
+};
+CKGSWindowConfirmBase.prototype.Close = function()
+{
+	RemoveWindow(this);
+};
+CKGSWindowConfirmBase.prototype.Get_DefaultWindowSize  = function()
+{
+	return {
+		W : this.m_nDefW,
+		H : this.m_nDefH
+	};
+};
+CKGSWindowConfirmBase.prototype.private_UpdatePosition = CKGSWindowBase.prototype.private_UpdatePosition;
+CKGSWindowConfirmBase.prototype.private_OnFocus        = CKGSWindowBase.prototype.private_OnFocus;

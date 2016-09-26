@@ -903,6 +903,10 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
 	{
 		this.private_HandleGameTimeExpired(oMessage);
 	}
+	else if ("GAME_UNDO_REQUEST" === oMessage.type)
+	{
+		this.private_HandleGameUndoRequest(oMessage);
+	}
 	else
 	{
 		console.log(oMessage);
@@ -1844,6 +1848,27 @@ CKGSClient.prototype.private_HandleGameTimeExpired = function(oMessage)
 		"type"     : "GAME_TIME_EXPIRED",
 		"channelId": nChannelId
 	});
+};
+CKGSClient.prototype.private_HandleGameUndoRequest = function(oMessage)
+{
+	var nChannelId = oMessage.channelId;
+	var oGame = this.m_aGames[nChannelId];
+	if (oGame)
+	{
+		CreateKGSWindow(EKGSWindowType.ConfirmBase, {
+			App        : this.m_oApp,
+			Client     : this,
+			Text       : "Undo request. Accept?",
+			WindowId   : "UndoRequest",
+			W          : 300,
+			H          : 140,
+			Resizeable : false,
+			OkHandler  : function()
+			{
+				oGame.AcceptUndo();
+			}
+		});
+	}
 };
 CKGSClient.prototype.private_AddUserToRoom = function(oUser, oRoom)
 {

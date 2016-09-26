@@ -1023,10 +1023,7 @@ CKGSGameRoom.prototype.IsOurMove = function()
 };
 CKGSGameRoom.prototype.SendMove = function(nGameRoomId, X, Y)
 {
-	if (!this.IsOurMove())
-		return;
-
-	if (!this.IsPlayer())
+	if (!this.IsOurMove() || !this.IsPlayer())
 		return;
 
 	if (true !== this.private_BeginSgfEvent())
@@ -1042,6 +1039,52 @@ CKGSGameRoom.prototype.SendMove = function(nGameRoomId, X, Y)
 	});
 
 	this.private_OpponentMove();
+};
+CKGSGameRoom.prototype.SendPass = function(nGameRoomId)
+{
+	if (!this.IsOurMove() || !this.IsPlayer())
+		return;
+
+	if (true !== this.private_BeginSgfEvent())
+		return;
+
+	this.m_oClient.private_SendMessage({
+		"type"     : "GAME_MOVE",
+		"channelId": nGameRoomId,
+		"loc"      : "PASS"
+	});
+
+	this.private_OpponentMove();
+};
+CKGSGameRoom.prototype.RequestUndo = function()
+{
+	if (!this.IsPlayer())
+		return;
+
+	this.m_oClient.private_SendMessage({
+		"type"     : "GAME_UNDO_REQUEST",
+		"channelId": this.GetRoomId()
+	});
+};
+CKGSGameRoom.prototype.AcceptUndo = function()
+{
+	if (!this.IsPlayer())
+		return;
+
+	this.m_oClient.private_SendMessage({
+		"type"      : "GAME_UNDO_ACCEPT",
+		"channelId" : this.GetRoomId()
+	});
+};
+CKGSGameRoom.prototype.Resign = function()
+{
+	if (!this.IsPlayer())
+		return;
+
+	this.m_oClient.private_SendMessage({
+		"type"     : "GAME_RESIGN",
+		"channelId": this.GetRoomId()
+	});
 };
 CKGSGameRoom.prototype.private_OurMove = function()
 {
@@ -1110,6 +1153,14 @@ CKGSEditorHandler.prototype.AddOrRemoveMark = function(isAdd, X, Y, Type, Text)
 
 	this.m_oGame.SendSgfEventAddOrRemoveMark(this.m_nGameId, sNodeId, isAdd, X, Y, Type, Text);
 };
+CKGSEditorHandler.prototype.Pass = function(Value)
+{
+	// TODO: Реализовать пас
+};
+CKGSEditorHandler.prototype.CheckExistNodeOnMove = function()
+{
+	return true;
+};
 
 function CKGSMatchHandler(oClient, oGame)
 {
@@ -1136,4 +1187,12 @@ CKGSMatchHandler.prototype.AddOrRemoveStone = function(isAddNewNode, X, Y, Value
 CKGSMatchHandler.prototype.AddOrRemoveMark = function(isAdd, X, Y, Type, Text)
 {
 	// Ничего не делаем
+};
+CKGSMatchHandler.prototype.Pass = function(Value)
+{
+	this.m_oGame.SendPass(this.m_nGameId);
+};
+CKGSMatchHandler.prototype.CheckExistNodeOnMove = function()
+{
+	return false;
 };
