@@ -51,6 +51,9 @@ function CKGSClient(oApp)
 	this.m_oFollowersGames          = {};
 
 	this.m_oEnterChatRoomRequest = {}; // Список комнат, в которые мы сделали запрос на вход, нужно для определения RoomJoin начальный или по запросу
+
+	this.m_nCallbackCounter = 1;
+	this.m_oSync            = {};
 }
 CKGSClient.prototype.Clear = function()
 {
@@ -625,6 +628,16 @@ CKGSClient.prototype.DeclineChallenge = function(nChannelId, sUserName)
 		"name"     : sUserName
 	});
 };
+CKGSClient.prototype.SendSync = function(oClass)
+{
+	var nCallbackKey = this.GetNewCallbackKey();
+	this.private_SendMessage({
+		"type"       : "SYNC_REQUEST",
+		"callbackKey": nCallbackKey
+	});
+
+	this.m_oSync[nCallbackKey] = oClass;
+};
 CKGSClient.prototype.private_SendMessage = function(oMessage)
 {
 	// console.log("Send:");
@@ -906,6 +919,10 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
 	else if ("GAME_UNDO_REQUEST" === oMessage.type)
 	{
 		this.private_HandleGameUndoRequest(oMessage);
+	}
+	else if ("SYNC" === oMessage.type)
+	{
+		this.private_HandleSync(oMessage);
 	}
 	else
 	{
@@ -1550,8 +1567,6 @@ CKGSClient.prototype.private_HandleGameState = function(oMessage)
 
 	oGame.HandleGameActions(oMessage["actions"]);
 	oGame.UpdateClocks(oMessage["clocks"], false);
-
-	console.log(oMessage);
 };
 CKGSClient.prototype.private_HandleFriendAddSuccess = function(oMessage)
 {
@@ -1874,6 +1889,16 @@ CKGSClient.prototype.private_HandleGameUndoRequest = function(oMessage)
 		});
 	}
 };
+CKGSClient.prototype.private_HandleSync = function(oMessage)
+{
+	var nCallbackKey = oMessage["callbackKey"];
+	var oClass = this.m_oSync[nCallbackKey];
+	if (oClass)
+	{
+		delete this.m_oSync[nCallbackKey];
+		oClass.OnSync();
+	}
+};
 CKGSClient.prototype.private_AddUserToRoom = function(oUser, oRoom)
 {
 	oRoom.Users[oUser.GetName()] = oUser;
@@ -2123,5 +2148,13 @@ CKGSClient.prototype.GetGame = function(nGameId)
 CKGSClient.prototype.GetCurrentUser = function()
 {
 	return this.m_oCurrentUser;
+};
+CKGSClient.prototype.GetNewCallbackKey = function()
+{
+	this.m_nCallbackCounter++;
+	if (this.m_nCallbackCounter >= 65536)
+		this.m_nCallbackCounter = 0;
+
+	return this.m_nCallbackCounter;
 };
 

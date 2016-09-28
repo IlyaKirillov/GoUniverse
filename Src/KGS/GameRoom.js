@@ -25,7 +25,6 @@ function CKGSGameRoom(oClient, nGameRoomId)
 	this.m_oStateHandler       = null;
 	this.m_oPlayersList        = new CListView();
 	this.m_bEditor             = false;
-	this.m_bSgfEventInProgress = false;
 	this.m_oBlack              = null;
 	this.m_oWhite              = null;
 	this.m_oOwner              = null;
@@ -33,6 +32,7 @@ function CKGSGameRoom(oClient, nGameRoomId)
 	this.m_sBlackAvatar        = "Files/DefaultUserBlack.png";
 	this.m_bOurMove            = false;
 	this.m_bCountScores        = false;
+	this.m_bCommandInProgress  = false;
 }
 CKGSGameRoom.prototype.GetRoomId = function()
 {
@@ -266,7 +266,6 @@ CKGSGameRoom.prototype.private_HandleGameClocks = function(oClocks)
 };
 CKGSGameRoom.prototype.HandleGameActions = function(arrActions)
 {
-	console.log(arrActions);
 	if (!arrActions)
 		return;
 
@@ -291,7 +290,6 @@ CKGSGameRoom.prototype.HandleGameActions = function(arrActions)
 					this.RemoveOwnChanges();
 					this.BackToGame();
 					this.m_bEditor = true;
-					this.private_EndSgfEvent();
 					var oHandler = new CKGSEditorHandler(this.m_oClient, this);
 					this.m_oGameTree.Set_Handler(oHandler);
 				}
@@ -299,7 +297,6 @@ CKGSGameRoom.prototype.HandleGameActions = function(arrActions)
 			else if (true === this.m_bEditor)
 			{
 				this.m_bEditor = false;
-				this.private_EndSgfEvent();
 				this.m_oGameTree.Set_Handler(null);
 			}
 		}
@@ -378,8 +375,6 @@ CKGSGameRoom.prototype.ReadSgfEvents = function(arrSgfEvents, isOnLoad)
 	}
 
 	oGameTree.Set_Handler(oHandler);
-
-	this.private_EndSgfEvent();
 };
 CKGSGameRoom.prototype.UpdatePlayersList = function(arrUsers)
 {
@@ -778,17 +773,22 @@ CKGSGameRoom.prototype.private_GetRank = function(nRank)
 	else
 		return (nRank - 39) + "p";
 };
-CKGSGameRoom.prototype.private_BeginSgfEvent = function()
+CKGSGameRoom.prototype.Sync = function()
 {
-	if (true === this.m_bSgfEventInProgress)
-		return false;
+	if (this.IsCommandInProgress())
+		return;
 
-	this.m_bSgfEventInProgress = true;
-	return true;
+	this.m_oClient.SendSync(this);
+	this.m_bCommandInProgress = true;
 };
-CKGSGameRoom.prototype.private_EndSgfEvent = function()
+CKGSGameRoom.prototype.OnSync = function()
 {
-	this.m_bSgfEventInProgress = false;
+	console.log("OnSync");
+	this.m_bCommandInProgress = false;
+};
+CKGSGameRoom.prototype.IsCommandInProgress = function()
+{
+	return this.m_bCommandInProgress;
 };
 CKGSGameRoom.prototype.GetNodeId = function(oNode)
 {
@@ -817,10 +817,7 @@ CKGSGameRoom.prototype.GetNewNodeId = function()
 };
 CKGSGameRoom.prototype.SendSgfEventChangeCurrentNode = function(nGameRoomId, nNodeId, nPrevNodeId)
 {
-	if (true !== this.private_BeginSgfEvent())
-		return;
-
-	this.m_oClient.private_SendMessage({
+	this.private_SendCommand({
 		"type"      : "KGS_SGF_CHANGE",
 		"channelId" : nGameRoomId,
 		"sgfEvents" : [{
@@ -832,10 +829,7 @@ CKGSGameRoom.prototype.SendSgfEventChangeCurrentNode = function(nGameRoomId, nNo
 };
 CKGSGameRoom.prototype.SendSgfEventNewNodeWithMove = function(nGameRoomId, nNodeId, nNewNodeId, X, Y, Value)
 {
-	if (true !== this.private_BeginSgfEvent())
-		return;
-
-	this.m_oClient.private_SendMessage({
+	this.private_SendCommand({
 		"type"      : "KGS_SGF_CHANGE",
 		"channelId" : nGameRoomId,
 		"sgfEvents" : [{
@@ -862,10 +856,7 @@ CKGSGameRoom.prototype.SendSgfEventNewNodeWithMove = function(nGameRoomId, nNode
 };
 CKGSGameRoom.prototype.SendSgfEventNewNodeWithAddOrRemoveStone = function(nGameRoomId, nNodeId, nNewNodeId, X, Y, Value)
 {
-	if (true !== this.private_BeginSgfEvent())
-		return;
-
-	this.m_oClient.private_SendMessage({
+	this.private_SendCommand({
 		"type"      : "KGS_SGF_CHANGE",
 		"channelId" : nGameRoomId,
 		"sgfEvents" : [{
@@ -892,10 +883,7 @@ CKGSGameRoom.prototype.SendSgfEventNewNodeWithAddOrRemoveStone = function(nGameR
 };
 CKGSGameRoom.prototype.SendSgfEventAddOrRemoveStone = function(nGameRoomId, nNodeId, X, Y, Value)
 {
-	if (true !== this.private_BeginSgfEvent())
-		return;
-
-	this.m_oClient.private_SendMessage({
+	this.private_SendCommand({
 		"type"      : "KGS_SGF_CHANGE",
 		"channelId" : nGameRoomId,
 		"sgfEvents" : [{
@@ -938,13 +926,9 @@ CKGSGameRoom.prototype.SendSgfEventAddOrRemoveMark = function(nGameRoomId, nNode
 	if (null === sType)
 		return;
 
-
-	if (true !== this.private_BeginSgfEvent())
-		return;
-
 	if (EDrawingMark.Tx === Type)
 	{
-		this.m_oClient.private_SendMessage({
+		this.private_SendCommand({
 			"type"      : "KGS_SGF_CHANGE",
 			"channelId" : nGameRoomId,
 			"sgfEvents" : [{
@@ -963,7 +947,7 @@ CKGSGameRoom.prototype.SendSgfEventAddOrRemoveMark = function(nGameRoomId, nNode
 	}
 	else
 	{
-		this.m_oClient.private_SendMessage({
+		this.private_SendCommand({
 			"type"      : "KGS_SGF_CHANGE",
 			"channelId" : nGameRoomId,
 			"sgfEvents" : [{
@@ -1036,17 +1020,16 @@ CKGSGameRoom.prototype.SendMove = function(nGameRoomId, X, Y)
 	if (!this.IsOurMove() || !this.IsPlayer())
 		return;
 
-	if (true !== this.private_BeginSgfEvent())
+	if (!this.private_SendCommand({
+			"type"     : "GAME_MOVE",
+			"channelId": nGameRoomId,
+			"loc"      : {
+				"x": X - 1,
+				"y": Y - 1
+			}
+		}))
 		return;
 
-	this.m_oClient.private_SendMessage({
-		"type"     : "GAME_MOVE",
-		"channelId": nGameRoomId,
-		"loc"      : {
-			"x": X - 1,
-			"y": Y - 1
-		}
-	});
 
 	this.private_OpponentMove();
 };
@@ -1055,14 +1038,12 @@ CKGSGameRoom.prototype.SendPass = function(nGameRoomId)
 	if (!this.IsOurMove() || !this.IsPlayer())
 		return;
 
-	if (true !== this.private_BeginSgfEvent())
+	if (!this.private_SendCommand({
+			"type"     : "GAME_MOVE",
+			"channelId": nGameRoomId,
+			"loc"      : "PASS"
+		}))
 		return;
-
-	this.m_oClient.private_SendMessage({
-		"type"     : "GAME_MOVE",
-		"channelId": nGameRoomId,
-		"loc"      : "PASS"
-	});
 
 	this.private_OpponentMove();
 };
@@ -1071,7 +1052,7 @@ CKGSGameRoom.prototype.SendMarkLife = function(nGameRoomId, X, Y, bAlive)
 	if (!this.IsCountingScores() || !this.IsPlayer())
 		return;
 
-	this.m_oClient.private_SendMessage({
+	this.private_SendCommand({
 		"type"      : "GAME_MARK_LIFE",
 		"channelId" : nGameRoomId,
 		"x"         : X - 1,
@@ -1151,6 +1132,17 @@ CKGSGameRoom.prototype.EndCountScores = function()
 		this.m_oGameTree.Get_DrawingBoard().End_CountScoresInMatch();
 		this.m_oGameTree.Set_ShowTarget(false, true);
 	}
+};
+CKGSGameRoom.prototype.private_SendCommand = function(oCommand)
+{
+	if (this.IsCommandInProgress())
+		return false;
+
+	this.m_oClient.private_SendMessage(oCommand);
+
+	this.Sync();
+
+	return true;
 };
 
 function CKGSEditorHandler(oClient, oGame)
