@@ -1270,8 +1270,6 @@ CKGSClient.prototype.private_HandleGameUpdate = function(oMessage)
 		return;
 
 	oGame.ReadSgfEvents(oMessage["sgfEvents"], false);
-
-	console.log(oMessage);
 };
 CKGSClient.prototype.private_HandleChat = function(oMessage)
 {
@@ -1567,6 +1565,7 @@ CKGSClient.prototype.private_HandleGameState = function(oMessage)
 
 	oGame.HandleGameActions(oMessage["actions"]);
 	oGame.UpdateClocks(oMessage["clocks"], false);
+	oGame.UpdateScores(oMessage);
 };
 CKGSClient.prototype.private_HandleFriendAddSuccess = function(oMessage)
 {

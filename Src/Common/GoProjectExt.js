@@ -1580,3 +1580,36 @@ CGoUniverseButtonResign.prototype.private_GetHint = function()
 {
 	return "Resignation";
 };
+//----------------------------------------------------------------------------------------------------------------------
+// Кнопка Analyze
+//----------------------------------------------------------------------------------------------------------------------
+function CGoUniverseButtonAnalyze(oDrawing, oGameRoom)
+{
+	CGoUniverseButtonResign.superclass.constructor.call(this, oDrawing);
+
+	this.m_oGameRoom = oGameRoom;
+}
+CommonExtend(CGoUniverseButtonAnalyze, CDrawingButtonBase);
+
+CGoUniverseButtonAnalyze.prototype.private_DrawOnCanvas = function(Canvas, Size, X_off, Y_off, bDisabled, W, H, BackColor, FillColor)
+{
+	var Text       = "Analyze";
+	var FontSize   = 20;
+	var FontFamily = "Times New Roman, Sans serif";
+	var sFont      = FontSize + "px " + FontFamily;
+
+	Canvas.font = sFont;
+
+	var Y = Y_off + Size / 2 + FontSize / 3;
+	var X = X_off + (Size - Canvas.measureText(Text).width) / 2;
+
+	Canvas.fillText(Text, X, Y);
+};
+CGoUniverseButtonAnalyze.prototype.private_HandleMouseDown = function()
+{
+	this.m_oGameRoom.ToggleAnalyze();
+};
+CGoUniverseButtonAnalyze.prototype.private_GetHint = function()
+{
+	return "Analyze the game";
+};

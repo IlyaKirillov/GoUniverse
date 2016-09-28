@@ -33,6 +33,11 @@ function CKGSGameRoom(oClient, nGameRoomId)
 	this.m_bOurMove            = false;
 	this.m_bCountScores        = false;
 	this.m_bCommandInProgress  = false;
+	this.m_nBlackScores        = 0;
+	this.m_nWhiteScores        = 0;
+	this.m_bBlackDone          = false;
+	this.m_bWhiteDone          = false;
+	this.m_nScoresDoneId       = -1;
 }
 CKGSGameRoom.prototype.GetRoomId = function()
 {
@@ -171,6 +176,28 @@ CKGSGameRoom.prototype.UpdateClocks = function(oClocks, isStopUndfined)
 	{
 		this.m_oBlackTime.Stop();
 		this.m_oWhiteTime.Stop();
+	}
+};
+CKGSGameRoom.prototype.UpdateScores = function(oMessage)
+{
+	if (undefined === oMessage.whiteScore || undefined === oMessage.blackScore)
+	{
+		this.m_nBlackScores  = 0;
+		this.m_nWhiteScores  = 0;
+		this.m_bBlackDone    = false;
+		this.m_bWhiteDone    = false;
+		this.m_nScoresDoneId = -1;
+	}
+	else
+	{
+		this.m_nBlackScores  = oMessage.blackScore;
+		this.m_nWhiteScores  = oMessage.whiteScore;
+		this.m_bBlackDone    = true === oMessage.blackDoneSent ? true : false;
+		this.m_bWhiteDone    = true === oMessage.whiteDoneSent ? true : false;
+		this.m_nScoresDoneId = oMessage.doneId;
+
+		if (this.m_bCountScores)
+			this.m_oGameTree.m_oDrawing.Update_Scores(this.m_nBlackScores, this.m_nWhiteScores);
 	}
 };
 CKGSGameRoom.prototype.StopClocks = function()
@@ -679,19 +706,35 @@ CKGSGameRoom.prototype.private_ReadProp = function(oProp, oNode, oGameTree)
 	}
 	else if ("TERRITORY" === oProp.name)
 	{
+		console.log("Add " + oProp);
 		oNode.Set_TerritoryForceUse(true);
 
 		var nX = oProp.loc.x + 1;
 		var nY = oProp.loc.y + 1;
 
-		if ("black" === oProp.color)
-			oNode.Add_TerritoryPoint(Common_XYtoValue(nX, nY), BOARD_BLACK);
-		else if ("white" === oProp.color)
-			oNode.Add_TerritoryPoint(Common_XYtoValue(nX, nY), BOARD_WHITE);
+		var nValue = oGameTree.Get_Board().Get(nX, nY);
+		if (BOARD_EMPTY === nValue)
+		{
+			if ("black" === oProp.color)
+				oNode.Add_TerritoryPoint(Common_XYtoValue(nX, nY), BOARD_BLACK);
+			else if ("white" === oProp.color)
+				oNode.Add_TerritoryPoint(Common_XYtoValue(nX, nY), BOARD_WHITE);
+		}
 	}
 	else if ("DEAD" === oProp.name)
 	{
-		// Нам это не нужно
+		console.log("Add " + oProp);
+		oNode.Set_TerritoryForceUse(true);
+
+		var nX = oProp.loc.x + 1;
+		var nY = oProp.loc.y + 1;
+
+		var nValue = oGameTree.Get_Board().Get(nX, nY);
+
+		if (BOARD_WHITE === nValue)
+			oNode.Add_TerritoryPoint(Common_XYtoValue(nX, nY), BOARD_BLACK);
+		else if (BOARD_BLACK === nValue)
+			oNode.Add_TerritoryPoint(Common_XYtoValue(nX, nY), BOARD_WHITE);
 	}
 	else if ("SETWHOSEMOVE" === oProp.name)
 	{
@@ -736,12 +779,30 @@ CKGSGameRoom.prototype.private_ReadPropRemove = function(oProp, oNode, oGameTree
 	}
 	else if ("TERRITORY" === oProp.name)
 	{
+		console.log("Remove " + oProp);
 		oNode.Set_TerritoryForceUse(true);
 
 		var nX = oProp.loc.x + 1;
 		var nY = oProp.loc.y + 1;
 
-		if ("black" === oProp.color || "white" === oProp.color)
+		var nValue = oGameTree.Get_Board().Get(nX, nY);
+		if (BOARD_EMPTY === nValue)
+		{
+			if ("black" === oProp.color || "white" === oProp.color)
+				oNode.Remove_TerritoryPoint(Common_XYtoValue(nX, nY));
+		}
+	}
+	else if ("DEAD" === oProp.name)
+	{
+		console.log("Remove " + oProp);
+		oNode.Set_TerritoryForceUse(true);
+
+		var nX = oProp.loc.x + 1;
+		var nY = oProp.loc.y + 1;
+
+		var nValue = oGameTree.Get_Board().Get(nX, nY);
+
+		if (BOARD_BLACK === nValue || BOARD_WHITE === nValue)
 			oNode.Remove_TerritoryPoint(Common_XYtoValue(nX, nY));
 	}
 	else if ("ARROW" === oProp.name || "LINE" === oProp.name)
@@ -1144,6 +1205,44 @@ CKGSGameRoom.prototype.private_SendCommand = function(oCommand)
 
 	return true;
 };
+CKGSGameRoom.prototype.GetBlackScores = function()
+{
+	return this.m_nBlackScores;
+};
+CKGSGameRoom.prototype.GetWhiteScores = function()
+{
+	return this.m_nWhiteScores;
+};
+CKGSGameRoom.prototype.IsGameInProgress = function()
+{
+	if (null === this.m_sResult)
+		return true;
+
+	return false;
+};
+CKGSGameRoom.prototype.ToggleAnalyze = function()
+{
+	if (this.IsPlayer())
+	{
+		var oHandler = this.m_oGameTree.Get_Handler();
+		if (oHandler && oHandler instanceof CKGSMatchHandler)
+		{
+			this.m_oGameTree.Set_Handler(null);
+			this.m_oGameTree.Set_ShowTarget(true, true);
+			this.m_oGameTree.Set_EditingFlags({NewNode : true, Move : true, ChangeBoardMode : true});
+		}
+		else
+		{
+			this.BackToGame();
+			this.m_oGameTree.Set_Handler(new CKGSMatchHandler(this.m_oClient, this));
+
+			if (true === this.IsOurMove())
+				this.private_OurMove();
+			else
+				this.private_OpponentMove();
+		}
+	}
+};
 
 function CKGSEditorHandler(oClient, oGame)
 {
@@ -1240,4 +1339,12 @@ CKGSMatchHandler.prototype.CheckExistNodeOnMove = function()
 CKGSMatchHandler.prototype.MarkLife = function(X, Y, bAlive)
 {
 	this.m_oGame.SendMarkLife(this.m_nGameId, X, Y, bAlive);
+};
+CKGSMatchHandler.prototype.GetBlackScores = function()
+{
+	return this.m_oGame.GetBlackScores();
+};
+CKGSMatchHandler.prototype.GetWhiteScores = function()
+{
+	return this.m_oGame.GetWhiteScores();
 };
