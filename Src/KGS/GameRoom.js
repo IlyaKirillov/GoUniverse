@@ -197,7 +197,10 @@ CKGSGameRoom.prototype.UpdateScores = function(oMessage)
 		this.m_nScoresDoneId = oMessage.doneId;
 
 		if (this.m_bCountScores)
-			this.m_oGameTree.m_oDrawing.Update_Scores(this.m_nBlackScores, this.m_nWhiteScores);
+		{
+			this.m_oGameTree.Get_Drawing().Update_Scores(this.m_nBlackScores, this.m_nWhiteScores);
+			this.m_oGameTree.Get_Drawing().GoUniverseUpdateScoresDone(this.m_bWhiteDone, this.m_bBlackDone);
+		}
 	}
 };
 CKGSGameRoom.prototype.StopClocks = function()
@@ -1151,6 +1154,17 @@ CKGSGameRoom.prototype.Resign = function()
 		"channelId": this.GetRoomId()
 	});
 };
+CKGSGameRoom.prototype.SendDone = function()
+{
+	if (!this.IsPlayer())
+		return;
+
+	this.m_oClient.private_SendMessage({
+		"type"     : "GAME_SCORING_DONE",
+		"channelId": this.GetRoomId(),
+		"doneId"   : this.m_nScoresDoneId
+	});
+};
 CKGSGameRoom.prototype.private_OurMove = function()
 {
 	if (true === this.IsBlackPlayer() && BOARD_BLACK !== this.m_oGameTree.Get_NextMove())
@@ -1183,6 +1197,7 @@ CKGSGameRoom.prototype.StartCountScores = function()
 		this.m_bCountScores = true;
 		this.m_oGameTree.Get_DrawingBoard().Start_CountScoresInMatch();
 		this.m_oGameTree.Set_ShowTarget(true, true);
+		this.m_oGameTree.Get_Drawing().GoUniverseOnStartCounting();
 	}
 };
 CKGSGameRoom.prototype.EndCountScores = function()
@@ -1192,6 +1207,7 @@ CKGSGameRoom.prototype.EndCountScores = function()
 		this.m_bCountScores = false;
 		this.m_oGameTree.Get_DrawingBoard().End_CountScoresInMatch();
 		this.m_oGameTree.Set_ShowTarget(false, true);
+		this.m_oGameTree.Get_Drawing().GoUniverseOnEndCounting();
 	}
 };
 CKGSGameRoom.prototype.private_SendCommand = function(oCommand)
@@ -1242,6 +1258,20 @@ CKGSGameRoom.prototype.ToggleAnalyze = function()
 				this.private_OpponentMove();
 		}
 	}
+};
+CKGSGameRoom.prototype.GetBlackName = function()
+{
+	if (this.m_oBlack)
+		return this.m_oBlack.GetName();
+
+	return "";
+};
+CKGSGameRoom.prototype.GetWhiteName = function()
+{
+	if (this.m_oWhite)
+		return this.m_oWhite.GetName();
+
+	return "";
 };
 
 function CKGSEditorHandler(oClient, oGame)

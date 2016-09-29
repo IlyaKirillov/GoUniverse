@@ -471,3 +471,76 @@ function StringToSeconds(sString)
 
 	return (nSeconds + 60 * nMinutes + 3600 * nHours);
 }
+
+
+//
+// (function(a) {
+// 	function b()
+// 	{
+// 		this.enabled = !1;
+// 		this.loaded = {};
+// 		this.sfx = {};
+// 		this.volume_override = null ;
+// 		this.sync()
+// 	}
+// 	b.prototype.enable = function()
+// 	{
+// 		this.enabled = !0;
+// 		this.sync()
+// 	}
+// 	;
+// 	b.prototype.sync = function()
+// 	{
+// 		"https://cdn.online-go.com/4.4/sound/beep.ogg"
+// 		"https://cdn.online-go.com/4.4/sound/female-en-5.ogg"
+//
+// 		if (this.enabled || null !== this.volume_override && 0 !== this.volume_override)
+// 			if ($.jStorage.get("go.settings.sound_enabled", !0) || null !== this.volume_override && 0 < this.volume_override) {
+// 				for (var a = 10; 1 <= a; a--)
+// 					this.addAudio(a, "female-en-" + a);
+// 				for (a = 1; 5 >= a; ++a)
+// 					this.addAudio("stone-" + a, "stone" + a);
+// 				this.addAudio("beep", "beep");
+// 				this.addAudio("beep1", "beep");
+// 				this.addAudio("beep2", "beep");
+// 				this.addAudio("beep3", "beep");
+// 				this.addAudio("beepbeep", "beepbeep");
+// 				this.addAudio("pass", "pass")
+// 			}
+// 	}
+// 	;
+// 	b.prototype.play = function(a, b) {
+// 		if ((this.enabled || null !== this.volume_override && 0 !== this.volume_override) && ($.jStorage.get("go.settings.sound_enabled", !0) || null !== this.volume_override && 0 < this.volume_override) && (null === this.volume_override || 0 !== this.volume_override))
+// 			try {
+// 				console.log("Playing ", a);
+// 				var e = $.jStorage.get("go.settings.sound_volume", .5);
+// 				null !== this.volume_override && (e = this.volume_override);
+// 				this.sfx[a][0].volume = e;
+// 				this.sfx[a][0].play()
+// 			} catch (m) {
+// 				console.log("Error playing ", a),
+// 					console.log(m),
+// 					console.log(m.stack)
+// 			}
+// 	}
+// 	;
+// 	b.prototype.addAudio = function(a, b)
+// 	{
+// 		if (this.enabled || null !== this.volume_override && 0 !== this.volume_override)
+// 			if (b in this.loaded)
+// 				this.sfx[a] = this.loaded[b];
+// 			else {
+// 				var e = $("<audio>");
+// 				e.attr("preload", "auto").append($("<source>").attr("type", "audio/ogg").attr("src", cdn_release + "/sound/" + b + ".ogg")).append($("<source>").attr("type", "audio/mpeg").attr("src", cdn_release + "/sound/" + b + ".mp3")).append($("<source>").attr("type", "audio/wav").attr("src", cdn_release + "/sound/" + b + ".wav"));
+// 				$("body").append(e);
+// 				this.sfx[a] = this.loaded[b] = e
+// 			}
+// 	}
+// 	;
+// 	var e = new b;
+// 	a.sfx = e;
+// 	setTimeout(function()
+// 	{
+// 		e.enable()
+// 	}, 100)
+// })(window);

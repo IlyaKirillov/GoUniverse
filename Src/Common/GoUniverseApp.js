@@ -54,30 +54,65 @@ CGoUniverseApplication.prototype.Init = function()
 	this.private_GotoLoginPage(false);
 	this.OnResize();
 
-	//  //TEST
-	//  this.m_oClient = new CKGSClient(this);
-	//  //this.OnConnect();
-	//  //
+	// //TEST
+	// this.m_oClient = new CKGSClient(this);
+	// this.m_oClient.m_oCurrentUser.Update({
+	// 	name : "GoUniverse",
+	// 	rank : "4d"
+	// });
 	//
-	//  document.getElementById("divMainId").style.display = "block";
-	//  this.OnResize();
+	// //this.OnConnect();
+	// //
 	//
-	//  var nRoomId = 0;
-	//  var oThis = this;
-	//  function TEST_AddChatRoom()
-	//  {
-	//  	oThis.AddChatRoom(nRoomId++, "Room " + nRoomId);
-	//  }
+	// document.getElementById("divMainId").style.display = "block";
+	// this.OnResize();
 	//
-	//  for (var nIndex = 0; nIndex < 100; nIndex++)
-	//  {
-	//  	TEST_AddChatRoom();
-	//  }
+	// var nRoomId = 0;
+	// var oThis   = this;
 	//
-	//  //this.AddGameRoom(1, new CGameTree(), false, "", "", new CTimeSettings(), new CTimeSettings(), {PlayersList : new CListView()});
-	//  // this.AddGameRoom(2, new CGameTree());
-	//  // this.AddGameRoom(3, new CGameTree());
-	//  // this.AddGameRoom(4, new CGameTree());
+	// function TEST_AddChatRoom()
+	// {
+	// 	oThis.AddChatRoom(nRoomId++, "Room " + nRoomId);
+	// }
+	//
+	// for (var nIndex = 0; nIndex < 100; nIndex++)
+	// {
+	// 	TEST_AddChatRoom();
+	// }
+	//
+	// var oGameRecord = new CKGSGameListRecord(this.m_oClient);
+	// oGameRecord.Update({
+	// 	gameType  : "ranked",
+	// 	gameId    : 1,
+	// 	channelId : 2,
+	// 	players   : {
+	// 		black : {
+	// 			name : "KOCMOHABT"
+	// 		},
+	// 		white : {
+	// 			name : "GoUniverse"
+	// 		}
+	// 	}
+	// });
+	// var oGameRoom = new CKGSGameRoom(this.m_oClient, 1);
+	// oGameRoom.InitGameTree({
+	// 	size    : 19,
+	// 	players : {
+	// 		black : {
+	// 			name : "KOCMOHABT"
+	// 		},
+	// 		white : {
+	// 			name : "GoUniverse"
+	// 		}
+	// 	}
+	// });
+	// oGameRoom.SetPlayers(oGameRecord);
+	//
+	//
+	// this.AddGameRoom(oGameRoom);
+	// // this.AddGameRoom(2, new CGameTree());
+	// // this.AddGameRoom(3, new CGameTree());
+	// // this.AddGameRoom(4, new CGameTree());
 	//
 	//  var nGameRoomId = 0;
 	//  function TEST_AddGameRoom()
@@ -121,27 +156,23 @@ CGoUniverseApplication.prototype.Init = function()
 	//  // this.m_oClient.private_HandlePrivateKeepOut({channelId : -1});
 	//  // this.m_oClient.private_HandleIdleWarning({});
 	//
-	// this.m_oClient.m_oCurrentUser.Update({
-	// 	name : "GoUniverse",
-	// 	rank : "4d"
-	// });
-	// this.m_oClient.m_oAllGames["123"] = new CKGSGameListRecord();
-	// this.m_oClient.m_oAllGames["123"].Update({
-	// 	gameType : "challenge",
-	// 	players : {
-	// 		challengeCreator : {
-	// 			name : "KOCMOHABT"
-	// 		}
-	// 	},
-	// 	name : "Challenge comment",
-	// 	initialProposal : {
-	// 		rules : {
-	//
-	// 		}
-	// 	}
-	// });
+	// // this.m_oClient.m_oAllGames["123"] = new CKGSGameListRecord();
+	// // this.m_oClient.m_oAllGames["123"].Update({
+	// // 	gameType : "challenge",
+	// // 	players : {
+	// // 		challengeCreator : {
+	// // 			name : "KOCMOHABT"
+	// // 		}
+	// // 	},
+	// // 	name : "Challenge comment",
+	// // 	initialProposal : {
+	// // 		rules : {
+	// //
+	// // 		}
+	// // 	}
+	// // });
 	// //this.m_oClient.private_HandleChallengeJoin({channelId : 123});
-	// this.m_oClient.CreateChallenge();
+	// //this.m_oClient.CreateChallenge();
 	//
 	// //_____________
 };

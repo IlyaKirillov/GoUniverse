@@ -58,6 +58,28 @@
 	border           : 1px solid black;
 }
 
+.ButtonCommon {
+	background-color    : rgb(234, 234, 234);
+	border              : 1px solid rgb(172, 172, 172);
+
+	text-decoration     : none;
+	outline             : none;
+	box-sizing          : border-box;
+	color               : #000000;
+	cursor              : pointer;
+	transition-property : width, height, background, margin, border, padding;
+	transition-duration : 0.25s;
+}
+
+.ButtonCommon:hover {
+	background-color : rgb(245, 245, 245);
+}
+
+.ButtonCommon:active {
+	background-color : rgb(234, 234, 234);
+	border           : 1px solid black;
+}
+
 .ButtonExit {
 	background-color       : transparent;
 

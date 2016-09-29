@@ -347,6 +347,10 @@ CDrawing.prototype.Create_GoUniverseMatchTemplate = function(sDivId, oApp, oTab,
 	this.m_oWhiteTime     = oGameRoom.GetWhiteTime();
 	this.m_oGameRoom      = oGameRoom;
 
+	this.m_fOnStartCounting = null;
+	this.m_fOnEndCounting   = null;
+	this.m_oCountingScores  = new CGoUniverseDrawingCountingScores(this, oGameRoom);
+
 	this.private_GoUniverseCreateWrappingMainDiv(sDivId);
 	this.private_GoUniverseCreateMatchTemplate();
 	this.Set_TemplateType(EDrawingTemplate.GoUniverseMatch);
@@ -360,6 +364,7 @@ CDrawing.prototype.private_GoUniverseCreateMatchTemplate = function()
 
 	this.m_nMixedRightSide = 344;
 
+	var oDrawingCountingScores = this.m_oCountingScores;
 	//------------------------------------------------------------------------------------------------------------------
 	// Делим на две части. Правая - панель управления, информация и комменты. Левая - доска.
 	//------------------------------------------------------------------------------------------------------------------
@@ -397,17 +402,20 @@ CDrawing.prototype.private_GoUniverseCreateMatchTemplate = function()
 	var InfoH      = 200;
 	var ToolbarH   = 36 + 2; // 36 - buttons + 1 space + 1px top border
 	var ChatInputH = 30;
+	var CountingH  = oDrawingCountingScores.GetHeight();
 
 	var sGameInfoDivId = sPanelDivId + "G";
 	var sInfoDivId     = sPanelDivId + "I";
 	var sToolbarDivId  = sPanelDivId + "T";
 	var sChatsDivId    = sPanelDivId + "C";
+	var sCountingDivId = sPanelDivId + "S";
 
 
 	this.private_CreateDiv(oPanelControl.HtmlElement, sGameInfoDivId);
 	this.private_CreateDiv(oPanelControl.HtmlElement, sInfoDivId);
 	this.private_CreateDiv(oPanelControl.HtmlElement, sToolbarDivId);
 	this.private_CreateDiv(oPanelControl.HtmlElement, sChatsDivId);
+	this.private_CreateDiv(oPanelControl.HtmlElement, sCountingDivId);
 	//------------------------------------------------------------------------------------------------------------------
 	// Информация об партии
 	//------------------------------------------------------------------------------------------------------------------
@@ -491,6 +499,17 @@ CDrawing.prototype.private_GoUniverseCreateMatchTemplate = function()
 
 	this.m_aElements.push(oDrawingToolbar);
 	//------------------------------------------------------------------------------------------------------------------
+	// Панель подсчета очков
+	//------------------------------------------------------------------------------------------------------------------
+	var oCountingControlWrapper = CreateControlContainer(sCountingDivId);
+	oCountingControlWrapper.Bounds.SetParams(0, GameInfoH + InfoH, 0, 0, true, true, true, false, -1, CountingH - 1);
+	oCountingControlWrapper.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right);
+	oPanelControl.AddControl(oCountingControlWrapper);
+	oCountingControlWrapper.HtmlElement.style.borderTop  = "1px solid rgb(172, 172, 172)";
+	oDrawingCountingScores.Init(sCountingDivId);
+	oCountingControlWrapper.HtmlElement.style.display = "none";
+	this.m_aElements.push(oDrawingCountingScores);
+	//------------------------------------------------------------------------------------------------------------------
 	// Чат + ввод для чата + список игроков
 	//------------------------------------------------------------------------------------------------------------------
 	var oChatsControl = CreateControlContainer(sChatsDivId);
@@ -565,6 +584,22 @@ CDrawing.prototype.private_GoUniverseCreateMatchTemplate = function()
 
 	this.Update_Size();
 	oGameTree.On_EndLoadDrawing();
+
+	this.m_fOnStartCounting = function()
+	{
+		oCountingControlWrapper.HtmlElement.style.display = "block";
+		oToolBarControlWrapper.HtmlElement.style.display = "none";
+		oChatsControl.Bounds.SetParams(0, GameInfoH + InfoH + CountingH + 1, 0, 1000, true, true, true, false, -1, -1);
+		oThis.Update_Size();
+	};
+
+	this.m_fOnEndCounting = function()
+	{
+		oCountingControlWrapper.HtmlElement.style.display = "none";
+		oToolBarControlWrapper.HtmlElement.style.display = "block";
+		oChatsControl.Bounds.SetParams(0, GameInfoH + InfoH + ToolbarH + 1, 0, 1000, true, true, true, false, -1, -1);
+		oThis.Update_Size();
+	};
 };
 CDrawing.prototype.Add_CommentWithCoordinates = function(sComment)
 {
@@ -575,6 +610,20 @@ CDrawing.prototype.Add_CommentWithCoordinates = function(sComment)
 		else
 			this.m_oChatInput.value += sComment + " ";
 	}
+};
+CDrawing.prototype.GoUniverseOnStartCounting = function()
+{
+	if (this.m_fOnStartCounting)
+		this.m_fOnStartCounting();
+};
+CDrawing.prototype.GoUniverseOnEndCounting = function()
+{
+	if (this.m_fOnEndCounting)
+		this.m_fOnEndCounting();
+};
+CDrawing.prototype.GoUniverseUpdateScoresDone = function(bWhiteDone, bBlackDone)
+{
+	this.m_oCountingScores.UpdateDoneState(bWhiteDone, bBlackDone);
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1612,4 +1661,202 @@ CGoUniverseButtonAnalyze.prototype.private_HandleMouseDown = function()
 CGoUniverseButtonAnalyze.prototype.private_GetHint = function()
 {
 	return "Analyze the game";
+};
+//----------------------------------------------------------------------------------------------------------------------
+// Панелька с подсчетом очков
+//----------------------------------------------------------------------------------------------------------------------
+function CGoUniverseDrawingCountingScores(oDrawing, oGameRoom)
+{
+	this.m_oDrawing  = oDrawing;
+	this.m_oGameRoom = oGameRoom;
+
+	this.m_oMainControl = null;
+	this.m_oMainDiv     = null;
+
+	this.nHeaderH = 40;
+	this.nInfoH   = 70;
+	this.nPlayerH = 25;
+	this.nButtonH = 30;
+
+	this.m_sWhiteName = oGameRoom.GetWhiteName();
+	this.m_sBlackName = oGameRoom.GetBlackName();
+
+	this.m_oWhiteDone = null;
+	this.m_oBlackDone = null;
+}
+CGoUniverseDrawingCountingScores.prototype.Init = function(sDivId)
+{
+	this.m_oMainControl = CreateControlContainer(sDivId);
+	this.m_oMainDiv     = this.m_oMainControl.HtmlElement;
+
+	var nHeaderH = this.nHeaderH;
+	var nInfoH   = this.nInfoH;
+	var nPlayerH = this.nPlayerH;
+	var nButtonH = this.nButtonH;
+
+	var oHeaderDiv = this.private_CreateDiv(this.m_oMainDiv);
+	var oInfoDiv   = this.private_CreateDiv(this.m_oMainDiv);
+	var oWhiteDiv  = this.private_CreateDiv(this.m_oMainDiv);
+	var oBlackDiv  = this.private_CreateDiv(this.m_oMainDiv);
+	var oAcceptDiv = this.private_CreateDiv(this.m_oMainDiv);
+	var oResumeDiv = this.private_CreateDiv(this.m_oMainDiv);
+
+	this.private_CreateHeader(0, nHeaderH, oHeaderDiv);
+	this.private_CreateInfo(nHeaderH, nInfoH, oInfoDiv);
+	this.m_oWhiteDone = this.private_CreatePlayer(nHeaderH + nInfoH, nPlayerH, oWhiteDiv, this.m_sWhiteName);
+	this.m_oBlackDone = this.private_CreatePlayer(nHeaderH + nInfoH + nPlayerH, nPlayerH, oBlackDiv, this.m_sBlackName);
+	this.private_CreateAcceptButton(nHeaderH + nInfoH + 2 * nPlayerH, nButtonH, oAcceptDiv);
+	this.private_CreateResumeButton(nHeaderH + nInfoH + 2 * nPlayerH + nButtonH, nButtonH, oResumeDiv);
+};
+CGoUniverseDrawingCountingScores.prototype.private_CreateDiv = function(oParent)
+{
+	var oElement = document.createElement("div");
+	oElement.setAttribute("style", "position:absolute;padding:0;margin:0;");
+	oElement.setAttribute("oncontextmenu", "return false;");
+	oParent.appendChild(oElement);
+	return oElement;
+};
+CGoUniverseDrawingCountingScores.prototype.Update_Size = function()
+{
+	this.m_oMainControl.Resize(this.m_oMainDiv.width, this.m_oMainDiv.height);
+};
+CGoUniverseDrawingCountingScores.prototype.private_CreatePlayer = function(nTop, nPlayerH, oPlayerDiv, sName)
+{
+	var oPlayerControl = CreateControlContainterByElement(oPlayerDiv);
+	oPlayerControl.Bounds.SetParams(0, nTop, 0, 0, true, true, true, false, -1, nPlayerH);
+	oPlayerControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right);
+	this.m_oMainControl.AddControl(oPlayerControl);
+
+	var oInnerDiv = document.createElement("div");
+	oInnerDiv.style.width       = "150px";
+	oInnerDiv.style.display     = "block";
+	oInnerDiv.style.marginLeft  = "auto";
+	oInnerDiv.style.marginRight = "auto";
+	oPlayerDiv.appendChild(oInnerDiv);
+
+	var oBoolDiv = document.createElement("div");
+	oBoolDiv.style["float"]  = "left";
+	oBoolDiv.style.color     = "red";
+	oBoolDiv.innerHTML       = "X";
+	oBoolDiv.style.width     = "30px";
+	oBoolDiv.style.textAlign = "center";
+	oBoolDiv.style.fontSize    = "14px";
+	oBoolDiv.style.fontFamily  = "'Segoe UI', Tahoma, sans-serif";
+	oInnerDiv.appendChild(oBoolDiv);
+
+	var oNameDiv = document.createElement("div");
+	oNameDiv.style["float"]  = "left";
+	oNameDiv.innerHTML       = sName;
+	oNameDiv.style.textAlign = "left";
+	oNameDiv.style.fontSize    = "14px";
+	oNameDiv.style.fontFamily  = "'Segoe UI', Tahoma, sans-serif";
+	oInnerDiv.appendChild(oNameDiv);
+
+	return oBoolDiv;
+};
+CGoUniverseDrawingCountingScores.prototype.private_CreateHeader = function(nTop, nH, oDiv)
+{
+	var oHeaderControl = CreateControlContainterByElement(oDiv);
+	oHeaderControl.Bounds.SetParams(0, nTop, 0, 0, true, true, true, false, -1, nH);
+	oHeaderControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right);
+	this.m_oMainControl.AddControl(oHeaderControl);
+	oHeaderControl.HtmlElement.style.borderBottom  = "1px solid rgb(172, 172, 172)";
+	oDiv.innerHTML        = "Score counting phase";
+	oDiv.style.textAlign  = "center";
+	oDiv.style.fontSize   = "25px";
+	oDiv.style.fontFamily = "'Segoe UI', Tahoma, sans-serif";
+};
+CGoUniverseDrawingCountingScores.prototype.private_CreateInfo = function(nTop, nH, oDiv)
+{
+	var oInfoControl = CreateControlContainterByElement(oDiv);
+	oInfoControl.Bounds.SetParams(0, nTop, 0, 0, true, true, true, false, -1, nH);
+	oInfoControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right);
+	this.m_oMainControl.AddControl(oInfoControl);
+	var oInfoInnerDiv = document.createElement("div");
+	oInfoInnerDiv.innerHTML         = "Both players now select and agree upon which groups should be considered 'dead' for the purpose of scoring.";
+	oInfoInnerDiv.style.width       = "300px";
+	oInfoInnerDiv.style.display     = "block";
+	oInfoInnerDiv.style.marginLeft  = "auto";
+	oInfoInnerDiv.style.marginRight = "auto";
+	oInfoInnerDiv.style.fontSize    = "14px";
+	oInfoInnerDiv.style.textAlign   = "center";
+	oInfoInnerDiv.style.fontFamily  = "'Segoe UI', Tahoma, sans-serif";
+	oDiv.appendChild(oInfoInnerDiv);
+};
+CGoUniverseDrawingCountingScores.prototype.private_CreateAcceptButton = function(nTop, nH, oButtonDiv)
+{
+	var oButtonControl = CreateControlContainterByElement(oButtonDiv);
+	oButtonControl.Bounds.SetParams(0, nTop, 0, 0, true, true, true, true, -1, nH);
+	oButtonControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right);
+	this.m_oMainControl.AddControl(oButtonControl);
+
+	var oButton = document.createElement("div");
+	oButtonDiv.appendChild(oButton);
+	oButton.innerHTML = "Accept";
+	oButton.className = "ButtonGreen";
+	oButton.style.textAlign   = "center";
+	oButton.style.width       = "200px";
+	oButton.style.height      = (nH - 5) + "px";
+	oButton.style.display     = "block";
+	oButton.style.marginLeft  = "auto";
+	oButton.style.marginRight = "auto";
+	oButton.style.lineHeight  = (nH - 5 - 2) + "px";
+	oButton.style.fontSize    = "14px";
+	oButton.style.fontFamily  = "'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif";
+
+	var oThis = this;
+	oButton.addEventListener("click", function()
+	{
+		oThis.m_oGameRoom.SendDone();
+	}, false);
+};
+CGoUniverseDrawingCountingScores.prototype.private_CreateResumeButton = function(nTop, nH, oButtonDiv)
+{
+	var oButtonControl = CreateControlContainterByElement(oButtonDiv);
+	oButtonControl.Bounds.SetParams(0, nTop, 0, 0, true, true, true, true, -1, nH);
+	oButtonControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right);
+	this.m_oMainControl.AddControl(oButtonControl);
+
+	var oButton = document.createElement("div");
+	oButtonDiv.appendChild(oButton);
+	oButton.innerHTML = "Cancel and resume game";
+	oButton.className = "ButtonCommon";
+	oButton.style.textAlign   = "center";
+	oButton.style.width       = "200px";
+	oButton.style.height      = (nH - 5) + "px";
+	oButton.style.display     = "block";
+	oButton.style.marginLeft  = "auto";
+	oButton.style.marginRight = "auto";
+	oButton.style.lineHeight  = (nH - 5 - 2) + "px";
+	oButton.style.fontSize    = "14px";
+	oButton.style.fontFamily  = "'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif";
+
+	var oThis = this;
+	oButton.addEventListener("click", function()
+	{
+		oThis.m_oGameRoom.RequestUndo();
+	}, false);
+};
+CGoUniverseDrawingCountingScores.prototype.GetHeight = function()
+{
+	return this.nHeaderH + this.nInfoH + 2 * this.nPlayerH + 2 * this.nButtonH + 3;
+};
+CGoUniverseDrawingCountingScores.prototype.UpdateDoneState = function(bWhiteDone, bBlackDone)
+{
+	function privateSet(bDone, oBoolDiv)
+	{
+		if (true !== bDone)
+		{
+			oBoolDiv.style.color = "red";
+			oBoolDiv.innerHTML   = "X";
+		}
+		else
+		{
+			oBoolDiv.style.color = "green";
+			oBoolDiv.innerHTML   = "0";
+		}
+	}
+
+	privateSet(bWhiteDone, this.m_oWhiteDone);
+	privateSet(bBlackDone, this.m_oBlackDone);
 };
