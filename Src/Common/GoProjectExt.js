@@ -495,6 +495,7 @@ CDrawing.prototype.private_GoUniverseCreateMatchTemplate = function()
 	oDrawingToolbar.Add_Control(new CGoUniverseButtonPass(this, this.m_oGameRoom), 72, 1, EToolbarFloat.Left);
 	oDrawingToolbar.Add_Control(new CGoUniverseButtonResign(this, this.m_oGameRoom), 72, 1, EToolbarFloat.Left);
 	oDrawingToolbar.Add_Control(new CDrawingButtonAbout(this), 36, 1, EToolbarFloat.Right);
+	oDrawingToolbar.Add_Control(new CDrawingButtonGameInfo(this), 36, 1, EToolbarFloat.Right);
 	oDrawingToolbar.Init(sToolbarInnerDivId, oGameTree);
 
 	this.m_aElements.push(oDrawingToolbar);
@@ -1736,8 +1737,8 @@ CGoUniverseDrawingCountingScores.prototype.private_CreatePlayer = function(nTop,
 
 	var oBoolDiv = document.createElement("div");
 	oBoolDiv.style["float"]  = "left";
-	oBoolDiv.style.color     = "red";
-	oBoolDiv.innerHTML       = "X";
+	oBoolDiv.style.color     = "rgb(199,40,40)";
+	oBoolDiv.innerHTML       = String.fromCharCode(0x2716);
 	oBoolDiv.style.width     = "30px";
 	oBoolDiv.style.textAlign = "center";
 	oBoolDiv.style.fontSize    = "14px";
@@ -1847,13 +1848,13 @@ CGoUniverseDrawingCountingScores.prototype.UpdateDoneState = function(bWhiteDone
 	{
 		if (true !== bDone)
 		{
-			oBoolDiv.style.color = "red";
-			oBoolDiv.innerHTML   = "X";
+			oBoolDiv.style.color = "rgb(199,40,40)";
+			oBoolDiv.innerHTML   = String.fromCharCode(0x2716);
 		}
 		else
 		{
-			oBoolDiv.style.color = "green";
-			oBoolDiv.innerHTML   = "0";
+			oBoolDiv.style.color = "rgb(0,130,57)";
+			oBoolDiv.innerHTML   = String.fromCharCode(0x2714);
 		}
 	}
 

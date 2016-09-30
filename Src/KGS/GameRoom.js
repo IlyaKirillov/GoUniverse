@@ -360,6 +360,14 @@ CKGSGameRoom.prototype.HandleScore = function(sScore)
 
 		if (this.m_oStateHandler)
 			this.m_oStateHandler.Update();
+
+		if (this.IsPlayer())
+		{
+			this.EndCountScores();
+			this.m_oGameTree.Set_Handler(null);
+			this.m_oGameTree.Set_ShowTarget(true, true);
+			this.m_oGameTree.Set_EditingFlags({Move : true, NewNode : true, ChangeBoardMode : true, ViewPort : true});
+		}
 	}
 
 	if (this.m_oCommentsHandler)
