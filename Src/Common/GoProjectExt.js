@@ -1071,8 +1071,26 @@ CGoUniverseDrawingPlayerInfo.prototype.Init = function(sDivId, oGameTree, nPlaye
 	{
 		Common.Set_InnerTextToElement(oTimeDiv, oTimeSettings.ToString());
 
+		var oGameRoom = this.m_oDrawing.m_oGameRoom;
+		var oSound = oApp.GetSound();
 		oTimeSettings.SetOnTick(function(sTime)
 		{
+			if (oGameRoom.IsPlayer() && oGameRoom.IsOurMove())
+			{
+				if (this.IsAbsolute())
+				{
+
+				}
+				else if (this.IsByoYomi())
+				{
+					oSound.PlayCountDown(this.GetCurrentOverTime());
+				}
+				else if (this.IsCanadian())
+				{
+					oSound.PlayCountDown(this.GetCurrentOverTime());
+				}
+			}
+
 			Common.Set_InnerTextToElement(oTimeDiv, sTime);
 		});
 	}

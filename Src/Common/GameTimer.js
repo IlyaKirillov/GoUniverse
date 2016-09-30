@@ -214,6 +214,7 @@ CTimeSettings.prototype.private_OnTickTimer = function(nSecondsLeft)
 		}
 		else
 		{
+			this.m_nOverTimeCur = Math.max(0, nSecondsLeft);
 			if (this.m_fOnTick)
 				this.m_fOnTick(this.private_SecondsToString(nSecondsLeft) + " (" + this.m_nOverCountCur + ")");
 		}
@@ -445,4 +446,8 @@ CTimeSettings.prototype.GetOverTime = function()
 CTimeSettings.prototype.GetOverCount = function()
 {
 	return this.m_nOverCount;
+};
+CTimeSettings.prototype.GetCurrentOverTime = function()
+{
+	return this.m_nOverTimeCur;
 };
