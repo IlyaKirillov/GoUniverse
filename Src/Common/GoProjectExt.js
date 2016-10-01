@@ -626,7 +626,6 @@ CDrawing.prototype.GoUniverseUpdateScoresDone = function(bWhiteDone, bBlackDone)
 {
 	this.m_oCountingScores.UpdateDoneState(bWhiteDone, bBlackDone);
 };
-
 //----------------------------------------------------------------------------------------------------------------------
 // Специальный класс с комментариями
 //----------------------------------------------------------------------------------------------------------------------
@@ -1741,7 +1740,7 @@ CGoUniverseDrawingCountingScores.prototype.Update_Size = function()
 };
 CGoUniverseDrawingCountingScores.prototype.private_CreatePlayer = function(nTop, nPlayerH, oPlayerDiv, sName)
 {
-	var oPlayerControl = CreateControlContainterByElement(oPlayerDiv);
+	var oPlayerControl = CreateControlContainerByElement(oPlayerDiv);
 	oPlayerControl.Bounds.SetParams(0, nTop, 0, 0, true, true, true, false, -1, nPlayerH);
 	oPlayerControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right);
 	this.m_oMainControl.AddControl(oPlayerControl);
@@ -1775,7 +1774,7 @@ CGoUniverseDrawingCountingScores.prototype.private_CreatePlayer = function(nTop,
 };
 CGoUniverseDrawingCountingScores.prototype.private_CreateHeader = function(nTop, nH, oDiv)
 {
-	var oHeaderControl = CreateControlContainterByElement(oDiv);
+	var oHeaderControl = CreateControlContainerByElement(oDiv);
 	oHeaderControl.Bounds.SetParams(0, nTop, 0, 0, true, true, true, false, -1, nH);
 	oHeaderControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right);
 	this.m_oMainControl.AddControl(oHeaderControl);
@@ -1787,7 +1786,7 @@ CGoUniverseDrawingCountingScores.prototype.private_CreateHeader = function(nTop,
 };
 CGoUniverseDrawingCountingScores.prototype.private_CreateInfo = function(nTop, nH, oDiv)
 {
-	var oInfoControl = CreateControlContainterByElement(oDiv);
+	var oInfoControl = CreateControlContainerByElement(oDiv);
 	oInfoControl.Bounds.SetParams(0, nTop, 0, 0, true, true, true, false, -1, nH);
 	oInfoControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right);
 	this.m_oMainControl.AddControl(oInfoControl);
@@ -1804,7 +1803,7 @@ CGoUniverseDrawingCountingScores.prototype.private_CreateInfo = function(nTop, n
 };
 CGoUniverseDrawingCountingScores.prototype.private_CreateAcceptButton = function(nTop, nH, oButtonDiv)
 {
-	var oButtonControl = CreateControlContainterByElement(oButtonDiv);
+	var oButtonControl = CreateControlContainerByElement(oButtonDiv);
 	oButtonControl.Bounds.SetParams(0, nTop, 0, 0, true, true, true, true, -1, nH);
 	oButtonControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right);
 	this.m_oMainControl.AddControl(oButtonControl);
@@ -1831,7 +1830,7 @@ CGoUniverseDrawingCountingScores.prototype.private_CreateAcceptButton = function
 };
 CGoUniverseDrawingCountingScores.prototype.private_CreateResumeButton = function(nTop, nH, oButtonDiv)
 {
-	var oButtonControl = CreateControlContainterByElement(oButtonDiv);
+	var oButtonControl = CreateControlContainerByElement(oButtonDiv);
 	oButtonControl.Bounds.SetParams(0, nTop, 0, 0, true, true, true, true, -1, nH);
 	oButtonControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right);
 	this.m_oMainControl.AddControl(oButtonControl);

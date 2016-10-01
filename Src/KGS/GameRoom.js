@@ -38,6 +38,7 @@ function CKGSGameRoom(oClient, nGameRoomId)
 	this.m_bBlackDone          = false;
 	this.m_bWhiteDone          = false;
 	this.m_nScoresDoneId       = -1;
+	this.m_bUndoForbidden      = false;
 }
 CKGSGameRoom.prototype.GetRoomId = function()
 {
@@ -1280,6 +1281,14 @@ CKGSGameRoom.prototype.GetWhiteName = function()
 		return this.m_oWhite.GetName();
 
 	return "";
+};
+CKGSGameRoom.prototype.ForbidUndo = function()
+{
+	this.m_bUndoForbidden = true;
+};
+CKGSGameRoom.prototype.IsUndoForbidden = function()
+{
+	return this.m_bUndoForbidden;
 };
 
 function CKGSEditorHandler(oClient, oGame)

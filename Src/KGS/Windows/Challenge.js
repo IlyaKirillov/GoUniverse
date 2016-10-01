@@ -4,7 +4,7 @@
  * Copyright 2016 the GoUniverse project authors.
  * All rights reserved.
  * Project  GoUniverse
- * Author   Ilya Kirillovhandled the situation when a reference footnote lies inside a table.
+ * Author   Ilya Kirillov
  * Date     08.09.2016
  * Time     23:29
  */
@@ -521,13 +521,13 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 	var oMainControl = this.HtmlElement.InnerControl;
 
 	var oWrapperDiv     = this.protected_CreateDivElement(oMainDiv);
-	var oWrapperControl = CreateControlContainterByElement(oWrapperDiv);
+	var oWrapperControl = CreateControlContainerByElement(oWrapperDiv);
 	oWrapperControl.SetParams(nLeftWidth, 0, 1000, 1000, true, false, false, false, -1, this.m_nHeaderHeight);
 	oWrapperControl.SetAnchor(false, true, true, false);
 	oMainControl.AddControl(oWrapperControl);
 
 	var oInput = this.protected_CreateDivElement(oWrapperDiv, null, "input");
-	var oInputControl = CreateControlContainterByElement(oInput);
+	var oInputControl = CreateControlContainerByElement(oInput);
 	oInputControl.SetParams(5, 5, 5, 0, true, true, true, true, -1, -1);
 	oInputControl.SetAnchor(true, true, true, true);
 	oWrapperControl.AddControl(oInputControl);
@@ -538,7 +538,7 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 		oInput.value = sComment;
 
 	var oWrapperTypeDiv     = this.protected_CreateDivElement(oMainDiv);
-	var oWrapperTypeControl = CreateControlContainterByElement(oWrapperTypeDiv);
+	var oWrapperTypeControl = CreateControlContainerByElement(oWrapperTypeDiv);
 	oWrapperTypeControl.SetParams(0, 0, -1, -1, true, true, false, false, nLeftWidth, this.m_nHeaderHeight);
 	oWrapperTypeControl.SetAnchor(true, true, false, false);
 	oMainControl.AddControl(oWrapperTypeControl);
@@ -573,7 +573,7 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 		}
 	}
 
-	var oTypeListControl = CreateControlContainterByElement(oTypeList);
+	var oTypeListControl = CreateControlContainerByElement(oTypeList);
 	oTypeListControl.SetParams(5, 5, 5, 0, true, true, true, true, -1, -1);
 	oTypeListControl.SetAnchor(true, true, true, true);
 	oWrapperTypeControl.AddControl(oTypeListControl);
@@ -614,7 +614,7 @@ CKGSChallengeWindow.prototype.private_CreatePlayers = function()
 	var oMainControl = this.HtmlElement.InnerControl;
 
 	var oPlayersColor        = this.protected_CreateDivElement(oMainDiv, null, "canvas");
-	var oPlayersColorControl = CreateControlContainterByElement(oPlayersColor);
+	var oPlayersColorControl = CreateControlContainerByElement(oPlayersColor);
 	oPlayersColorControl.SetParams(10, nTop, 0, 0, true, true, false, false, 50, 2 * this.m_nPlayersHeight);
 	oPlayersColorControl.SetAnchor(true, true, false, false);
 	oMainControl.AddControl(oPlayersColorControl);
@@ -626,7 +626,7 @@ CKGSChallengeWindow.prototype.private_CreatePlayers = function()
 	oPlayersColor.addEventListener("click", this.private_OnChangeColors, false);
 
 	var oCreatorPlayer = this.protected_CreateDivElement(oMainDiv);
-	var oCreatorControl = CreateControlContainterByElement(oCreatorPlayer);
+	var oCreatorControl = CreateControlContainerByElement(oCreatorPlayer);
 	oCreatorControl.SetParams(70, nTop, 10, 0, true, true, true, false, -1, this.m_nPlayersHeight);
 	oCreatorControl.SetAnchor(true, true, true, false);
 	oMainControl.AddControl(oCreatorControl);
@@ -649,14 +649,14 @@ CKGSChallengeWindow.prototype.private_CreatePlayers = function()
 	}
 
 	var oChallengerListElement = this.protected_CreateDivElement(oMainDiv, "", "select");
-	var oChallengerListControl = CreateControlContainterByElement(oChallengerListElement);
+	var oChallengerListControl = CreateControlContainerByElement(oChallengerListElement);
 	oChallengerListControl.SetParams(70, nTop + this.m_nPlayersHeight, 10, 0, true, true, true, false, -1, this.m_nPlayersHeight);
 	oChallengerListControl.SetAnchor(true, true, true, false);
 	oMainControl.AddControl(oChallengerListControl);
 	this.private_AddOptionToSelect(oChallengerListElement, "");
 
 	var oChallengerPlayer = this.protected_CreateDivElement(oMainDiv);
-	var oChallengerControl = CreateControlContainterByElement(oChallengerPlayer);
+	var oChallengerControl = CreateControlContainerByElement(oChallengerPlayer);
 	oChallengerControl.SetParams(70 + 1, nTop + this.m_nPlayersHeight + 1, 50, 0, true, true, true, false, -1, this.m_nPlayersHeight - 2);
 	oChallengerControl.SetAnchor(true, true, true, false);
 	oMainControl.AddControl(oChallengerControl);
@@ -913,7 +913,7 @@ CKGSChallengeWindow.prototype.private_AddRulesField = function(nLeftWidth, nTop,
 	var oMainControl = this.HtmlElement.InnerControl;
 
 	var oTitleElement = this.protected_CreateDivElement(oMainDiv);
-	var oTitleControl = CreateControlContainterByElement(oTitleElement);
+	var oTitleControl = CreateControlContainerByElement(oTitleElement);
 	oTitleControl.SetParams(10, nTop, 0, 0, true, true, false, false, nLeftWidth, this.m_nFieldHeight);
 	oTitleControl.SetAnchor(true, true, false, false);
 	oMainControl.AddControl(oTitleControl);
@@ -923,7 +923,7 @@ CKGSChallengeWindow.prototype.private_AddRulesField = function(nLeftWidth, nTop,
 	var oElement = this.protected_CreateDivElement(oMainDiv, "", sTag);
 	oElement.style.padding = "";
 
-	var oControl = CreateControlContainterByElement(oElement);
+	var oControl = CreateControlContainerByElement(oElement);
 	oControl.SetParams(20 + nLeftWidth, nTop + 1, 5, 0, true, true, true, false, -1, this.m_nFieldHeight - 2);
 	oControl.SetAnchor(true, true, true, false);
 	oMainControl.AddControl(oControl);
@@ -951,7 +951,7 @@ CKGSChallengeWindow.prototype.private_CreateButtons = function()
 	// Close - общая кнопка
 	var sCloseButtonId      = sMainId + "Z";
 	var oCloseButtonElement = this.protected_CreateDivElement(oMainDiv, sCloseButtonId);
-	var oCloseButtonControl = CreateControlContainterByElement(oCloseButtonElement);
+	var oCloseButtonControl = CreateControlContainerByElement(oCloseButtonElement);
 	oCloseButtonControl.SetParams(0, 0, 5, 5, false, false, true, true, nButtonW, nButtonH);
 	oCloseButtonControl.SetAnchor(false, false, true, true);
 	oMainControl.AddControl(oCloseButtonControl);
@@ -965,7 +965,7 @@ CKGSChallengeWindow.prototype.private_CreateButtons = function()
 	// Create - кнопка для создания вызова
 	var sCreateButtonId      = sMainId + "C";
 	var oCreateButtonElement = this.protected_CreateDivElement(oMainDiv, sCreateButtonId);
-	var oCreateButtonControl = CreateControlContainterByElement(oCreateButtonElement);
+	var oCreateButtonControl = CreateControlContainerByElement(oCreateButtonElement);
 	oCreateButtonControl.SetParams(0, 0, 5 + nButtonW + 5, 5, false, false, true, true, nButtonW, nButtonH);
 	oCreateButtonControl.SetAnchor(false, false, true, true);
 	oMainControl.AddControl(oCreateButtonControl);
@@ -979,7 +979,7 @@ CKGSChallengeWindow.prototype.private_CreateButtons = function()
 	// Ok - кнопка для подтверждения
 	var sOkButtonId      = sMainId + "O";
 	var oOkButtonElement = this.protected_CreateDivElement(oMainDiv, sOkButtonId);
-	var oOkButtonControl = CreateControlContainterByElement(oOkButtonElement);
+	var oOkButtonControl = CreateControlContainerByElement(oOkButtonElement);
 	oOkButtonControl.SetParams(0, 0, 5 + nButtonW + 5, 5, false, false, true, true, nButtonW, nButtonH);
 	oOkButtonControl.SetAnchor(false, false, true, true);
 	oMainControl.AddControl(oOkButtonControl);
@@ -993,7 +993,7 @@ CKGSChallengeWindow.prototype.private_CreateButtons = function()
 	// Retry - кнопка для отмены предложения
 	var sRetryButtonId      = sMainId + "R";
 	var oRetryButtonElement = this.protected_CreateDivElement(oMainDiv, sRetryButtonId);
-	var oRetryButtonControl = CreateControlContainterByElement(oRetryButtonElement);
+	var oRetryButtonControl = CreateControlContainerByElement(oRetryButtonElement);
 	oRetryButtonControl.SetParams(0, 0, 5 + nButtonW + 5, 5, false, false, true, true, nButtonW, nButtonH);
 	oRetryButtonControl.SetAnchor(false, false, true, true);
 	oMainControl.AddControl(oRetryButtonControl);

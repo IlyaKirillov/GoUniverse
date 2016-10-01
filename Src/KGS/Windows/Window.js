@@ -20,7 +20,8 @@ var EKGSWindowType = {
 	Idle        : 4,
 	SgfViewer   : 5,
 	Challenge   : 6,
-	ConfirmBase : 7
+	ConfirmBase : 7,
+	UndoRequest : 8
 };
 
 var g_aKGSWindows      = {};
@@ -39,15 +40,36 @@ function CreateKGSWindow(nWindowType, oPr)
 	var sApp = "unknownwindow";
 	switch (nWindowType)
 	{
-	case EKGSWindowType.GoUniverseAbout : sApp = "GoUniverseAbout"; break;
-	case EKGSWindowType.RoomList        : sApp = "RoomList"; break;
-	case EKGSWindowType.UserInfo        : sApp = "UserInfo_" + oPr.UserName; break;
-	case EKGSWindowType.RoomInfo        : sApp = "RoomInfo_" + oPr.RoomId; break;
-	case EKGSWindowType.Information     : sApp = "Information" + (new Date()).getTime(); break;
-	case EKGSWindowType.Idle            : sApp = "Idle"; break;
-	case EKGSWindowType.SgfViewer       : sApp = "SgfViewer_" + oPr.Url; break;
-	case EKGSWindowType.Challenge       : sApp = "Challenge_" + oPr.ChannelId; break;
-	case EKGSWindowType.ConfirmBase     : sApp = "ConfirmBase_" + oPr.WindowId; break;
+		case EKGSWindowType.GoUniverseAbout :
+			sApp = "GoUniverseAbout";
+			break;
+		case EKGSWindowType.RoomList        :
+			sApp = "RoomList";
+			break;
+		case EKGSWindowType.UserInfo        :
+			sApp = "UserInfo_" + oPr.UserName;
+			break;
+		case EKGSWindowType.RoomInfo        :
+			sApp = "RoomInfo_" + oPr.RoomId;
+			break;
+		case EKGSWindowType.Information     :
+			sApp = "Information" + (new Date()).getTime();
+			break;
+		case EKGSWindowType.Idle            :
+			sApp = "Idle";
+			break;
+		case EKGSWindowType.SgfViewer       :
+			sApp = "SgfViewer_" + oPr.Url;
+			break;
+		case EKGSWindowType.Challenge       :
+			sApp = "Challenge_" + oPr.ChannelId;
+			break;
+		case EKGSWindowType.ConfirmBase     :
+			sApp = "ConfirmBase_" + oPr.WindowId;
+			break;
+		case EKGSWindowType.UndoRequest:
+			sApp = "UndoRequest_" + oPr.WindowId;
+			break;
 	}
 	var sId = sParentId + sApp;
 
@@ -71,15 +93,36 @@ function CreateKGSWindow(nWindowType, oPr)
 
 		switch (nWindowType)
 		{
-		case EKGSWindowType.GoUniverseAbout : oWindow = new CGoUniverseAboutWindow(); break;
-		case EKGSWindowType.RoomList        : oWindow = new CKGSRoomListWindow(); break;
-		case EKGSWindowType.UserInfo        : oWindow = new CKGSUserInfoWindow(); break;
-		case EKGSWindowType.RoomInfo        : oWindow = new CKGSRoomInfoWindow(); break;
-		case EKGSWindowType.Information     : oWindow = new CKGSInformationWindow(); break;
-		case EKGSWindowType.Idle            : oWindow = new CKGSInformationIdleWindow(); break;
-		case EKGSWindowType.SgfViewer       : oWindow = new CKGSSgfViewerWindow(); break;
-		case EKGSWindowType.Challenge       : oWindow = new CKGSChallengeWindow(); break;
-		case EKGSWindowType.ConfirmBase     : oWindow = new CKGSWindowConfirmBase(); break;
+			case EKGSWindowType.GoUniverseAbout :
+				oWindow = new CGoUniverseAboutWindow();
+				break;
+			case EKGSWindowType.RoomList        :
+				oWindow = new CKGSRoomListWindow();
+				break;
+			case EKGSWindowType.UserInfo        :
+				oWindow = new CKGSUserInfoWindow();
+				break;
+			case EKGSWindowType.RoomInfo        :
+				oWindow = new CKGSRoomInfoWindow();
+				break;
+			case EKGSWindowType.Information     :
+				oWindow = new CKGSInformationWindow();
+				break;
+			case EKGSWindowType.Idle            :
+				oWindow = new CKGSInformationIdleWindow();
+				break;
+			case EKGSWindowType.SgfViewer       :
+				oWindow = new CKGSSgfViewerWindow();
+				break;
+			case EKGSWindowType.Challenge       :
+				oWindow = new CKGSChallengeWindow();
+				break;
+			case EKGSWindowType.ConfirmBase     :
+				oWindow = new CKGSWindowConfirmBase();
+				break;
+			case EKGSWindowType.UndoRequest:
+				oWindow = new CKGSUndoRequestWindow();
+				break;
 		}
 
 		oWindows[sId] = oWindow;
@@ -291,7 +334,7 @@ CKGSWindowConfirmBase.prototype.Init = function(sDivId, oPr)
 	if (oPr.W)
 		this.m_nDefW = oPr.W;
 
-	CKGSWindowOKBase.superclass.Init.call(this, sDivId, oPr.Resizeable);
+	CKGSWindowConfirmBase.superclass.Init.call(this, sDivId, oPr.Resizeable);
 	this.m_oApp    = oPr.App;
 	this.m_oClient = oPr.Client;
 	this.private_UpdatePosition();

@@ -1871,14 +1871,15 @@ CKGSClient.prototype.private_HandleGameUndoRequest = function(oMessage)
 {
 	var nChannelId = oMessage.channelId;
 	var oGame = this.m_aGames[nChannelId];
-	if (oGame)
+	if (oGame && true !== oGame.IsUndoForbidden())
 	{
-		CreateKGSWindow(EKGSWindowType.ConfirmBase, {
+		CreateKGSWindow(EKGSWindowType.UndoRequest, {
 			App        : this.m_oApp,
 			Client     : this,
-			Text       : "Undo request. Accept?",
-			WindowId   : "UndoRequest",
-			W          : 300,
+			Text       : "The opponent has requested an undo for their last move. Do you want to perform an undo?",
+			WindowId   : nChannelId,
+			GameRoom   : oGame,
+			W          : 320,
 			H          : 140,
 			Resizeable : false,
 			OkHandler  : function()
