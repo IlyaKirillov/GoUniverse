@@ -364,10 +364,8 @@ CKGSGameRoom.prototype.HandleScore = function(sScore)
 
 		if (this.IsPlayer())
 		{
-			this.EndCountScores();
-			this.m_oGameTree.Set_Handler(null);
-			this.m_oGameTree.Set_ShowTarget(true, true);
-			this.m_oGameTree.Set_EditingFlags({Move : true, NewNode : true, ChangeBoardMode : true, ViewPort : true});
+			this.m_oClient.m_oApp.GetSound().PlayBeepBeep();
+			this.SetViewMode();
 		}
 	}
 
@@ -388,6 +386,10 @@ CKGSGameRoom.prototype.ReadSgfEvents = function(arrSgfEvents, isOnLoad)
 	if (true === isOnLoad && !oCurNode)
 		oCurNode = oGameTree.Get_FirstNode();
 
+	var nBlackCapt = oGameTree.Get_BlackCapt();
+	var nWhiteCapt = oGameTree.Get_WhiteCapt();
+	var nPrevNode  = oGameTree.Get_CurNode();
+
 	if (oCurNode)
 	{
 		if (bGoToNode)
@@ -403,6 +405,21 @@ CKGSGameRoom.prototype.ReadSgfEvents = function(arrSgfEvents, isOnLoad)
 	{
 		if (bGoToNode)
 			oGameTree.Execute_CurNodeCommands();
+	}
+
+	var oNewCurNode = oGameTree.Get_CurNode();
+	if (this.IsPlayer() && nPrevNode !== oNewCurNode && oNewCurNode.Get_Prev() === nPrevNode && oNewCurNode.Have_Move())
+	{
+		var oSound = this.m_oClient.m_oApp.GetSound();
+
+		if (oGameTree.Is_CurrentMovePass())
+			oSound.PlayBeep();
+		else
+			oSound.Play_PlaceStone();
+
+		var nStonesCaptured = Math.max(oGameTree.Get_BlackCapt() - nBlackCapt, oGameTree.Get_WhiteCapt() - nWhiteCapt);
+		if (nStonesCaptured > 0)
+			oSound.Play_CaptureStones(nStonesCaptured);
 	}
 
 	if (oGameTree.m_oDrawingNavigator)
@@ -1185,6 +1202,8 @@ CKGSGameRoom.prototype.private_OurMove = function()
 	this.m_oGameTree.Set_ShowTarget(true, true);
 	this.m_oGameTree.Set_EditingFlags({NewNode : true, Move : true});
 
+	this.m_oClient.m_oApp.GetSound().ResetCountDown();
+
 	this.m_bOurMove = true;
 };
 CKGSGameRoom.prototype.private_OpponentMove = function()
@@ -1194,6 +1213,8 @@ CKGSGameRoom.prototype.private_OpponentMove = function()
 	this.m_oGameTree.Set_ShowTarget(false, true);
 	this.m_oGameTree.Forbid_All();
 	this.m_oGameTree.Set_EditingFlags({Move : true});
+
+	this.m_oClient.m_oApp.GetSound().StopCountDown();
 };
 CKGSGameRoom.prototype.IsCountingScores = function()
 {
@@ -1206,7 +1227,7 @@ CKGSGameRoom.prototype.StartCountScores = function()
 		this.m_bCountScores = true;
 		this.m_oGameTree.Get_DrawingBoard().Start_CountScoresInMatch();
 		this.m_oGameTree.Set_ShowTarget(true, true);
-		this.m_oGameTree.Get_Drawing().GoUniverseOnStartCounting();
+		this.m_oGameTree.Get_Drawing().GoUniverseOnCounting();
 	}
 };
 CKGSGameRoom.prototype.EndCountScores = function()
@@ -1216,8 +1237,17 @@ CKGSGameRoom.prototype.EndCountScores = function()
 		this.m_bCountScores = false;
 		this.m_oGameTree.Get_DrawingBoard().End_CountScoresInMatch();
 		this.m_oGameTree.Set_ShowTarget(false, true);
-		this.m_oGameTree.Get_Drawing().GoUniverseOnEndCounting();
+		this.m_oGameTree.Get_Drawing().GoUniverseOnMatch();
 	}
+};
+CKGSGameRoom.prototype.SetViewMode = function()
+{
+	this.EndCountScores();
+	this.m_oGameTree.Get_Drawing().GoUniverseOnView();
+
+	this.m_oGameTree.Set_Handler(null);
+	this.m_oGameTree.Set_ShowTarget(true, true);
+	this.m_oGameTree.Set_EditingFlags({Move : true, NewNode : true, ChangeBoardMode : true, ViewPort : true, ScoreEstimate : true});
 };
 CKGSGameRoom.prototype.private_SendCommand = function(oCommand)
 {
@@ -1252,9 +1282,10 @@ CKGSGameRoom.prototype.ToggleAnalyze = function()
 		var oHandler = this.m_oGameTree.Get_Handler();
 		if (oHandler && oHandler instanceof CKGSMatchHandler)
 		{
+			this.m_oGameTree.Get_Drawing().GoUniverseOnMatchAnalyze();
 			this.m_oGameTree.Set_Handler(null);
 			this.m_oGameTree.Set_ShowTarget(true, true);
-			this.m_oGameTree.Set_EditingFlags({NewNode : true, Move : true, ChangeBoardMode : true});
+			this.m_oGameTree.Set_EditingFlags({Move : true, NewNode : true, ChangeBoardMode : true, ViewPort : true, ScoreEstimate : true});
 		}
 		else
 		{
@@ -1265,6 +1296,11 @@ CKGSGameRoom.prototype.ToggleAnalyze = function()
 				this.private_OurMove();
 			else
 				this.private_OpponentMove();
+
+			if (this.IsCountingScores())
+				this.m_oGameTree.Get_Drawing().GoUniverseOnCounting();
+			else
+				this.m_oGameTree.Get_Drawing().GoUniverseOnMatch();
 		}
 	}
 };

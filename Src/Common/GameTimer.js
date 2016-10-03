@@ -451,3 +451,7 @@ CTimeSettings.prototype.GetCurrentOverTime = function()
 {
 	return this.m_nOverTimeCur;
 };
+CTimeSettings.prototype.GetCurrentMainTime = function()
+{
+	return this.m_nMainTime;
+};

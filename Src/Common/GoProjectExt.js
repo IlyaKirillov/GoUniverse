@@ -9,8 +9,6 @@
  * Time     2:33
  */
 
-var g_oDrawingBoardElements = null;
-
 String.prototype.IsLatinLetter = function(nPos)
 {
 	var nCharCode = this.charCodeAt(nPos);
@@ -111,7 +109,6 @@ CDrawing.prototype.private_GoUniverseCreateHorFullTemplate = function()
 	var sDivId       = sMainDivId;
 
 	this.m_nMixedRightSide = 344;
-
 	//------------------------------------------------------------------------------------------------------------------
 	// Делим на две части. Правая - панель управления, информация и комменты. Левая - доска.
 	//------------------------------------------------------------------------------------------------------------------
@@ -134,11 +131,13 @@ CDrawing.prototype.private_GoUniverseCreateHorFullTemplate = function()
 	this.m_aElements.push(oDrawingBoard);
 	oPanelControl.HtmlElement.style.backgroundColor = "rgb(217, 217, 217)";
 	//------------------------------------------------------------------------------------------------------------------
-	// Заполняем правую панель. Делим ее на четыре части:
+	// Заполняем правую панель. Делим на части (некоторые используются только во время игры):
 	//  1. Информация о текущем состоянии партии
 	//  2. Информация об игроках
 	//  3. Навигатор + панель управления
-	//  4. Чат + ввод для чата
+	//  4. Панель с кнопками во время игры
+	//  5. Панель подсчета очков
+	//  6. Чат + ввод для чата
 	//------------------------------------------------------------------------------------------------------------------
 	var GameInfoH  = this.m_oGoUniversePr.GameInfoH;
 	var InfoH      = this.m_oGoUniversePr.InfoH;
@@ -177,267 +176,6 @@ CDrawing.prototype.private_GoUniverseCreateHorFullTemplate = function()
 	// Чат + ввод для чата + список игроков
 	//------------------------------------------------------------------------------------------------------------------
 	this.private_GoUniverseCreateChatPanel(oPanelControl, oPanelControl.HtmlElement, sPanelDivId + "C", GameInfoH + InfoH + ManagerH + 1);
-
-	this.Update_Size();
-	oGameTree.On_EndLoadDrawing();
-
-	// this.m_fOnStartCounting = function()
-	// {
-	// 	oCountingControlWrapper.HtmlElement.style.display = "block";
-	// 	oToolBarControlWrapper.HtmlElement.style.display = "none";
-	// 	oChatsControl.Bounds.SetParams(0, GameInfoH + InfoH + CountingH + 1, 0, 1000, true, true, true, false, -1, -1);
-	// 	oThis.Update_Size();
-	// };
-	//
-	// this.m_fOnEndCounting = function()
-	// {
-	// 	oCountingControlWrapper.HtmlElement.style.display = "none";
-	// 	oToolBarControlWrapper.HtmlElement.style.display = "block";
-	// 	oChatsControl.Bounds.SetParams(0, GameInfoH + InfoH + ToolbarH + 1, 0, 1000, true, true, true, false, -1, -1);
-	// 	oThis.Update_Size();
-	// };
-};
-CDrawing.prototype.Create_GoUniverseMatchTemplate = function(sDivId, oApp, oTab, oGameRoom)
-{
-	this.m_oGoUniverseApp = oApp;
-	this.m_oVisualTab     = oTab;
-	this.m_sBlackAvatar   = oGameRoom.GetBlackAvatarUrl();
-	this.m_sWhiteAvatar   = oGameRoom.GetWhiteAvatarUrl();
-	this.m_oBlackTime     = oGameRoom.GetBlackTime();
-	this.m_oWhiteTime     = oGameRoom.GetWhiteTime();
-	this.m_oGameRoom      = oGameRoom;
-
-	this.m_fOnStartCounting = null;
-	this.m_fOnEndCounting   = null;
-	this.m_oCountingScores  = new CGoUniverseDrawingCountingScores(this, oGameRoom);
-
-	this.private_GoUniverseCreateWrappingMainDiv(sDivId);
-	this.private_GoUniverseCreateMatchTemplate();
-	this.Set_TemplateType(EDrawingTemplate.GoUniverseMatch);
-};
-CDrawing.prototype.private_GoUniverseCreateMatchTemplate = function()
-{
-	var oGameTree    = this.m_oGameTree;
-	var oMainControl = this.m_oMainControl;
-	var sMainDivId   = this.m_oMainDiv.id;
-	var sDivId       = sMainDivId;
-
-	this.m_nMixedRightSide = 344;
-
-	var oDrawingCountingScores = this.m_oCountingScores;
-	//------------------------------------------------------------------------------------------------------------------
-	// Делим на две части. Правая - панель управления, информация и комменты. Левая - доска.
-	//------------------------------------------------------------------------------------------------------------------
-	var oDrawingBoard = new CDrawingBoard(this);
-	oMainControl.Set_Type(1, oDrawingBoard, {RMin : this.m_nMixedRightSide});
-
-	var sBoardDivId = sDivId + "B";
-	var sPanelDivId = sDivId + "P";
-
-	this.private_CreateDiv(oMainControl.HtmlElement, sBoardDivId);
-	this.private_CreateDiv(oMainControl.HtmlElement, sPanelDivId);
-
-	var oBoardControl = CreateControlContainer(sBoardDivId);
-	var oPanelControl = CreateControlContainer(sPanelDivId);
-	oMainControl.AddControl(oBoardControl);
-	oMainControl.AddControl(oPanelControl);
-
-	oDrawingBoard.Init(sBoardDivId, oGameTree);
-	oDrawingBoard.Focus();
-	this.m_aElements.push(oDrawingBoard);
-	oPanelControl.HtmlElement.style.backgroundColor = "rgb(217, 217, 217)";
-	//------------------------------------------------------------------------------------------------------------------
-	// Заполняем правую панель. Делим ее на четыре части:
-	//  1. Информация о текущем состоянии партии
-	//  2. Информация об игроках
-	//  3. Навигатор + панель управления
-	//  4. Чат + ввод для чата
-	//------------------------------------------------------------------------------------------------------------------
-	var GameInfoH  = 37;
-	var InfoH      = 200;
-	var ToolbarH   = 36 + 2; // 36 - buttons + 1 space + 1px top border
-	var ChatInputH = 30;
-	var CountingH  = oDrawingCountingScores.GetHeight();
-
-	var sGameInfoDivId = sPanelDivId + "G";
-	var sInfoDivId     = sPanelDivId + "I";
-	var sManagerDivId  = sPanelDivId + "M";
-	var sToolbarDivId  = sPanelDivId + "T";
-	var sChatsDivId    = sPanelDivId + "C";
-	var sCountingDivId = sPanelDivId + "S";
-
-	this.private_CreateDiv(oPanelControl.HtmlElement, sGameInfoDivId);
-	this.private_CreateDiv(oPanelControl.HtmlElement, sInfoDivId);
-	this.private_CreateDiv(oPanelControl.HtmlElement, sManagerDivId);
-	this.private_CreateDiv(oPanelControl.HtmlElement, sToolbarDivId);
-	this.private_CreateDiv(oPanelControl.HtmlElement, sChatsDivId);
-	this.private_CreateDiv(oPanelControl.HtmlElement, sCountingDivId);
-	//------------------------------------------------------------------------------------------------------------------
-	// Информация об партии
-	//------------------------------------------------------------------------------------------------------------------
-	var oGameInfoControl = CreateControlContainer(sGameInfoDivId);
-	oGameInfoControl.Bounds.SetParams(0, 0, 1000, 0, true, false, false, false, -1, GameInfoH - 1);
-	oGameInfoControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right);
-	oPanelControl.AddControl(oGameInfoControl);
-	oGameInfoControl.HtmlElement.style.borderBottom = "1px solid rgb(172, 172, 172)";
-	oGameInfoControl.HtmlElement.className = "HorVerAlignCenter";
-
-	var oGameState = new CGoUniverseDrawingGameState();
-	oGameState.Init(oGameInfoControl.HtmlElement, this.m_oGameRoom);
-	this.m_oGameRoom.SetStateHandler(oGameState);
-	this.Add_StateHandler(oGameState);
-	//------------------------------------------------------------------------------------------------------------------
-	// Информация об игроках
-	//------------------------------------------------------------------------------------------------------------------
-	var oInfoControl = CreateControlContainer(sInfoDivId);
-	oInfoControl.Bounds.SetParams(0, GameInfoH + 3, 1000, 0, true, true, false, false, -1, InfoH - 3);
-	oInfoControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right);
-	oPanelControl.AddControl(oInfoControl);
-
-	var sWhiteInfo = sInfoDivId + "_White";
-	var sBlackInfo = sInfoDivId + "_Black";
-	this.private_CreateDiv(oInfoControl.HtmlElement, sWhiteInfo);
-	this.private_CreateDiv(oInfoControl.HtmlElement, sBlackInfo);
-
-	var oInfoWhiteControl = CreateControlContainer(sWhiteInfo);
-	oInfoWhiteControl.Bounds.SetParams(0, 0, 500, 1000, false, false, false, false, -1, -1);
-	oInfoWhiteControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right | g_anchor_bottom);
-	oInfoControl.AddControl(oInfoWhiteControl);
-
-	var oInfoBlackControl = CreateControlContainer(sBlackInfo);
-	oInfoBlackControl.Bounds.SetParams(500, 0, 1000, 1000, false, false, false, false, -1, -1);
-	oInfoBlackControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right | g_anchor_bottom);
-	oInfoControl.AddControl(oInfoBlackControl);
-
-	var oDrawingWhiteInfo = new CGoUniverseDrawingPlayerInfo(this);
-	oDrawingWhiteInfo.Init(sWhiteInfo, oGameTree, BOARD_WHITE, this.m_sWhiteAvatar, this.m_oWhiteTime);
-	var oDrawingBlackInfo = new CGoUniverseDrawingPlayerInfo(this);
-	oDrawingBlackInfo.Init(sBlackInfo, oGameTree, BOARD_BLACK, this.m_sBlackAvatar, this.m_oBlackTime);
-
-	this.m_aElements.push(oDrawingBlackInfo);
-	this.m_aElements.push(oDrawingWhiteInfo);
-	//------------------------------------------------------------------------------------------------------------------
-	// Кнопка меню
-	//------------------------------------------------------------------------------------------------------------------
-	var sMenuButton = sPanelDivId + "D";
-	this.private_CreateDiv(oPanelControl.HtmlElement, sMenuButton);
-	var oMenuButtonControl = CreateControlContainer(sMenuButton);
-	oMenuButtonControl.Bounds.SetParams(7, 0, 1000, 7, true, true, false, true, 36, 36);
-	oMenuButtonControl.Anchor = (g_anchor_top | g_anchor_left);
-	oPanelControl.AddControl(oMenuButtonControl);
-
-	var oDrawingMenuButton = new CDrawingButtonFileMenu(this, true);
-	oDrawingMenuButton.Init(sMenuButton, oGameTree);
-	this.Register_MenuButton(oDrawingMenuButton);
-	this.m_aElements.push(oDrawingMenuButton);
-	//------------------------------------------------------------------------------------------------------------------
-	// Панель управления
-	//------------------------------------------------------------------------------------------------------------------
-	var oToolBarControlWrapper = CreateControlContainer(sToolbarDivId);
-	oToolBarControlWrapper.Bounds.SetParams(0, GameInfoH + InfoH, 0, 0, true, true, true, false, -1, ToolbarH - 1);
-	oToolBarControlWrapper.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right);
-	oPanelControl.AddControl(oToolBarControlWrapper);
-	oToolBarControlWrapper.HtmlElement.style.borderTop  = "1px solid rgb(172, 172, 172)";
-
-	var sToolbarInnerDivId = sToolbarDivId + "I";
-	this.private_CreateDiv(oToolBarControlWrapper.HtmlElement, sToolbarInnerDivId);
-	var oToolBarControl = CreateControlContainer(sToolbarInnerDivId);
-	oToolBarControl.Bounds.SetParams(3, 1, 3, 0, true, true, true, true, -1, -1);
-	oToolBarControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right | g_anchor_bottom);
-	oToolBarControlWrapper.AddControl(oToolBarControl);
-
-	var oDrawingToolbar = new CDrawingToolbar(this);
-	oDrawingToolbar.Add_Control(new CGoUniverseButtonUndo(this, this.m_oGameRoom), 72, 1, EToolbarFloat.Left);
-	oDrawingToolbar.Add_Control(new CGoUniverseButtonPass(this, this.m_oGameRoom), 72, 1, EToolbarFloat.Left);
-	oDrawingToolbar.Add_Control(new CGoUniverseButtonResign(this, this.m_oGameRoom), 72, 1, EToolbarFloat.Left);
-	oDrawingToolbar.Add_Control(new CDrawingButtonAbout(this), 36, 1, EToolbarFloat.Right);
-	oDrawingToolbar.Add_Control(new CDrawingButtonGameInfo(this), 36, 1, EToolbarFloat.Right);
-	oDrawingToolbar.Init(sToolbarInnerDivId, oGameTree);
-
-	this.m_aElements.push(oDrawingToolbar);
-	//------------------------------------------------------------------------------------------------------------------
-	// Панель подсчета очков
-	//------------------------------------------------------------------------------------------------------------------
-	var oCountingControlWrapper = CreateControlContainer(sCountingDivId);
-	oCountingControlWrapper.Bounds.SetParams(0, GameInfoH + InfoH, 0, 0, true, true, true, false, -1, CountingH - 1);
-	oCountingControlWrapper.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right);
-	oPanelControl.AddControl(oCountingControlWrapper);
-	oCountingControlWrapper.HtmlElement.style.borderTop  = "1px solid rgb(172, 172, 172)";
-	oDrawingCountingScores.Init(sCountingDivId);
-	oCountingControlWrapper.HtmlElement.style.display = "none";
-	this.m_aElements.push(oDrawingCountingScores);
-	//------------------------------------------------------------------------------------------------------------------
-	// Чат + ввод для чата + список игроков
-	//------------------------------------------------------------------------------------------------------------------
-	var oChatsControl = CreateControlContainer(sChatsDivId);
-	oChatsControl.Bounds.SetParams(0, GameInfoH + InfoH + ToolbarH + 1, 0, 1000, true, true, true, false, -1, -1);
-	oChatsControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right | g_anchor_bottom);
-	oPanelControl.AddControl(oChatsControl);
-
-	var PlayerListW = 180;
-
-	var sChatAreaDivId  = sChatsDivId + "A";
-	var sChatInputDivId = sChatsDivId + "I";
-	var sPlayersListDivId = sChatsDivId + "L";
-	this.private_CreateDiv(oChatsControl.HtmlElement, sChatAreaDivId);
-	this.private_CreateDiv(oChatsControl.HtmlElement, sChatInputDivId);
-	this.private_CreateDiv(oChatsControl.HtmlElement, sPlayersListDivId);
-	//------------------------------------------------------------------------------------------------------------------
-	// Место под список игроков
-	//------------------------------------------------------------------------------------------------------------------
-	var oPlayersListView = this.m_oGameRoom.GetPlayersListView();
-	var oPlayersListControl = oPlayersListView.Init(sPlayersListDivId, new CKGSInGamePlayersList(this.m_oGoUniverseApp, this.m_oGameRoom.GetRoomId()));
-	oPlayersListControl.Bounds.SetParams(0, 0, 0, 0, true, false, true, true, PlayerListW, -1);
-	oPlayersListControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_bottom);
-	oChatsControl.AddControl(oPlayersListControl);
-	var oPlayerListElement = oPlayersListControl.HtmlElement;
-	oPlayerListElement.style.borderTop  = "1px solid rgb(172, 172, 172)";
-	oPlayerListElement.style.borderLeft = "1px solid rgb(172, 172, 172)";
-	oPlayerListElement.style.background = "rgb(235, 235, 228)";
-	oPlayersListView.Set_BGColor(235, 235, 228);
-	this.m_aElements.push(oPlayersListView);
-	//------------------------------------------------------------------------------------------------------------------
-	// Место под чат
-	//------------------------------------------------------------------------------------------------------------------
-	var oChatAreaControl = CreateControlContainer(sChatAreaDivId);
-	oChatAreaControl.Bounds.SetParams(0, 0, PlayerListW, ChatInputH, false, false, true, true, -1, -1);
-	oChatAreaControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right | g_anchor_bottom);
-	oChatsControl.AddControl(oChatAreaControl);
-
-	var oDrawingComments = new CGoUniverseDrawingComments(this);
-	oDrawingComments.Init(sChatAreaDivId, oGameTree, this.m_oGoUniverseApp);
-	this.m_aElements.push(oDrawingComments);
-	this.m_oGameRoom.SetCommentsHandler(oDrawingComments);
-	//------------------------------------------------------------------------------------------------------------------
-	// Место под ввод в чат
-	//------------------------------------------------------------------------------------------------------------------
-	var oChatInputControl = CreateControlContainer(sChatInputDivId);
-	oChatInputControl.Bounds.SetParams(0, 0, PlayerListW, 0, false, false, true, true, -1, ChatInputH);
-	oChatInputControl.Anchor = (g_anchor_left | g_anchor_right | g_anchor_bottom);
-	oChatsControl.AddControl(oChatInputControl);
-
-	var oChatInputArea = document.createElement("textarea");
-	oChatInputArea.className = "ChatInput";
-	oChatInputControl.HtmlElement.appendChild(oChatInputArea);
-
-	this.m_oChatInput = oChatInputArea;
-
-	var oThis = this;
-	oChatInputArea.addEventListener("keydown", function(e)
-	{
-		if (13 === e.keyCode && true !== e.ctrlKey && true !== e.shiftKey && oThis.m_oGoUniverseApp && oThis.m_oVisualTab)
-		{
-			if ("" !== oChatInputArea.value)
-			{
-				var sMessage = oChatInputArea.value;
-				sMessage = sMessage.replace(/\u000A/g, String.fromCharCode(0xFF0A));
-				oThis.m_oGoUniverseApp.SendChatMessageInGameRoom(oThis.m_oVisualTab.GetId(), sMessage);
-			}
-
-			oChatInputArea.value = "";
-			e.preventDefault();
-		}
-	});
 
 	this.Update_Size();
 	oGameTree.On_EndLoadDrawing();
@@ -620,7 +358,7 @@ CDrawing.prototype.private_GoUniverseCreateChatPanel = function(oParentControl, 
 	oChatsControl.AddControl(oChatAreaControl);
 
 	var oDrawingComments = new CGoUniverseDrawingComments(this);
-	oDrawingComments.Init(sChatAreaDivId, this.m_ooGameTree, this.m_oGoUniverseApp);
+	oDrawingComments.Init(sChatAreaDivId, this.m_oGameTree, this.m_oGoUniverseApp);
 	this.m_aElements.push(oDrawingComments);
 	this.m_oGameRoom.SetCommentsHandler(oDrawingComments);
 	//------------------------------------------------------------------------------------------------------------------
@@ -711,25 +449,58 @@ CDrawing.prototype.Add_CommentWithCoordinates = function(sComment)
 };
 CDrawing.prototype.GoUniverseOnCounting = function()
 {
-	oCountingControlWrapper.HtmlElement.style.display = "block";
-	oToolBarControlWrapper.HtmlElement.style.display  = "none";
+	var oPr = this.m_oGoUniversePr;
 
+	oPr.CountingControl.HtmlElement.style.display     = "block";
+	oPr.ManagerControl.HtmlElement.style.display      = "none";
+	oPr.MatchToolbarControl.HtmlElement.style.display = "none";
+	oPr.EditButtonControl.HtmlElement.style.display   = "none";
+	oPr.MenuButtonControl.HtmlElement.style.display   = "none";
 
-	oChatsControl.Bounds.SetParams(0, GameInfoH + InfoH + CountingH + 1, 0, 1000, true, true, true, false, -1, -1);
-	oThis.Update_Size();
+	oPr.ChatsContol.SetParams(0, oPr.GameInfoH + oPr.InfoH + oPr.CountingH + 1, 0, 1000, true, true, true, false, -1, -1);
+	this.Update_Size();
 };
 CDrawing.prototype.GoUniverseOnMatch = function()
 {
-	if (this.m_fOnEndCounting)
-		this.m_fOnEndCounting();
+	var oPr = this.m_oGoUniversePr;
+
+	oPr.CountingControl.HtmlElement.style.display     = "none";
+	oPr.ManagerControl.HtmlElement.style.display      = "none";
+	oPr.MatchToolbarControl.HtmlElement.style.display = "block";
+	oPr.EditButtonControl.HtmlElement.style.display   = "none";
+	oPr.MenuButtonControl.HtmlElement.style.display   = "none";
+
+	oPr.MatchToolbarControl.SetParams(0, oPr.GameInfoH + oPr.InfoH, 0, 1000, true, true, true, false, -1, oPr.ToolbarH - 1);
+	oPr.ChatsContol.SetParams(0, oPr.GameInfoH + oPr.InfoH + oPr.ToolbarH + 1, 0, 1000, true, true, true, false, -1, -1);
+	this.Update_Size();
 };
 CDrawing.prototype.GoUniverseOnView = function()
 {
+	var oPr = this.m_oGoUniversePr;
 
+	oPr.CountingControl.HtmlElement.style.display     = "none";
+	oPr.ManagerControl.HtmlElement.style.display      = "block";
+	oPr.MatchToolbarControl.HtmlElement.style.display = "none";
+	oPr.EditButtonControl.HtmlElement.style.display   = "block";
+	oPr.MenuButtonControl.HtmlElement.style.display   = "block";
+
+	oPr.ChatsContol.SetParams(0, oPr.GameInfoH + oPr.InfoH + oPr.ManagerH + 1, 0, 1000, true, true, true, false, -1, -1);
+	this.Update_Size();
 };
 CDrawing.prototype.GoUniverseOnMatchAnalyze = function()
 {
+	var oPr = this.m_oGoUniversePr;
 
+	oPr.CountingControl.HtmlElement.style.display     = "none";
+	oPr.ManagerControl.HtmlElement.style.display      = "block";
+	oPr.MatchToolbarControl.HtmlElement.style.display = "block";
+	oPr.EditButtonControl.HtmlElement.style.display   = "none";
+	oPr.MenuButtonControl.HtmlElement.style.display   = "block";
+
+	oPr.MatchToolbarControl.SetParams(0, oPr.GameInfoH + oPr.InfoH + oPr.ManagerH + 1, 0, 1000, true, true, true, false, -1, oPr.ToolbarH - 1);
+	oPr.ChatsContol.SetParams(0, oPr.GameInfoH + oPr.InfoH + oPr.ToolbarH + 1 + oPr.ManagerH + 1, 0, 1000, true, true, true, false, -1, -1);
+
+	this.Update_Size();
 };
 CDrawing.prototype.GoUniverseUpdateScoresDone = function(bWhiteDone, bBlackDone)
 {
@@ -1187,15 +958,17 @@ CGoUniverseDrawingPlayerInfo.prototype.Init = function(sDivId, oGameTree, nPlaye
 			{
 				if (this.IsAbsolute())
 				{
-
+					oSound.PlayCountDown(this.GetCurrentMainTime(), 60);
 				}
 				else if (this.IsByoYomi())
 				{
-					oSound.PlayCountDown(this.GetCurrentOverTime());
+					if (this.GetCurrentMainTime() <= 0)
+						oSound.PlayCountDown(this.GetCurrentOverTime(), 10);
 				}
 				else if (this.IsCanadian())
 				{
-					oSound.PlayCountDown(this.GetCurrentOverTime());
+					if (this.GetCurrentMainTime() <= 0)
+						oSound.PlayCountDown(this.GetCurrentOverTime(), 60);
 				}
 			}
 

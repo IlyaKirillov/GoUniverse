@@ -262,11 +262,12 @@ CVisualGameRoomTab.prototype.InitGameRoom = function(sDivIdContainer, oGame)
 	if (null !== oGameTree)
 	{
 		var oDrawing = new CDrawing(oGameTree);
+		oDrawing.Create_GoUniverseViewerTemplate(sGameRoomDivId + "B", this.m_oApp, this, oGame);
 
 		if (!oGame.IsPlayer())
-			oDrawing.Create_GoUniverseViewerTemplate(sGameRoomDivId + "B", this.m_oApp, this, oGame);
+			oDrawing.GoUniverseOnView();
 		else
-			oDrawing.Create_GoUniverseMatchTemplate(sGameRoomDivId + "B", this.m_oApp, this, oGame);
+			oDrawing.GoUniverseOnMatch();
 
 		oDrawing.Update_Size(true);
 		oGameTree.Set_EditingFlags({LoadFile : false, GameInfo : false, RemoveNodes : false});
