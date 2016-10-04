@@ -129,6 +129,25 @@ var KGSCommon = {
 	},
 
 	/**
+	 * Convert a rules type to a redable string.
+	 * @param {EKGSGameRules} nRules
+	 * @returns {string}
+	 */
+	GameRulesToRedableString : function(nRules)
+	{
+		if (EKGSGameRules.Japanese === nRules)
+			return "Japanese";
+		else if (EKGSGameRules.Chinese === nRules)
+			return "Chinese";
+		else if (EKGSGameRules.Aga === nRules)
+			return "AGA";
+		else if (EKGSGameRules.NewZealand === nRules)
+			return "New Zealand";
+
+		return "Japanese";
+	},
+
+	/**
 	 * Convert a time system to KGS string.
 	 * @param {CTimeSettings} oTime
 	 * @returns {string}

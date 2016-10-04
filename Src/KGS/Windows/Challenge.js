@@ -195,6 +195,7 @@ function CKGSChallengeWindow()
 		if (0 === nSelectedIndex)
 		{
 			oThis.m_oCurrentChallenger = null;
+			oThis.m_oButtons.Ok.Hide();
 
 			oChallengerSpan.innerHTML = "";
 			oChallengerSpan.title     = "";
@@ -218,6 +219,7 @@ function CKGSChallengeWindow()
 			var oChallenger = oThis.m_arrChallengers[nSelectedIndex - 1].User;
 			var oProposal   = oThis.m_arrChallengers[nSelectedIndex - 1].Proposal;
 			oThis.m_oCurrentChallenger = oChallenger;
+			oThis.m_oButtons.Ok.Show();
 
 			oChallengerSpan.innerHTML = oChallenger.GetName() + "[" + oChallenger.GetStringRank() + "]";
 			oChallengerSpan.title     = "View user info";
@@ -406,6 +408,7 @@ CKGSChallengeWindow.prototype.OnSubmit = function(oUser, oProposal)
 	{
 		this.m_oChallengerSelect.selectedIndex = 1;
 		this.private_OnChangeChallenger();
+		this.Update_Size(); // Для обсчета кнопки Ok
 	}
 };
 CKGSChallengeWindow.prototype.OnDecline = function()
@@ -1486,7 +1489,18 @@ CKGSChallengeWindow.prototype.private_UpdateButtons = function()
 		this.m_oButtons.Retry.Hide();
 		this.m_oButtons.Close.Show();
 	}
-	else if (EKGSChallengeWindowState.CreatorProposal === this.m_nState || EKGSChallengeWindowState.ChallengerSubmit === this.m_nState || EKGSChallengeWindowState.ChallengerAccept === this.m_nState)
+	else if (EKGSChallengeWindowState.CreatorProposal === this.m_nState)
+	{
+		this.m_oButtons.Create.Hide();
+		this.m_oButtons.Retry.Hide();
+		this.m_oButtons.Close.Show();
+
+		if (null === this.m_oCurrentChallenger)
+			this.m_oButtons.Ok.Hide();
+		else
+			this.m_oButtons.Ok.Show();
+	}
+	else if (EKGSChallengeWindowState.ChallengerSubmit === this.m_nState || EKGSChallengeWindowState.ChallengerAccept === this.m_nState)
 	{
 		this.m_oButtons.Create.Hide();
 		this.m_oButtons.Ok.Show();
