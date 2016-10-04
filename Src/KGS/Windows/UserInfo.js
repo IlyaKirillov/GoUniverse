@@ -37,6 +37,8 @@ function CKGSUserInfoWindow()
 		Email       : null
 	};
 
+	this.m_oRawInfo = {};
+
 	this.m_oRankHint = null;
 
 	this.m_arrGameArchive = [];
@@ -278,6 +280,28 @@ CKGSUserInfoWindow.prototype.OnDetailsUpdate = function(oMessage)
 
 	this.private_AddEmail(oMessage.email);
 	this.private_AddInfo(oMessage.personalInfo);
+
+	this.m_oRawInfo.ChannelId    = oMessage.channelId;
+	this.m_oRawInfo.PersonalName = oMessage.personalName;
+	this.m_oRawInfo.Email        = oMessage.email;
+	this.m_oRawInfo.PrivateEmail = oMessage.emailPrivate ? true : false;
+	this.m_oRawInfo.EmailWanted  = oMessage.emailWanted ? true : false;
+	this.m_oRawInfo.PersonalInfo = oMessage.personalInfo;
+	this.m_oRawInfo.AuthLevel    = oMessage.authLevel ? oMessage.authLevel : "normal";
+};
+CKGSUserInfoWindow.prototype.EditUserInfo = function()
+{
+	this.m_oClient.private_SendMessage({
+		"type"          : "DETAILS_CHANGE",
+		"channelId"     : this.m_oRawInfo.ChannelId,
+		"personalName"  : this.m_oRawInfo.PersonalName,
+		"personalInfo"  : this.m_oRawInfo.PersonalInfo,
+		"personalEmail" : this.m_oRawInfo.Email,
+		"emailPrivate"  : this.m_oRawInfo.PrivateEmail,
+		"emailWanted"   : this.m_oRawInfo.EmailWanted,
+		"authLevel"     : this.m_oRawInfo.AuthLevel,
+		"forcedNoRank"  : false
+	});
 };
 CKGSUserInfoWindow.prototype.private_UpdateGameArchiveStats = function()
 {
