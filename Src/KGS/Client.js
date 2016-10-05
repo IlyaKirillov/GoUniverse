@@ -2164,4 +2164,26 @@ CKGSClient.prototype.GetNewCallbackKey = function()
 
 	return this.m_nCallbackCounter;
 };
+CKGSClient.prototype.GetOwnChallenge = function()
+{
+	var sUserName = this.GetUserName();
+	for (var nChannelId in this.m_oChallenges)
+	{
+		var oWindow = this.m_oChallenges[nChannelId];
+		var oChallengeCreator = oWindow.GetChallengeCreator();
+		if (oChallengeCreator && sUserName.toLowerCase() === oChallengeCreator.GetName().toLowerCase())
+			return oWindow;
+	}
+
+	return null;
+};
+CKGSClient.prototype.GetAllChallenges = function()
+{
+	var arrChallenges = [];
+	for (var nChannelId in this.m_oChallenges)
+	{
+		arrChallenges.push(this.m_oChallenges[nChannelId]);
+	}
+	return arrChallenges;
+};
 

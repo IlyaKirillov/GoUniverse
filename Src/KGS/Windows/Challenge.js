@@ -517,6 +517,10 @@ CKGSChallengeWindow.prototype.OnUserRemoved = function(oUser)
 		}
 	}
 };
+CKGSChallengeWindow.prototype.GetChallengeCreator = function()
+{
+	return this.m_oOwner;
+};
 CKGSChallengeWindow.prototype.private_CreateName = function()
 {
 	var nLeftWidth = 120;

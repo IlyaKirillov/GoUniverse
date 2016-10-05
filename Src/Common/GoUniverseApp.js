@@ -43,6 +43,7 @@ function CGoUniverseApplication()
 	this.m_oMainRoomLeftPartControl = null;
 
 	this.m_oAnimatedLogo = null;
+	this.m_oPlayMenu     = null;
 }
 CGoUniverseApplication.prototype.Init = function()
 {
@@ -203,14 +204,6 @@ CGoUniverseApplication.prototype.OnConnect = function()
 {
 	document.title = "KGS: " + this.m_oClient.GetUserName();
 	document.getElementById("divIdClientNameText").innerHTML = this.m_oClient.GetUserName();
-
-	//TEST
-	var oThis = this;
-	document.getElementById("divIdClientNameText").onclick = function()
-	{
-		oThis.m_oClient.CreateChallenge();
-	};
-	//TEST
 
 	g_oFadeEffect.In(document.getElementById("divMainId"), 200);
 	this.private_HideAnimatedLogo();
@@ -669,11 +662,85 @@ CGoUniverseApplication.prototype.private_InitGameTabs = function()
 };
 CGoUniverseApplication.prototype.private_InitTabPanel = function(oTabsControl)
 {
+	g_oTextMeasurer.SetFont("24px 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif");
+
+	var sMainRoom = "Main Room";
+	var sPlay     = "Play";
+
+	var nHomeW = g_oTextMeasurer.Measure(sMainRoom) + 42;
+	var nPlayW = g_oTextMeasurer.Measure(sPlay) + 42;
+	var nSpace = 5;
+
 	// Кнопка HOME
 	var oHomeControl = CreateControlContainer("divIdHomeButton");
-	oHomeControl.Bounds.SetParams(0, 0, 0, 1000, false, false, false, false, 200, -1);
+	oHomeControl.Bounds.SetParams(0, 0, 0, 1000, false, false, false, false, nHomeW, -1);
 	oHomeControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_bottom);
 	oTabsControl.AddControl(oHomeControl);
+	document.getElementById("spanIdMainRoom").innerHTML = sMainRoom;
+
+	// Кнопка Play
+	var oPlayControl = CreateControlContainer("divIdPlayButtonWrapper");
+	oPlayControl.Bounds.SetParams(nHomeW + nSpace, 0, 0, 1000, true, false, false, false, nPlayW, -1);
+	oPlayControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_bottom);
+	oTabsControl.AddControl(oPlayControl);
+	document.getElementById("spanIdPlay").innerHTML = sPlay;
+
+	var oThis = this;
+	oPlayControl.HtmlElement.addEventListener("click", function()
+	{
+		var oClient = oThis.m_oClient;
+		if (!oClient)
+			return;
+
+		if (oThis.m_oPlayMenu)
+		{
+			oThis.m_oPlayMenu.Hide();
+			oThis.m_oPlayMenu = null;
+			return;
+		}
+
+		document.getElementById("divIdPlayButton").style.background = "#969696";
+
+		var oContextMenu = new CVisualContextMenu(oThis, nHomeW + nSpace, 53);
+		var oOwnChallenge = oClient.GetOwnChallenge();
+		if (!oOwnChallenge)
+		{
+			oContextMenu.AddCheckBoxItem(false, "New challenge", function()
+			{
+				oThis.m_oClient.CreateChallenge();
+			});
+		}
+		else
+		{
+			oContextMenu.AddCheckBoxItem(false, "Your challenge", function()
+			{
+				oOwnChallenge.Show();
+			});
+		}
+		oContextMenu.AddHorizontalLine();
+
+		var arrAllChallenges = oClient.GetAllChallenges();
+		for (var nIndex = 0, nCount = arrAllChallenges.length; nIndex < nCount; ++nIndex)
+		{
+			var oChallengeWindow = arrAllChallenges[nIndex];
+			if (oChallengeWindow && oChallengeWindow !== oOwnChallenge)
+			{
+				var oChallengeCreator = oChallengeWindow.GetChallengeCreator();
+				oContextMenu.AddCheckBoxItem(false, oChallengeCreator.GetName() + "[" + oChallengeCreator.GetStringRank() + "]", function()
+				{
+				});
+			}
+		}
+
+		oContextMenu.Show();
+		oContextMenu.AddOnHideCallback(function()
+		{
+			oThis.m_oPlayMenu = null;
+			document.getElementById("divIdPlayButton").style.background = "";
+		});
+		oThis.m_oPlayMenu = oContextMenu;
+
+	}, false);
 
 	// Правая панелька с поиском, ником и кнопкой выхода
 	var oRightPanel = CreateControlContainer("divIdPanelRight");
@@ -684,7 +751,7 @@ CGoUniverseApplication.prototype.private_InitTabPanel = function(oTabsControl)
 
 	// Панель под табы с игровыми комнатами
 	var oGameRoomTabs = CreateControlContainer("divIdTabPanelRooms");
-	oGameRoomTabs.Bounds.SetParams(200, 0, 375, 1000, true, false, true, false, -1, -1); // 300(правая часть) + 5(отступ) + 50(кнопка) + 20(скролл)
+	oGameRoomTabs.Bounds.SetParams(nHomeW + nPlayW + 2 * nSpace, 0, 375, 1000, true, false, true, false, -1, -1); // 300(правая часть) + 5(отступ) + 50(кнопка) + 20(скролл)
 	oGameRoomTabs.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right | g_anchor_bottom);
 	oTabsControl.AddControl(oGameRoomTabs);
 
