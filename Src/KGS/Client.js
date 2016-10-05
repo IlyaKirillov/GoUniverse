@@ -1145,6 +1145,8 @@ CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
 
 		nGameType = oProposal.GetGameType();
 		bDemo = false;
+		
+		var nBoardSize = oProposal.GetBoardSize();
 
 		var oCreator = oGameRecord.GetChallengeCreator();
 		sWhite       = oCreator ? oCreator.GetName() : "";
@@ -1152,7 +1154,7 @@ CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
 		sBlack       = "";
 		nBlackR      = -3;
 		sGameName    = oGameRecord.GetComment();
-		sSizeHandi   = oProposal.GetBoardSize() + "x" + oProposal.GetBoardSize() + ",   "  + oProposal.GetKomi() + ",   " + KGSCommon.GameRulesToRedableString(oProposal.GetRules());
+		sSizeHandi   = nBoardSize + "x" + nBoardSize + ",   "  + oProposal.GetKomi() + ",   " + KGSCommon.GameRulesToRedableString(oProposal.GetRules());
 		sTime        = oProposal.GetTimeSettingsString();
 
 		if (oCreator && oCreator.IsRobot())

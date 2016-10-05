@@ -366,7 +366,16 @@ CKGSGamesListRecord.prototype.Draw = function(oContext, dX, dY, eType)
 		case EKGSGameListRecord.Info     : sString += this.m_sComment; break;
     }
 
-    oContext.fillText(sString, dX, dY);
+    if (EKGSGameListRecord.SizeHandi === eType && 'x' === this.m_sSizeHandi.charAt(1))
+	{
+		g_oTextMeasurer.SetFont(oContext.font);
+		var nShiftX = g_oTextMeasurer.Measure("11");
+		oContext.fillText(sString, nShiftX + dX, dY);
+	}
+	else
+	{
+		oContext.fillText(sString, dX, dY);
+	}
 
 	if (true === bResetFont)
 		oContext.font = sFont;
