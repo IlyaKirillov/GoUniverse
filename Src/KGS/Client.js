@@ -488,11 +488,16 @@ CKGSClient.prototype.CreateChallenge = function()
 		return;
 	}
 
+	var nChannelId = this.m_nChatChannelId;
+
+	if (this.m_oPrivateChats[nChannelId] || !this.m_aAllRooms[nChannelId])
+		return;
+
 	var oGameRecord = new CKGSGameListRecord(this);
 	oGameRecord.Update({
 		gameType        : "challenge",
 		channelId       : -1,
-		roomId          : this.m_nChatChannelId,
+		roomId          : nChannelId,
 		private         : false,
 		players         : {
 			challengeCreator : {
