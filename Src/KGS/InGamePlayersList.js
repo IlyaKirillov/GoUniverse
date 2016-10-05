@@ -284,7 +284,7 @@ CKGSInGamePlayersListRecord.prototype.Draw = function(oContext, dX, dY, eType)
 
 	oContext.fillText(sString, dX, dY);
 
-	if (eType === EKGSInGamePlayersListRecord.Type && "" !== sString)
+	if (eType === EKGSInGamePlayersListRecord.Type && "" !== sString && this.m_oListObject.IsEditor(this.m_sName))
 		oContext.strokeText(sString, dX, dY);
 
 	if (oClient)
@@ -371,9 +371,9 @@ CKGSInGamePlayersListRecord.prototype.private_GetUserType = function(oContext)
 	}
 	else if (this.m_oListObject.IsWhite(this.m_sName))
 	{
-		oContext.fillStyle   = "#FFF";
+		oContext.fillStyle   = "#000";
 		oContext.strokeStyle = "#000";
-		return String.fromCharCode(0x26AB);
+		return String.fromCharCode(0x26AA);
 	}
 
 	return "";

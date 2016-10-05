@@ -735,7 +735,6 @@ CKGSGameRoom.prototype.private_ReadProp = function(oProp, oNode, oGameTree)
 	}
 	else if ("TERRITORY" === oProp.name)
 	{
-		console.log("Add " + oProp);
 		oNode.Set_TerritoryForceUse(true);
 
 		var nX = oProp.loc.x + 1;
@@ -752,7 +751,6 @@ CKGSGameRoom.prototype.private_ReadProp = function(oProp, oNode, oGameTree)
 	}
 	else if ("DEAD" === oProp.name)
 	{
-		console.log("Add " + oProp);
 		oNode.Set_TerritoryForceUse(true);
 
 		var nX = oProp.loc.x + 1;
@@ -808,7 +806,6 @@ CKGSGameRoom.prototype.private_ReadPropRemove = function(oProp, oNode, oGameTree
 	}
 	else if ("TERRITORY" === oProp.name)
 	{
-		console.log("Remove " + oProp);
 		oNode.Set_TerritoryForceUse(true);
 
 		var nX = oProp.loc.x + 1;
@@ -823,7 +820,6 @@ CKGSGameRoom.prototype.private_ReadPropRemove = function(oProp, oNode, oGameTree
 	}
 	else if ("DEAD" === oProp.name)
 	{
-		console.log("Remove " + oProp);
 		oNode.Set_TerritoryForceUse(true);
 
 		var nX = oProp.loc.x + 1;
@@ -873,7 +869,6 @@ CKGSGameRoom.prototype.Sync = function()
 };
 CKGSGameRoom.prototype.OnSync = function()
 {
-	console.log("OnSync");
 	this.m_bCommandInProgress = false;
 };
 CKGSGameRoom.prototype.IsCommandInProgress = function()
