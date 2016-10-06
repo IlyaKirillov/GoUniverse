@@ -106,6 +106,12 @@ CVisualPopup.prototype.Hide = function(bFast)
 		}
 		else
 		{
+			if (null !== oThis.m_nTransitionId)
+			{
+				clearTimeout(oThis.m_nTransitionId);
+				oThis.m_nTransitionId = null;
+			}
+
 			this.m_nTransitionId = setTimeout(function()
 			{
 				if (true === oThis.m_bDestroyOnHide)

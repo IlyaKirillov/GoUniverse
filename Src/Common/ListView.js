@@ -71,13 +71,13 @@ function CListView()
         var oControl = this.HtmlElement.Control;
         this.HtmlElement.MainCanvas.Control = CreateControlContainer(sName + "_MainCanvas");
         var MainCanvas = this.HtmlElement.MainCanvas.Control;
-        MainCanvas.Bounds.SetParams(0,0,14,1000,false,false,true,false, -1,-1);
+        MainCanvas.Bounds.SetParams(0,0,0,1000,false,false,true,false, -1,-1);
         MainCanvas.Anchor = (g_anchor_top | g_anchor_left | g_anchor_bottom);
         oControl.AddControl(MainCanvas);
 
         this.HtmlElement.SelectionCanvas.Control = CreateControlContainer(sName + "_SelectionCanvas");
         var SelectionCanvas = this.HtmlElement.SelectionCanvas.Control;
-        SelectionCanvas.Bounds.SetParams(0,0,14,1000,false,false,true,false, -1,-1);
+        SelectionCanvas.Bounds.SetParams(0,0,0,1000,false,false,true,false, -1,-1);
         SelectionCanvas.Anchor = (g_anchor_top | g_anchor_left | g_anchor_bottom);
         oControl.AddControl(SelectionCanvas);
 
@@ -483,7 +483,7 @@ CListView.prototype.private_UpdateScrollSize = function()
 
     var sH = Math.max(20, ((vaH - saY) * vaH / paH)) | 0;
     var sY = Math.max(saY, Math.min(saY + saH - sH + 1, saY + paY * (saH - sH) / (paH - vaH)));
-    var sX = this.m_dXLimit - 1;
+    var sX = this.m_dXLimit - 1 - 14;
 
     oVerScroll.style.display = "block";
     oVerScroll.style.height  = sH + "px";
