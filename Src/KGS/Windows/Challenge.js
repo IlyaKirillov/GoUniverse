@@ -65,6 +65,12 @@ function CKGSChallengeWindow()
 		Create : null
 	};
 
+	this.m_oSavedPosition = {
+		Left   : 0,
+		Top    : 0,
+		Height : 0,
+		Width  : 0
+	};
 
 	this.m_oCurrentChallenger = null;
 	this.m_arrChallengers     = [];
@@ -304,6 +310,27 @@ CKGSChallengeWindow.prototype.Init = function(sDivId, oPr)
 {
 	CKGSChallengeWindow.superclass.Init.call(this, sDivId, oPr, false);
 
+	// MinimizeButton
+	var oMainDiv     = this.HtmlElement.Control.HtmlElement;
+	var oMainControl = this.HtmlElement.Control;
+
+	var sMinimizeButtonId      = sDivId + "_Minimize";
+	var oMinimizeButtonElement = this.protected_CreateDivElement(oMainDiv, sMinimizeButtonId);
+	var oMinimizeButtonControl = CreateControlContainer(sMinimizeButtonId);
+	oMinimizeButtonControl.SetParams(0, 0, 45 + 6, 1000, false, true, true, false, 45, 20);
+	oMinimizeButtonControl.SetAnchor(false, true, true, false);
+	oMainControl.AddControl(oMinimizeButtonControl);
+
+	var oThis = this;
+	var oMinimizeButton = new CGoUniverseButtonMinimize(function()
+	{
+		oThis.Hide();
+	});
+	oMinimizeButton.Init(sMinimizeButtonId, this);
+	this.HtmlElement.MinimizeButton = oMinimizeButton;
+	this.HtmlElement.CaptionTextControl.SetParams(15, 0, 55 + 45 + 6, 1000, true, false, true, false, -1, 30);
+	//--------------------------------------------------------------------------------------------
+
 	this.m_nChannelId  = oPr.ChannelId;
 	this.m_oGameRecord = oPr.GameRecord;
 	this.m_nRoomId     = oPr.RoomId;
@@ -385,6 +412,9 @@ CKGSChallengeWindow.prototype.Update_Size = function(bForce)
 
 	if (this.m_oPlayersColorsCanvas)
 		this.private_DrawPlayerColor();
+
+	if (this.HtmlElement.MinimizeButton)
+		this.HtmlElement.MinimizeButton.Update_Size();
 };
 CKGSChallengeWindow.prototype.Get_DefaultWindowSize = function()
 {
@@ -520,6 +550,43 @@ CKGSChallengeWindow.prototype.OnUserRemoved = function(oUser)
 CKGSChallengeWindow.prototype.GetChallengeCreator = function()
 {
 	return this.m_oOwner;
+};
+CKGSChallengeWindow.prototype.Hide = function()
+{
+	var oMainDiv = this.HtmlElement.Control.HtmlElement;
+
+	oMainDiv.style.transitionProperty = "left, top,height";
+	oMainDiv.style.transitionDuration = ".5s";
+
+	this.m_oSavedPosition.Left   = oMainDiv.style.left;
+	this.m_oSavedPosition.Top    = oMainDiv.style.top;
+	this.m_oSavedPosition.Height = oMainDiv.style.height;
+	this.m_oSavedPosition.Width  = oMainDiv.style.width;
+
+	var oLocation = oApp.GetButtonPlayLocation();
+
+	oMainDiv.style.left   = oLocation.Left + "px";
+	oMainDiv.style.top    = (oLocation.Top + oLocation.Height + 3) + "px";
+	oMainDiv.style.height = "0px";
+	oMainDiv.style.width  = oLocation.Width + "px";
+
+	g_oFadeEffect.Out(oMainDiv, 500, null);
+};
+CKGSChallengeWindow.prototype.Show = function()
+{
+	var oMainDiv = this.HtmlElement.Control.HtmlElement;
+
+	g_oFadeEffect.In(oMainDiv, -1, null);
+
+	oMainDiv.style.left   = this.m_oSavedPosition.Left;
+	oMainDiv.style.top    = this.m_oSavedPosition.Top;
+	oMainDiv.style.height = this.m_oSavedPosition.Height;
+	oMainDiv.style.width  = this.m_oSavedPosition.Width;
+
+	oMainDiv.style.transitionProperty = "";
+	oMainDiv.style.transitionDuration = "";
+
+	this.Focus();
 };
 CKGSChallengeWindow.prototype.private_CreateName = function()
 {
@@ -1729,4 +1796,71 @@ CKGSChallengeWindow.prototype.private_FillDefaultChallengerValues = function()
 CKGSChallengeWindow.prototype.private_GetGlobalSettings = function()
 {
 	return this.m_oClient.m_oApp.GetGlobalSettings();
+};
+
+function CGoUniverseButtonMinimize(fOnClickHandler)
+{
+	CGoUniverseButtonMinimize.superclass.constructor.call(this, null);
+
+	this.m_fOnClickHandler = fOnClickHandler ? fOnClickHandler : null;
+
+	this.m_oNormaFColor  = new CColor(217, 217, 217, 217);
+	this.m_oHoverFColor  = new CColor(187, 187, 187, 187);
+	this.m_oActiveFColor = new CColor(147, 147, 147, 147);
+}
+CommonExtend(CGoUniverseButtonMinimize, CDrawingButtonBase);
+
+CGoUniverseButtonMinimize.prototype.private_DrawOnCanvas = function(Canvas, Size, X_off, Y_off, bDisabled, W, H, BackColor, FillColor)
+{
+	var oImageData = Canvas.createImageData(W, H);
+	var oBitmap = oImageData.data;
+
+	var X_off = (W - 8) / 2 | 0;
+	var Y_off = (H - 8) / 2 | 0;
+
+	for (var Y = 0; Y < H; Y++)
+	{
+		for (var X = 0; X < W; X++)
+		{
+			var Index = (X + Y * W) * 4;
+
+			var r = FillColor.r;
+			var g = FillColor.g;
+			var b = FillColor.b;
+
+			var y = Y - Y_off;
+			var x = X - X_off;
+			if (4 === y && 0 <= x  && x <= 7)
+			{
+				r = 0;
+				g = 0;
+				b = 0;
+			}
+
+			oBitmap[Index + 0] = r;
+			oBitmap[Index + 1] = g;
+			oBitmap[Index + 2] = b;
+			oBitmap[Index + 3] = 255;
+		}
+	}
+
+	Canvas.putImageData(oImageData, 0, 0);
+};
+CGoUniverseButtonMinimize.prototype.private_HandleMouseDown = function()
+{
+	if (this.m_fOnClickHandler)
+		this.m_fOnClickHandler();
+};
+CGoUniverseButtonMinimize.prototype.private_GetHint = function()
+{
+	return "Minimize";
+};
+CGoUniverseButtonMinimize.prototype.private_ClickTransformIn = function()
+{
+};
+CGoUniverseButtonMinimize.prototype.private_ClickTransformOut = function()
+{
+};
+CGoUniverseButtonMinimize.prototype.private_DrawSelectionBounds = function(Canvas, W, H)
+{
 };

@@ -50,16 +50,47 @@ CVisualPopup.prototype.GetHtmlElement = function()
 };
 CVisualPopup.prototype.Toggle = function()
 {
-	var oThis    = this;
-	var oHandler = this.m_oHandler;
 	if ("none" === this.m_oHtmlElement.style.display)
 	{
-		if (null === this.m_nShowId)
-		{
-			if (oHandler.UpdatePopupPosition)
-				oHandler.UpdatePopupPosition(oThis);
+		this.Show(false);
+	}
+	else
+	{
+		this.Hide(false);
+	}
+};
+CVisualPopup.prototype.Show = function(bFast)
+{
+	var oThis    = this;
+	var oHandler = this.m_oHandler;
 
-			this.m_nShowId = setTimeout(function ()
+	if (null === this.m_nShowId)
+	{
+		if (oHandler.UpdatePopupPosition)
+			oHandler.UpdatePopupPosition(oThis);
+
+		if (true === bFast)
+		{
+			if (null !== oThis.m_nTransitionId)
+			{
+				clearTimeout(oThis.m_nTransitionId);
+				oThis.m_nTransitionId = null;
+			}
+
+			oThis.m_oHtmlElement.style.display = "block";
+
+			if (oHandler.OnPreShowPopup)
+				oHandler.OnPreShowPopup(oThis);
+
+			if (oHandler.OnShowPopup)
+				oHandler.OnShowPopup(oThis);
+
+			oThis.m_nTransitionId = null;
+			oThis.m_nShowId       = null;
+		}
+		else
+		{
+			this.m_nShowId = setTimeout(function()
 			{
 				if (null !== oThis.m_nTransitionId)
 				{
@@ -72,7 +103,7 @@ CVisualPopup.prototype.Toggle = function()
 				if (oHandler.OnPreShowPopup)
 					oHandler.OnPreShowPopup(oThis);
 
-				oThis.m_nTransitionId = setTimeout(function ()
+				oThis.m_nTransitionId = setTimeout(function()
 				{
 					if (oHandler.OnShowPopup)
 						oHandler.OnShowPopup(oThis);
@@ -82,10 +113,6 @@ CVisualPopup.prototype.Toggle = function()
 				}, 20);
 			}, 20);
 		}
-	}
-	else
-	{
-		this.Hide(false);
 	}
 };
 CVisualPopup.prototype.Hide = function(bFast)
@@ -110,6 +137,12 @@ CVisualPopup.prototype.Hide = function(bFast)
 			{
 				clearTimeout(oThis.m_nTransitionId);
 				oThis.m_nTransitionId = null;
+			}
+
+			if (null !== oThis.m_nShowId)
+			{
+				clearTimeout(oThis.m_nShowId);
+				oThis.m_nShowId = null;
 			}
 
 			this.m_nTransitionId = setTimeout(function()
@@ -243,7 +276,7 @@ CVisualContextMenu.prototype.AddCheckBoxItem = function(bChecked, sText, fAction
 };
 CVisualContextMenu.prototype.Show = function()
 {
-	this.m_oPopup.Toggle();
+	this.m_oPopup.Show();
 };
 CVisualContextMenu.prototype.Hide = function()
 {

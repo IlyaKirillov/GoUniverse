@@ -2186,4 +2186,8 @@ CKGSClient.prototype.GetAllChallenges = function()
 	}
 	return arrChallenges;
 };
+CKGSClient.prototype.GetCurrentChatId = function()
+{
+	return this.m_nChatChannelId;
+};
 

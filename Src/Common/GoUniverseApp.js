@@ -44,6 +44,13 @@ function CGoUniverseApplication()
 
 	this.m_oAnimatedLogo = null;
 	this.m_oPlayMenu     = null;
+
+	this.m_oPlayButtonLocation = {
+		Left   : 0,
+		Top    : 0,
+		Width  : 50,
+		Height : 50
+	};
 }
 CGoUniverseApplication.prototype.Init = function()
 {
@@ -153,26 +160,24 @@ CGoUniverseApplication.prototype.Init = function()
 	//  this.m_oGamesListView.Update_Size();
 	//
 	//
-	//  // this.m_oClient.private_HandleDetailsNonExistant({name : "WWWWWWWW"});
-	//  // this.m_oClient.private_HandlePrivateKeepOut({channelId : -1});
-	//  // this.m_oClient.private_HandleIdleWarning({});
+	// // this.m_oClient.private_HandleDetailsNonExistant({name : "WWWWWWWW"});
+	// // this.m_oClient.private_HandlePrivateKeepOut({channelId : -1});
+	// // this.m_oClient.private_HandleIdleWarning({});
 	//
-	// // this.m_oClient.m_oAllGames["123"] = new CKGSGameListRecord();
-	// // this.m_oClient.m_oAllGames["123"].Update({
-	// // 	gameType : "challenge",
-	// // 	players : {
-	// // 		challengeCreator : {
-	// // 			name : "KOCMOHABT"
-	// // 		}
-	// // 	},
-	// // 	name : "Challenge comment",
-	// // 	initialProposal : {
-	// // 		rules : {
-	// //
-	// // 		}
-	// // 	}
-	// // });
-	// //this.m_oClient.private_HandleChallengeJoin({channelId : 123});
+	// this.m_oClient.m_oAllGames["123"] = new CKGSGameListRecord();
+	// this.m_oClient.m_oAllGames["123"].Update({
+	// 	gameType        : "challenge",
+	// 	players         : {
+	// 		challengeCreator : {
+	// 			name : "KOCMOHABT"
+	// 		}
+	// 	},
+	// 	name            : "Challenge comment",
+	// 	initialProposal : {
+	// 		rules : {}
+	// 	}
+	// });
+	// this.m_oClient.private_HandleChallengeJoin({channelId : 123});
 	// //this.m_oClient.CreateChallenge();
 	//
 	// //_____________
@@ -685,6 +690,13 @@ CGoUniverseApplication.prototype.private_InitTabPanel = function(oTabsControl)
 	oTabsControl.AddControl(oPlayControl);
 	document.getElementById("spanIdPlay").innerHTML = sPlay;
 
+	this.m_oPlayButtonLocation = {
+		Left   : nHomeW + nSpace,
+		Top    : 0,
+		Width  : nPlayW,
+		Height : 50
+	};
+
 	var oThis = this;
 	oPlayControl.HtmlElement.addEventListener("click", function()
 	{
@@ -705,17 +717,22 @@ CGoUniverseApplication.prototype.private_InitTabPanel = function(oTabsControl)
 		var oOwnChallenge = oClient.GetOwnChallenge();
 		if (!oOwnChallenge)
 		{
-			oContextMenu.AddCheckBoxItem(false, "New challenge", function()
+			var bDisabled = oClient.IsPrivateChat(oClient.GetCurrentChatId());
+			oContextMenu.AddListItem("Create challenge in the current room", function()
 			{
 				oThis.m_oClient.CreateChallenge();
-			});
+			}, bDisabled);
+			oContextMenu.AddListItem("Create challenge in room...", function()
+			{
+				oThis.m_oClient.CreateChallenge();
+			}, false);
 		}
 		else
 		{
-			oContextMenu.AddCheckBoxItem(false, "Your challenge", function()
+			oContextMenu.AddListItem("Your challenge", function()
 			{
 				oOwnChallenge.Show();
-			});
+			}, false);
 		}
 		oContextMenu.AddHorizontalLine();
 
@@ -726,9 +743,10 @@ CGoUniverseApplication.prototype.private_InitTabPanel = function(oTabsControl)
 			if (oChallengeWindow && oChallengeWindow !== oOwnChallenge)
 			{
 				var oChallengeCreator = oChallengeWindow.GetChallengeCreator();
-				oContextMenu.AddCheckBoxItem(false, oChallengeCreator.GetName() + "[" + oChallengeCreator.GetStringRank() + "]", function()
+				oContextMenu.AddListItem(oChallengeCreator.GetName() + "[" + oChallengeCreator.GetStringRank() + "]", function(e, _oChallengeWindow)
 				{
-				});
+					_oChallengeWindow.Show();
+				}, false, oChallengeWindow);
 			}
 		}
 
@@ -1411,6 +1429,10 @@ CGoUniverseApplication.prototype.private_ShowAnimatedLogo = function()
 CGoUniverseApplication.prototype.private_HideAnimatedLogo = function()
 {
 	this.m_oAnimatedLogo.Hide();
+};
+CGoUniverseApplication.prototype.GetButtonPlayLocation = function()
+{
+	return this.m_oPlayButtonLocation;
 };
 
 function CGoUniverseGlobalSettings(oApp)
