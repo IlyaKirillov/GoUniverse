@@ -77,6 +77,7 @@ function CKGSChallengeWindow()
 
 	this.m_oCommentInput      = null;
 	this.m_oGameTypeSelect    = null;
+	this.m_oRoomSelect        = null;
 	this.m_oRulesSelect       = null;
 	this.m_oSizeInput         = null;
 	this.m_oKomiInput         = null;
@@ -418,7 +419,7 @@ CKGSChallengeWindow.prototype.Update_Size = function(bForce)
 };
 CKGSChallengeWindow.prototype.Get_DefaultWindowSize = function()
 {
-	return {W : 360, H : 450};
+	return {W : 360, H : 482};
 };
 CKGSChallengeWindow.prototype.Close = function()
 {
@@ -536,7 +537,7 @@ CKGSChallengeWindow.prototype.OnUserRemoved = function(oUser)
 			this.m_arrChallengers.splice(nIndex, 1);
 			this.m_oChallengerSelect.remove(nIndex + 1);
 
-			if (this.m_oCurrentChallenger.GetName() === oUser.GetName())
+			if (this.m_oCurrentChallenger && this.m_oCurrentChallenger.GetName() === oUser.GetName())
 			{
 				this.m_oChallengerSelect.selectedIndex = 0;
 				this.private_OnChangeChallenger();
@@ -876,6 +877,26 @@ CKGSChallengeWindow.prototype.private_CreateRules = function()
 
 	var nLeftWidth = 100;
 	var nTop = this.m_nTop + 10;
+
+	// Room
+	var oRoomSelectElement = this.private_AddRulesField(nLeftWidth, nTop, "select", "Room:");
+	if (EKGSChallengeWindowState.Creation === this.m_nState)
+	{
+		var oClient  = this.m_oClient;
+		var arrRooms = oClient.GetRooms();
+		for (var nIndex = 0, nCount = arrRooms.length; nIndex < nCount; ++nIndex)
+		{
+			var oRoom = arrRooms[nIndex];
+			this.private_AddOptionToSelect(oRoomSelectElement, oRoom.Name);
+		}
+	}
+	else
+	{
+		this.private_AddOptionToSelect(oRoomSelectElement, "Test");
+	}
+	this.m_oRoomSelect = oRoomSelectElement;
+
+	nTop += this.m_nFieldHeight;
 
 	// Rules
 	var oRulesSelectElement = this.private_AddRulesField(nLeftWidth, nTop, "select", "Rules:");
@@ -1636,6 +1657,8 @@ CKGSChallengeWindow.prototype.private_UpdateOnStateChange = function()
 		this.m_oGameTypeSelect.disabled    = "disabled";
 		this.m_oCommentInput.className     = "challengeInput";
 		this.m_oCommentInput.disabled      = "disabled";
+		this.m_oRoomSelect.className       = "challengeSelect challengeSelectDisabled";
+		this.m_oRoomSelect.disabled        = "disabled";
 		this.m_oRulesSelect.className      = "challengeSelect challengeSelectDisabled";
 		this.m_oRulesSelect.disabled       = "disabled";
 		this.m_oSizeInput.className        = "challengeInput";
@@ -1656,6 +1679,8 @@ CKGSChallengeWindow.prototype.private_UpdateOnStateChange = function()
 		this.m_oGameTypeSelect.disabled    = "";
 		this.m_oCommentInput.className     = "challengeInput challengeInputEditable";
 		this.m_oCommentInput.disabled      = "";
+		this.m_oRoomSelect.className       = "challengeSelect challengeSelectEditable";
+		this.m_oRoomSelect.disabled        = "";
 		this.m_oRulesSelect.className      = "challengeSelect challengeSelectEditable";
 		this.m_oRulesSelect.disabled       = "";
 		this.m_oSizeInput.className        = "challengeInput challengeInputEditable";
@@ -1678,6 +1703,8 @@ CKGSChallengeWindow.prototype.private_UpdateOnStateChange = function()
 		this.m_oCommentInput.disabled      = "disabled";
 		this.m_oRulesSelect.className      = "challengeSelect challengeSelectDisabled";
 		this.m_oRulesSelect.disabled       = "disabled";
+		this.m_oRulesSelect.className      = "challengeSelect challengeSelectDisabled";
+		this.m_oRulesSelect.disabled       = "disabled";
 		this.m_oSizeInput.className        = "challengeInput";
 		this.m_oSizeInput.disabled         = "disabled";
 		this.m_oKomiInput.className        = "challengeInput";
@@ -1696,6 +1723,8 @@ CKGSChallengeWindow.prototype.private_UpdateOnStateChange = function()
 		this.m_oGameTypeSelect.disabled    = "disabled";
 		this.m_oCommentInput.className     = "challengeInput";
 		this.m_oCommentInput.disabled      = "disabled";
+		this.m_oRulesSelect.className      = "challengeSelect challengeSelectDisabled";
+		this.m_oRulesSelect.disabled       = "disabled";
 		this.m_oRulesSelect.className      = "challengeSelect challengeSelectDisabled";
 		this.m_oRulesSelect.disabled       = "disabled";
 		this.m_oSizeInput.className        = "challengeInput";
