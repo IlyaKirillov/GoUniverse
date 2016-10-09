@@ -669,7 +669,7 @@ CGoUniverseApplication.prototype.private_InitTabPanel = function(oTabsControl)
 {
 	g_oTextMeasurer.SetFont("24px 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif");
 
-	var sMainRoom = "Main Room";
+	var sMainRoom = "Rooms";
 	var sPlay     = "Play";
 
 	var nHomeW = g_oTextMeasurer.Measure(sMainRoom) + 42;
@@ -717,15 +717,11 @@ CGoUniverseApplication.prototype.private_InitTabPanel = function(oTabsControl)
 		var oOwnChallenge = oClient.GetOwnChallenge();
 		if (!oOwnChallenge)
 		{
-			var bDisabled = oClient.IsPrivateChat(oClient.GetCurrentChatId());
-			oContextMenu.AddListItem("Create challenge in the current room", function()
+			var bDisabled = oClient.GetRooms().length <= 0 ? true : false;
+			oContextMenu.AddListItem("Create new challenge", function()
 			{
 				oThis.m_oClient.CreateChallenge();
 			}, bDisabled);
-			oContextMenu.AddListItem("Create challenge in room...", function()
-			{
-				oThis.m_oClient.CreateChallenge();
-			}, false);
 		}
 		else
 		{
@@ -1448,6 +1444,7 @@ function CGoUniverseGlobalSettings(oApp)
 
 	this.m_nKGSChallengeGameType   = EKGSGameType.Free;
 	this.m_sKGSChallengeComment    = "";
+	this.m_nKGSChallengeRoomId     = -1;
 	this.m_nKGSChallengeRules      = EKGSGameRules.Japanese;
 	this.m_nKGSChallengeBoardSize  = 19;
 	this.m_nKGSChallengeTimeSystem = ETimeSettings.ByoYomi;
@@ -1466,6 +1463,7 @@ CGoUniverseGlobalSettings.prototype.ParseUserSettings = function()
 	this.private_ParseKGSChatRoomId();
 	this.private_ParseKGSChallengeGameType();
 	this.private_ParseKGSChallengeComment();
+	this.private_ParseKGSChallengeRoomId();
 	this.private_ParseKGSChallengeRules();
 	this.private_ParseKGSChallengeBoardSize();
 	this.private_ParseKGSChallengeTimeSystem();
@@ -1696,4 +1694,21 @@ CGoUniverseGlobalSettings.prototype.private_ParseKGSChallengeComment = function(
 	if (null === this.m_sKGSChallengeComment
 		|| undefined === this.m_sKGSChallengeComment)
 		this.m_sKGSChallengeComment = "";
+};
+CGoUniverseGlobalSettings.prototype.SetKGSChallengeRoomId = function(nRoomId)
+{
+	this.m_nKGSChallengeRoomId = nRoomId;
+	this.private_SetValueForUser("KGSChallengeRoomId", "" + nRoomId);
+};
+CGoUniverseGlobalSettings.prototype.GetKGSChallengeRoomId = function()
+{
+	return this.m_nKGSChallengeRoomId;
+};
+CGoUniverseGlobalSettings.prototype.private_ParseKGSChallengeRoomId = function()
+{
+	this.m_nKGSChallengeRoomId = parseInt(this.private_GetValueForUser("KGSChallengeRoomId"));
+	if (isNaN(this.m_nKGSChallengeRoomId)
+		|| null === this.m_nKGSChallengeRoomId
+		|| undefined === this.m_nKGSChallengeRoomId)
+		this.m_nKGSChallengeRoomId = -1;
 };

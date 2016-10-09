@@ -74,6 +74,7 @@ function CKGSChallengeWindow()
 
 	this.m_oCurrentChallenger = null;
 	this.m_arrChallengers     = [];
+	this.m_arrRooms           = [];
 
 	this.m_oCommentInput      = null;
 	this.m_oGameTypeSelect    = null;
@@ -92,6 +93,13 @@ function CKGSChallengeWindow()
 	this.m_oChallengerDiv     = null;
 
 	var oThis = this;
+	this.private_OnChangeRoom = function()
+	{
+		if (!oThis.m_oRoomSelect)
+			return;
+
+		oThis.private_GetGlobalSettings().SetKGSChallengeRoomId(oThis.private_GetSelectedRoomId());
+	};
 	this.private_OnChangeRules = function()
 	{
 		if (!oThis.m_oKomiInput)
@@ -334,7 +342,7 @@ CKGSChallengeWindow.prototype.Init = function(sDivId, oPr)
 
 	this.m_nChannelId  = oPr.ChannelId;
 	this.m_oGameRecord = oPr.GameRecord;
-	this.m_nRoomId     = oPr.RoomId;
+	this.m_nRoomId     = oPr.GameRecord.GetRoomId();
 
 	var oMainDiv     = this.HtmlElement.InnerDiv;
 	var oMainControl = this.HtmlElement.InnerControl;
@@ -888,11 +896,20 @@ CKGSChallengeWindow.prototype.private_CreateRules = function()
 		{
 			var oRoom = arrRooms[nIndex];
 			this.private_AddOptionToSelect(oRoomSelectElement, oRoom.Name);
+			this.m_arrRooms.push({
+				Room     : oRoom,
+				ChannelId: oRoom.ChannelId
+			});
 		}
 	}
 	else
 	{
-		this.private_AddOptionToSelect(oRoomSelectElement, "Test");
+		var nRoomId = this.m_nRoomId;
+		var oAllRooms = this.m_oClient.GetAllRooms();
+		if (oAllRooms[nRoomId])
+			this.private_AddOptionToSelect(oRoomSelectElement, oAllRooms[nRoomId].Name);
+		else
+			this.private_AddOptionToSelect(oRoomSelectElement, "Unknown");
 	}
 	this.m_oRoomSelect = oRoomSelectElement;
 
@@ -986,6 +1003,7 @@ CKGSChallengeWindow.prototype.private_CreateRules = function()
 
 	this.m_nTop = nTop;
 
+	this.private_AddEventsForSelect(this.private_OnChangeRoom, oRoomSelectElement);
 	this.private_AddEventsForSelect(this.private_OnChangeRules, oRulesSelectElement);
 	this.private_AddEventsForInput(this.private_OnChangeBoardSize, oBoardElement);
 	this.private_AddEventsForSelect(this.private_OnChangeTimeSettings, oTimeSystemElement);
@@ -1106,8 +1124,9 @@ CKGSChallengeWindow.prototype.private_CreateChallenge = function()
 	var nRules      = this.private_GetSelectedRules();
 	var nSize       = this.m_oSizeInput.value;
 	var oTimeSystem = this.m_oGameRecord.GetProposal().GetTimeSettings();
+	var nRoomId     = this.private_GetSelectedRoomId();
 
-	this.m_oClient.SendCreateChallenge(this.m_nRoomId, this.m_nChannelId, nGameType, sComment, nRules, nSize, oTimeSystem);
+	this.m_oClient.SendCreateChallenge(nRoomId, this.m_nChannelId, nGameType, sComment, nRules, nSize, oTimeSystem);
 
 	this.private_SetState(EKGSChallengeWindowState.Waiting);
 	this.m_nGameType = nGameType;
@@ -1294,6 +1313,25 @@ CKGSChallengeWindow.prototype.private_SetSelectedTimeSystem = function(nSystem)
 		nSelectedIndex = 3;
 
 	this.m_oTimeSystemSelect.selectedIndex = nSelectedIndex;
+};
+CKGSChallengeWindow.prototype.private_GetSelectedRoomId = function()
+{
+	return this.m_arrRooms[this.m_oRoomSelect.selectedIndex].ChannelId;
+};
+CKGSChallengeWindow.prototype.private_SetSelectedRoomId = function(nRoomId)
+{
+	if (this.m_arrRooms.length <= 0)
+		return;
+
+	for (var nIndex = 0, nCount = this.m_arrRooms.length; nIndex < nCount; ++nIndex)
+	{
+		var oRoomRecord = this.m_arrRooms[nIndex];
+		if (nRoomId === oRoomRecord.ChannelId)
+		{
+			this.m_oRoomSelect.selectedIndex = nIndex;
+			return;
+		}
+	}
 };
 CKGSChallengeWindow.prototype.private_AddEventsForInput = function(fOnChange, oInput)
 {
@@ -1701,8 +1739,8 @@ CKGSChallengeWindow.prototype.private_UpdateOnStateChange = function()
 		this.m_oGameTypeSelect.disabled    = "disabled";
 		this.m_oCommentInput.className     = "challengeInput";
 		this.m_oCommentInput.disabled      = "disabled";
-		this.m_oRulesSelect.className      = "challengeSelect challengeSelectDisabled";
-		this.m_oRulesSelect.disabled       = "disabled";
+		this.m_oRoomSelect.className      = "challengeSelect challengeSelectDisabled";
+		this.m_oRoomSelect.disabled       = "disabled";
 		this.m_oRulesSelect.className      = "challengeSelect challengeSelectDisabled";
 		this.m_oRulesSelect.disabled       = "disabled";
 		this.m_oSizeInput.className        = "challengeInput";
@@ -1723,8 +1761,8 @@ CKGSChallengeWindow.prototype.private_UpdateOnStateChange = function()
 		this.m_oGameTypeSelect.disabled    = "disabled";
 		this.m_oCommentInput.className     = "challengeInput";
 		this.m_oCommentInput.disabled      = "disabled";
-		this.m_oRulesSelect.className      = "challengeSelect challengeSelectDisabled";
-		this.m_oRulesSelect.disabled       = "disabled";
+		this.m_oRoomSelect.className      = "challengeSelect challengeSelectDisabled";
+		this.m_oRoomSelect.disabled       = "disabled";
 		this.m_oRulesSelect.className      = "challengeSelect challengeSelectDisabled";
 		this.m_oRulesSelect.disabled       = "disabled";
 		this.m_oSizeInput.className        = "challengeInput";
@@ -1793,6 +1831,7 @@ CKGSChallengeWindow.prototype.private_FillDefaultCreatorValues = function()
 
 	var sComment    = oGlobalSettings.GetKGSChallengeComment();
 	var nGameType   = oGlobalSettings.GetKGSChallengeGameType();
+	var nRoomId     = oGlobalSettings.GetKGSChallengeRoomId();
 	var nRules      = oGlobalSettings.GetKGSChallengeRules();
 	var nSize       = oGlobalSettings.GetKGSChallengeBoardSize();
 	var nTimeSystem = oGlobalSettings.GetKGSChallengeTimeSystem();
@@ -1802,6 +1841,7 @@ CKGSChallengeWindow.prototype.private_FillDefaultCreatorValues = function()
 
 	this.private_SetSelectedGameType(nGameType);
 	this.m_oCommentInput.value = sComment;
+	this.private_SetSelectedRoomId(nRoomId);
 	this.private_SetSelectedRules(nRules);
 	this.m_oSizeInput.value = nSize;
 	this.private_SetSelectedTimeSystem(nTimeSystem);
