@@ -506,7 +506,11 @@ CGoUniverseApplication.prototype.AddGameRoom = function(oGame)
 {
 	var oTab = new CVisualGameRoomTab(this);
 	var oGameRoomControl = oTab.InitGameRoom("divMainId", oGame);
-	this.m_oGameRoomTabs.AddTab(oTab);
+
+	if (oGame.IsPlayer())
+		this.m_oGameRoomTabs.AddOwnGameTab(oTab);
+	else
+		this.m_oGameRoomTabs.AddTab(oTab);
 
 	oGameRoomControl.Bounds.SetParams(0, 50, 1000, 1000, false, true, false, false, -1, -1);
 	oGameRoomControl.Anchor = (g_anchor_bottom | g_anchor_left | g_anchor_right);

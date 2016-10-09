@@ -200,7 +200,14 @@ CVisualGameRoomTabs.prototype.Clear = function()
 
 	this.m_arrTabs.push(oMainTab);
 };
+CVisualGameRoomTabs.prototype.AddOwnGameTab = function(oTab)
+{
+	this.m_arrTabs.push(oTab);
+	oTab.SetParent(this);
 
+	var oTabDiv = oTab.GetDiv();
+	this.m_oPanelElement.insertBefore(oTabDiv, this.m_oPanelElement.children[0] ? this.m_oPanelElement.children[0] : null);
+};
 
 function CVisualGameRoomTab(oApp)
 {

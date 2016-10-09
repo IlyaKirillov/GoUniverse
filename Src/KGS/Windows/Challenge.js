@@ -207,14 +207,13 @@ function CKGSChallengeWindow()
 
 		var bChangedColors = false;
 		// 0 - элемент пустая строка
-		if (0 === nSelectedIndex)
+		if (nSelectedIndex <= 0)
 		{
 			oThis.m_oCurrentChallenger = null;
 			oThis.m_oButtons.Ok.Hide();
 
 			oChallengerSpan.innerHTML = "";
 			oChallengerSpan.title     = "";
-			oChallengerSpan.onclick   = null;
 
 			oThis.m_oHandicapInput.value = oThis.private_GetDefaultHandicap();
 			oThis.m_oKomiInput.value     = oThis.private_GetDefaultKomi();
@@ -281,6 +280,7 @@ function CKGSChallengeWindow()
 		}
 
 		oThis.private_DrawPlayerColor(bChangedColors);
+		oThis.Update_Size(); // Нужно вызывать из-за кнопки OK
 	};
 	this.private_OnChangeColors = function()
 	{
@@ -596,6 +596,7 @@ CKGSChallengeWindow.prototype.Show = function()
 	oMainDiv.style.transitionDuration = "";
 
 	this.Focus();
+	this.Update_Size();
 };
 CKGSChallengeWindow.prototype.private_CreateName = function()
 {
@@ -628,6 +629,7 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 
 	var oTypeList       = this.protected_CreateDivElement(oWrapperTypeDiv, null, "select");
 	oTypeList.style.fontWeight = "bold";
+	oTypeList.style.padding = "";
 
 	switch (this.m_nType)
 	{
@@ -748,6 +750,7 @@ CKGSChallengeWindow.prototype.private_CreatePlayers = function()
 
 	var oChallengerSpan            = document.createElement("span");
 	oChallengerSpan.style["float"] = "left";
+	oChallengerSpan.style.display  = "block";
 	oChallengerSpan.className      = "challengePlayerSpan";
 	oChallengerSpan.innerHTML      = "";
 	oChallengerSpan.title          = "";

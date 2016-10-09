@@ -480,6 +480,12 @@ CKGSClient.prototype.GiveGameControl = function(nGameId, sUserName)
 };
 CKGSClient.prototype.CreateChallenge = function()
 {
+	if (this.private_IsAlreadyPlaying())
+	{
+		this.private_ShowAlreadyPlayingWindow();
+		return;
+	}
+
 	var nCallBackKey = -1;
 
 	if (this.m_oChallenges[nCallBackKey])
@@ -928,6 +934,10 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
 	else if ("SYNC" === oMessage.type)
 	{
 		this.private_HandleSync(oMessage);
+	}
+	else if ("CANT_PLAY_TWICE" === oMessage.type)
+	{
+		this.private_HandleCantPlayTwice(oMessage);
 	}
 	else
 	{
@@ -1814,6 +1824,12 @@ CKGSClient.prototype.private_HandleChallengeJoin = function(oMessage)
 
 	var oWindow = CreateKGSWindow(EKGSWindowType.Challenge, {ChannelId : nChannelId, GameRecord : oGameRecord, Client : this, App: this.m_oApp});
 	this.m_oChallenges[nChannelId] = oWindow;
+
+	if (this.private_IsAlreadyPlaying())
+	{
+		oWindow.Close();
+		// Здесь сообщение не показываем, оно покажется на "CANT_PLAY_TWICE"
+	}
 };
 CKGSClient.prototype.private_HandleChallengeSubmit = function(oMessage)
 {
@@ -1905,6 +1921,16 @@ CKGSClient.prototype.private_HandleSync = function(oMessage)
 		delete this.m_oSync[nCallbackKey];
 		oClass.OnSync();
 	}
+};
+CKGSClient.prototype.private_HandleCantPlayTwice = function()
+{
+	for (var nChannelId in this.m_oChallenges)
+	{
+		var oWindow = this.m_oChallenges[nChannelId];
+		oWindow.Close();
+	}
+
+	this.private_ShowAlreadyPlayingWindow();
 };
 CKGSClient.prototype.private_AddUserToRoom = function(oUser, oRoom)
 {
@@ -2190,4 +2216,26 @@ CKGSClient.prototype.GetCurrentChatId = function()
 {
 	return this.m_nChatChannelId;
 };
+CKGSClient.prototype.private_IsAlreadyPlaying = function()
+{
+	for (var nGameId in this.m_aGames)
+	{
+		var oGameRoom = this.m_aGames[nGameId];
+		if (oGameRoom.IsPlayer())
+			return true;
+	}
 
+	return false;
+};
+CKGSClient.prototype.private_ShowAlreadyPlayingWindow = function()
+{
+	CreateKGSWindow(EKGSWindowType.Information, {
+		Client : this,
+		App    : this.m_oApp,
+		Caption: "Warning",
+		Text   : "Sorry, you are already playing in one game, so you can't start playing in another.",
+		Image  : "WarningSpanWarning",
+		W      : 370,
+		H      : 144
+	});
+};
