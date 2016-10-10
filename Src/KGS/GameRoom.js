@@ -366,6 +366,7 @@ CKGSGameRoom.prototype.HandleScore = function(sScore)
 		{
 			this.m_oClient.m_oApp.GetSound().PlayBeepBeep();
 			this.SetViewMode();
+			this.private_SendNotification();
 		}
 	}
 
@@ -1200,6 +1201,16 @@ CKGSGameRoom.prototype.private_OurMove = function()
 	this.m_oClient.m_oApp.GetSound().ResetCountDown();
 
 	this.m_bOurMove = true;
+	this.private_SendNotification();
+
+	// if (this.IsPlayer() && this.m_oGameTree.Get_Drawing())
+	// {
+	// 	var oTime = this.IsBlackPlayer() ? this.m_oBlackTime : this.m_oWhiteTime;
+	// 	if (oTime.IsCountDown())
+	// 		this.m_oGameTree.Get_Drawing().GoUniverseShowCountDown(oTime.GetCountDownTime());
+	// 	else
+	// 		this.m_oGameTree.Get_Drawing().GoUniverseHideCountDown();
+	// }
 };
 CKGSGameRoom.prototype.private_OpponentMove = function()
 {
@@ -1210,6 +1221,13 @@ CKGSGameRoom.prototype.private_OpponentMove = function()
 	this.m_oGameTree.Set_EditingFlags({Move : true});
 
 	this.m_oClient.m_oApp.GetSound().StopCountDown();
+
+	// if (this.IsPlayer() && this.m_oGameTree.Get_Drawing())
+	// {
+	// 	var oTime = this.IsBlackPlayer() ? this.m_oBlackTime : this.m_oWhiteTime;
+	// 	if (!oTime.IsCountDown())
+	// 		this.m_oGameTree.Get_Drawing().GoUniverseHideCountDown();
+	// }
 };
 CKGSGameRoom.prototype.IsCountingScores = function()
 {
@@ -1320,6 +1338,10 @@ CKGSGameRoom.prototype.ForbidUndo = function()
 CKGSGameRoom.prototype.IsUndoForbidden = function()
 {
 	return this.m_bUndoForbidden;
+};
+CKGSGameRoom.prototype.private_SendNotification = function()
+{
+	this.m_oClient.SendGameNotification(this.m_nGameRoomId);
 };
 
 function CKGSEditorHandler(oClient, oGame)

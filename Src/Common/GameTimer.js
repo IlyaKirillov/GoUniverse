@@ -455,3 +455,30 @@ CTimeSettings.prototype.GetCurrentMainTime = function()
 {
 	return this.m_nMainTime;
 };
+CTimeSettings.prototype.IsCountDown = function()
+{
+	if ((this.IsAbsolute() && this.GetCurrentMainTime() < 60 + 0.05)
+		|| (this.IsByoYomi() && this.GetCurrentMainTime() <= 0 && this.GetCurrentOverTime() < 10 + 0.05)
+		|| (this.IsCanadian() && this.GetCurrentMainTime() <= 0 && this.GetCurrentOverTime() < 60 + 0.05))
+			return true;
+
+	return false;
+};
+CTimeSettings.prototype.GetCountDownTime = function()
+{
+	if (this.IsAbsolute())
+		return this.GetCurrentMainTime();
+	else if (this.IsByoYomi() || this.IsCanadian())
+		return this.GetCurrentOverTime();
+
+	return 0;
+};
+CTimeSettings.prototype.GetCountDownLimit = function()
+{
+	if (this.IsAbsolute() || this.IsCanadian())
+		return 60;
+	else (this.IsByoYomi())
+		return 10;
+
+	return 0;
+};

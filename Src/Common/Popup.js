@@ -229,6 +229,8 @@ CVisualContextMenu.prototype.AddListItem = function(sText, fAction, isDisabled, 
 	}
 
 	this.m_nHeight += 20;
+
+	return oListEntry;
 };
 CVisualContextMenu.prototype.AddHorizontalLine = function()
 {
@@ -273,6 +275,8 @@ CVisualContextMenu.prototype.AddCheckBoxItem = function(bChecked, sText, fAction
 	}
 
 	this.m_nHeight += 20;
+
+	return oListEntry;
 };
 CVisualContextMenu.prototype.Show = function()
 {

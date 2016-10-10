@@ -722,17 +722,20 @@ CGoUniverseApplication.prototype.private_InitTabPanel = function(oTabsControl)
 		if (!oOwnChallenge)
 		{
 			var bDisabled = oClient.GetRooms().length <= 0 ? true : false;
-			oContextMenu.AddListItem("Create new challenge", function()
+			var oListEntry = oContextMenu.AddListItem("Create new challenge", function()
 			{
 				oThis.m_oClient.CreateChallenge();
 			}, bDisabled);
 		}
 		else
 		{
-			oContextMenu.AddListItem("Your challenge", function()
+			var oListEntry = oContextMenu.AddListItem("Your challenge", function()
 			{
 				oOwnChallenge.Show();
 			}, false);
+
+			if (oOwnChallenge.HaveChallengers())
+				oListEntry.className += " blinkPlayMenu";
 		}
 		oContextMenu.AddHorizontalLine();
 
@@ -743,10 +746,13 @@ CGoUniverseApplication.prototype.private_InitTabPanel = function(oTabsControl)
 			if (oChallengeWindow && oChallengeWindow !== oOwnChallenge)
 			{
 				var oChallengeCreator = oChallengeWindow.GetChallengeCreator();
-				oContextMenu.AddListItem(oChallengeCreator.GetName() + "[" + oChallengeCreator.GetStringRank() + "]", function(e, _oChallengeWindow)
+				var oListEntry = oContextMenu.AddListItem(oChallengeCreator.GetName() + "[" + oChallengeCreator.GetStringRank() + "]", function(e, _oChallengeWindow)
 				{
 					_oChallengeWindow.Show();
 				}, false, oChallengeWindow);
+
+				if (oChallengeWindow.IsWaitingForAccept())
+					oListEntry.className += " blinkPlayMenu";
 			}
 		}
 
@@ -1433,6 +1439,18 @@ CGoUniverseApplication.prototype.private_HideAnimatedLogo = function()
 CGoUniverseApplication.prototype.GetButtonPlayLocation = function()
 {
 	return this.m_oPlayButtonLocation;
+};
+CGoUniverseApplication.prototype.SendGameNotification = function(nGameId)
+{
+	if (this.m_oGameRoomTabs.GetCurrentId() !== nGameId)
+	{
+		var oTab = this.m_oGameRoomTabs.GetTab(nGameId);
+		oTab.ShowNotification();
+	}
+};
+CGoUniverseApplication.prototype.SendChallengeNotification = function(nChallengeId)
+{
+	document.getElementById("divIdPlayButton").style.background = "rgb(153, 82, 25)";
 };
 
 function CGoUniverseGlobalSettings(oApp)

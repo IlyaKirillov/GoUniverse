@@ -222,6 +222,8 @@ function CVisualGameRoomTab(oApp)
 	this.m_oGameHandler  = null;
 
 	this.m_oCaptionDiv   = null;
+
+	this.m_bShowNotification = false;
 }
 CVisualGameRoomTab.prototype.InitMainRoom = function(nId, sMainDivId, sTabDivId)
 {
@@ -295,14 +297,18 @@ CVisualGameRoomTab.prototype.InitGameRoom = function(sDivIdContainer, oGame)
 	}, false);
 	oDivTab.addEventListener("mouseover", function()
 	{
-		oDivTab.style.backgroundColor = "#505050";
+		if (!oThis.m_bShowNotification)
+			oDivTab.style.backgroundColor = "#505050";
 	});
 	oDivTab.addEventListener("mouseout", function()
 	{
-		if (oThis.m_oParent && oThis.m_oParent.GetCurrent() !== oThis)
-			oDivTab.style.backgroundColor = "transparent";
-		else
-			oDivTab.style.backgroundColor = "#737373";
+		if (!oThis.m_bShowNotification)
+		{
+			if (oThis.m_oParent && oThis.m_oParent.GetCurrent() !== oThis)
+				oDivTab.style.backgroundColor = "transparent";
+			else
+				oDivTab.style.backgroundColor = "#737373";
+		}
 	});
 
 	var oButton                             = document.createElement("button");
@@ -425,6 +431,8 @@ CVisualGameRoomTab.prototype.OnClick = function()
 	if (!this.m_oParent)
 		return;
 
+	this.HideNotification();
+
 	var oOldTab = this.m_oParent.OnClick(this);
 	if (oOldTab)
 	{
@@ -477,6 +485,22 @@ CVisualGameRoomTab.prototype.OnCloseTab = function()
 		this.m_oContainerDiv.removeChild(this.m_oMainDiv);
 
 	this.m_oApp.UpdateDropDownGameTabsButton();
+};
+CVisualGameRoomTab.prototype.ShowNotification = function()
+{
+	if (!this.m_bShowNotification)
+	{
+		this.m_oTabDiv.style.backgroundColor = "rgb(153, 82, 25)";
+		this.m_bShowNotification             = true;
+	}
+};
+CVisualGameRoomTab.prototype.HideNotification = function()
+{
+	if (this.m_bShowNotification)
+	{
+		this.m_oTabDiv.style.backgroundColor = "transparent";
+		this.m_bShowNotification             = false;
+	}
 };
 
 function CVisualChatRoomTabs()

@@ -80,6 +80,7 @@ CDrawing.prototype.Create_GoUniverseViewerTemplate = function(sDivId, oApp, oTab
 	this.m_oWhiteTime     = oGameRoom.GetWhiteTime();
 	this.m_oGameRoom      = oGameRoom;
 
+	this.m_oCountDown       = new CGoUniverseDrawingCountDown();
 	this.m_oCountingScores  = new CGoUniverseDrawingCountingScores(this, oGameRoom);
 
 	this.m_oGoUniversePr = {
@@ -229,6 +230,16 @@ CDrawing.prototype.private_GoUniverseCreatePlayersInfo = function(oParentControl
 
 	this.m_aElements.push(oDrawingBlackInfo);
 	this.m_aElements.push(oDrawingWhiteInfo);
+
+	var sCountDown = sInfoDivId + "CountDown";
+	this.private_CreateDiv(oInfoControl.HtmlElement, sCountDown);
+
+	var oCountDownControl = CreateControlContainer(sCountDown);
+	oCountDownControl.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, -1);
+	oCountDownControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right | g_anchor_bottom);
+	oInfoControl.AddControl(oCountDownControl);
+
+	this.m_oCountDown.Init(oCountDownControl.HtmlElement);
 };
 CDrawing.prototype.private_GoUniverseCreateMenuButton = function(oParentControl, oParentDiv, sDivId)
 {
@@ -505,6 +516,15 @@ CDrawing.prototype.GoUniverseOnMatchAnalyze = function()
 CDrawing.prototype.GoUniverseUpdateScoresDone = function(bWhiteDone, bBlackDone)
 {
 	this.m_oCountingScores.UpdateDoneState(bWhiteDone, bBlackDone);
+};
+CDrawing.prototype.GoUniverseShowCountDown = function(nTime)
+{
+	this.m_oCountDown.Show();
+	this.m_oCountDown.Update(nTime);
+};
+CDrawing.prototype.GoUniverseHideCountDown = function()
+{
+	this.m_oCountDown.Hide();
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Специальный класс с комментариями
@@ -945,32 +965,30 @@ CGoUniverseDrawingPlayerInfo.prototype.Init = function(sDivId, oGameTree, nPlaye
 	oTimeDiv.style["float"] = "left";
 	oTimeDiv.style.fontSize = "12pt";
 	oTimeDiv.innerHTML      = "--:--";
+	oTimeDiv.style.border   = "1px solid transparent";
 
 	if (oTimeSettings)
 	{
 		Common.Set_InnerTextToElement(oTimeDiv, oTimeSettings.ToString());
 
-		var oGameRoom = this.m_oDrawing.m_oGameRoom;
-		var oSound = oApp.GetSound();
+		var oGameRoom  = this.m_oDrawing.m_oGameRoom;
+		var oSound     = oApp.GetSound();
+		var oCountDown = this.m_oDrawing.m_oCountDown;
 		oTimeSettings.SetOnTick(function(sTime)
 		{
-			if (oGameRoom.IsPlayer() && oGameRoom.IsOurMove())
+			if (oGameRoom.IsPlayer() && oGameRoom.IsOurMove() && this.IsCountDown())
 			{
-				if (this.IsAbsolute())
-				{
-					oSound.PlayCountDown(this.GetCurrentMainTime(), 60);
-				}
-				else if (this.IsByoYomi())
-				{
-					if (this.GetCurrentMainTime() <= 0)
-						oSound.PlayCountDown(this.GetCurrentOverTime(), 10);
-				}
-				else if (this.IsCanadian())
-				{
-					if (this.GetCurrentMainTime() <= 0)
-						oSound.PlayCountDown(this.GetCurrentOverTime(), 60);
-				}
+				var nCurTime = this.GetCountDownTime();
+				var nLimit   = this.GetCountDownLimit();
+
+				oSound.PlayCountDown(nCurTime, nLimit);
+				// oCountDown.Show();
+				// oCountDown.Update(nCurTime);
 			}
+
+			if(this.IsCountDown())
+				oTimeDiv.className += "blinkCountDownTime";
+
 
 			Common.Set_InnerTextToElement(oTimeDiv, sTime);
 		});
@@ -1759,4 +1777,35 @@ CGoUniverseDrawingCountingScores.prototype.UpdateDoneState = function(bWhiteDone
 
 	privateSet(bWhiteDone, this.m_oWhiteDone);
 	privateSet(bBlackDone, this.m_oBlackDone);
+};
+//----------------------------------------------------------------------------------------------------------------------
+// Таймер обратного отсчета
+//----------------------------------------------------------------------------------------------------------------------
+function CGoUniverseDrawingCountDown()
+{
+	this.m_oMainDiv = null;
+}
+CGoUniverseDrawingCountDown.prototype.Init = function(oDiv)
+{
+	this.m_oMainDiv = oDiv;
+
+	oDiv.style.color      = "#000000";
+	oDiv.style.fontSize   = "36pt";
+	oDiv.style.fontFamily = '"Segoe UI", Helvetica, Tahoma, Geneva, Verdana, sans-serif';
+	oDiv.style.textAlign  = "center";
+	oDiv.style.paddingTop = "40px";
+};
+CGoUniverseDrawingCountDown.prototype.Update = function(nTime)
+{
+	var _nTime = nTime | 0;
+	var sTime = "" + _nTime;
+	this.m_oMainDiv.innerHTML = sTime;
+};
+CGoUniverseDrawingCountDown.prototype.Show = function()
+{
+	this.m_oMainDiv.style.display = "block";
+};
+CGoUniverseDrawingCountDown.prototype.Hide = function()
+{
+	this.m_oMainDiv.style.display = "none";
 };

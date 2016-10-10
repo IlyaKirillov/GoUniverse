@@ -255,7 +255,7 @@ CKGSInGamePlayersListRecord.prototype.Draw = function(oContext, dX, dY, eType)
 		oContext.fillStyle = "#AAAAAA";
 
 	var bResetFont = false;
-	if (oClient)
+	if (oClient && EKGSInGamePlayersListRecord.Type !== eType)
 	{
 		if (true === oClient.IsUserInFollowerList(this.m_sName))
 		{

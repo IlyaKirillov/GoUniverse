@@ -2239,3 +2239,17 @@ CKGSClient.prototype.private_ShowAlreadyPlayingWindow = function()
 		H      : 144
 	});
 };
+CKGSClient.prototype.SendGameNotification = function(nGameId)
+{
+	if (!this.m_aGames[nGameId])
+		return;
+
+	this.m_oApp.SendGameNotification(nGameId);
+};
+CKGSClient.prototype.SendChallengeNotification = function(nChallengeId)
+{
+	if (!this.m_oChallenges[nChallengeId] || true === this.m_oChallenges[nChallengeId].IsVisible())
+		return;
+
+	this.m_oApp.SendChallengeNotification(nChallengeId);
+};

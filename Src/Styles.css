@@ -594,3 +594,23 @@ div.challengePlayerDivEditable {
 	border-right : 1px transparent;
 	background   : rgb(255, 255, 255);
 }
+
+.blinkPlayMenu {
+	animation : blinkPlayMenuAnimation 2s linear infinite;
+}
+
+@keyframes blinkPlayMenuAnimation {
+	50% {
+		opacity : 0.25;
+	}
+}
+
+.blinkCountDownTime {
+	animation : blinkCountDownTimeAnimation 1s linear infinite;
+}
+
+@keyframes blinkCountDownTimeAnimation {
+	50% {
+		border : 1px solid black;
+	}
+}

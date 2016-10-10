@@ -449,6 +449,8 @@ CKGSChallengeWindow.prototype.OnSubmit = function(oUser, oProposal)
 		this.private_OnChangeChallenger();
 		this.Update_Size(); // Для обсчета кнопки Ok
 	}
+
+	this.m_oClient.SendChallengeNotification(this.m_nChannelId);
 };
 CKGSChallengeWindow.prototype.OnDecline = function()
 {
@@ -528,6 +530,8 @@ CKGSChallengeWindow.prototype.OnProposal = function(oProposal)
 
 			if (bColorsChanged)
 				this.private_DrawPlayerColor(true);
+
+			this.m_oClient.SendChallengeNotification(this.m_nChannelId);
 		}
 	}
 };
@@ -597,6 +601,19 @@ CKGSChallengeWindow.prototype.Show = function()
 
 	this.Focus();
 	this.Update_Size();
+};
+CKGSChallengeWindow.prototype.IsVisible = function()
+{
+	var oMainDiv = this.HtmlElement.Control.HtmlElement;
+	return (oMainDiv.style.display === "none" ? false : true);
+};
+CKGSChallengeWindow.prototype.HaveChallengers = function()
+{
+	return (this.m_arrChallengers.length > 0 ? true : false);
+};
+CKGSChallengeWindow.prototype.IsWaitingForAccept = function()
+{
+	return this.m_nState === EKGSChallengeWindowState.ChallengerAccept ? true : false;
 };
 CKGSChallengeWindow.prototype.private_CreateName = function()
 {
