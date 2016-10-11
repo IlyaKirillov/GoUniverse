@@ -227,7 +227,7 @@ CGoUniverseApplication.prototype.OnResize = function(bSkipChatHandler)
 
 	var AboutDiv        = document.getElementById("divIdAbout");
 	AboutDiv.style.left = (document.body.clientWidth - 250) / 2 + "px";
-	AboutDiv.style.top  = (document.body.clientHeight - 90 - 20) + "px";
+	AboutDiv.style.top  = (document.body.clientHeight - 65 - 20) + "px";
 
 	var Logo = document.getElementById("animatedLogoId");
 	Logo.style.left = (document.body.clientWidth - Logo.width) / 2 + "px";
