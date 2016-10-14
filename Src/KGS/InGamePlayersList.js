@@ -230,7 +230,6 @@ CKGSInGamePlayersList.prototype.GetVerLinesPositions = function()
 	return [2];
 };
 
-
 function CKGSInGamePlayersListRecord(oListObject, oClient)
 {
 	CKGSInGamePlayersListRecord.superclass.constructor.call(this);
@@ -273,6 +272,11 @@ CKGSInGamePlayersListRecord.prototype.Draw = function(oContext, dX, dY, eType)
 
 		bResetFont = true;
 	}
+	else if (oClient && EKGSInGamePlayersListRecord.Type === eType)
+	{
+		oContext.font = "12px 'NotoEmoji'";
+		bResetFont = true;
+	}
 
 	var sString = "";
 	switch(eType)
@@ -284,7 +288,7 @@ CKGSInGamePlayersListRecord.prototype.Draw = function(oContext, dX, dY, eType)
 
 	oContext.fillText(sString, dX, dY);
 
-	if (eType === EKGSInGamePlayersListRecord.Type && "" !== sString && this.m_oListObject.IsEditor(this.m_sName))
+	if (eType === EKGSInGamePlayersListRecord.Type && "" !== sString)
 		oContext.strokeText(sString, dX, dY);
 
 	if (oClient)
@@ -359,21 +363,21 @@ CKGSInGamePlayersListRecord.prototype.private_GetUserType = function(oContext)
 	}
 	else if (this.m_oListObject.IsOwner(this.m_sName))
 	{
-		oContext.fillStyle   = "#000";
-		oContext.strokeStyle = "transparent";
-		return String.fromCharCode(0x2615);
+		oContext.fillStyle   = "transparent";
+		oContext.strokeStyle = "#000";
+		return EncodeSurrogateChar(0x1F4FA);
 	}
 	else if (this.m_oListObject.IsBlack(this.m_sName))
 	{
 		oContext.fillStyle   = "#000";
 		oContext.strokeStyle = "#000";
-		return String.fromCharCode(0x26AB);
+		return EncodeSurrogateChar(0x1F311);
 	}
 	else if (this.m_oListObject.IsWhite(this.m_sName))
 	{
-		oContext.fillStyle   = "#000";
+		oContext.fillStyle   = "#FFF";
 		oContext.strokeStyle = "#000";
-		return String.fromCharCode(0x26AA);
+		return EncodeSurrogateChar(0x1F311);
 	}
 
 	return "";

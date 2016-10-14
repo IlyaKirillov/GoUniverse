@@ -17,6 +17,29 @@ if (!String.prototype.splice)
 	};
 }
 
+
+function DecodeSurrogateChar(nLeadingChar, nTrailingChar)
+{
+	if (nLeadingChar < 0xDC00 && nTrailingChar >= 0xDC00 && nTrailingChar <= 0xDFFF)
+		return 0x10000 + ((nLeadingChar & 0x3FF) << 10) | (nTrailingChar & 0x3FF);
+	else
+		return null;
+}
+function EncodeSurrogateChar(nUnicode)
+{
+	if (nUnicode < 0x10000)
+	{
+		return String.fromCharCode(nUnicode);
+	}
+	else
+	{
+		nUnicode          = nUnicode - 0x10000;
+		var nLeadingChar  = 0xD800 | (nUnicode >> 10);
+		var nTrailingChar = 0xDC00 | (nUnicode & 0x3FF);
+		return String.fromCharCode(nLeadingChar) + String.fromCharCode(nTrailingChar);
+	}
+}
+
 var urlRegEx = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-]*)?\??(?:[\-\+=&;%@\.\w]*)#?(?:[\.\-\!\/\\\w]*))?)/g;
 function SplitTextToLines(sText)
 {

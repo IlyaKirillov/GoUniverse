@@ -614,3 +614,10 @@ div.challengePlayerDivEditable {
 		border : 1px solid black;
 	}
 }
+
+@font-face {
+	font-family: 'NotoEmoji';
+	src: url('Files/Fonts/NotoEmoji/NotoEmoji-Regular.ttf')  format('truetype');
+	font-weight: normal;
+	font-style: normal;
+}

@@ -396,16 +396,17 @@ CVisualGameRoomTab.prototype.private_FillCaption = function(bDemonstration)
 		var sWhiteName = oGameTree ? oGameTree.Get_WhiteName() : "White";
 		var sBlackName = oGameTree ? oGameTree.Get_BlackName() : "Black";
 		var oCaptionStringDiv       = document.createElement("div");
-		oCaptionStringDiv.innerHTML = String.fromCharCode(0x2691) + "&nbsp;" + sWhiteName + "[" + (oGameTree ? oGameTree.Get_WhiteRating() : "-") + "]";
+		oCaptionStringDiv.innerHTML = '<span style="font-family: NotoEmoji;">' + String.fromCharCode(0x2691) + '</span>' + "&nbsp;" + sWhiteName + "[" + (oGameTree ? oGameTree.Get_WhiteRating() : "-") + "]";
 		oCaptionDiv.appendChild(oCaptionStringDiv);
 		oCaptionStringDiv           = document.createElement("div");
-		oCaptionStringDiv.innerHTML = String.fromCharCode(0x2690) + "&nbsp;" + sBlackName + "[" + (oGameTree ? oGameTree.Get_BlackRating() : "-") + "]";
+		oCaptionStringDiv.innerHTML = '<span style="font-family: NotoEmoji;">' + String.fromCharCode(0x2690) + '</span>' + "&nbsp;" + sBlackName + "[" + (oGameTree ? oGameTree.Get_BlackRating() : "-") + "]";
 		oCaptionDiv.appendChild(oCaptionStringDiv);
 	}
 	else
 	{
 		var oCaptionStringDiv       = document.createElement("div");
-		oCaptionStringDiv.innerHTML = String.fromCharCode(0x2615) + "&nbsp;" + (oGameTree ? oGameTree.Get_GameTranscriber() : "");
+
+		oCaptionStringDiv.innerHTML = '<span style="font-family: NotoEmoji;">' + EncodeSurrogateChar(0x1F4FA) + '</span>'+ "&nbsp;" + (oGameTree ? oGameTree.Get_GameTranscriber() : "");
 		oCaptionDiv.appendChild(oCaptionStringDiv);
 	}
 };

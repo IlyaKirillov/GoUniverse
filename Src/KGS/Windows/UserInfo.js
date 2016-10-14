@@ -647,9 +647,9 @@ CKGSUserInfoWindow.prototype.private_AddInfo = function(sText)
 CKGSUserInfoWindow.prototype.private_SetCaption = function(sCaption, bOnline)
 {
 	if (bOnline)
-		this.HtmlElement.CaptionText.innerHTML = "\<span\>" + sCaption + "\<\/span\>" + "\<span style='position:absolute;left:0px;color:rgb(0,130,57)'\>&#x2600;\<\/span\>";
+		this.HtmlElement.CaptionText.innerHTML = "\<span\>" + sCaption + "\<\/span\>" + '<span style="font-family:NotoEmoji;position:absolute;left:0px;color:rgb(0,130,57)">&#x2600;</span>';
 	else
-		this.HtmlElement.CaptionText.innerHTML = "\<span\>" + sCaption + "\<\/span\>" + "\<span style='position:absolute;left:0px;color:rgb(199,40,40)'\>&#x26C5;\<\/span\>";
+		this.HtmlElement.CaptionText.innerHTML = "\<span\>" + sCaption + "\<\/span\>" + '<span style="font-family:NotoEmoji;position:absolute;left:0px;color:rgb(199,40,40)">&#x26C5;</span>';
 };
 CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
 {
