@@ -12,7 +12,7 @@
 var EKGSGamesListType = {
 	AllGames      : 0,
 	Room          : 1,
-	Follower      : 2,
+	Followed      : 2,
 	AllChallenges : 3,
 
 	Min : 0,
@@ -1368,7 +1368,7 @@ CKGSClient.prototype.private_HandleGameList = function(oMessage)
 		if ((EKGSGamesListType.AllGames === this.m_eGamesListType && true !== bChallenge)
 			|| (EKGSGamesListType.AllChallenges === this.m_eGamesListType && true === bChallenge)
 			|| (EKGSGamesListType.Room === this.m_eGamesListType && oMessage.channelId == this.m_nChatChannelId)
-			|| (EKGSGamesListType.Follower === this.m_eGamesListType && oMessage.channelId === this.m_nFollowersGamesChannelId))
+			|| (EKGSGamesListType.Followed === this.m_eGamesListType && oMessage.channelId === this.m_nFollowersGamesChannelId))
 			this.private_HandleGameRecord(oGameRecord, true);
 	}
 	this.m_oGamesListView.Update_Size();
@@ -1384,7 +1384,7 @@ CKGSClient.prototype.private_HandleGameContainerRemoveGame = function(oMessage)
 	if ((EKGSGamesListType.AllGames === this.m_eGamesListType && !this.m_oAllGames[oMessage.gameId] && true !== bIsChallenge)
 		|| (EKGSGamesListType.AllChallenges === this.m_eGamesListType && !this.m_oAllGames[oMessage.gameId] && true === bIsChallenge)
 		|| (EKGSGamesListType.Room === this.m_eGamesListType && oMessage.channelId === this.m_nChatChannelId)
-		|| (EKGSGamesListType.Follower === this.m_eGamesListType && oMessage.channelId === this.m_nFollowersGamesChannelId))
+		|| (EKGSGamesListType.Followed === this.m_eGamesListType && oMessage.channelId === this.m_nFollowersGamesChannelId))
 	{
 		this.m_oGamesListView.Handle_Record([1, oMessage.gameId]);
 		this.m_oGamesListView.Update_Size();
@@ -1513,7 +1513,7 @@ CKGSClient.prototype.private_HandleGlobalGamesJoin = function(oMessage)
 
 	if (EKGSGamesListType.AllGames === this.m_eGamesListType
 		|| (EKGSGamesListType.AllChallenges === this.m_eGamesListType && "CHALLENGES" === oMessage.containerType)
-		|| (EKGSGamesListType.Follower === this.m_eGamesListType && "FANS" === oMessage.containerType))
+		|| (EKGSGamesListType.Followed === this.m_eGamesListType && "FANS" === oMessage.containerType))
 		this.private_UpdateGamesList();
 };
 CKGSClient.prototype.private_HandleLoginFailedBadPassword = function(oMessage)
@@ -2159,7 +2159,7 @@ CKGSClient.prototype.private_UpdateGamesList = function()
 			}
 		}
 	}
-	else if (EKGSGamesListType.Follower === this.m_eGamesListType)
+	else if (EKGSGamesListType.Followed === this.m_eGamesListType)
 	{
 		for (var nGameId in this.m_oFollowersGames)
 		{

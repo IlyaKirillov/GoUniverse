@@ -24,9 +24,9 @@ function CKGSGamesList(oApp)
 	CKGSGamesList.superclass.constructor.call(this);
 
 	this.m_oHeaders = {
-		Sizes : [0, 16, 56, 196, 221, 261, 381, 450, 515, 609, 784],
+		Sizes : [0, 16, 46, 186, 211, 241, 361, 430, 495, 589, 764],
 		Count : 11,
-		1     : "Kind",
+		1     : "Type",
 		2     : "wr",
 		3     : "White",
 		4     : "",
@@ -204,23 +204,37 @@ CKGSGamesList.prototype.Draw_Record = function(dX, dY, oContext, oRecord, nColNu
 {
 	var eType = nColNum + 1;
 
+	var nShiftX = 0;
+
+	if ((EKGSGameListRecord.WRank === eType && true === oRecord.IsChallenge() && true === oRecord.m_bDemo)
+		|| (!(true === oRecord.IsChallenge() && true === oRecord.m_bDemo) && (EKGSGameListRecord.WRank === eType || EKGSGameListRecord.BRank === eType)))
+	{
+		g_oTextMeasurer.SetFont(oContext.font);
+		var nWidth = g_oTextMeasurer.Measure(oRecord.GetRankString(EKGSGameListRecord.BRank === eType ? true : false));
+
+		var nSizeIndex = EKGSGameListRecord.BRank === eType ? 5 : 2;
+		var nSize = this.m_oHeaders.Sizes[nSizeIndex] - this.m_oHeaders.Sizes[nSizeIndex - 1];
+
+		nShiftX = (nSize - nWidth) / 2 - 5; // 5 - leftPadding
+	}
+
 	if (true === oRecord.IsChallenge())
 	{
 		if (3 === nColNum)
 		{
 			oListView.Start_ClipException(oContext, 3, 6);
-			oRecord.Draw(oContext, dX, dY, eType);
+			oRecord.Draw(oContext, dX + nShiftX, dY, eType);
 			oListView.Restore_Clip(oContext, 3);
 		}
 		else if (6 === nColNum)
 		{
 			oListView.Start_ClipException(oContext, 6, 9);
-			oRecord.Draw(oContext, dX, dY, eType);
+			oRecord.Draw(oContext, dX + nShiftX, dY, eType);
 			oListView.Restore_Clip(oContext, 6);
 		}
 		else
 		{
-			oRecord.Draw(oContext, dX, dY, eType);
+			oRecord.Draw(oContext, dX + nShiftX, dY, eType);
 
 		}
 	}
@@ -230,14 +244,15 @@ CKGSGamesList.prototype.Draw_Record = function(dX, dY, oContext, oRecord, nColNu
 			oListView.Start_ClipException(oContext, 2, 6);
 
 		if (3 !== nColNum && 4 !== nColNum && 5 !== nColNum)
-			oRecord.Draw(oContext, dX, dY, eType);
+			oRecord.Draw(oContext, dX + nShiftX, dY, eType);
 
 		if (true === oRecord.m_bDemo && 2 === nColNum)
 			oListView.Restore_Clip(oContext, 2);
 	}
 	else
 	{
-		oRecord.Draw(oContext, dX, dY, eType);
+
+		oRecord.Draw(oContext, dX + nShiftX, dY, eType);
 	}
 };
 CKGSGamesList.prototype.Get_Record = function(aLine)
@@ -417,15 +432,15 @@ CKGSGamesListRecord.prototype.private_GetRank = function(nRank)
     if (nRank <= -3)
         return "";
     if (nRank === -2)
-        return "[?]";
+        return "?";
     else if (nRank === -1)
-        return "[-]";
+        return "-";
     else if (nRank <= 29)
-        return "[" + (30 - nRank) + "k]";
+        return "" + (30 - nRank) + "k";
     else if (nRank <= 49)
-        return "[" + (nRank - 29) + "d]";
+        return "" + (nRank - 29) + "d";
     else
-        return "[" + (nRank - 49) + "p]";
+        return "" + (nRank - 49) + "p";
 };
 CKGSGamesListRecord.prototype.private_GetRoomName = function(nRoomId)
 {
@@ -474,4 +489,8 @@ CKGSGamesListRecord.prototype.private_GetVs = function()
 	{
 		return this.m_sTime;
 	}
+};
+CKGSGamesListRecord.prototype.GetRankString = function(bBlack)
+{
+	return this.private_GetRank(bBlack ? this.m_nBlackRank : this.m_nWhiteRank);
 };

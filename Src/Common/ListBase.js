@@ -104,6 +104,10 @@ CListBase.prototype.GetSortType = function()
 {
 	return this.m_nSortType;
 };
+CListBase.prototype.SetHeadersSizes = function(nColNum, nSize)
+{
+	this.m_oHeaders.Sizes[nColNum] = nSize;
+};
 
 function CListRecordBase()
 {

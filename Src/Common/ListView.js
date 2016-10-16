@@ -841,7 +841,8 @@ CListView.prototype.private_SetColX = function(nColNum, dX)
     for (var nCurColNum = nColNum, nColsCount = this.m_nColsCount; nCurColNum < nColsCount; ++nCurColNum)
         this.m_aX[nCurColNum] += nDiff;
 
-    //this.m_aX[nColNum] = Math.min(this.m_aX[nColNum + 1] - 10, Math.max(this.m_aX[nColNum - 1] + 10, dX));
+	for (var nCurColNum = 0, nColsCount = this.m_nColsCount; nCurColNum < nColsCount; ++nCurColNum)
+		this.m_oListObject.SetHeadersSizes(nCurColNum, this.m_aX[nCurColNum]);
 };
 
 CListView.prototype.private_UpdateMousePos = function(X, Y)

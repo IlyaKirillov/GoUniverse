@@ -1366,9 +1366,9 @@ CGoUniverseApplication.prototype.ShowGamesListContextMenu = function(nX, nY, nGa
 	{
 		oClient.SetGamesListType(EKGSGamesListType.Room);
 	});
-	oContextMenu.AddCheckBoxItem(EKGSGamesListType.Follower === nGamesListType ? true : false, "Followers", function ()
+	oContextMenu.AddCheckBoxItem(EKGSGamesListType.Followed === nGamesListType ? true : false, "Followed", function ()
 	{
-		oClient.SetGamesListType(EKGSGamesListType.Follower);
+		oClient.SetGamesListType(EKGSGamesListType.Followed);
 	});
 	oContextMenu.Show();
 
