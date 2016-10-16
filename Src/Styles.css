@@ -454,6 +454,7 @@ textarea.ChatInput {
 	-moz-appearance : none;
 	resize          : none;
 	font-family     : 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif;
+	padding-left    : 3px;
 }
 
 div.HorAlignCenter {
