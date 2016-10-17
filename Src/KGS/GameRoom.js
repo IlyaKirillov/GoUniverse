@@ -480,11 +480,12 @@ CKGSGameRoom.prototype.OnStartReview = function(nNewChannelId, oOwner)
 	this.m_nGameRoomId = nNewChannelId;
 	this.m_bDemo       = true;
 
-	this.m_oWhiteInfoHandler.StopCountDown();
-	this.m_oBlackInfoHandler.StopCountDown();
 	this.m_oBlackTime.Stop();
 	this.m_oWhiteTime.Stop();
 	this.m_oStateHandler.Update();
+
+	this.m_oWhiteInfoHandler.StopCountDown();
+	this.m_oBlackInfoHandler.StopCountDown();
 
 	if (oOwner)
 	{

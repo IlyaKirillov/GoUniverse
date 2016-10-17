@@ -990,6 +990,8 @@ CGoUniverseDrawingPlayerInfo.prototype.Init = function(sDivId, oGameTree, nPlaye
 
 			if (this.IsCountDown() && oTimeDiv.className !== "blinkCountDownTime")
 				oTimeDiv.className = "blinkCountDownTime";
+			else if (!this.IsCountDown() && oTimeDiv.className === "blinkCountDownTime")
+				oTimeDiv.className = "";
 
 			Common.Set_InnerTextToElement(oTimeDiv, sTime);
 		});
