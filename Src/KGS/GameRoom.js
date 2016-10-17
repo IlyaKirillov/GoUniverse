@@ -1216,15 +1216,6 @@ CKGSGameRoom.prototype.private_OurMove = function()
 
 	this.m_bOurMove = true;
 	this.private_SendNotification();
-
-	// if (this.IsPlayer() && this.m_oGameTree.Get_Drawing())
-	// {
-	// 	var oTime = this.IsBlackPlayer() ? this.m_oBlackTime : this.m_oWhiteTime;
-	// 	if (oTime.IsCountDown())
-	// 		this.m_oGameTree.Get_Drawing().GoUniverseShowCountDown(oTime.GetCountDownTime());
-	// 	else
-	// 		this.m_oGameTree.Get_Drawing().GoUniverseHideCountDown();
-	// }
 };
 CKGSGameRoom.prototype.private_OpponentMove = function()
 {
@@ -1235,13 +1226,6 @@ CKGSGameRoom.prototype.private_OpponentMove = function()
 	this.m_oGameTree.Set_EditingFlags({Move : true});
 
 	this.m_oClient.m_oApp.GetSound().StopCountDown();
-
-	// if (this.IsPlayer() && this.m_oGameTree.Get_Drawing())
-	// {
-	// 	var oTime = this.IsBlackPlayer() ? this.m_oBlackTime : this.m_oWhiteTime;
-	// 	if (!oTime.IsCountDown())
-	// 		this.m_oGameTree.Get_Drawing().GoUniverseHideCountDown();
-	// }
 };
 CKGSGameRoom.prototype.IsCountingScores = function()
 {

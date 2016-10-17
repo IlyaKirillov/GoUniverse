@@ -45,7 +45,13 @@ String.prototype.IsEnd = function(nPos)
 String.prototype.IsSpaceOrPunctuation = function(nPos)
 {
 	var nChar = this.charAt(nPos);
-	if (' ' === nChar || '!' === nChar || ',' === nChar || '.' === nChar || '?' === nChar)
+	if (' ' === nChar
+		|| '!' === nChar
+		|| ',' === nChar
+		|| '.' === nChar
+		|| '?' === nChar
+		|| '-' === nChar
+		|| ';' === nChar)
 		return true;
 
 	return false;
@@ -520,15 +526,6 @@ CDrawing.prototype.GoUniverseUpdateScoresDone = function(bWhiteDone, bBlackDone)
 {
 	this.m_oCountingScores.UpdateDoneState(bWhiteDone, bBlackDone);
 };
-CDrawing.prototype.GoUniverseShowCountDown = function(nTime)
-{
-	this.m_oCountDown.Show();
-	this.m_oCountDown.Update(nTime);
-};
-CDrawing.prototype.GoUniverseHideCountDown = function()
-{
-	this.m_oCountDown.Hide();
-};
 //----------------------------------------------------------------------------------------------------------------------
 // Специальный класс с комментариями
 //----------------------------------------------------------------------------------------------------------------------
@@ -747,7 +744,7 @@ CGoUniverseDrawingComments.prototype.private_ParseMessage = function(oTextDiv, s
 	var sBuffer = "";
 	for (var nPos = 0, nLen = sMessage.length; nPos < nLen; ++nPos)
 	{
-		if ((0 === nPos || sMessage.IsSpace(nPos - 1)) && sMessage.IsLatinLetter(nPos) && sMessage.IsDigit(nPos + 1))
+		if ((0 === nPos || sMessage.IsSpaceOrPunctuation(nPos - 1)) && sMessage.IsLatinLetter(nPos) && sMessage.IsDigit(nPos + 1))
 		{
 			var sRef = "";
 			if (sMessage.IsSpaceOrPunctuation(nPos + 2) || sMessage.IsEnd(nPos + 2))
