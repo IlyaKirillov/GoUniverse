@@ -273,7 +273,7 @@ CVisualGameRoomTab.prototype.InitGameRoom = function(sDivIdContainer, oGame)
 		var oDrawing = new CDrawing(oGameTree);
 		oDrawing.Create_GoUniverseViewerTemplate(sGameRoomDivId + "B", this.m_oApp, this, oGame);
 
-		if (!oGame.IsPlayer())
+		if (!oGame.IsPlayer() || oGame.IsDemonstration())
 			oDrawing.GoUniverseOnView();
 		else
 			oDrawing.GoUniverseOnMatch();
