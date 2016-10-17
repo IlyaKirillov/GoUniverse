@@ -240,6 +240,9 @@ CDrawing.prototype.private_GoUniverseCreatePlayersInfo = function(oParentControl
 	oInfoControl.AddControl(oCountDownControl);
 
 	this.m_oCountDown.Init(oCountDownControl.HtmlElement);
+
+	this.m_oGameRoom.SetWhiteInfoHandler(oDrawingWhiteInfo);
+	this.m_oGameRoom.SetBlackInfoHandler(oDrawingBlackInfo);
 };
 CDrawing.prototype.private_GoUniverseCreateMenuButton = function(oParentControl, oParentDiv, sDivId)
 {
@@ -823,7 +826,8 @@ function CGoUniverseDrawingPlayerInfo(oDrawing)
 
 		NameDiv   : null,
 		ScoresDiv : null,
-		Image     : null
+		Image     : null,
+		TimeDiv   : null
 	};
 
 	this.m_oImage  = null;
@@ -962,10 +966,14 @@ CGoUniverseDrawingPlayerInfo.prototype.Init = function(sDivId, oGameTree, nPlaye
 	var oTimeDiv = document.createElement("div");
 	oCenterDiv.appendChild(oTimeDiv);
 
-	oTimeDiv.style["float"] = "left";
-	oTimeDiv.style.fontSize = "12pt";
-	oTimeDiv.innerHTML      = "--:--";
-	oTimeDiv.style.border   = "1px solid transparent";
+	oTimeDiv.style["float"]  = "left";
+	oTimeDiv.style.fontSize  = "12pt";
+	oTimeDiv.innerHTML       = "--:--";
+	oTimeDiv.style.border    = "1px solid transparent";
+	oTimeDiv.style.width     = "100px";
+	oTimeDiv.style.textAlign = "center";
+
+	this.HtmlElement.TimeDiv = oTimeDiv;
 
 	if (oTimeSettings)
 	{
@@ -973,7 +981,6 @@ CGoUniverseDrawingPlayerInfo.prototype.Init = function(sDivId, oGameTree, nPlaye
 
 		var oGameRoom  = this.m_oDrawing.m_oGameRoom;
 		var oSound     = oApp.GetSound();
-		var oCountDown = this.m_oDrawing.m_oCountDown;
 		oTimeSettings.SetOnTick(function(sTime)
 		{
 			if (oGameRoom.IsPlayer() && oGameRoom.IsOurMove() && this.IsCountDown())
@@ -982,13 +989,10 @@ CGoUniverseDrawingPlayerInfo.prototype.Init = function(sDivId, oGameTree, nPlaye
 				var nLimit   = this.GetCountDownLimit();
 
 				oSound.PlayCountDown(nCurTime, nLimit);
-				// oCountDown.Show();
-				// oCountDown.Update(nCurTime);
 			}
 
-			if(this.IsCountDown())
-				oTimeDiv.className += "blinkCountDownTime";
-
+			if (this.IsCountDown() && oTimeDiv.className !== "blinkCountDownTime")
+				oTimeDiv.className = "blinkCountDownTime";
 
 			Common.Set_InnerTextToElement(oTimeDiv, sTime);
 		});
@@ -1043,6 +1047,10 @@ CGoUniverseDrawingPlayerInfo.prototype.private_Update = function()
 
 	Common.Set_InnerTextToElement(oNameDiv, sNameText);
 	Common.Set_InnerTextToElement(oScoresDiv, sScoresText);
+};
+CGoUniverseDrawingPlayerInfo.prototype.StopCountDown = function()
+{
+	this.HtmlElement.TimeDiv.className = "";
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Специальный класс с информацией о текущем состоянии партии

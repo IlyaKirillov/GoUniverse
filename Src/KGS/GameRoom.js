@@ -39,6 +39,8 @@ function CKGSGameRoom(oClient, nGameRoomId)
 	this.m_bWhiteDone          = false;
 	this.m_nScoresDoneId       = -1;
 	this.m_bUndoForbidden      = false;
+	this.m_oBlackInfoHandler   = null;
+	this.m_oWhiteInfoHandler   = null;
 }
 CKGSGameRoom.prototype.GetRoomId = function()
 {
@@ -91,6 +93,14 @@ CKGSGameRoom.prototype.SetStateHandler = function(oHandler)
 CKGSGameRoom.prototype.SetCommentsHandler = function(oHandler)
 {
 	this.m_oCommentsHandler = oHandler;
+};
+CKGSGameRoom.prototype.SetWhiteInfoHandler = function(oHandler)
+{
+	this.m_oWhiteInfoHandler = oHandler;
+};
+CKGSGameRoom.prototype.SetBlackInfoHandler = function(oHandler)
+{
+	this.m_oBlackInfoHandler = oHandler;
 };
 CKGSGameRoom.prototype.InitGameTree = function(oGameSummary)
 {
@@ -172,11 +182,15 @@ CKGSGameRoom.prototype.UpdateClocks = function(oClocks, isStopUndfined)
 	if (oClocks)
 	{
 		this.private_HandleGameClocks(oClocks);
+		this.m_oWhiteInfoHandler.StopCountDown();
+		this.m_oBlackInfoHandler.StopCountDown();
 	}
 	else if (true === isStopUndfined)
 	{
 		this.m_oBlackTime.Stop();
 		this.m_oWhiteTime.Stop();
+		this.m_oWhiteInfoHandler.StopCountDown();
+		this.m_oBlackInfoHandler.StopCountDown();
 	}
 };
 CKGSGameRoom.prototype.UpdateScores = function(oMessage)

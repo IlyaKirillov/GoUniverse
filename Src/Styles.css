@@ -607,13 +607,42 @@ div.challengePlayerDivEditable {
 }
 
 .blinkCountDownTime {
-	animation : blinkCountDownTimeAnimation 1s linear infinite;
+	animation : blinkCountDownTimeAnimation 2s linear infinite;
+	animation-delay: 0.1s;
 }
 
 @keyframes blinkCountDownTimeAnimation {
-	50% {
-		border : 1px solid black;
+
+	76% {
+		background : transparent;
+		color      : black;
 	}
+
+	74% {
+		background : #111111;
+		color      : white;
+		opacity    : 0;
+	}
+
+
+	50% {
+		background : black;
+		color      : white;
+		opacity    : 1;
+	}
+
+	25% {
+		background : #111111;
+		color      : white;
+		opacity    : 0;
+	}
+
+	24% {
+		background : transparent;
+		color      : black;
+	}
+
+
 }
 
 @font-face {

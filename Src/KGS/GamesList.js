@@ -275,7 +275,7 @@ CKGSGamesList.prototype.Handle_RightClick = function(Record, e)
 };
 CKGSGamesList.prototype.ResetToChallangesList = function()
 {
-	this.m_oHeaders[1]  = "Kind";
+	this.m_oHeaders[1]  = "Type";
 	this.m_oHeaders[2]  = "rank";
 	this.m_oHeaders[3]  = "Name";
 	this.m_oHeaders[4]  = "";
@@ -289,7 +289,7 @@ CKGSGamesList.prototype.ResetToChallangesList = function()
 };
 CKGSGamesList.prototype.ResetToGamesList = function()
 {
-	this.m_oHeaders[1]  = "Kind";
+	this.m_oHeaders[1]  = "Type";
 	this.m_oHeaders[2]  = "wr";
 	this.m_oHeaders[3]  = "White";
 	this.m_oHeaders[4]  = "";
