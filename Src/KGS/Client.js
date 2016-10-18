@@ -121,7 +121,7 @@ CKGSClient.prototype.LeaveGameRoom = function(nGameRoomId)
 	if (this.m_aGames[nGameRoomId])
 	{
 		var oGame = this.m_aGames[nGameRoomId];
-		oGame.StopClocks();
+		oGame.OnClose();
 		delete this.m_aGames[nGameRoomId];
 	}
 

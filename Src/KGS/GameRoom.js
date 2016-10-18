@@ -1380,6 +1380,14 @@ CKGSGameRoom.prototype.private_SendNotification = function()
 {
 	this.m_oClient.SendGameNotification(this.m_nGameRoomId);
 };
+CKGSGameRoom.prototype.OnClose = function()
+{
+	this.StopClocks();
+
+	var oDrawing = this.m_oGameTree.Get_Drawing();
+	if (oDrawing)
+		oDrawing.OnDestroy();
+};
 
 function CKGSEditorHandler(oClient, oGame)
 {
