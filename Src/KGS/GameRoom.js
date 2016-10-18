@@ -136,6 +136,33 @@ CKGSGameRoom.prototype.InitGameTree = function(oGameSummary)
 		this.m_bDemo = false;
 	}
 
+	if (oGameSummary.gameType)
+	{
+		var nGameType = KGSCommon.GetGameType(oGameSummary.gameType);
+		var sEvent = "";
+
+		if (EKGSGameType.Demonstration === nGameType)
+			sEvent = "Demonstration";
+		else if (EKGSGameType.Review === nGameType)
+			sEvent = "Review";
+		else if (EKGSGameType.RengoReview === nGameType)
+			sEvent = "Rengo review";
+		else if (EKGSGameType.Teaching === nGameType)
+			sEvent = "Teaching game";
+		else if (EKGSGameType.Simul === nGameType)
+			sEvent = "Simulation game";
+		else if (EKGSGameType.Rengo === nGameType)
+			sEvent = "Rengo";
+		else if (EKGSGameType.Free === nGameType)
+			sEvent = "Free game";
+		else if (EKGSGameType.Ranked === nGameType)
+			sEvent = "Ranked game";
+		else if (EKGSGameType.Tournament === nGameType)
+			sEvent = "Tournament game";
+
+		oGameTree.Set_GameEvent(sEvent);
+	}
+
 	this.m_oGameTree = oGameTree;
 };
 CKGSGameRoom.prototype.SetPlayers = function(oGameRecord)
@@ -657,22 +684,31 @@ CKGSGameRoom.prototype.private_ReadProp = function(oProp, oNode, oGameTree)
 
 		if (oProp.timeSystem)
 		{
+			var sTimeSettings = "";
 			var sTimeType = oProp.timeSystem;
 			if ("absolute" === sTimeType)
 			{
 				this.m_oBlackTime.SetAbsolute(oProp.mainTime);
 				this.m_oWhiteTime.SetAbsolute(oProp.mainTime);
+
+				sTimeSettings = this.m_oBlackTime.GetMainTimeString();
 			}
 			else if ("byo_yomi" === sTimeType)
 			{
 				this.m_oBlackTime.SetByoYomi(oProp.mainTime, oProp.byoYomiTime, oProp.byoYomiPeriods);
 				this.m_oWhiteTime.SetByoYomi(oProp.mainTime, oProp.byoYomiTime, oProp.byoYomiPeriods);
+
+				sTimeSettings = this.m_oBlackTime.GetMainTimeString()  + " + " + this.m_oBlackTime.GetByoYomiTimeString() + "(" + this.m_oBlackTime.GetOverCount() + ") ByoYomi";
 			}
 			else if ("canadian" === sTimeType)
 			{
 				this.m_oBlackTime.SetCanadian(oProp.mainTime, oProp.byoYomiTime, oProp.byoYomiStones);
 				this.m_oWhiteTime.SetCanadian(oProp.mainTime, oProp.byoYomiTime, oProp.byoYomiStones);
+
+				sTimeSettings = this.m_oBlackTime.GetMainTimeString()  + " + " + this.m_oBlackTime.GetByoYomiTimeString() + "/" + this.m_oBlackTime.GetOverCount() + " Canadian";
 			}
+
+			oGameTree.Set_TimeLimit(sTimeSettings);
 		}
 	}
 	else if ("PLAYERNAME" === oProp.name)
