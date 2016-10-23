@@ -63,6 +63,12 @@ function SplitTextToLines(sText)
 
 	for (var nIndex = 0, nCount = aLines.length; nIndex < nCount; ++nIndex)
 	{
+		aLines[nIndex] = aLines[nIndex].replace("&", "&amp;");
+		aLines[nIndex] = aLines[nIndex].replace("<", "&lt;");
+		aLines[nIndex] = aLines[nIndex].replace(">", "&gt;");
+		aLines[nIndex] = aLines[nIndex].replace("\"", "&quot;");
+		aLines[nIndex] = aLines[nIndex].replace("\'", "&apos;");
+
 		aLines[nIndex] = aLines[nIndex].replace(urlRegEx, "<a href='$1' target='_blank'>$1</a>");
 
 		var nPos = 0;
