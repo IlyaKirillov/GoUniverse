@@ -170,10 +170,11 @@ div.ButtonCloseGameRoom center div {
 }
 
 span.GameRoomCloseSpan {
-	width    : 100%;
-	height   : 100%;
-	left     : 0px;
-	top      : 2px;
+	width       : 100%;
+	height      : 100%;
+	left        : 0px;
+	top         : 2px;
+	font-family : NotoEmoji;
 }
 
 span.GameRoomCloseSpan:before {

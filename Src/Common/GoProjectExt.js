@@ -1237,8 +1237,8 @@ CommonExtend(CGoUniverseButtonEditorControl, CDrawingButtonBase);
 CGoUniverseButtonEditorControl.prototype.private_DrawOnCanvas = function(Canvas, Size, X_off, Y_off, bDisabled, W, H, BackColor, FillColor)
 {
 	var Text       = String.fromCharCode(0x270E);
-	var FontSize   = Size * 0.8;
-	var FontFamily = "Arial";
+	var FontSize   = 22;
+	var FontFamily = "'NotoEmoji'";
 	var sFont      = FontSize + "px " + FontFamily;
 
 	Canvas.fillStyle = (true === this.m_oActiveBColor.Compare(BackColor) ? "rgb(167, 167, 167)" : "rgb(217, 217, 217)");
