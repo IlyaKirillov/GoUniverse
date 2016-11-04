@@ -503,6 +503,10 @@ CVisualGameRoomTab.prototype.HideNotification = function()
 		this.m_bShowNotification             = false;
 	}
 };
+CVisualGameRoomTab.prototype.GetGameTree = function()
+{
+	return this.m_oGameTree;
+};
 
 function CVisualChatRoomTabs()
 {

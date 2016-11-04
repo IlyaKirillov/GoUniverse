@@ -51,6 +51,17 @@ function CGoUniverseApplication()
 		Width  : 50,
 		Height : 50
 	};
+
+	var oThis = this;
+	this.private_OnKeyPress = function(e)
+	{
+		var oGameTab = oThis.m_oGameRoomTabs.GetCurrent();
+		var oGameTree = oGameTab ? oGameTab.GetGameTree() : null;
+		if (oGameTree)
+		{
+			oGameTree.m_oDrawingBoard.private_OnKeyDown(e);
+		}
+	};
 }
 CGoUniverseApplication.prototype.Init = function()
 {
@@ -592,6 +603,7 @@ CGoUniverseApplication.prototype.private_InitMainDiv = function()
 	{
 		oThis.private_CollapsePopups();
 	}, false);
+	//this.m_oMainDiv.addEventListener("keypress", this.private_OnKeyPress, false);
 
 	this.m_oMainDiv.addEventListener("contextmenu", function()
 	{
@@ -777,6 +789,13 @@ CGoUniverseApplication.prototype.private_InitTabPanel = function(oTabsControl)
 			if (oOwnChallenge.HaveChallengers())
 				oListEntry.className += " blinkPlayMenu";
 		}
+		oContextMenu.AddHorizontalLine();
+
+		oContextMenu.AddListItem("Automatch preferences", function()
+		{
+			CreateKGSWindow(EKGSWindowType.AutomatchPr, {App : oApp, Client : oApp.GetClient()});
+		}, false);
+
 		oContextMenu.AddHorizontalLine();
 
 		var arrAllChallenges = oClient.GetAllChallenges();

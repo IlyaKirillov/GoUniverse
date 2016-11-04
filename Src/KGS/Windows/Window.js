@@ -21,7 +21,8 @@ var EKGSWindowType = {
 	SgfViewer   : 5,
 	Challenge   : 6,
 	ConfirmBase : 7,
-	UndoRequest : 8
+	UndoRequest : 8,
+	AutomatchPr : 9
 };
 
 var g_aKGSWindows      = {};
@@ -69,6 +70,9 @@ function CreateKGSWindow(nWindowType, oPr)
 			break;
 		case EKGSWindowType.UndoRequest:
 			sApp = "UndoRequest_" + oPr.WindowId;
+			break;
+		case EKGSWindowType.AutomatchPr:
+			sApp = "AutomatchSetup";
 			break;
 	}
 	var sId = sParentId + sApp;
@@ -122,6 +126,9 @@ function CreateKGSWindow(nWindowType, oPr)
 				break;
 			case EKGSWindowType.UndoRequest:
 				oWindow = new CKGSUndoRequestWindow();
+				break;
+			case EKGSWindowType.AutomatchPr:
+				oWindow = new CKGSAutomatchSetupWindow();
 				break;
 		}
 
