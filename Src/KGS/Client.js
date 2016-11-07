@@ -54,6 +54,8 @@ function CKGSClient(oApp)
 
 	this.m_nCallbackCounter = 1;
 	this.m_oSync            = {};
+
+	this.m_oAutomatchPreferences = new CKGSAutomatchPreferences();
 }
 CKGSClient.prototype.Clear = function()
 {
@@ -938,6 +940,10 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
 	else if ("CANT_PLAY_TWICE" === oMessage.type)
 	{
 		this.private_HandleCantPlayTwice(oMessage);
+	}
+	else if ("AUTOMATCH_PREFS" === oMessage.type)
+	{
+		this.private_HandleAutoMatchPrefs(oMessage);
 	}
 	else
 	{
@@ -1931,6 +1937,10 @@ CKGSClient.prototype.private_HandleCantPlayTwice = function()
 	}
 
 	this.private_ShowAlreadyPlayingWindow();
+};
+CKGSClient.prototype.private_HandleAutoMatchPrefs = function(oMessage)
+{
+	this.m_oAutomatchPreferences.Parse(oMessage);
 };
 CKGSClient.prototype.private_AddUserToRoom = function(oUser, oRoom)
 {
