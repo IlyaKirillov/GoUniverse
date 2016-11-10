@@ -2263,3 +2263,7 @@ CKGSClient.prototype.SendChallengeNotification = function(nChallengeId)
 
 	this.m_oApp.SendChallengeNotification(nChallengeId);
 };
+CKGSClient.prototype.GetAutomatchPreferences = function()
+{
+	return this.m_oAutomatchPreferences;
+};

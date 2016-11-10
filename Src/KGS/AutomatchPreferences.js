@@ -74,3 +74,43 @@ CKGSAutomatchPreferences.prototype.CreateKGSMessage = function()
 
 	return oMessage;
 };
+CKGSAutomatchPreferences.prototype.GetEstimatedRank = function()
+{
+	return this.m_sEstimadedRank;
+};
+CKGSAutomatchPreferences.prototype.GetMaxHandicap = function()
+{
+	return this.m_nMaxHandicap;
+};
+CKGSAutomatchPreferences.prototype.CanPlayFreeGames = function()
+{
+	return this.m_bFree;
+};
+CKGSAutomatchPreferences.prototype.CanPlayRankedGames = function()
+{
+	return this.m_bRanked;
+};
+CKGSAutomatchPreferences.prototype.CanPlayWithHuman = function()
+{
+	return this.m_bHuman;
+};
+CKGSAutomatchPreferences.prototype.CanPlayWithRobot = function()
+{
+	return this.m_bRobot;
+};
+CKGSAutomatchPreferences.prototype.CanPlayWithUnranked = function()
+{
+	return this.m_bUnranked;
+};
+CKGSAutomatchPreferences.prototype.CanPlayFast = function()
+{
+	return this.m_bFast;
+};
+CKGSAutomatchPreferences.prototype.CanPlayMedium = function()
+{
+	return this.m_bMedium;
+};
+CKGSAutomatchPreferences.prototype.CanPlayBlitz = function()
+{
+	return this.m_bBlitz;
+};
