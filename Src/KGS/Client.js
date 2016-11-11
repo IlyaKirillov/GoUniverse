@@ -651,6 +651,13 @@ CKGSClient.prototype.SendSync = function(oClass)
 
 	this.m_oSync[nCallbackKey] = oClass;
 };
+CKGSClient.prototype.UpdateAutomatchPreferences = function()
+{
+	var oPreferences = this.GetAutomatchPreferences();
+	var oMessage     = oPreferences.CreateKGSMessage();
+	oMessage["type"] = "AUTOMATCH_SET_PREFS";
+	this.private_SendMessage(oMessage);
+};
 CKGSClient.prototype.private_SendMessage = function(oMessage)
 {
 	// console.log("Send:");

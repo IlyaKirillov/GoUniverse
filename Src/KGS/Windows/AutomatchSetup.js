@@ -13,10 +13,16 @@ function CKGSAutomatchSetupWindow()
 {
 	CKGSAutomatchSetupWindow.superclass.constructor.call(this);
 
-	this.m_oHumanCheckBox = null;
-	this.m_oRobotCheckBox = null;
+	this.m_oRankSelect       = null;
+	this.m_oHumanCheckBox    = null;
+	this.m_oRobotCheckBox    = null;
 	this.m_oUnrankedCheckBox = null;
 	this.m_oMaxHandicapInput = null;
+	this.m_oRankedCheckBox   = null;
+	this.m_oFreeCheckBox     = null;
+	this.m_oMediumCheckBox   = null;
+	this.m_oFastCheckBox     = null;
+	this.m_oBlitzCheckBox    = null;
 }
 CommonExtend(CKGSAutomatchSetupWindow, CKGSWindowConfirmBase);
 
@@ -45,7 +51,7 @@ CKGSAutomatchSetupWindow.prototype.Init = function(sDivId, oPr)
 
 	if (oUser.GetRank() < 0)
 	{
-		this.private_AddRankSelect(oPreferences.GetEstimatedRank());
+		this.m_oRankSelect = this.private_AddRankSelect(oPreferences.GetEstimatedRank());
 		this.private_AddSeparator();
 	}
 
@@ -77,19 +83,71 @@ CKGSAutomatchSetupWindow.prototype.Init = function(sDivId, oPr)
 
 	if (oUser.CanPlayRanked())
 	{
-		this.private_AddCheckBox("Ranked game", oPreferences.CanPlayRankedGames());
-		this.private_AddCheckBox("Free game", oPreferences.CanPlayFreeGames());
+		this.m_oRankedCheckBox = this.private_AddCheckBox("Ranked game", oPreferences.CanPlayRankedGames(), true, function()
+		{
+			var oRanked = oThis.m_oRankedCheckBox;
+			var oFree   = oThis.m_oFreeCheckBox;
+			if (!oRanked || !oFree)
+				return;
+
+			if (false === oFree.checked && false === oRanked.checked)
+				oFree.checked = true;
+		});
+		this.m_oFreeCheckBox = this.private_AddCheckBox("Free game", oPreferences.CanPlayFreeGames(), true, function()
+		{
+			var oRanked = oThis.m_oRankedCheckBox;
+			var oFree   = oThis.m_oFreeCheckBox;
+			if (!oRanked || !oFree)
+				return;
+
+			if (false === oFree.checked && false === oRanked.checked)
+				oRanked.checked = true;
+		});
 	}
 	else
 	{
-		this.private_AddCheckBox("Ranked game", false, false);
-		this.private_AddCheckBox("Free game", true, false);
+		this.m_oRankedCheckBox = this.private_AddCheckBox("Ranked game", false, false, null);
+		this.m_oFreeCheckBox = this.private_AddCheckBox("Free game", true, false, null);
 	}
 
 	this.private_AddSeparator();
-	this.private_AddCheckBox("Medium", oPreferences.CanPlayMedium());
-	this.private_AddCheckBox("Fast", oPreferences.CanPlayFast());
-	this.private_AddCheckBox("Blitz", oPreferences.CanPlayBlitz());
+
+	this.m_oMediumCheckBox = this.private_AddCheckBox("Medium", oPreferences.CanPlayMedium(), true, function()
+	{
+		var oMedium = oThis.m_oMediumCheckBox;
+		var oFast   = oThis.m_oFastCheckBox;
+		var oBlitz  = oThis.m_oBlitzCheckBox;
+
+		if (!oMedium || !oFast || !oBlitz)
+			return;
+
+		if (false === oMedium.checked && false === oFast.checked && false === oBlitz.checked)
+			oFast.checked = true;
+	});
+	this.m_oFastCheckBox = this.private_AddCheckBox("Fast", oPreferences.CanPlayFast(), true, function()
+	{
+		var oMedium = oThis.m_oMediumCheckBox;
+		var oFast   = oThis.m_oFastCheckBox;
+		var oBlitz  = oThis.m_oBlitzCheckBox;
+
+		if (!oMedium || !oFast || !oBlitz)
+			return;
+
+		if (false === oMedium.checked && false === oFast.checked && false === oBlitz.checked)
+			oMedium.checked = true;
+	});
+	this.m_oBlitzCheckBox = this.private_AddCheckBox("Blitz", oPreferences.CanPlayBlitz(), true, function()
+	{
+		var oMedium = oThis.m_oMediumCheckBox;
+		var oFast   = oThis.m_oFastCheckBox;
+		var oBlitz  = oThis.m_oBlitzCheckBox;
+
+		if (!oMedium || !oFast || !oBlitz)
+			return;
+
+		if (false === oMedium.checked && false === oFast.checked && false === oBlitz.checked)
+			oFast.checked = true;
+	});
 
 	this.Update_Size(true);
 	this.Show(oPr);
@@ -144,14 +202,20 @@ CKGSAutomatchSetupWindow.prototype.private_AddCheckBox = function(sName, bChecke
 		oCheckBox.disabled      = "disabled";
 		oWrapperDiv.style.color = "silver";
 	}
-
-	oCheckBox.addEventListener("change", function(){if (fOnChange) fOnChange();}, false);
-	oLabelDiv.addEventListener("click", function()
+	else
 	{
-		oCheckBox.checked = !oCheckBox.checked;
-		if (fOnChange)
-			fOnChange();
-	}, false);
+		oCheckBox.addEventListener("change", function()
+		{
+			if (fOnChange)
+				fOnChange();
+		}, false);
+		oLabelDiv.addEventListener("click", function()
+		{
+			oCheckBox.checked = !oCheckBox.checked;
+			if (fOnChange)
+				fOnChange();
+		}, false);
+	}
 
 
 	oMainDiv.appendChild(oWrapperDiv);
@@ -179,6 +243,7 @@ CKGSAutomatchSetupWindow.prototype.private_AddTextBox = function(sName, sValue)
 	oInput.class               = "challengeInput";
 	oInput.style.width         = "20px";
 	oInput.style.height        = "22px";
+	oInput.style.outline       = "none";
 
 	oInputDiv.appendChild(oInput);
 	oWrapperDiv.appendChild(oInputDiv);
@@ -281,6 +346,8 @@ CKGSAutomatchSetupWindow.prototype.private_AddRankSelect = function(sRank)
 
 
 	oMainDiv.appendChild(oWrapperDiv);
+
+	return oSelect;
 };
 CKGSAutomatchSetupWindow.prototype.private_AddSeparator = function(sRank)
 {
@@ -305,9 +372,39 @@ CKGSAutomatchSetupWindow.prototype.private_AddSeparator = function(sRank)
 };
 CKGSAutomatchSetupWindow.prototype.Handle_OK = function()
 {
+	var oPreferences = this.m_oClient.GetAutomatchPreferences();
 
-};
-CKGSAutomatchSetupWindow.prototype.Handle_Cancel = function()
-{
+	if (this.m_oRankSelect)
+		oPreferences.SetEstimatedRank((30 - this.m_oRankSelect.selectedIndex) + "k");
 
+	if (this.m_oHumanCheckBox)
+		oPreferences.SetHuman(this.m_oHumanCheckBox.checked);
+
+	if (this.m_oRobotCheckBox)
+		oPreferences.SetRobot(this.m_oRobotCheckBox.checked);
+
+	if (this.m_oUnrankedCheckBox)
+		oPreferences.SetUnranked(this.m_oUnrankedCheckBox.checked);
+
+	if (this.m_oMaxHandicapInput)
+		oPreferences.SetMaxHandicap(parseInt(this.m_oMaxHandicapInput.value));
+
+	if (this.m_oRankedCheckBox)
+		oPreferences.SetRanked(this.m_oRankedCheckBox.checked);
+
+	if (this.m_oFreeCheckBox)
+		oPreferences.SetFree(this.m_oFreeCheckBox.checked);
+
+	if (this.m_oMediumCheckBox)
+		oPreferences.SetMedium(this.m_oMediumCheckBox.checked);
+
+	if (this.m_oFastCheckBox)
+		oPreferences.SetFast(this.m_oFastCheckBox.checked);
+
+	if (this.m_oBlitzCheckBox)
+		oPreferences.SetBlitz(this.m_oBlitzCheckBox.checked);
+
+	this.m_oClient.UpdateAutomatchPreferences();
+
+	this.Close();
 };

@@ -114,3 +114,44 @@ CKGSAutomatchPreferences.prototype.CanPlayBlitz = function()
 {
 	return this.m_bBlitz;
 };
+CKGSAutomatchPreferences.prototype.SetEstimatedRank = function(sRank)
+{
+	this.m_sEstimadedRank = sRank;
+};
+CKGSAutomatchPreferences.prototype.SetMaxHandicap = function(nMax)
+{
+	var _nMax = Math.max(0, Math.min(9, nMax));
+	this.m_nMaxHandicap = _nMax;
+};
+CKGSAutomatchPreferences.prototype.SetFree = function(bValue)
+{
+	this.m_bFree = bValue;
+};
+CKGSAutomatchPreferences.prototype.SetRanked = function(bValue)
+{
+	this.m_bRanked = bValue;
+};
+CKGSAutomatchPreferences.prototype.SetMedium = function(bValue)
+{
+	this.m_bMedium = bValue;
+};
+CKGSAutomatchPreferences.prototype.SetFast = function(bValue)
+{
+	this.m_bFast = bValue;
+};
+CKGSAutomatchPreferences.prototype.SetBlitz = function(bValue)
+{
+	this.m_bBlitz = bValue;
+};
+CKGSAutomatchPreferences.prototype.SetHuman = function(bValue)
+{
+	this.m_bHuman = bValue;
+};
+CKGSAutomatchPreferences.prototype.SetRobot = function(bValue)
+{
+	this.m_bRobot = bValue;
+};
+CKGSAutomatchPreferences.prototype.SetUnranked = function(bValue)
+{
+	this.m_bUnranked = bValue;
+};
