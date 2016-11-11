@@ -56,6 +56,7 @@ function CKGSClient(oApp)
 	this.m_oSync            = {};
 
 	this.m_oAutomatchPreferences = new CKGSAutomatchPreferences();
+	this.m_bAutomatchOn          = false;
 }
 CKGSClient.prototype.Clear = function()
 {
@@ -658,6 +659,19 @@ CKGSClient.prototype.UpdateAutomatchPreferences = function()
 	oMessage["type"] = "AUTOMATCH_SET_PREFS";
 	this.private_SendMessage(oMessage);
 };
+CKGSClient.prototype.StartAutomatch = function()
+{
+	var oPreferences = this.GetAutomatchPreferences();
+	var oMessage     = oPreferences.CreateKGSMessage();
+	oMessage["type"] = "AUTOMATCH_CREATE";
+	this.private_SendMessage(oMessage);
+};
+CKGSClient.prototype.CancelAutomatch = function()
+{
+	this.private_SendMessage({
+		"type" : "AUTOMATCH_CANCEL"
+	});
+};
 CKGSClient.prototype.private_SendMessage = function(oMessage)
 {
 	// console.log("Send:");
@@ -679,7 +693,7 @@ CKGSClient.prototype.private_SendMessage = function(oMessage)
 					// After this first download call, each download will automatically trigger the next,
 					// so we won't need to call this again.
 					oThis.m_bLoggedIn = true;
-					oThis.private_RecieveMessage();
+					oThis.private_ReceiveMessage();
 				}
 			}
 			else
@@ -704,7 +718,7 @@ CKGSClient.prototype.private_SendMessage = function(oMessage)
 	req.setRequestHeader("content-type", "application/json;charset=UTF-8"); // Make sure Unicode is used.
 	req.send(this.private_TranslateUnicodeMessage(JSON.stringify(oMessage)));
 };
-CKGSClient.prototype.private_RecieveMessage = function()
+CKGSClient.prototype.private_ReceiveMessage = function()
 {
 	var oThis = this;
 	var req = new XMLHttpRequest();
@@ -728,7 +742,7 @@ CKGSClient.prototype.private_RecieveMessage = function()
 
 				if (oThis.m_bLoggedIn)
 				{
-					oThis.private_RecieveMessage();
+					oThis.private_ReceiveMessage();
 				}
 			}
 			else
@@ -951,6 +965,10 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
 	else if ("AUTOMATCH_PREFS" === oMessage.type)
 	{
 		this.private_HandleAutoMatchPrefs(oMessage);
+	}
+	else if ("AUTOMATCH_STATUS" === oMessage.type)
+	{
+		this.private_HandleAutoMatchStatus(oMessage);
 	}
 	else
 	{
@@ -1949,6 +1967,19 @@ CKGSClient.prototype.private_HandleAutoMatchPrefs = function(oMessage)
 {
 	this.m_oAutomatchPreferences.Parse(oMessage);
 };
+CKGSClient.prototype.private_HandleAutoMatchStatus = function(oMessage)
+{
+	if (true === oMessage["enabled"])
+	{
+		this.m_bAutomatchOn = true;
+		this.m_oApp.OnStartAutomatch();
+	}
+	else
+	{
+		this.m_bAutomatchOn = false;
+		this.m_oApp.OnCancelAutomatch();
+	}
+};
 CKGSClient.prototype.private_AddUserToRoom = function(oUser, oRoom)
 {
 	oRoom.Users[oUser.GetName()] = oUser;
@@ -2273,4 +2304,12 @@ CKGSClient.prototype.SendChallengeNotification = function(nChallengeId)
 CKGSClient.prototype.GetAutomatchPreferences = function()
 {
 	return this.m_oAutomatchPreferences;
+};
+CKGSClient.prototype.IsOnAutomatch = function()
+{
+	return this.m_bAutomatchOn;
+};
+CKGSClient.prototype.IsAlreadyPlaying = function()
+{
+	return this.private_IsAlreadyPlaying();
 };

@@ -45,6 +45,8 @@ function CGoUniverseApplication()
 	this.m_oAnimatedLogo = null;
 	this.m_oPlayMenu     = null;
 
+	this.m_oAutomatchAnimatedLogo = null;
+
 	this.m_oPlayButtonLocation = {
 		Left   : 0,
 		Top    : 0,
@@ -791,6 +793,20 @@ CGoUniverseApplication.prototype.private_InitTabPanel = function(oTabsControl)
 		}
 		oContextMenu.AddHorizontalLine();
 
+		if (oClient.IsOnAutomatch())
+		{
+			oContextMenu.AddListItem("Cancel automatch", function()
+			{
+				oClient.CancelAutomatch();
+			}, false);
+		}
+		else
+		{
+			oContextMenu.AddListItem("Start automatch", function()
+			{
+				oClient.StartAutomatch();
+			}, oClient.IsAlreadyPlaying());
+		}
 		oContextMenu.AddListItem("Automatch preferences", function()
 		{
 			CreateKGSWindow(EKGSWindowType.AutomatchPr, {App : oApp, Client : oApp.GetClient()});
@@ -1510,4 +1526,37 @@ CGoUniverseApplication.prototype.SendGameNotification = function(nGameId)
 CGoUniverseApplication.prototype.SendChallengeNotification = function(nChallengeId)
 {
 	document.getElementById("divIdPlayButton").style.background = "rgb(153, 82, 25)";
+};
+CGoUniverseApplication.prototype.OnStartAutomatch = function()
+{
+	var oCanvas = document.getElementById("divIdPlayButtonAutomatch");
+	var oName   = document.getElementById("divIdPlayButton");
+
+	oName.style.display = "none";
+	oCanvas.style.display = "block";
+
+	if (!this.m_oAutomatchAnimatedLogo)
+	{
+		this.m_oAutomatchAnimatedLogo = new CGoUniverseAnimatedLogo(oCanvas);
+		this.m_oAutomatchAnimatedLogo.SetInverted(true);
+	}
+	else
+	{
+		this.m_oAutomatchAnimatedLogo.Stop();
+	}
+
+	this.m_oAutomatchAnimatedLogo.Start();
+
+	oCanvas.title = "Auto match is turned on";
+};
+CGoUniverseApplication.prototype.OnCancelAutomatch = function()
+{
+	var oCanvas = document.getElementById("divIdPlayButtonAutomatch");
+	var oName   = document.getElementById("divIdPlayButton");
+
+	oName.style.display = "block";
+	oCanvas.style.display = "none";
+
+	if (this.m_oAutomatchAnimatedLogo)
+		this.m_oAutomatchAnimatedLogo.Stop();
 };

@@ -312,10 +312,18 @@ CTextMeasurer.prototype.Measure = function(sText)
 
 function CGoUniverseAnimatedLogo(oCanvas)
 {
-	this.m_oCanvas  = oCanvas;
-	this.m_nState   = 0;
-	this.m_nTimerId = null;
+	this.m_oCanvas   = oCanvas;
+	this.m_nState    = 0;
+	this.m_nTimerId  = null;
+	this.m_sStrokeStyle = "rgb(0, 0, 0)";
 }
+CGoUniverseAnimatedLogo.prototype.SetInverted = function(bValue)
+{
+	if (false === bValue)
+		this.m_sStrokeStyle = "rgb(0, 0, 0)";
+	else
+		this.m_sStrokeStyle = "rgb(255, 255, 255)";
+};
 CGoUniverseAnimatedLogo.prototype.Start = function()
 {
 	var oCanvas  = this.m_oCanvas;
@@ -335,7 +343,7 @@ CGoUniverseAnimatedLogo.prototype.Start = function()
 
 	if (this.m_nState < 100)
 	{
-		oContext.strokeStyle = "rgb(0, 0, 0)";
+		oContext.strokeStyle = this.m_sStrokeStyle;
 		oContext.fillStyle   = "rgb(255, 255, 255)";
 		oContext.beginPath();
 		oContext.arc(0, 0, nRad, 0, 2 * Math.PI, false);
@@ -354,7 +362,7 @@ CGoUniverseAnimatedLogo.prototype.Start = function()
 	}
 	else if (this.m_nState < 200)
 	{
-		oContext.strokeStyle = "rgb(0, 0, 0)";
+		oContext.strokeStyle = this.m_sStrokeStyle;
 		oContext.fillStyle   = "rgb(0, 0, 0)";
 		oContext.beginPath();
 		oContext.arc(0, 0, nRad, 0, 2 * Math.PI, false);
@@ -381,7 +389,7 @@ CGoUniverseAnimatedLogo.prototype.Start = function()
 	}
 	else if (this.m_nState < 300)
 	{
-		oContext.strokeStyle = "rgb(0, 0, 0)";
+		oContext.strokeStyle = this.m_sStrokeStyle;
 		oContext.fillStyle   = "rgb(0, 0, 0)";
 		oContext.beginPath();
 		oContext.arc(0, 0, nRad, 0, 2 * Math.PI, false);
@@ -400,7 +408,7 @@ CGoUniverseAnimatedLogo.prototype.Start = function()
 	}
 	else if (this.m_nState < 400)
 	{
-		oContext.strokeStyle = "rgb(0, 0, 0)";
+		oContext.strokeStyle = this.m_sStrokeStyle;
 		oContext.fillStyle   = "rgb(255, 255, 255)";
 		oContext.beginPath();
 		oContext.arc(0, 0, nRad, 0, 2 * Math.PI, false);
