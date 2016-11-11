@@ -12,6 +12,11 @@
 function CKGSAutomatchSetupWindow()
 {
 	CKGSAutomatchSetupWindow.superclass.constructor.call(this);
+
+	this.m_oHumanCheckBox = null;
+	this.m_oRobotCheckBox = null;
+	this.m_oUnrankedCheckBox = null;
+	this.m_oMaxHandicapInput = null;
 }
 CommonExtend(CKGSAutomatchSetupWindow, CKGSWindowConfirmBase);
 
@@ -44,11 +49,30 @@ CKGSAutomatchSetupWindow.prototype.Init = function(sDivId, oPr)
 		this.private_AddSeparator();
 	}
 
-	this.private_AddCheckBox("Human", oPreferences.CanPlayWithHuman());
-	this.private_AddCheckBox("Robot", oPreferences.CanPlayWithRobot());
-	this.private_AddCheckBox("Unranked opponent", oPreferences.CanPlayWithUnranked());
+	var oThis = this;
+	this.m_oHumanCheckBox = this.private_AddCheckBox("Human", oPreferences.CanPlayWithHuman(), true, function()
+	{
+		var oHuman = oThis.m_oHumanCheckBox;
+		var oRobot = oThis.m_oRobotCheckBox;
+		if (!oHuman || !oRobot)
+			return;
+
+		if (false === oHuman.checked && false === oRobot.checked)
+			oRobot.checked = true;
+	});
+	this.m_oRobotCheckBox = this.private_AddCheckBox("Robot", oPreferences.CanPlayWithRobot(), true, function()
+	{
+		var oHuman = oThis.m_oHumanCheckBox;
+		var oRobot = oThis.m_oRobotCheckBox;
+		if (!oHuman || !oRobot)
+			return;
+
+		if (false === oRobot.checked && false === oHuman.checked)
+			oHuman.checked = true;
+	});
+	this.m_oUnrankedCheckBox = this.private_AddCheckBox("Unranked opponent", oPreferences.CanPlayWithUnranked());
 	this.private_AddSeparator();
-	this.private_AddTextBox("Max handicap", oPreferences.GetMaxHandicap());
+	this.m_oMaxHandicapInput = this.private_AddTextBox("Max handicap", oPreferences.GetMaxHandicap());
 	this.private_AddSeparator();
 
 	if (oUser.CanPlayRanked())
@@ -79,7 +103,7 @@ CKGSAutomatchSetupWindow.prototype.Close = function()
 	CKGSAutomatchSetupWindow.superclass.Close.call(this);
 	RemoveWindow(this);
 };
-CKGSAutomatchSetupWindow.prototype.private_AddCheckBox = function(sName, bChecked, bEnabled)
+CKGSAutomatchSetupWindow.prototype.private_AddCheckBox = function(sName, bChecked, bEnabled, fOnChange)
 {
 	var oMainDiv = this.HtmlElement.ConfirmInnerDiv;
 
@@ -121,8 +145,17 @@ CKGSAutomatchSetupWindow.prototype.private_AddCheckBox = function(sName, bChecke
 		oWrapperDiv.style.color = "silver";
 	}
 
+	oCheckBox.addEventListener("change", function(){if (fOnChange) fOnChange();}, false);
+	oLabelDiv.addEventListener("click", function()
+	{
+		oCheckBox.checked = !oCheckBox.checked;
+		if (fOnChange)
+			fOnChange();
+	}, false);
+
 
 	oMainDiv.appendChild(oWrapperDiv);
+	return oCheckBox;
 };
 CKGSAutomatchSetupWindow.prototype.private_AddTextBox = function(sName, sValue)
 {
@@ -137,19 +170,18 @@ CKGSAutomatchSetupWindow.prototype.private_AddTextBox = function(sName, sValue)
 	oWrapperDiv.style.fontSize     = "14px";
 	oWrapperDiv.style.fontFamily   = "'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif";
 
-	var oCheckBoxDiv            = document.createElement("div");
-	oCheckBoxDiv.style["float"] = "left";
-	oCheckBoxDiv.style.paddingTop = "2px";
-	var oCheckBox               = document.createElement("input");
-	oCheckBox.type              = "text";
-	oCheckBox.value             = sValue;
-	oCheckBox.class             = "challengeInput";
+	var oInputDiv              = document.createElement("div");
+	oInputDiv.style["float"]   = "left";
+	oInputDiv.style.paddingTop = "2px";
+	var oInput                 = document.createElement("input");
+	oInput.type                = "text";
+	oInput.value               = sValue;
+	oInput.class               = "challengeInput";
+	oInput.style.width         = "20px";
+	oInput.style.height        = "22px";
 
-	oCheckBox.style.width     = "20px";
-	oCheckBox.style.height    = "22px";
-
-	oCheckBoxDiv.appendChild(oCheckBox);
-	oWrapperDiv.appendChild(oCheckBoxDiv);
+	oInputDiv.appendChild(oInput);
+	oWrapperDiv.appendChild(oInputDiv);
 
 	var oLabelDiv               = document.createElement("div");
 	oLabelDiv.style.paddingLeft = "5px";
@@ -158,11 +190,43 @@ CKGSAutomatchSetupWindow.prototype.private_AddTextBox = function(sName, sValue)
 	oSpan.innerText             = sName;
 	oSpan.style.cursor          = "default";
 
+	oLabelDiv.addEventListener("click", function()
+	{
+		if (oInput.focus)
+			oInput.focus();
+	}, false);
+
+	function private_OnChange()
+	{
+		var sValue = oInput.value;
+		var nValue = parseInt(sValue);
+
+		if (isNaN(nValue))
+			nValue = 6;
+		else if (nValue > 9)
+			nValue = 9;
+		else if (nValue < 0)
+			nValue = 0;
+
+		oInput.value = "" + nValue;
+	}
+
+	oInput.addEventListener("keyup", function(e)
+	{
+		if (13 === e.keyCode)
+			private_OnChange(e);
+	}, false);
+	oInput.addEventListener("blur", function(e)
+	{
+		private_OnChange();
+	}, false);
+
 	oLabelDiv.appendChild(oSpan);
 	oWrapperDiv.appendChild(oLabelDiv);
 
-
 	oMainDiv.appendChild(oWrapperDiv);
+
+	return oInput;
 };
 CKGSAutomatchSetupWindow.prototype.private_AddRankSelect = function(sRank)
 {
