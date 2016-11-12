@@ -1416,7 +1416,7 @@ CKGSClient.prototype.private_HandleGameContainerRemoveGame = function(oMessage)
 
 	if ((EKGSGamesListType.AllGames === this.m_eGamesListType && !this.m_oAllGames[oMessage.gameId] && true !== bIsChallenge)
 		|| (EKGSGamesListType.AllChallenges === this.m_eGamesListType && !this.m_oAllGames[oMessage.gameId] && true === bIsChallenge)
-		|| (EKGSGamesListType.AllChallenges === this.m_eGamesListType && !this.m_oAllGames[oMessage.gameId] && true === bIsChallenge && true !== oGameRecord.IsRobotChallenge())
+		|| (EKGSGamesListType.AllChallengesNoBots === this.m_eGamesListType && !this.m_oAllGames[oMessage.gameId] && true === bIsChallenge && true !== oGameRecord.IsRobotChallenge())
 		|| (EKGSGamesListType.Room === this.m_eGamesListType && oMessage.channelId === this.m_nChatChannelId)
 		|| (EKGSGamesListType.Followed === this.m_eGamesListType && oMessage.channelId === this.m_nFollowersGamesChannelId))
 	{
