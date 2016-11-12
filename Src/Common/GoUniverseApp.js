@@ -1437,6 +1437,10 @@ CGoUniverseApplication.prototype.ShowGamesListContextMenu = function(nX, nY, nGa
 	{
 		oClient.SetGamesListType(EKGSGamesListType.AllChallenges);
 	});
+	oContextMenu.AddCheckBoxItem(EKGSGamesListType.AllChallengesNoBots === nGamesListType ? true : false, "All challenges(no robots)", function ()
+	{
+		oClient.SetGamesListType(EKGSGamesListType.AllChallengesNoBots);
+	});
 	oContextMenu.AddCheckBoxItem(EKGSGamesListType.Room === nGamesListType ? true : false, "Rooms", function ()
 	{
 		oClient.SetGamesListType(EKGSGamesListType.Room);

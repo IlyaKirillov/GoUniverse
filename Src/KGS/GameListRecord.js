@@ -162,6 +162,18 @@ CKGSGameListRecord.prototype.IsChallenge = function()
 {
 	return (this.m_nGameType === EKGSGameType.Challenge ? true : false);
 };
+CKGSGameListRecord.prototype.IsRobotChallenge = function()
+{
+	var isChallenge = this.IsChallenge();
+	if (!isChallenge)
+		return false;
+
+	var oCreator = this.m_oChallengeCreator;
+	if (!oCreator || true !== oCreator.IsRobot())
+		return false;
+
+	return true;
+};
 
 function CKGSChallengeProposal(oGameRecord)
 {

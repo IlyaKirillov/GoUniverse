@@ -10,13 +10,14 @@
  */
 
 var EKGSGamesListType = {
-	AllGames      : 0,
-	Room          : 1,
-	Followed      : 2,
-	AllChallenges : 3,
+	AllGames            : 0,
+	Room                : 1,
+	Followed            : 2,
+	AllChallenges       : 3,
+	AllChallengesNoBots : 4,
 
 	Min : 0,
-	Max : 3
+	Max : 4
 };
 
 function CKGSClient(oApp)
@@ -1058,7 +1059,7 @@ CKGSClient.prototype.private_HandleRoomJoin = function(oMessage)
 	if (oMessage.channelId == this.m_nChatChannelId)
 		this.private_UpdatePlayersList();
 
-	if (EKGSGamesListType.AllGames === this.m_eGamesListType || EKGSGamesListType.AllChallenges === this.m_eGamesListType ||  (EKGSGamesListType.Room === this.m_eGamesListType && oMessage.channelId == this.m_nChatChannelId))
+	if (EKGSGamesListType.AllGames === this.m_eGamesListType || EKGSGamesListType.AllChallenges === this.m_eGamesListType || EKGSGamesListType.AllChallengesNoBots === this.m_eGamesListType ||  (EKGSGamesListType.Room === this.m_eGamesListType && oMessage.channelId == this.m_nChatChannelId))
 		this.private_UpdateGamesList();
 };
 CKGSClient.prototype.private_HandleLoginSuccess = function(oMessage)
@@ -1398,6 +1399,7 @@ CKGSClient.prototype.private_HandleGameList = function(oMessage)
 
 		if ((EKGSGamesListType.AllGames === this.m_eGamesListType && true !== bChallenge)
 			|| (EKGSGamesListType.AllChallenges === this.m_eGamesListType && true === bChallenge)
+			|| (EKGSGamesListType.AllChallengesNoBots === this.m_eGamesListType && true === bChallenge && true !== oGameRecord.IsRobotChallenge())
 			|| (EKGSGamesListType.Room === this.m_eGamesListType && oMessage.channelId == this.m_nChatChannelId)
 			|| (EKGSGamesListType.Followed === this.m_eGamesListType && oMessage.channelId === this.m_nFollowersGamesChannelId))
 			this.private_HandleGameRecord(oGameRecord, true);
@@ -1414,6 +1416,7 @@ CKGSClient.prototype.private_HandleGameContainerRemoveGame = function(oMessage)
 
 	if ((EKGSGamesListType.AllGames === this.m_eGamesListType && !this.m_oAllGames[oMessage.gameId] && true !== bIsChallenge)
 		|| (EKGSGamesListType.AllChallenges === this.m_eGamesListType && !this.m_oAllGames[oMessage.gameId] && true === bIsChallenge)
+		|| (EKGSGamesListType.AllChallenges === this.m_eGamesListType && !this.m_oAllGames[oMessage.gameId] && true === bIsChallenge && true !== oGameRecord.IsRobotChallenge())
 		|| (EKGSGamesListType.Room === this.m_eGamesListType && oMessage.channelId === this.m_nChatChannelId)
 		|| (EKGSGamesListType.Followed === this.m_eGamesListType && oMessage.channelId === this.m_nFollowersGamesChannelId))
 	{
@@ -1544,6 +1547,7 @@ CKGSClient.prototype.private_HandleGlobalGamesJoin = function(oMessage)
 
 	if (EKGSGamesListType.AllGames === this.m_eGamesListType
 		|| (EKGSGamesListType.AllChallenges === this.m_eGamesListType && "CHALLENGES" === oMessage.containerType)
+		|| (EKGSGamesListType.AllChallengesNoBots === this.m_eGamesListType && "CHALLENGES" === oMessage.containerType)
 		|| (EKGSGamesListType.Followed === this.m_eGamesListType && "FANS" === oMessage.containerType))
 		this.private_UpdateGamesList();
 };
@@ -2159,11 +2163,11 @@ CKGSClient.prototype.SetGamesListType = function(eType)
 {
 	if (eType !== this.m_eGamesListType)
 	{
-		if (eType === EKGSGamesListType.AllChallenges)
+		if (eType === EKGSGamesListType.AllChallenges || eType === EKGSGamesListType.AllChallengesNoBots)
 		{
 			this.m_oGamesListView.GetListObject().ResetToChallangesList();
 		}
-		else if (this.m_eGamesListType === EKGSGamesListType.AllChallenges)
+		else if (this.m_eGamesListType === EKGSGamesListType.AllChallenges || this.m_eGamesListType === EKGSGamesListType.AllChallengesNoBots)
 		{
 			this.m_oGamesListView.GetListObject().ResetToGamesList();
 		}
@@ -2192,6 +2196,15 @@ CKGSClient.prototype.private_UpdateGamesList = function()
 		{
 			var oGameRecord = this.m_oAllGames[nGameId];
 			if (oGameRecord.IsChallenge())
+				this.private_HandleGameRecord(oGameRecord, true);
+		}
+	}
+	else if (EKGSGamesListType.AllChallengesNoBots === this.m_eGamesListType)
+	{
+		for (var nGameId in this.m_oAllGames)
+		{
+			var oGameRecord = this.m_oAllGames[nGameId];
+			if (oGameRecord.IsChallenge() && true !== oGameRecord.IsRobotChallenge())
 				this.private_HandleGameRecord(oGameRecord, true);
 		}
 	}
