@@ -436,6 +436,9 @@ CGoUniverseApplication.prototype.AddConsoleMessage = function(sField, sText)
 };
 CGoUniverseApplication.prototype.OnAddChatMessage = function(nChatRoomId, sUserName, sText, oPr)
 {
+	var oTime = new Date();
+	var sTime = "[" + (oTime.getHours() < 10 ? "0" + oTime.getHours() : oTime.getHours()) + ":" + (oTime.getMinutes() < 10 ? "0" + oTime.getMinutes() : oTime.getMinutes()) + "]";
+
 	var oThis = this;
 
 	var oDiv     = document.getElementById("textareaChatId");
@@ -460,9 +463,15 @@ CGoUniverseApplication.prototype.OnAddChatMessage = function(nChatRoomId, sUserN
 			bMessageForMe = true;
 
 		oTextSpan                  = document.createElement("span");
+		oTextSpan.textContent      = sTime;
+		oTextSpan.style.fontFamily = "'Courier New', Courier, monospace";
+		oTextSpan.style.color      = "black";
+		oTextDiv.appendChild(oTextSpan);
+
+		oTextSpan                  = document.createElement("span");
 		oTextSpan.style.fontWeight = "bold";
 		oTextSpan.style.cursor     = "pointer";
-		oTextSpan.textContent      = sUserName + ": ";
+		oTextSpan.textContent      =  " " + sUserName + ": ";
 		oTextSpan.className        = "UserChatSpan";
 		oTextSpan.addEventListener("click", function()
 		{
