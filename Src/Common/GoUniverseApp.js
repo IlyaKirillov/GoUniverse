@@ -469,9 +469,13 @@ CGoUniverseApplication.prototype.OnAddChatMessage = function(nChatRoomId, sUserN
 		oTextDiv.appendChild(oTextSpan);
 
 		oTextSpan                  = document.createElement("span");
+		oTextSpan.textContent      =  " ";
+		oTextDiv.appendChild(oTextSpan);
+
+		oTextSpan                  = document.createElement("span");
 		oTextSpan.style.fontWeight = "bold";
 		oTextSpan.style.cursor     = "pointer";
-		oTextSpan.textContent      =  " " + sUserName + ": ";
+		oTextSpan.textContent      =  sUserName + ": ";
 		oTextSpan.className        = "UserChatSpan";
 		oTextSpan.addEventListener("click", function()
 		{
