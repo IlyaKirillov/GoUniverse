@@ -664,6 +664,11 @@ CKGSClient.prototype.StartAutomatch = function()
 {
 	var oPreferences = this.GetAutomatchPreferences();
 	var oMessage     = oPreferences.CreateKGSMessage();
+
+	// JSON translator bug, it sends "?" on "AUTOMATHC_PREFS" but can't handle it on "AUTOMATCH_CREATE"
+	if ("?" === oMessage["estimatedRank"])
+		oMessage["estimatedRank"] = "30k";
+
 	oMessage["type"] = "AUTOMATCH_CREATE";
 	this.private_SendMessage(oMessage);
 };
@@ -971,6 +976,10 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
 	{
 		this.private_HandleAutoMatchStatus(oMessage);
 	}
+	else if ("LOGIN_FAILED_KEEP_OUT" === oMessage.type)
+	{
+		this.private_HandleLoginFailedKeepOut(oMessage);
+	}
 	else
 	{
 		console.log(oMessage);
@@ -978,9 +987,12 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
 };
 CKGSClient.prototype.private_HandleLogout = function(oMessage)
 {
-	this.m_bLoggedIn = false;
-	this.m_oApp.Logout(oMessage.text);
-	console.log(oMessage);
+	if (true === this.m_bLoggedIn)
+	{
+		this.m_bLoggedIn = false;
+		this.m_oApp.Logout(oMessage.text);
+		console.log(oMessage);
+	}
 };
 CKGSClient.prototype.private_HandleHello = function(oMessage)
 {
@@ -1982,6 +1994,14 @@ CKGSClient.prototype.private_HandleAutoMatchStatus = function(oMessage)
 	{
 		this.m_bAutomatchOn = false;
 		this.m_oApp.OnCancelAutomatch();
+	}
+};
+CKGSClient.prototype.private_HandleLoginFailedKeepOut = function(oMessage)
+{
+	if (true === this.m_bLoggedIn)
+	{
+		this.m_bLoggedIn = false;
+		this.m_oApp.Logout("You can't log in, an admin has blocked you. \<br/\>\<strong\>Note: \</strong\>perhaps it is not you, who was blocked, but there is an issue with ban system and this new client. We are very sorry if you have suffered because of this." + "\<br/\>\<strong\>Ban reason: \</strong\>" + oMessage["text"]);
 	}
 };
 CKGSClient.prototype.private_AddUserToRoom = function(oUser, oRoom)
