@@ -1231,6 +1231,9 @@ CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
 			sWhite  = "";
 			nWhiteR = -3;
 		}
+
+		sBlack  = "";
+		nBlackR = -3;
 	}
 	else if (EKGSGameType.Review === nGameType || EKGSGameType.RengoReview === nGameType)
 	{
@@ -1248,6 +1251,9 @@ CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
 			sWhite  = "";
 			nWhiteR = -3;
 		}
+
+		sBlack  = "";
+		nBlackR = -3;
 
 		if (oBlack && oWhite)
 			sWhite += " review (" + oWhite.GetName() + " vs. " + oBlack.GetName() + ")";

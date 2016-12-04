@@ -39,7 +39,7 @@ function CKGSGamesList(oApp)
 		11    : "Comment"
 	};
 
-	this.m_nSortType = -EKGSGameListRecord.WRank;
+	this.m_nSortType = -EKGSGameListRecord.Vs;
 
 	this.m_oApp = oApp;
 }
@@ -133,6 +133,54 @@ CKGSGamesList.prototype.private_Sort = function (oRecord1, oRecord2)
 		else if (Common.Compare_Strings(oRecord1.GetPlace(), oRecord2.GetPlace()) > 0)
 			return -1;
 	}
+	else if (EKGSGameListRecord.Vs === SortType)
+	{
+		var nMaxRank1 = Math.max(oRecord1.m_nWhiteRank, oRecord1.m_nBlackRank);
+		var nMaxRank2 = Math.max(oRecord2.m_nWhiteRank, oRecord2.m_nBlackRank);
+
+		if (nMaxRank1 < nMaxRank2)
+		{
+			return -1;
+		}
+		else if (nMaxRank1 > nMaxRank2)
+		{
+			return 1;
+		}
+		else
+		{
+			var nMinRank1 = Math.min(oRecord1.m_nWhiteRank, oRecord1.m_nBlackRank);
+			var nMinRank2 = Math.min(oRecord2.m_nWhiteRank, oRecord2.m_nBlackRank);
+
+			if (nMinRank1 < nMinRank2)
+				return -1;
+			else if (nMinRank1 > nMinRank2)
+				return 1;
+		}
+	}
+	else if (-EKGSGameListRecord.Vs === SortType)
+	{
+		var nMaxRank1 = Math.max(oRecord1.m_nWhiteRank, oRecord1.m_nBlackRank);
+		var nMaxRank2 = Math.max(oRecord2.m_nWhiteRank, oRecord2.m_nBlackRank);
+
+		if (nMaxRank1 < nMaxRank2)
+		{
+			return 1;
+		}
+		else if (nMaxRank1 > nMaxRank2)
+		{
+			return -1;
+		}
+		else
+		{
+			var nMinRank1 = Math.min(oRecord1.m_nWhiteRank, oRecord1.m_nBlackRank);
+			var nMinRank2 = Math.min(oRecord2.m_nWhiteRank, oRecord2.m_nBlackRank);
+
+			if (nMinRank1 < nMinRank2)
+				return 1;
+			else if (nMinRank1 > nMinRank2)
+				return -1;
+		}
+	}
 
 	return 0;
 };
@@ -195,6 +243,7 @@ CKGSGamesList.prototype.Is_Sortable = function(nColNum)
 		case EKGSGameListRecord.BName    :
 		case EKGSGameListRecord.Observers:
 		case EKGSGameListRecord.Place    :
+		case EKGSGameListRecord.Vs:
 			return true;
 	}
 
