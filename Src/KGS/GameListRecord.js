@@ -23,6 +23,8 @@ function CKGSGameListRecord(oClient)
 	this.m_oBlack      = null;
 	this.m_oWhite      = null;
 	this.m_oOwner      = null;
+	this.m_oBlack2     = null;
+	this.m_oWhite2     = null;
 	this.m_nHandicap   = 0;
 	this.m_nBoardSize  = 19;
 	this.m_bAdjourned  = false;
@@ -57,6 +59,12 @@ CKGSGameListRecord.prototype.Update = function(oGameRecord)
 	if (oGameRecord.players.owner)
 		this.m_oOwner = GetKGSUser(oGameRecord.players.owner);
 
+	if (oGameRecord.players.black_2)
+		this.m_oBlack2 = GetKGSUser(oGameRecord.players.black_2);
+
+	if (oGameRecord.players.white_2)
+		this.m_oWhite2 = GetKGSUser(oGameRecord.players.white_2);
+
 	this.m_nHandicap  = oGameRecord.handicap ? parseInt(oGameRecord.handicap) : 0;
 	this.m_nBoardSize = oGameRecord.size ? oGameRecord.size : 19;
 
@@ -89,6 +97,14 @@ CKGSGameListRecord.prototype.GetWhite = function()
 CKGSGameListRecord.prototype.GetOwner = function ()
 {
 	return this.m_oOwner;
+};
+CKGSGameListRecord.prototype.GetBlack2 = function()
+{
+	return this.m_oBlack2;
+};
+CKGSGameListRecord.prototype.GetWhite2 = function()
+{
+	return this.m_oWhite2;
 };
 CKGSGameListRecord.prototype.GetObservers = function()
 {

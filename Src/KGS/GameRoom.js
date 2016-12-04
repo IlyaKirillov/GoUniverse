@@ -27,6 +27,8 @@ function CKGSGameRoom(oClient, nGameRoomId)
 	this.m_bEditor             = false;
 	this.m_oBlack              = null;
 	this.m_oWhite              = null;
+	this.m_oBlack2             = null;
+	this.m_oWhite2             = null;
 	this.m_oOwner              = null;
 	this.m_sWhiteAvatar        = "Files/DefaultUserWhite.png";
 	this.m_sBlackAvatar        = "Files/DefaultUserBlack.png";
@@ -169,9 +171,11 @@ CKGSGameRoom.prototype.SetPlayers = function(oGameRecord)
 {
 	if (oGameRecord)
 	{
-		this.m_oBlack = oGameRecord.GetBlack();
-		this.m_oWhite = oGameRecord.GetWhite();
-		this.m_oOwner = oGameRecord.GetOwner();
+		this.m_oBlack  = oGameRecord.GetBlack();
+		this.m_oWhite  = oGameRecord.GetWhite();
+		this.m_oOwner  = oGameRecord.GetOwner();
+		this.m_oBlack2 = oGameRecord.GetBlack2();
+		this.m_oWhite2 = oGameRecord.GetWhite2();
 
 		var oBlackUser = this.m_oBlack;
 		if (oBlackUser)
@@ -1387,6 +1391,22 @@ CKGSGameRoom.prototype.OnClose = function()
 	var oDrawing = this.m_oGameTree.Get_Drawing();
 	if (oDrawing)
 		oDrawing.OnDestroy();
+};
+CKGSGameRoom.prototype.GetBlackPlayer = function()
+{
+	return this.m_oBlack;
+};
+CKGSGameRoom.prototype.GetWhitePlayer = function()
+{
+	return this.m_oWhite;
+};
+CKGSGameRoom.prototype.GetBlack2Player = function()
+{
+	return this.m_oBlack2;
+};
+CKGSGameRoom.prototype.GetWhite2Player = function()
+{
+	return this.m_oWhite2;
 };
 
 function CKGSEditorHandler(oClient, oGame)

@@ -86,8 +86,7 @@ CDrawing.prototype.Create_GoUniverseViewerTemplate = function(sDivId, oApp, oTab
 	this.m_oWhiteTime     = oGameRoom.GetWhiteTime();
 	this.m_oGameRoom      = oGameRoom;
 
-	this.m_oCountDown       = new CGoUniverseDrawingCountDown();
-	this.m_oCountingScores  = new CGoUniverseDrawingCountingScores(this, oGameRoom);
+	this.m_oCountingScores = new CGoUniverseDrawingCountingScores(this, oGameRoom);
 
 	this.m_oGoUniversePr = {
 		GameInfoH: 37,
@@ -236,16 +235,6 @@ CDrawing.prototype.private_GoUniverseCreatePlayersInfo = function(oParentControl
 
 	this.m_aElements.push(oDrawingBlackInfo);
 	this.m_aElements.push(oDrawingWhiteInfo);
-
-	var sCountDown = sInfoDivId + "CountDown";
-	this.private_CreateDiv(oInfoControl.HtmlElement, sCountDown);
-
-	var oCountDownControl = CreateControlContainer(sCountDown);
-	oCountDownControl.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, -1);
-	oCountDownControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right | g_anchor_bottom);
-	oInfoControl.AddControl(oCountDownControl);
-
-	this.m_oCountDown.Init(oCountDownControl.HtmlElement);
 
 	this.m_oGameRoom.SetWhiteInfoHandler(oDrawingWhiteInfo);
 	this.m_oGameRoom.SetBlackInfoHandler(oDrawingBlackInfo);
@@ -1038,13 +1027,50 @@ CGoUniverseDrawingPlayerInfo.prototype.Update_Scores = function(dScores)
 };
 CGoUniverseDrawingPlayerInfo.prototype.private_Update = function()
 {
+	var oGameRoom = this.m_oDrawing.m_oGameRoom;
+
 	var oNameDiv   = this.m_oNameDiv;
 	var oScoresDiv = this.m_oScoresDiv;
 
-	var sNameText   = ("" === this.m_sName ? (BOARD_BLACK === this.m_nPlayer ? "Black " : "White ") : this.m_sName) + ("" === this.m_sRank ? "" : "[" + this.m_sRank +  "]");
-	var sScoresText = this.m_dScores + (true === this.m_bScores ? " points" : " captures");
+	function privateAddUserToInfo(oUser)
+	{
+		var oSpan = document.createElement("span");
+		Common.Set_InnerTextToElement(oSpan, oUser.GetName() + "[" + oUser.GetStringRank() + "]");
+		oNameDiv.appendChild(oSpan);
+		oSpan.addEventListener("click", function(){
+			oUser.m_oClient.LoadUserInfo(oUser.GetName());
+		}, false);
+		oSpan.className = "UserChatSpan";
+		oSpan.style.cursor = "pointer";
+	}
 
-	Common.Set_InnerTextToElement(oNameDiv, sNameText);
+	while (oNameDiv.firstChild)
+	{
+		oNameDiv.removeChild(oNameDiv.firstChild);
+	}
+
+	var oBlack = oGameRoom.GetBlackPlayer();
+	var oWhite = oGameRoom.GetWhitePlayer();
+	if (oBlack && oWhite)
+	{
+		var oUser = BOARD_BLACK === this.m_nPlayer ? oBlack : oWhite;
+		privateAddUserToInfo(oUser);
+		var oUser2 = BOARD_BLACK === this.m_nPlayer ? oGameRoom.GetBlack2Player() : oGameRoom.GetWhite2Player();
+		if (oUser2)
+		{
+			var oSpan = document.createElement("span");
+			Common.Set_InnerTextToElement(oSpan, ", ");
+			oNameDiv.appendChild(oSpan);
+			privateAddUserToInfo(oUser2);
+		}
+	}
+	else
+	{
+		var sNameText = ("" === this.m_sName ? (BOARD_BLACK === this.m_nPlayer ? "Black " : "White ") : this.m_sName) + ("" === this.m_sRank ? "" : "[" + this.m_sRank +  "]");
+		Common.Set_InnerTextToElement(oNameDiv, sNameText);
+	}
+
+	var sScoresText = this.m_dScores + (true === this.m_bScores ? " points" : " captures");
 	Common.Set_InnerTextToElement(oScoresDiv, sScoresText);
 };
 CGoUniverseDrawingPlayerInfo.prototype.StopCountDown = function()
