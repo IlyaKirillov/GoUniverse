@@ -1328,6 +1328,16 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 	oGame.HandleGameActions(oMessage["actions"]);
 	oGame.HandleScore(oMessage["score"] ? this.private_ParseScore(oMessage["score"]) : null);
 	oGame.UpdatePlayersList(oMessage["users"]);
+
+	// Закрываем все вызовы, когда попадаем в свою игру
+	if (oGame.IsPlayer() && !oGame.IsDemonstration() && oGame.IsGameInProgress())
+	{
+		for (var nChannelId in this.m_oChallenges)
+		{
+			var oWindow = this.m_oChallenges[nChannelId];
+			oWindow.Close();
+		}
+	}
 };
 CKGSClient.prototype.private_HandleGameUpdate = function(oMessage)
 {
