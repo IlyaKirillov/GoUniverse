@@ -806,11 +806,11 @@ CKGSUserInfoWindow.prototype.private_CreateFriendsPage = function(oDiv, oControl
 	oListControl.HtmlElement.style.background = "#F3F3F3";
 	oControl.AddControl(oListControl);
 
-
-	this.m_oFriendsListView.Handle_Record([0, "Test1", 12, false, this.m_oClient.GetCurrentUser()]);
-	this.m_oFriendsListView.Handle_Record([0, "Test2", 23, false, this.m_oClient.GetCurrentUser()]);
-	this.m_oFriendsListView.Handle_Record([0, "Test3", 42, false, this.m_oClient.GetCurrentUser()]);
-	this.m_oFriendsListView.Handle_Record([0, "Test4", 11, false, this.m_oClient.GetCurrentUser()]);
+	var oFriends = this.m_oClient.GetFriendsList();
+	for (var sId in oFriends)
+	{
+		this.m_oFriendsListView.Handle_Record([0, sId, 12, false, this.m_oClient.GetCurrentUser()]);
+	}
 
 	this.m_oFriendsListView.Update_Size();
 

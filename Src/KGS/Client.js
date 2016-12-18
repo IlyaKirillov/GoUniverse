@@ -678,6 +678,14 @@ CKGSClient.prototype.CancelAutomatch = function()
 		"type" : "AUTOMATCH_CANCEL"
 	});
 };
+CKGSClient.prototype.GetFriendsList = function()
+{
+	return this.m_oFriendList;
+};
+CKGSClient.prototype.GetBlackList = function()
+{
+	return this.m_oBlackList;
+};
 CKGSClient.prototype.private_SendMessage = function(oMessage)
 {
 	// console.log("Send:");
