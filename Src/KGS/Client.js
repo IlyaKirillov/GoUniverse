@@ -686,6 +686,10 @@ CKGSClient.prototype.GetBlackList = function()
 {
 	return this.m_oBlackList;
 };
+CKGSClient.prototype.GetFollowedList = function()
+{
+	return this.m_oFollowerList;
+};
 CKGSClient.prototype.private_SendMessage = function(oMessage)
 {
 	// console.log("Send:");

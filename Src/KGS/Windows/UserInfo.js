@@ -46,6 +46,7 @@ function CKGSUserInfoWindow()
 	this.m_bOwnInfo          = false;
 	this.m_oFriendsListView  = null;
 	this.m_oCensoredListView = null;
+	this.m_oFollowerListView = null;
 }
 CommonExtend(CKGSUserInfoWindow, CKGSWindowBase);
 
@@ -65,6 +66,7 @@ CKGSUserInfoWindow.prototype.Init = function(sDivId, oPr)
 			this.m_bOwnInfo          = true;
 			this.m_oFriendsListView  = new CListView();
 			this.m_oCensoredListView = new CListView();
+			this.m_oFollowerListView = new CListView();
 		}
 		else
 		{
@@ -88,6 +90,7 @@ CKGSUserInfoWindow.prototype.Init = function(sDivId, oPr)
 	var sRankWrapperId  = sDivId + "R";
 	var sFriendsWrapperId  = sDivId + "F";
 	var sCensoredWrapperId = sDivId + "C";
+	var sFollowerWrapperId = sDivId + "W";
 
 
 	var oInfoDivWrapper = this.protected_CreateDivElement(oMainDiv, sInfoWrapperId);
@@ -159,8 +162,16 @@ CKGSUserInfoWindow.prototype.Init = function(sDivId, oPr)
 		oMainControl.AddControl(oCensoredDivWrapperControl);
 		oCensoredDivWrapper.style.display = "none";
 
+		var oFollowerDivWrapper = this.protected_CreateDivElement(oMainDiv, sFollowerWrapperId);
+		var oFollowerDivWrapperControl = CreateControlContainer(sFollowerWrapperId);
+		oFollowerDivWrapperControl.Bounds.SetParams(0, 25, 0, 0, true, true, true, true, -1, -1);
+		oFollowerDivWrapperControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left | g_anchor_bottom);
+		oMainControl.AddControl(oFollowerDivWrapperControl);
+		oFollowerDivWrapper.style.display = "none";
+
 		this.private_CreateFriendsPage(oFriendsDivWrapper, oFriendsDivWrapperControl);
 		this.private_CreateCensoredPage(oCensoredDivWrapper, oCensoredDivWrapperControl);
+		this.private_CreateFollowerPage(oFollowerDivWrapper, oFollowerDivWrapperControl);
 
 		oTab = new CVisualUserInfoTab(this);
 		oTab.Init(3, oFriendsDivWrapper, "Friends");
@@ -168,6 +179,10 @@ CKGSUserInfoWindow.prototype.Init = function(sDivId, oPr)
 
 		oTab = new CVisualUserInfoTab(this);
 		oTab.Init(4, oCensoredDivWrapper, "Censored");
+		this.m_oTabs.AddTab(oTab);
+
+		oTab = new CVisualUserInfoTab(this);
+		oTab.Init(5, oFollowerDivWrapper, "Funs");
 		this.m_oTabs.AddTab(oTab);
 	}
 
@@ -208,6 +223,9 @@ CKGSUserInfoWindow.prototype.Update_Size = function(bForce)
 
 	if (this.m_oCensoredListView)
 		this.m_oCensoredListView.Update_Size();
+
+	if (this.m_oFollowerListView)
+		this.m_oFollowerListView.Update_Size();
 };
 CKGSUserInfoWindow.prototype.OnUserDetails = function(oDetails)
 {
@@ -813,38 +831,52 @@ CKGSUserInfoWindow.prototype.private_CreateFriendsPage = function(oDiv, oControl
 	}
 
 	this.m_oFriendsListView.Update_Size();
-
-
-	// var sMainInfo  = sDivId + "M";
-	// var sAvatar    = sDivId + "A";
-	// var sExtension = sDivId + "E";
-	//
-	// this.m_oMainInfoDiv = this.protected_CreateDivElement(oDiv, sMainInfo);
-	// var oMainInfoControl = CreateControlContainer(sMainInfo);
-	// oMainInfoControl.Bounds.SetParams(5, 5, 155, 0, true, true, true, false, -1, 210);
-	// oMainInfoControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left);
-	// oControl.AddControl(oMainInfoControl);
-	//
-	// this.m_oAvatarDiv = this.protected_CreateDivElement(oDiv, sAvatar);
-	// var oAvatarControl = CreateControlContainer(sAvatar);
-	// oAvatarControl.Bounds.SetParams(0, 10, 5, 0, false, true, true, false, 150, 200);
-	// oAvatarControl.Anchor = (g_anchor_top | g_anchor_right);
-	// oControl.AddControl(oAvatarControl);
-	//
-	// this.m_oExtensionDiv = this.protected_CreateDivElement(oDiv, sExtension);
-	// var oExtensionControl = CreateControlContainer(sExtension);
-	// oExtensionControl.Bounds.SetParams(5, 220, 5, 7, true, true, true, true, -1, -1);
-	// oExtensionControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left | g_anchor_bottom);
-	// oControl.AddControl(oExtensionControl);
-	//
-	// this.m_oExtensionDiv.style.borderBottom = "1px solid #BEBEBE";
-	// this.m_oExtensionDiv.style.borderTop    = "1px solid #BEBEBE";
-	//
-	// this.private_AddMainInfo();
 };
 CKGSUserInfoWindow.prototype.private_CreateCensoredPage = function(oDiv, oControl)
 {
+	var sDivId = oDiv.id;
 
+	this.m_oCensoredListView.Set_BGColor(243, 243, 243);
+
+	var sListViewDivId = sDivId + "L";
+	var oListViewDiv   = this.protected_CreateDivElement(oDiv, sListViewDivId);
+
+	var oListControl = this.m_oCensoredListView.Init(sListViewDivId, new CKGSPlayersList(this.m_oClient.m_oApp));
+	oListControl.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, -1);
+	oListControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right);
+	oListControl.HtmlElement.style.background = "#F3F3F3";
+	oControl.AddControl(oListControl);
+
+	var oCensored = this.m_oClient.GetBlackList();
+	for (var sId in oCensored)
+	{
+		this.m_oCensoredListView.Handle_Record([0, sId, 12, false, this.m_oClient.GetCurrentUser()]);
+	}
+
+	this.m_oCensoredListView.Update_Size();
+};
+CKGSUserInfoWindow.prototype.private_CreateFollowerPage = function(oDiv, oControl)
+{
+	var sDivId = oDiv.id;
+
+	this.m_oFollowerListView.Set_BGColor(243, 243, 243);
+
+	var sListViewDivId = sDivId + "L";
+	var oListViewDiv   = this.protected_CreateDivElement(oDiv, sListViewDivId);
+
+	var oListControl = this.m_oFollowerListView.Init(sListViewDivId, new CKGSPlayersList(this.m_oClient.m_oApp));
+	oListControl.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, -1);
+	oListControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right);
+	oListControl.HtmlElement.style.background = "#F3F3F3";
+	oControl.AddControl(oListControl);
+
+	var oFollowed = this.m_oClient.GetFollowedList();
+	for (var sId in oFollowed)
+	{
+		this.m_oFollowerListView.Handle_Record([0, sId, 12, false, this.m_oClient.GetCurrentUser()]);
+	}
+
+	this.m_oFollowerListView.Update_Size();
 };
 CKGSUserInfoWindow.prototype.private_UpdateMousePosOnRankGraph = function(X, Y)
 {
