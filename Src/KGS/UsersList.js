@@ -78,7 +78,7 @@ CKGSUsersListRecord.prototype.Draw = function(oContext, dX, dY, eType)
 	var sString = "";
 	switch(eType)
 	{
-		case EKGSUsersListRecord.Name : sString += this.m_sName; break;
+		case EKGSUsersListRecord.Name : sString += this.m_sName + "[" + this.m_sRank + "]"; break;
 	}
 
 	oContext.fillText(sString, dX, dY);
@@ -91,6 +91,7 @@ CKGSUsersListRecord.prototype.Update = function(aLine)
 {
 	this.m_oUser = aLine[1];
 	this.m_sName = this.m_oUser.GetName();
+	this.m_sRank = this.m_oUser.GetStringRank();
 };
 CKGSUsersListRecord.prototype.Compare = function(sName)
 {
