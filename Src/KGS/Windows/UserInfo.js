@@ -184,6 +184,8 @@ CKGSUserInfoWindow.prototype.Init = function(sDivId, oPr)
 		oTab = new CVisualUserInfoTab(this);
 		oTab.Init(5, oFollowerDivWrapper, "Funs");
 		this.m_oTabs.AddTab(oTab);
+
+		this.UpdateFriendsLists();
 	}
 
 	this.m_oGamesListView.Set_BGColor(243, 243, 243);
@@ -818,19 +820,11 @@ CKGSUserInfoWindow.prototype.private_CreateFriendsPage = function(oDiv, oControl
 	var sListViewDivId = sDivId + "L";
 	var oListViewDiv   = this.protected_CreateDivElement(oDiv, sListViewDivId);
 
-	var oListControl = this.m_oFriendsListView.Init(sListViewDivId, new CKGSPlayersList(this.m_oClient.m_oApp));
+	var oListControl = this.m_oFriendsListView.Init(sListViewDivId, new CKGSUsersList(this.m_oClient.m_oApp));
 	oListControl.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, -1);
 	oListControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right);
 	oListControl.HtmlElement.style.background = "#F3F3F3";
 	oControl.AddControl(oListControl);
-
-	var oFriends = this.m_oClient.GetFriendsList();
-	for (var sId in oFriends)
-	{
-		this.m_oFriendsListView.Handle_Record([0, sId, 12, false, this.m_oClient.GetCurrentUser()]);
-	}
-
-	this.m_oFriendsListView.Update_Size();
 };
 CKGSUserInfoWindow.prototype.private_CreateCensoredPage = function(oDiv, oControl)
 {
@@ -841,19 +835,11 @@ CKGSUserInfoWindow.prototype.private_CreateCensoredPage = function(oDiv, oContro
 	var sListViewDivId = sDivId + "L";
 	var oListViewDiv   = this.protected_CreateDivElement(oDiv, sListViewDivId);
 
-	var oListControl = this.m_oCensoredListView.Init(sListViewDivId, new CKGSPlayersList(this.m_oClient.m_oApp));
+	var oListControl = this.m_oCensoredListView.Init(sListViewDivId, new CKGSUsersList(this.m_oClient.m_oApp));
 	oListControl.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, -1);
 	oListControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right);
 	oListControl.HtmlElement.style.background = "#F3F3F3";
 	oControl.AddControl(oListControl);
-
-	var oCensored = this.m_oClient.GetBlackList();
-	for (var sId in oCensored)
-	{
-		this.m_oCensoredListView.Handle_Record([0, sId, 12, false, this.m_oClient.GetCurrentUser()]);
-	}
-
-	this.m_oCensoredListView.Update_Size();
 };
 CKGSUserInfoWindow.prototype.private_CreateFollowerPage = function(oDiv, oControl)
 {
@@ -864,19 +850,11 @@ CKGSUserInfoWindow.prototype.private_CreateFollowerPage = function(oDiv, oContro
 	var sListViewDivId = sDivId + "L";
 	var oListViewDiv   = this.protected_CreateDivElement(oDiv, sListViewDivId);
 
-	var oListControl = this.m_oFollowerListView.Init(sListViewDivId, new CKGSPlayersList(this.m_oClient.m_oApp));
+	var oListControl = this.m_oFollowerListView.Init(sListViewDivId, new CKGSUsersList(this.m_oClient.m_oApp));
 	oListControl.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, -1);
 	oListControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right);
 	oListControl.HtmlElement.style.background = "#F3F3F3";
 	oControl.AddControl(oListControl);
-
-	var oFollowed = this.m_oClient.GetFollowedList();
-	for (var sId in oFollowed)
-	{
-		this.m_oFollowerListView.Handle_Record([0, sId, 12, false, this.m_oClient.GetCurrentUser()]);
-	}
-
-	this.m_oFollowerListView.Update_Size();
 };
 CKGSUserInfoWindow.prototype.private_UpdateMousePosOnRankGraph = function(X, Y)
 {
@@ -1044,7 +1022,32 @@ CKGSUserInfoWindow.prototype.private_HideRankHint = function()
 	this.m_oRankHint = null;
 
 };
+CKGSUserInfoWindow.prototype.UpdateFriendsLists = function()
+{
+	var oFriends = this.m_oClient.GetFriendsList();
+	this.m_oFriendsListView.Clear();
+	for (var sId in oFriends)
+	{
+		this.m_oFriendsListView.Handle_Record([0, oFriends[sId]]);
+	}
+	this.m_oFriendsListView.Update_Size();
 
+	var oCensored = this.m_oClient.GetBlackList();
+	this.m_oCensoredListView.Clear();
+	for (var sId in oCensored)
+	{
+		this.m_oCensoredListView.Handle_Record([0, oCensored[sId]]);
+	}
+	this.m_oCensoredListView.Update_Size();
+
+	var oFollowed = this.m_oClient.GetFollowedList();
+	this.m_oFollowerListView.Clear();
+	for (var sId in oFollowed)
+	{
+		this.m_oFollowerListView.Handle_Record([0, oFollowed[sId]]);
+	}
+	this.m_oFollowerListView.Update_Size();
+};
 
 var EKGSUserInfoGameListRecord = {
 	Type      : 1,

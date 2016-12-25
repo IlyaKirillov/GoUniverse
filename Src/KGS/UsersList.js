@@ -68,6 +68,7 @@ function CKGSUsersListRecord(oClient)
 
 	this.m_oClient = oClient;
 	this.m_sName   = "";
+	this.m_oUser   = null;
 }
 
 CommonExtend(CKGSUsersListRecord, CListRecordBase);
@@ -88,7 +89,8 @@ CKGSUsersListRecord.prototype.Get_Key = function()
 };
 CKGSUsersListRecord.prototype.Update = function(aLine)
 {
-	this.m_sName   = aLine[1];
+	this.m_oUser = aLine[1];
+	this.m_sName = this.m_oUser.GetName();
 };
 CKGSUsersListRecord.prototype.Compare = function(sName)
 {
