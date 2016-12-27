@@ -10,7 +10,8 @@
  */
 
 var EKGSUsersListRecord = {
-	Name : 1
+	Name  : 1,
+	Notes : 2
 };
 
 function CKGSUsersList(oApp)
@@ -18,9 +19,10 @@ function CKGSUsersList(oApp)
 	CKGSUsersList.superclass.constructor.call(this);
 
 	this.m_oHeaders = {
-		Sizes : [0],
-		Count : 1,
-		1     : "Name"
+		Sizes : [0, 130],
+		Count : 2,
+		1     : "Name",
+		2     : "Notes"
 	};
 
 	this.m_nSortType = EKGSUsersListRecord.Name;
@@ -49,6 +51,13 @@ CKGSUsersList.prototype.private_Sort = function (oRecord1, oRecord2)
 
 	return 0;
 };
+CKGSUsersList.prototype.Is_Sortable = function(nColNum)
+{
+	if (0 === nColNum)
+		return true;
+
+	return false;
+};
 CKGSUsersList.prototype.Get_Record = function(aLine)
 {
 	var oRecord = new CKGSUsersListRecord(this.m_oApp.GetClient());
@@ -69,6 +78,7 @@ function CKGSUsersListRecord(oClient)
 	this.m_oClient = oClient;
 	this.m_sName   = "";
 	this.m_oUser   = null;
+	this.m_sNotes  = "";
 }
 
 CommonExtend(CKGSUsersListRecord, CListRecordBase);
@@ -79,6 +89,7 @@ CKGSUsersListRecord.prototype.Draw = function(oContext, dX, dY, eType)
 	switch(eType)
 	{
 		case EKGSUsersListRecord.Name : sString += this.m_sName + "[" + this.m_sRank + "]"; break;
+		case EKGSUsersListRecord.Notes : sString += this.m_sNotes;
 	}
 
 	oContext.fillText(sString, dX, dY);
@@ -89,9 +100,11 @@ CKGSUsersListRecord.prototype.Get_Key = function()
 };
 CKGSUsersListRecord.prototype.Update = function(aLine)
 {
-	this.m_oUser = aLine[1];
-	this.m_sName = this.m_oUser.GetName();
-	this.m_sRank = this.m_oUser.GetStringRank();
+	var oUserExt  = aLine[1];
+	this.m_oUser  = oUserExt.User;
+	this.m_sName  = this.m_oUser.GetName();
+	this.m_sRank  = this.m_oUser.GetStringRank();
+	this.m_sNotes = oUserExt.Notes;
 };
 CKGSUsersListRecord.prototype.Compare = function(sName)
 {

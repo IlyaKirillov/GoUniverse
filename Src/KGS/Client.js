@@ -1098,17 +1098,22 @@ CKGSClient.prototype.private_HandleLoginSuccess = function(oMessage)
 			var oFriend = Friends[Pos];
 			var oUser   = GetKGSUser(oFriend["user"]);
 			var sUserName = oUser.GetName();
+			var oUserExt  = {
+				User : oUser,
+				Notes : oFriend["notes"] ? oFriend["notes"] : ""
+			};
+
 			if ("buddy" === oFriend["friendType"])
 			{
-				this.m_oFriendList[sUserName] = oUser;
+				this.m_oFriendList[sUserName] = oUserExt;
 			}
 			else if ("censored" === oFriend["friendType"])
 			{
-				this.m_oBlackList[sUserName] = oUser;
+				this.m_oBlackList[sUserName] = oUserExt;
 			}
 			else if ("fan" === oFriend["friendType"])
 			{
-				this.m_oFollowerList[sUserName] = oUser;
+				this.m_oFollowerList[sUserName] = oUserExt;
 			}
 		}
 	}
@@ -1659,18 +1664,22 @@ CKGSClient.prototype.private_HandleFriendAddSuccess = function(oMessage)
 	var sFriendType = oMessage["friendType"];
 	var oUser       = GetKGSUser(oMessage["user"]);
 	var sUserName   = oUser.GetName();
+	var oUserExt    = {
+		User  : oUser,
+		Notes : oMessage["notes"] ? oMessage["notes"] : ""
+	};
 
 	if ("buddy" === sFriendType)
 	{
-		this.m_oFriendList[sUserName] = oUser;
+		this.m_oFriendList[sUserName] = oUserExt;
 	}
 	else if ("censored" === sFriendType)
 	{
-		this.m_oBlackList[sUserName] = oUser;
+		this.m_oBlackList[sUserName] = oUserExt;
 	}
 	else if ("fan" === sFriendType)
 	{
-		this.m_oFollowerList[sUserName] = oUser;
+		this.m_oFollowerList[sUserName] = oUserExt;
 		this.m_oGamesListView.Update_Size();
 	}
 
