@@ -110,14 +110,8 @@ CKGSRoomListWindow.prototype.private_CreateFindInput = function(sInputId, oParen
 	oFindInput["aria-label"]  = "Enter room name here";
 	oFindInput["placeholder"] = "Enter room name here";
 
-	oFindInput.style.color           = "#505050";
-	oFindInput.style.backgroundColor = "#fff";
-	oFindInput.style.border          = "1px solid #969696";
-	oFindInput.style.fontFamily      = '"Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif';
-	oFindInput.style.height          = "37px";
-	oFindInput.style.fontSize        = "13px";
-	oFindInput.style.padding         = "0px 47px 0px 6px";
-	oFindInput.style.outline         = "none";
+	oFindInput.className += " inputKGSWindow";
+	oFindInput.style.padding = "0px 6px 0px 6px";
 
 	oParentDiv.appendChild(oFindInput);
 

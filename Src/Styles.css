@@ -652,3 +652,14 @@ div.challengePlayerDivEditable {
 	font-weight: normal;
 	font-style: normal;
 }
+
+input.inputKGSWindow {
+	color            : #505050;
+	background-color : #fff;
+	border           : 1px solid #969696;
+	font-family      : "Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif;
+	height           : 37px;
+	font-size        : 13px;
+	padding          : 0px 47px 0px 6px;
+	outline          : none;
+}

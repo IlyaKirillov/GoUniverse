@@ -402,13 +402,14 @@ CKGSClient.prototype.IsUserInFollowerList = function(sUserName)
 
 	return false;
 };
-CKGSClient.prototype.AddToFriendList = function(sUserName)
+CKGSClient.prototype.AddToFriendList = function(sUserName, sNotes)
 {
 	this.private_SendMessage({
 		"type"        : "FRIEND_ADD",
 		"callbackKey" : 12345,
 		"friendType"  : "buddy",
 		"name"        : sUserName,
+		"notes"       : sNotes ? sNotes : "",
 		"text"        : ""
 	});
 };

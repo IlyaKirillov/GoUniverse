@@ -211,22 +211,22 @@ CKGSUserInfoWindow.prototype.Update_Size = function(bForce)
 {
 	CKGSUserInfoWindow.superclass.Update_Size.call(this, bForce);
 
-	if (this.m_oInfoScroll)
+	if (this.m_oInfoScroll && 0 === this.m_oTabs.GetCurrentId())
 		this.m_oInfoScroll.CheckVisibility();
 
-	if (this.m_oGamesListView)
+	if (this.m_oGamesListView && 1 === this.m_oTabs.GetCurrentId())
 		this.m_oGamesListView.Update_Size();
 
-	if (this.m_oRankCanvas)
+	if (this.m_oRankCanvas && 2 === this.m_oTabs.GetCurrentId())
 		this.private_DrawRank();
 
-	if (this.m_oFriendsListView)
+	if (this.m_oFriendsListView && 3 === this.m_oTabs.GetCurrentId())
 		this.m_oFriendsListView.Update_Size();
 
-	if (this.m_oCensoredListView)
+	if (this.m_oCensoredListView && 4 === this.m_oTabs.GetCurrentId())
 		this.m_oCensoredListView.Update_Size();
 
-	if (this.m_oFollowerListView)
+	if (this.m_oFollowerListView && 5 === this.m_oTabs.GetCurrentId())
 		this.m_oFollowerListView.Update_Size();
 };
 CKGSUserInfoWindow.prototype.OnUserDetails = function(oDetails)
@@ -813,18 +813,85 @@ CKGSUserInfoWindow.prototype.private_CreateRankPage = function(oDiv, oControl)
 };
 CKGSUserInfoWindow.prototype.private_CreateFriendsPage = function(oDiv, oControl)
 {
+	var nRightPanelW = 200;
+
 	var sDivId = oDiv.id;
 
 	this.m_oFriendsListView.Set_BGColor(243, 243, 243);
 
 	var sListViewDivId = sDivId + "L";
 	var oListViewDiv   = this.protected_CreateDivElement(oDiv, sListViewDivId);
+	oListViewDiv.style.borderRight = "1px solid rgb(190, 190, 190)";
 
 	var oListControl = this.m_oFriendsListView.Init(sListViewDivId, new CKGSUsersList(this.m_oClient.m_oApp));
-	oListControl.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, -1);
+	oListControl.Bounds.SetParams(0, 0, nRightPanelW, 1000, false, false, true, false, -1, -1);
 	oListControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right);
 	oListControl.HtmlElement.style.background = "#F3F3F3";
 	oControl.AddControl(oListControl);
+
+	var oNameInput   = this.protected_CreateDivElement(oDiv, null, "input");
+	var oNameControl = CreateControlContainerByElement(oNameInput);
+	oNameControl.SetParams(2, 2, 2, 1000, true, true, true, false, nRightPanelW - 6, 30);
+	oNameControl.SetAnchor(false, true, true, false);
+	oControl.AddControl(oNameControl);
+	oNameInput.className += " inputKGSWindow";
+	oNameInput.style.padding  = "0px 5px 0px 5px";
+	oNameInput.type           = "text";
+	oNameInput.maxLength      = "20";
+	oNameInput["aria-label"]  = "User name";
+	oNameInput["placeholder"] = "User name";
+
+	var oNotesInput   = this.protected_CreateDivElement(oDiv, null, "input");
+	var oNotesControl = CreateControlContainerByElement(oNotesInput);
+	oNotesControl.SetParams(2, 36, 2, 1000, true, true, true, false, nRightPanelW - 6, 30);
+	oNotesControl.SetAnchor(false, true, true, false);
+	oControl.AddControl(oNotesControl);
+	oNotesInput.className += " inputKGSWindow";
+	oNotesInput.style.padding  = "0px 5px 0px 5px";
+	oNotesInput.type           = "text";
+	oNotesInput.maxLength      = "256";
+	oNotesInput["aria-label"]  = "Notes";
+	oNotesInput["placeholder"] = "Notes";
+
+	var nButtonW = (nRightPanelW - 4 - 2) / 2 - 2;
+	var oAddButton              = this.protected_CreateDivElement(oDiv, null, "div");
+	oAddButton.className        = "ButtonCommon";
+	oAddButton.style.textAlign  = "center";
+	oAddButton.style.width      = "100px";
+	oAddButton.style.height     = "25px";
+	oAddButton.style.lineHeight = "23px";
+	oAddButton.style.fontSize   = "14px";
+	oAddButton.style.fontFamily = "'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif";
+	Common.Set_InnerTextToElement(oAddButton, "Add");
+	var oAddControl = CreateControlContainerByElement(oAddButton);
+	oAddControl.SetParams(2, 70, nRightPanelW - 4 - nButtonW, 1000, true, true, true, false, nButtonW, 25);
+	oAddControl.SetAnchor(false, true, true, false);
+	oControl.AddControl(oAddControl);
+
+	var oClient = this.m_oClient;
+	oAddButton.addEventListener("click", function(){
+		if (oNameInput.value.length > 0)
+			oClient.AddToFriendList(oNameInput.value, oNotesInput.value ? oNotesInput.value : "");
+	}, false);
+
+	var oRemoveButton              = this.protected_CreateDivElement(oDiv, null, "div");
+	oRemoveButton.className        = "ButtonCommon";
+	oRemoveButton.style.textAlign  = "center";
+	oRemoveButton.style.width      = "100px";
+	oRemoveButton.style.height     = "25px";
+	oRemoveButton.style.lineHeight = "23px";
+	oRemoveButton.style.fontSize   = "14px";
+	oRemoveButton.style.fontFamily = "'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif";
+	Common.Set_InnerTextToElement(oRemoveButton, "Remove");
+	var oRemoveControl = CreateControlContainerByElement(oRemoveButton);
+	oRemoveControl.SetParams(2, 70, 2, 1000, true, true, true, false, nButtonW, 25);
+	oRemoveControl.SetAnchor(false, true, true, false);
+	oControl.AddControl(oRemoveControl);
+
+	oRemoveButton.addEventListener("click", function(){
+		if (oNameInput.value.length > 0)
+			oClient.RemoveFromFriendList(oNameInput.value);
+	}, false);
 };
 CKGSUserInfoWindow.prototype.private_CreateCensoredPage = function(oDiv, oControl)
 {
