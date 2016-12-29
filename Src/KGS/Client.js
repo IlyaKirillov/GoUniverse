@@ -409,8 +409,7 @@ CKGSClient.prototype.AddToFriendList = function(sUserName, sNotes)
 		"callbackKey" : 12345,
 		"friendType"  : "buddy",
 		"name"        : sUserName,
-		"notes"       : sNotes ? sNotes : "",
-		"text"        : ""
+		"text"        : sNotes ? sNotes : ""
 	});
 };
 CKGSClient.prototype.RemoveFromFriendList = function(sUserName)
@@ -423,14 +422,14 @@ CKGSClient.prototype.RemoveFromFriendList = function(sUserName)
 		"text"        : ""
 	});
 };
-CKGSClient.prototype.AddToBlackList = function(sUserName)
+CKGSClient.prototype.AddToBlackList = function(sUserName, sNotes)
 {
 	this.private_SendMessage({
 		"type"        : "FRIEND_ADD",
 		"callbackKey" : 12345,
 		"friendType"  : "censored",
 		"name"        : sUserName,
-		"text"        : ""
+		"text"        : sNotes ? sNotes : ""
 	});
 };
 CKGSClient.prototype.RemoveFromBlackList = function(sUserName)
@@ -443,14 +442,14 @@ CKGSClient.prototype.RemoveFromBlackList = function(sUserName)
 		"text"        : ""
 	});
 };
-CKGSClient.prototype.AddToFollowerList = function(sUserName)
+CKGSClient.prototype.AddToFollowerList = function(sUserName, sNotes)
 {
 	this.private_SendMessage({
 		"type"        : "FRIEND_ADD",
 		"callbackKey" : 12345,
 		"friendType"  : "fan",
 		"name"        : sUserName,
-		"text"        : ""
+		"text"        : sNotes ? sNotes : ""
 	});
 };
 CKGSClient.prototype.RemoveFromFollowerList = function(sUserName)
