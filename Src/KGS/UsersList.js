@@ -70,6 +70,10 @@ CKGSUsersList.prototype.Handle_DoubleClick = function(Record)
 CKGSUsersList.prototype.Handle_RightClick = function(Record, e)
 {
 };
+CKGSUsersList.prototype.Handle_Select = function(Record, e)
+{
+
+};
 
 function CKGSUsersListRecord(oClient)
 {

@@ -15,6 +15,8 @@ function CListView()
 
     this.m_nSelectedIndex = -1;
     this.m_nTrackBorder   = -1;
+	this.m_bSelectable    = false;
+    this.m_nSelectedIndex2 = -1;
 
     this.m_dYOffset = 0;
     this.m_dYLimit  = 0;
@@ -175,6 +177,15 @@ function CListView()
             {
                 if (oThis.m_aList[oThis.m_nSelectedIndex])
                     oThis.m_oListObject.Handle_DoubleClick(oThis.m_aList[oThis.m_nSelectedIndex], e);
+            }
+            else if (true === oThis.m_bSelectable && g_mouse_button_left === global_mouseEvent.Button && 1 === global_mouseEvent.ClickCount && oThis.m_oListObject && oThis.m_oListObject.Handle_Select)
+            {
+                oThis.m_nSelectedIndex2 = oThis.private_GetIndexByXY(oPos.X, oPos.Y);
+                oThis.private_UpdateCursorType(oPos.X, oPos.Y);
+                oThis.private_UpdateSelectionContext();
+
+                if (oThis.m_aList[oThis.m_nSelectedIndex2])
+                    oThis.m_oListObject.Handle_Select(oThis.m_aList[oThis.m_nSelectedIndex2], e);
             }
         }
 
@@ -443,6 +454,14 @@ CListView.prototype.Update = function()
     this.private_UpdateSelectionContext();
     this.private_UpdateScrollSize();
 };
+CListView.prototype.EnableSelect = function()
+{
+	this.m_bSelectable = true;
+};
+CListView.prototype.DisableSelect = function()
+{
+	this.m_bSelectable = false;
+};
 
 CListView.prototype.FreezeSelection = function()
 {
@@ -587,6 +606,32 @@ CListView.prototype.private_UpdateSelectionContext = function()
         var dX1 = this.m_aX[this.m_aX.length - 1];
 
         var dY0 = this.m_aY[this.m_nSelectedIndex] - this.m_dYOffset;
+        var dY1 = dY0 + this.m_dRowHeight;
+
+        oContext.save();
+        oContext.beginPath();
+        oContext.rect(this.m_aX[0], this.m_aY[0], this.m_aX[this.m_aX.length - 1] - this.m_aX[0], this.m_dYLimit - this.m_aY[0]);
+        oContext.clip();
+
+        oContext.fillStyle = "rgb(204, 230, 227)";
+        //oContext.fillStyle = "rgb(219,229,241)";
+        oContext.beginPath();
+        oContext.moveTo(dX0, dY0);
+        oContext.lineTo(dX1, dY0);
+        oContext.lineTo(dX1, dY1);
+        oContext.lineTo(dX0, dY1);
+        oContext.lineTo(dX0, dY0);
+        oContext.fill();
+
+        oContext.restore();
+    }
+
+    if (-1 !== this.m_nSelectedIndex2 && this.m_nSelectedIndex2 !== this.m_nSelectedIndex)
+    {
+        var dX0 = this.m_aX[0];
+        var dX1 = this.m_aX[this.m_aX.length - 1];
+
+        var dY0 = this.m_aY[this.m_nSelectedIndex2] - this.m_dYOffset;
         var dY1 = dY0 + this.m_dRowHeight;
 
         oContext.save();

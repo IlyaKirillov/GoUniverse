@@ -67,6 +67,10 @@ CKGSUserInfoWindow.prototype.Init = function(sDivId, oPr)
 			this.m_oFriendsListView  = new CListView();
 			this.m_oCensoredListView = new CListView();
 			this.m_oFollowerListView = new CListView();
+
+			this.m_oFriendsListView.EnableSelect();
+			this.m_oCensoredListView.EnableSelect();
+			this.m_oFollowerListView.EnableSelect();
 		}
 		else
 		{
