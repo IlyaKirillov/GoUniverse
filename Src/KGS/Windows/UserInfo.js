@@ -844,6 +844,11 @@ CKGSUserInfoWindow.prototype.private_CreateFriendsPage = function(oDiv, oControl
 	oNameInput.maxLength      = "20";
 	oNameInput["aria-label"]  = "User name";
 	oNameInput["placeholder"] = "User name";
+	var oThis = this;
+	oNameInput.addEventListener("input", function()
+	{
+		oThis.m_oFriendsListView.SelectByKey(oNameInput.value.toLowerCase());
+	}, false);
 
 	var oNotesInput   = this.protected_CreateDivElement(oDiv, null, "input");
 	var oNotesControl = CreateControlContainerByElement(oNotesInput);
@@ -896,6 +901,12 @@ CKGSUserInfoWindow.prototype.private_CreateFriendsPage = function(oDiv, oControl
 		if (oNameInput.value.length > 0)
 			oClient.RemoveFromFriendList(oNameInput.value);
 	}, false);
+
+	this.m_oFriendsListView.GetListObject().SetSelectCallback(function(sName, sNotes)
+	{
+		oNameInput.value  = sName;
+		oNotesInput.value = sNotes;
+	});
 };
 CKGSUserInfoWindow.prototype.private_CreateCensoredPage = function(oDiv, oControl)
 {

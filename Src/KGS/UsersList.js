@@ -27,6 +27,8 @@ function CKGSUsersList(oApp)
 
 	this.m_nSortType = EKGSUsersListRecord.Name;
 	this.m_oApp      = oApp;
+
+	this.m_fOnSelect = null;
 }
 
 CommonExtend(CKGSUsersList, CListBase);
@@ -70,9 +72,14 @@ CKGSUsersList.prototype.Handle_DoubleClick = function(Record)
 CKGSUsersList.prototype.Handle_RightClick = function(Record, e)
 {
 };
-CKGSUsersList.prototype.Handle_Select = function(Record, e)
+CKGSUsersList.prototype.Handle_Select = function(oRecord, e)
 {
-
+	if (this.m_fOnSelect)
+		this.m_fOnSelect(oRecord.m_sName, oRecord.m_sNotes);
+};
+CKGSUsersList.prototype.SetSelectCallback = function(fCallBack)
+{
+	this.m_fOnSelect = fCallBack;
 };
 
 function CKGSUsersListRecord(oClient)
@@ -100,7 +107,7 @@ CKGSUsersListRecord.prototype.Draw = function(oContext, dX, dY, eType)
 };
 CKGSUsersListRecord.prototype.Get_Key = function()
 {
-	return this.m_sName;
+	return this.m_sName.toLowerCase();
 };
 CKGSUsersListRecord.prototype.Update = function(aLine)
 {

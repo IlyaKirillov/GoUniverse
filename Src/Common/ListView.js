@@ -915,3 +915,18 @@ CListView.prototype.GetListObject = function()
 {
     return this.m_oListObject;
 };
+CListView.prototype.SelectByKey = function(sKey)
+{
+    this.m_nSelectedIndex2 = -1;
+    var nRecordsCount = this.m_aList.length;
+    for (var nRecordIndex = 0; nRecordIndex < nRecordsCount; nRecordIndex++)
+    {
+        var oRecord = this.m_aList[nRecordIndex];
+        if (sKey === oRecord.Get_Key())
+        {
+            this.m_nSelectedIndex2 = nRecordIndex;
+        }
+    }
+
+    this.Update_Size();
+};
