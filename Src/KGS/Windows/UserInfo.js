@@ -847,7 +847,15 @@ CKGSUserInfoWindow.prototype.private_CreateFriendsPage = function(oDiv, oControl
 	var oThis = this;
 	oNameInput.addEventListener("input", function()
 	{
-		oThis.m_oFriendsListView.SelectByKey(oNameInput.value.toLowerCase());
+		if (true !== oThis.m_oFriendsListView.SelectByKey(oNameInput.value.toLowerCase()))
+		{
+			oNotesInput.value = "";
+			Common.Set_InnerTextToElement(oAddButton, "Add");
+		}
+		else
+		{
+			Common.Set_InnerTextToElement(oAddButton, "Change");
+		}
 	}, false);
 
 	var oNotesInput   = this.protected_CreateDivElement(oDiv, null, "input");
@@ -906,6 +914,7 @@ CKGSUserInfoWindow.prototype.private_CreateFriendsPage = function(oDiv, oControl
 	{
 		oNameInput.value  = sName;
 		oNotesInput.value = sNotes;
+		Common.Set_InnerTextToElement(oAddButton, "Change");
 	});
 };
 CKGSUserInfoWindow.prototype.private_CreateCensoredPage = function(oDiv, oControl)

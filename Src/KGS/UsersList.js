@@ -72,7 +72,7 @@ CKGSUsersList.prototype.Handle_DoubleClick = function(Record)
 CKGSUsersList.prototype.Handle_RightClick = function(Record, e)
 {
 };
-CKGSUsersList.prototype.Handle_Select = function(oRecord, e)
+CKGSUsersList.prototype.Handle_Select = function(oRecord)
 {
 	if (this.m_fOnSelect)
 		this.m_fOnSelect(oRecord.m_sName, oRecord.m_sNotes);

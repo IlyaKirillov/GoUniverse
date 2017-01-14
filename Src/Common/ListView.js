@@ -180,12 +180,16 @@ function CListView()
             }
             else if (true === oThis.m_bSelectable && g_mouse_button_left === global_mouseEvent.Button && 1 === global_mouseEvent.ClickCount && oThis.m_oListObject && oThis.m_oListObject.Handle_Select)
             {
-                oThis.m_nSelectedIndex2 = oThis.private_GetIndexByXY(oPos.X, oPos.Y);
-                oThis.private_UpdateCursorType(oPos.X, oPos.Y);
-                oThis.private_UpdateSelectionContext();
+            	var nIndex = oThis.private_GetIndexByXY(oPos.X, oPos.Y);
+				if (-1 !== nIndex)
+				{
+					oThis.m_nSelectedIndex2 = oThis.private_GetIndexByXY(oPos.X, oPos.Y);
+					oThis.private_UpdateCursorType(oPos.X, oPos.Y);
+					oThis.private_UpdateSelectionContext();
 
-                if (oThis.m_aList[oThis.m_nSelectedIndex2])
-                    oThis.m_oListObject.Handle_Select(oThis.m_aList[oThis.m_nSelectedIndex2], e);
+					if (oThis.m_aList[oThis.m_nSelectedIndex2])
+						oThis.m_oListObject.Handle_Select(oThis.m_aList[oThis.m_nSelectedIndex2]);
+				}
             }
         }
 
@@ -915,8 +919,9 @@ CListView.prototype.GetListObject = function()
 {
     return this.m_oListObject;
 };
-CListView.prototype.SelectByKey = function(sKey)
+CListView.prototype.SelectByKey = function(sKey, isSendOnSelectEvent)
 {
+	var oResult = false;
     this.m_nSelectedIndex2 = -1;
     var nRecordsCount = this.m_aList.length;
     for (var nRecordIndex = 0; nRecordIndex < nRecordsCount; nRecordIndex++)
@@ -925,8 +930,20 @@ CListView.prototype.SelectByKey = function(sKey)
         if (sKey === oRecord.Get_Key())
         {
             this.m_nSelectedIndex2 = nRecordIndex;
+			oResult = oRecord;
+			break;
         }
     }
 
+    if (false !== isSendOnSelectEvent
+		&& true === this.m_bSelectable
+		&& this.m_oListObject
+		&& this.m_oListObject.Handle_Select
+		&& this.m_aList[this.m_nSelectedIndex2])
+	{
+		this.m_oListObject.Handle_Select(this.m_aList[this.m_nSelectedIndex2]);
+    }
+
     this.Update_Size();
+	return oResult;
 };
