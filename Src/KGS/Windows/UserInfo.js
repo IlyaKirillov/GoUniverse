@@ -840,6 +840,19 @@ CKGSUserInfoWindow.prototype.private_CreateRankPage = function(oDiv, oControl)
 };
 CKGSUserInfoWindow.prototype.private_CreateFriendsPage = function(oDiv, oControl)
 {
+	var oClient = this.m_oClient;
+	this.private_CreateUserListPage(oDiv, oControl, this.m_oFriendsListView, this.m_oFriendsPageInfo,
+		function(sName, sNotes)
+		{
+			oClient.AddToFriendList(sName, sNotes);
+		},
+		function(sName)
+		{
+			oClient.RemoveFromFriendList(sName);
+		}
+	);
+	return;
+
 	var nRightPanelW = 200;
 
 	var sDivId = oDiv.id;
@@ -987,6 +1000,133 @@ CKGSUserInfoWindow.prototype.private_CreateFollowerPage = function(oDiv, oContro
 	oListControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right);
 	oListControl.HtmlElement.style.background = "#F3F3F3";
 	oControl.AddControl(oListControl);
+};
+CKGSUserInfoWindow.prototype.private_CreateUserListPage = function(oDiv, oControl, oListView, oInfo, fOnAdd, fOnRemove)
+{
+	var nRightPanelW = 200;
+
+	var sDivId = oDiv.id;
+
+	oListView.Set_BGColor(243, 243, 243);
+
+	var sListViewDivId = sDivId + "L";
+	var oListViewDiv   = this.protected_CreateDivElement(oDiv, sListViewDivId);
+	oListViewDiv.style.borderRight = "1px solid rgb(190, 190, 190)";
+
+	var oListControl = oListView.Init(sListViewDivId, new CKGSUsersList(this.m_oClient.m_oApp));
+	oListControl.Bounds.SetParams(0, 0, nRightPanelW, 1000, false, false, true, false, -1, -1);
+	oListControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right);
+	oListControl.HtmlElement.style.background = "#F3F3F3";
+	oControl.AddControl(oListControl);
+
+	var oNameInput   = this.protected_CreateDivElement(oDiv, null, "input");
+	var oNameControl = CreateControlContainerByElement(oNameInput);
+	oNameControl.SetParams(2, 2, 2, 1000, true, true, true, false, nRightPanelW - 6, 30);
+	oNameControl.SetAnchor(false, true, true, false);
+	oControl.AddControl(oNameControl);
+	oNameInput.className += " inputKGSWindow";
+	oNameInput.style.padding  = "0px 5px 0px 5px";
+	oNameInput.type           = "text";
+	oNameInput.maxLength      = "20";
+	oNameInput["aria-label"]  = "User name";
+	oNameInput["placeholder"] = "User name";
+	var oThis = this;
+	oNameInput.addEventListener("input", function()
+	{
+		if (true !== oListView.SelectByKey(oNameInput.value.toLowerCase()))
+		{
+			oNotesInput.value = "";
+			Common.Set_InnerTextToElement(oAddButton, "Add");
+
+			oRemoveButton.className = "ButtonCommonDisabled";
+		}
+		else
+		{
+			Common.Set_InnerTextToElement(oAddButton, "Change");
+			oRemoveButton.className = "ButtonCommon";
+		}
+	}, false);
+
+	var oNotesInput   = this.protected_CreateDivElement(oDiv, null, "input");
+	var oNotesControl = CreateControlContainerByElement(oNotesInput);
+	oNotesControl.SetParams(2, 36, 2, 1000, true, true, true, false, nRightPanelW - 6, 30);
+	oNotesControl.SetAnchor(false, true, true, false);
+	oControl.AddControl(oNotesControl);
+	oNotesInput.className += " inputKGSWindow";
+	oNotesInput.style.padding  = "0px 5px 0px 5px";
+	oNotesInput.type           = "text";
+	oNotesInput.maxLength      = "256";
+	oNotesInput["aria-label"]  = "Notes";
+	oNotesInput["placeholder"] = "Notes";
+
+	var nButtonW = (nRightPanelW - 4 - 2) / 2 - 2;
+	var oAddButton              = this.protected_CreateDivElement(oDiv, null, "div");
+	oAddButton.className        = "ButtonCommon";
+	oAddButton.style.textAlign  = "center";
+	oAddButton.style.width      = "100px";
+	oAddButton.style.height     = "25px";
+	oAddButton.style.lineHeight = "23px";
+	oAddButton.style.fontSize   = "14px";
+	oAddButton.style.fontFamily = "'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif";
+	Common.Set_InnerTextToElement(oAddButton, "Add");
+	var oAddControl = CreateControlContainerByElement(oAddButton);
+	oAddControl.SetParams(2, 70, nRightPanelW - 4 - nButtonW, 1000, true, true, true, false, nButtonW, 25);
+	oAddControl.SetAnchor(false, true, true, false);
+	oControl.AddControl(oAddControl);
+
+	var oClient = this.m_oClient;
+	oAddButton.addEventListener("click", function()
+	{
+		if (oNameInput.value.length > 0 && fOnAdd)
+		{
+			fOnAdd(oNameInput.value, oNotesInput.value ? oNotesInput.value : "");
+			//oClient.AddToFriendList(oNameInput.value, oNotesInput.value ? oNotesInput.value : "");
+		}
+	}, false);
+
+	var oRemoveButton              = this.protected_CreateDivElement(oDiv, null, "div");
+	oRemoveButton.className        = "ButtonCommonDisabled";
+	oRemoveButton.style.textAlign  = "center";
+	oRemoveButton.style.width      = "100px";
+	oRemoveButton.style.height     = "25px";
+	oRemoveButton.style.lineHeight = "23px";
+	oRemoveButton.style.fontSize   = "14px";
+	oRemoveButton.style.fontFamily = "'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif";
+	Common.Set_InnerTextToElement(oRemoveButton, "Remove");
+	var oRemoveControl = CreateControlContainerByElement(oRemoveButton);
+	oRemoveControl.SetParams(2, 70, 2, 1000, true, true, true, false, nButtonW, 25);
+	oRemoveControl.SetAnchor(false, true, true, false);
+	oControl.AddControl(oRemoveControl);
+
+	oRemoveButton.addEventListener("click", function()
+	{
+		if (oNameInput.value.length > 0 && fOnRemove)
+		{
+			fOnRemove(oNameInput.value);
+			//oClient.RemoveFromFriendList(oNameInput.value);
+			oListView.ResetSelection();
+		}
+	}, false);
+
+	oListView.GetListObject().SetSelectCallback(function(sName, sNotes)
+	{
+		oNameInput.value  = sName;
+		oNotesInput.value = sNotes;
+		Common.Set_InnerTextToElement(oAddButton, "Change");
+		oRemoveButton.className = "ButtonCommon";
+	});
+	oListView.GetListObject().SetUnselectCallback(function()
+	{
+		oNameInput.value  = "";
+		oNotesInput.value = "";
+		Common.Set_InnerTextToElement(oAddButton, "Add");
+		oRemoveButton.className = "ButtonCommonDisabled";
+	});
+
+	oInfo.AddButton    = oAddButton;
+	oInfo.RemoveButton = oRemoveButton;
+	oInfo.NameInput    = oNameInput;
+	oInfo.NotesInput   = oNotesInput;
 };
 CKGSUserInfoWindow.prototype.private_UpdateMousePosOnRankGraph = function(X, Y)
 {
