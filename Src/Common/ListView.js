@@ -100,6 +100,7 @@ function CListView()
             oMainElement.addEventListener("mousewheel", this.private_OnMouseWheel, false);
             oMainElement.addEventListener("DOMMouseScroll", this.private_OnMouseWheel, false);
             oMainElement.addEventListener("contextmenu", this.private_OnContextMenu, false);
+            oMainElement.addEventListener("keydown", this.private_OnKeyDown, false);
 
             oMainElement.addEventListener("touchstart", this.private_OnTouchStart, false);
             oMainElement.addEventListener("touchend", this.private_OnTouchEnd, false);
@@ -363,6 +364,23 @@ function CListView()
     this.private_OnTouchMove = function(e)
     {
         console.log("TouchMove");
+    };
+
+    this.private_OnKeyDown = function(e)
+    {
+        check_KeyboardEvent(e);
+
+        var bPreventDefault = false;
+        if (27 === global_keyboardEvent.KeyCode && oThis.m_bSelectable && oThis.m_oListObject && oThis.m_oListObject.Handle_Unselect)
+        {
+            oThis.m_oListObject.Handle_Unselect();
+            bPreventDefault = true;
+        }
+
+        if (true === bPreventDefault)
+            e.preventDefault();
+
+        return (bPreventDefault ? false : true);
     };
 }
 CListView.prototype.Clear = function()
@@ -921,7 +939,7 @@ CListView.prototype.GetListObject = function()
 };
 CListView.prototype.SelectByKey = function(sKey, isSendOnSelectEvent)
 {
-	var oResult = false;
+	var oResult = null;
     this.m_nSelectedIndex2 = -1;
     var nRecordsCount = this.m_aList.length;
     for (var nRecordIndex = 0; nRecordIndex < nRecordsCount; nRecordIndex++)
@@ -946,4 +964,16 @@ CListView.prototype.SelectByKey = function(sKey, isSendOnSelectEvent)
 
     this.Update_Size();
 	return oResult;
+};
+CListView.prototype.ResetSelection = function()
+{
+	this.m_nSelectedIndex2 = -1;
+	if (true === this.m_bSelectable
+		&& this.m_oListObject
+		&& this.m_oListObject.Handle_Unselect)
+	{
+		this.m_oListObject.Handle_Unselect();
+	}
+
+	this.Update_Size();
 };

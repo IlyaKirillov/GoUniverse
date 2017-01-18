@@ -101,6 +101,17 @@
 	border           : 1px solid black;
 }
 
+.ButtonCommonDisabled {
+	background-color    : rgb(234, 234, 234);
+	border              : 1px solid rgb(200, 200, 200);
+
+	text-decoration     : none;
+	outline             : none;
+	box-sizing          : border-box;
+	color               : #AAAAAA;
+	cursor              : default;
+}
+
 .ButtonExit {
 	background-color       : transparent;
 

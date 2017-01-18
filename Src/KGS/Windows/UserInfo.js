@@ -47,6 +47,10 @@ function CKGSUserInfoWindow()
 	this.m_oFriendsListView  = null;
 	this.m_oCensoredListView = null;
 	this.m_oFollowerListView = null;
+
+	this.m_oFriendsPageInfo  = null;
+	this.m_oCensoredPageInfo = null;
+	this.m_oFollowedPageInfo = null;
 }
 CommonExtend(CKGSUserInfoWindow, CKGSWindowBase);
 
@@ -71,6 +75,25 @@ CKGSUserInfoWindow.prototype.Init = function(sDivId, oPr)
 			this.m_oFriendsListView.EnableSelect();
 			this.m_oCensoredListView.EnableSelect();
 			this.m_oFollowerListView.EnableSelect();
+
+			this.m_oFriendsPageInfo  = {
+				AddButton    : null,
+				RemoveButton : null,
+				NameInput    : null,
+				NotesInput   : null
+			};
+			this.m_oCensoredPageInfo = {
+				AddButton    : null,
+				RemoveButton : null,
+				NameInput    : null,
+				NotesInput   : null
+			};
+			this.m_oFollowedPageInfo = {
+				AddButton    : null,
+				RemoveButton : null,
+				NameInput    : null,
+				NotesInput   : null
+			};
 		}
 		else
 		{
@@ -851,10 +874,13 @@ CKGSUserInfoWindow.prototype.private_CreateFriendsPage = function(oDiv, oControl
 		{
 			oNotesInput.value = "";
 			Common.Set_InnerTextToElement(oAddButton, "Add");
+
+			oRemoveButton.className = "ButtonCommonDisabled";
 		}
 		else
 		{
 			Common.Set_InnerTextToElement(oAddButton, "Change");
+			oRemoveButton.className = "ButtonCommon";
 		}
 	}, false);
 
@@ -886,13 +912,16 @@ CKGSUserInfoWindow.prototype.private_CreateFriendsPage = function(oDiv, oControl
 	oControl.AddControl(oAddControl);
 
 	var oClient = this.m_oClient;
-	oAddButton.addEventListener("click", function(){
+	oAddButton.addEventListener("click", function()
+	{
 		if (oNameInput.value.length > 0)
+		{
 			oClient.AddToFriendList(oNameInput.value, oNotesInput.value ? oNotesInput.value : "");
+		}
 	}, false);
 
 	var oRemoveButton              = this.protected_CreateDivElement(oDiv, null, "div");
-	oRemoveButton.className        = "ButtonCommon";
+	oRemoveButton.className        = "ButtonCommonDisabled";
 	oRemoveButton.style.textAlign  = "center";
 	oRemoveButton.style.width      = "100px";
 	oRemoveButton.style.height     = "25px";
@@ -905,9 +934,13 @@ CKGSUserInfoWindow.prototype.private_CreateFriendsPage = function(oDiv, oControl
 	oRemoveControl.SetAnchor(false, true, true, false);
 	oControl.AddControl(oRemoveControl);
 
-	oRemoveButton.addEventListener("click", function(){
+	oRemoveButton.addEventListener("click", function()
+	{
 		if (oNameInput.value.length > 0)
+		{
 			oClient.RemoveFromFriendList(oNameInput.value);
+			oThis.m_oFriendsListView.ResetSelection();
+		}
 	}, false);
 
 	this.m_oFriendsListView.GetListObject().SetSelectCallback(function(sName, sNotes)
@@ -915,6 +948,14 @@ CKGSUserInfoWindow.prototype.private_CreateFriendsPage = function(oDiv, oControl
 		oNameInput.value  = sName;
 		oNotesInput.value = sNotes;
 		Common.Set_InnerTextToElement(oAddButton, "Change");
+		oRemoveButton.className = "ButtonCommon";
+	});
+	this.m_oFriendsListView.GetListObject().SetUnselectCallback(function()
+	{
+		oNameInput.value  = "";
+		oNotesInput.value = "";
+		Common.Set_InnerTextToElement(oAddButton, "Add");
+		oRemoveButton.className = "ButtonCommonDisabled";
 	});
 };
 CKGSUserInfoWindow.prototype.private_CreateCensoredPage = function(oDiv, oControl)
