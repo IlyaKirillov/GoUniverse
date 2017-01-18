@@ -46,7 +46,7 @@ function CKGSUserInfoWindow()
 	this.m_bOwnInfo          = false;
 	this.m_oFriendsListView  = null;
 	this.m_oCensoredListView = null;
-	this.m_oFollowerListView = null;
+	this.m_oFollowedListView = null;
 
 	this.m_oFriendsPageInfo  = null;
 	this.m_oCensoredPageInfo = null;
@@ -70,11 +70,11 @@ CKGSUserInfoWindow.prototype.Init = function(sDivId, oPr)
 			this.m_bOwnInfo          = true;
 			this.m_oFriendsListView  = new CListView();
 			this.m_oCensoredListView = new CListView();
-			this.m_oFollowerListView = new CListView();
+			this.m_oFollowedListView = new CListView();
 
 			this.m_oFriendsListView.EnableSelect();
 			this.m_oCensoredListView.EnableSelect();
-			this.m_oFollowerListView.EnableSelect();
+			this.m_oFollowedListView.EnableSelect();
 
 			this.m_oFriendsPageInfo  = {
 				AddButton    : null,
@@ -253,8 +253,8 @@ CKGSUserInfoWindow.prototype.Update_Size = function(bForce)
 	if (this.m_oCensoredListView && 4 === this.m_oTabs.GetCurrentId())
 		this.m_oCensoredListView.Update_Size();
 
-	if (this.m_oFollowerListView && 5 === this.m_oTabs.GetCurrentId())
-		this.m_oFollowerListView.Update_Size();
+	if (this.m_oFollowedListView && 5 === this.m_oTabs.GetCurrentId())
+		this.m_oFollowedListView.Update_Size();
 };
 CKGSUserInfoWindow.prototype.OnUserDetails = function(oDetails)
 {
@@ -851,155 +851,34 @@ CKGSUserInfoWindow.prototype.private_CreateFriendsPage = function(oDiv, oControl
 			oClient.RemoveFromFriendList(sName);
 		}
 	);
-	return;
-
-	var nRightPanelW = 200;
-
-	var sDivId = oDiv.id;
-
-	this.m_oFriendsListView.Set_BGColor(243, 243, 243);
-
-	var sListViewDivId = sDivId + "L";
-	var oListViewDiv   = this.protected_CreateDivElement(oDiv, sListViewDivId);
-	oListViewDiv.style.borderRight = "1px solid rgb(190, 190, 190)";
-
-	var oListControl = this.m_oFriendsListView.Init(sListViewDivId, new CKGSUsersList(this.m_oClient.m_oApp));
-	oListControl.Bounds.SetParams(0, 0, nRightPanelW, 1000, false, false, true, false, -1, -1);
-	oListControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right);
-	oListControl.HtmlElement.style.background = "#F3F3F3";
-	oControl.AddControl(oListControl);
-
-	var oNameInput   = this.protected_CreateDivElement(oDiv, null, "input");
-	var oNameControl = CreateControlContainerByElement(oNameInput);
-	oNameControl.SetParams(2, 2, 2, 1000, true, true, true, false, nRightPanelW - 6, 30);
-	oNameControl.SetAnchor(false, true, true, false);
-	oControl.AddControl(oNameControl);
-	oNameInput.className += " inputKGSWindow";
-	oNameInput.style.padding  = "0px 5px 0px 5px";
-	oNameInput.type           = "text";
-	oNameInput.maxLength      = "20";
-	oNameInput["aria-label"]  = "User name";
-	oNameInput["placeholder"] = "User name";
-	var oThis = this;
-	oNameInput.addEventListener("input", function()
-	{
-		if (true !== oThis.m_oFriendsListView.SelectByKey(oNameInput.value.toLowerCase()))
-		{
-			oNotesInput.value = "";
-			Common.Set_InnerTextToElement(oAddButton, "Add");
-
-			oRemoveButton.className = "ButtonCommonDisabled";
-		}
-		else
-		{
-			Common.Set_InnerTextToElement(oAddButton, "Change");
-			oRemoveButton.className = "ButtonCommon";
-		}
-	}, false);
-
-	var oNotesInput   = this.protected_CreateDivElement(oDiv, null, "input");
-	var oNotesControl = CreateControlContainerByElement(oNotesInput);
-	oNotesControl.SetParams(2, 36, 2, 1000, true, true, true, false, nRightPanelW - 6, 30);
-	oNotesControl.SetAnchor(false, true, true, false);
-	oControl.AddControl(oNotesControl);
-	oNotesInput.className += " inputKGSWindow";
-	oNotesInput.style.padding  = "0px 5px 0px 5px";
-	oNotesInput.type           = "text";
-	oNotesInput.maxLength      = "256";
-	oNotesInput["aria-label"]  = "Notes";
-	oNotesInput["placeholder"] = "Notes";
-
-	var nButtonW = (nRightPanelW - 4 - 2) / 2 - 2;
-	var oAddButton              = this.protected_CreateDivElement(oDiv, null, "div");
-	oAddButton.className        = "ButtonCommon";
-	oAddButton.style.textAlign  = "center";
-	oAddButton.style.width      = "100px";
-	oAddButton.style.height     = "25px";
-	oAddButton.style.lineHeight = "23px";
-	oAddButton.style.fontSize   = "14px";
-	oAddButton.style.fontFamily = "'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif";
-	Common.Set_InnerTextToElement(oAddButton, "Add");
-	var oAddControl = CreateControlContainerByElement(oAddButton);
-	oAddControl.SetParams(2, 70, nRightPanelW - 4 - nButtonW, 1000, true, true, true, false, nButtonW, 25);
-	oAddControl.SetAnchor(false, true, true, false);
-	oControl.AddControl(oAddControl);
-
-	var oClient = this.m_oClient;
-	oAddButton.addEventListener("click", function()
-	{
-		if (oNameInput.value.length > 0)
-		{
-			oClient.AddToFriendList(oNameInput.value, oNotesInput.value ? oNotesInput.value : "");
-		}
-	}, false);
-
-	var oRemoveButton              = this.protected_CreateDivElement(oDiv, null, "div");
-	oRemoveButton.className        = "ButtonCommonDisabled";
-	oRemoveButton.style.textAlign  = "center";
-	oRemoveButton.style.width      = "100px";
-	oRemoveButton.style.height     = "25px";
-	oRemoveButton.style.lineHeight = "23px";
-	oRemoveButton.style.fontSize   = "14px";
-	oRemoveButton.style.fontFamily = "'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif";
-	Common.Set_InnerTextToElement(oRemoveButton, "Remove");
-	var oRemoveControl = CreateControlContainerByElement(oRemoveButton);
-	oRemoveControl.SetParams(2, 70, 2, 1000, true, true, true, false, nButtonW, 25);
-	oRemoveControl.SetAnchor(false, true, true, false);
-	oControl.AddControl(oRemoveControl);
-
-	oRemoveButton.addEventListener("click", function()
-	{
-		if (oNameInput.value.length > 0)
-		{
-			oClient.RemoveFromFriendList(oNameInput.value);
-			oThis.m_oFriendsListView.ResetSelection();
-		}
-	}, false);
-
-	this.m_oFriendsListView.GetListObject().SetSelectCallback(function(sName, sNotes)
-	{
-		oNameInput.value  = sName;
-		oNotesInput.value = sNotes;
-		Common.Set_InnerTextToElement(oAddButton, "Change");
-		oRemoveButton.className = "ButtonCommon";
-	});
-	this.m_oFriendsListView.GetListObject().SetUnselectCallback(function()
-	{
-		oNameInput.value  = "";
-		oNotesInput.value = "";
-		Common.Set_InnerTextToElement(oAddButton, "Add");
-		oRemoveButton.className = "ButtonCommonDisabled";
-	});
 };
 CKGSUserInfoWindow.prototype.private_CreateCensoredPage = function(oDiv, oControl)
 {
-	var sDivId = oDiv.id;
-
-	this.m_oCensoredListView.Set_BGColor(243, 243, 243);
-
-	var sListViewDivId = sDivId + "L";
-	var oListViewDiv   = this.protected_CreateDivElement(oDiv, sListViewDivId);
-
-	var oListControl = this.m_oCensoredListView.Init(sListViewDivId, new CKGSUsersList(this.m_oClient.m_oApp));
-	oListControl.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, -1);
-	oListControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right);
-	oListControl.HtmlElement.style.background = "#F3F3F3";
-	oControl.AddControl(oListControl);
+	var oClient = this.m_oClient;
+	this.private_CreateUserListPage(oDiv, oControl, this.m_oCensoredListView, this.m_oCensoredPageInfo,
+		function(sName, sNotes)
+		{
+			oClient.AddToBlackList(sName, sNotes);
+		},
+		function(sName)
+		{
+			oClient.RemoveFromBlackList(sName);
+		}
+	);
 };
 CKGSUserInfoWindow.prototype.private_CreateFollowerPage = function(oDiv, oControl)
 {
-	var sDivId = oDiv.id;
-
-	this.m_oFollowerListView.Set_BGColor(243, 243, 243);
-
-	var sListViewDivId = sDivId + "L";
-	var oListViewDiv   = this.protected_CreateDivElement(oDiv, sListViewDivId);
-
-	var oListControl = this.m_oFollowerListView.Init(sListViewDivId, new CKGSUsersList(this.m_oClient.m_oApp));
-	oListControl.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, -1);
-	oListControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right);
-	oListControl.HtmlElement.style.background = "#F3F3F3";
-	oControl.AddControl(oListControl);
+	var oClient = this.m_oClient;
+	this.private_CreateUserListPage(oDiv, oControl, this.m_oFollowedListView, this.m_oFollowedPageInfo,
+		function(sName, sNotes)
+		{
+			oClient.AddToFollowerList(sName, sNotes);
+		},
+		function(sName)
+		{
+			oClient.RemoveFromFollowerList(sName);
+		}
+	);
 };
 CKGSUserInfoWindow.prototype.private_CreateUserListPage = function(oDiv, oControl, oListView, oInfo, fOnAdd, fOnRemove)
 {
@@ -1033,7 +912,7 @@ CKGSUserInfoWindow.prototype.private_CreateUserListPage = function(oDiv, oContro
 	var oThis = this;
 	oNameInput.addEventListener("input", function()
 	{
-		if (true !== oListView.SelectByKey(oNameInput.value.toLowerCase()))
+		if (null === oListView.SelectByKey(oNameInput.value.toLowerCase()))
 		{
 			oNotesInput.value = "";
 			Common.Set_InnerTextToElement(oAddButton, "Add");
@@ -1313,12 +1192,37 @@ CKGSUserInfoWindow.prototype.UpdateFriendsLists = function()
 	this.m_oCensoredListView.Update_Size();
 
 	var oFollowed = this.m_oClient.GetFollowedList();
-	this.m_oFollowerListView.Clear();
+	this.m_oFollowedListView.Clear();
 	for (var sId in oFollowed)
 	{
-		this.m_oFollowerListView.Handle_Record([0, oFollowed[sId]]);
+		this.m_oFollowedListView.Handle_Record([0, oFollowed[sId]]);
 	}
-	this.m_oFollowerListView.Update_Size();
+	this.m_oFollowedListView.Update_Size();
+
+	function private_UpdateSelection(oListView, oInfo)
+	{
+		var oNameInput    = oInfo.NameInput;
+		var oNotesInput   = oInfo.NotesInput;
+		var oAddButton    = oInfo.AddButton;
+		var oRemoveButton = oInfo.RemoveButton;
+
+		if (null === oListView.SelectByKey(oNameInput.value.toLowerCase()))
+		{
+			oNotesInput.value = "";
+			Common.Set_InnerTextToElement(oAddButton, "Add");
+
+			oRemoveButton.className = "ButtonCommonDisabled";
+		}
+		else
+		{
+			Common.Set_InnerTextToElement(oAddButton, "Change");
+			oRemoveButton.className = "ButtonCommon";
+		}
+	}
+
+	private_UpdateSelection(this.m_oFriendsListView, this.m_oFriendsPageInfo);
+	private_UpdateSelection(this.m_oCensoredListView, this.m_oCensoredPageInfo);
+	private_UpdateSelection(this.m_oFollowedListView, this.m_oFollowedPageInfo);
 };
 
 var EKGSUserInfoGameListRecord = {
