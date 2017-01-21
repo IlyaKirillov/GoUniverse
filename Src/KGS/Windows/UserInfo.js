@@ -959,7 +959,6 @@ CKGSUserInfoWindow.prototype.private_CreateUserListPage = function(oDiv, oContro
 		if (oNameInput.value.length > 0 && fOnAdd)
 		{
 			fOnAdd(oNameInput.value, oNotesInput.value ? oNotesInput.value : "");
-			//oClient.AddToFriendList(oNameInput.value, oNotesInput.value ? oNotesInput.value : "");
 		}
 	}, false);
 
@@ -982,7 +981,6 @@ CKGSUserInfoWindow.prototype.private_CreateUserListPage = function(oDiv, oContro
 		if (oNameInput.value.length > 0 && fOnRemove)
 		{
 			fOnRemove(oNameInput.value);
-			//oClient.RemoveFromFriendList(oNameInput.value);
 			oListView.ResetSelection();
 		}
 	}, false);

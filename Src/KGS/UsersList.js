@@ -70,8 +70,12 @@ CKGSUsersList.prototype.Get_Record = function(aLine)
 CKGSUsersList.prototype.Handle_DoubleClick = function(Record)
 {
 };
-CKGSUsersList.prototype.Handle_RightClick = function(Record, e)
+CKGSUsersList.prototype.Handle_RightClick = function(oRecord, e)
 {
+	if (this.m_oApp && oRecord)
+		return this.m_oApp.ShowUserContextMenu(e.pageX - 2, e.pageY + 2, oRecord.m_sName);
+
+	return null;
 };
 CKGSUsersList.prototype.Handle_Select = function(oRecord)
 {
