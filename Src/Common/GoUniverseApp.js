@@ -729,6 +729,7 @@ CGoUniverseApplication.prototype.private_InitClientPage = function()
 	this.private_InitExitButton();
 	this.private_InitGameTabs();
 	this.private_InitMainRoom();
+	this.private_InitUserNameLink();
 };
 CGoUniverseApplication.prototype.private_InitGameTabs = function()
 {
@@ -938,6 +939,16 @@ CGoUniverseApplication.prototype.private_InitMainRoom = function()
 	this.m_oChatDragHandlerControl = oChatDragHandlerControl;
 
 	this.private_InitChats(oChatControl);
+};
+CGoUniverseApplication.prototype.private_InitUserNameLink = function()
+{
+	var oThis = this;
+	document.getElementById("divIdClientNameText").addEventListener("click", function()
+	{
+		var oClient = oThis.m_oClient;
+		if (oClient)
+			oClient.LoadUserInfo(oClient.GetUserName());
+	});
 };
 CGoUniverseApplication.prototype.private_InitChats = function(oChatControl)
 {

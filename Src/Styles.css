@@ -674,3 +674,13 @@ input.inputKGSWindow {
 	padding          : 0px 47px 0px 6px;
 	outline          : none;
 }
+
+div#divIdClientNameText {
+	text-decoration : none;
+	cursor          : default;
+}
+
+div#divIdClientNameText:hover {
+	text-decoration : underline;
+	cursor          : pointer;
+}
