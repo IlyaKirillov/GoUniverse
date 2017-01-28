@@ -756,6 +756,9 @@ CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
 {
 	var sDivId = oDiv.id;
 
+	var nEditH = 20;
+	var nBot   = this.m_bOwnInfo ?  nEditH + 10 : 7;
+
 	var sMainInfo  = sDivId + "M";
 	var sAvatar    = sDivId + "A";
 	var sExtension = sDivId + "E";
@@ -774,12 +777,36 @@ CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
 
 	this.m_oExtensionDiv = this.protected_CreateDivElement(oDiv, sExtension);
 	var oExtensionControl = CreateControlContainer(sExtension);
-	oExtensionControl.Bounds.SetParams(5, 220, 5, 7, true, true, true, true, -1, -1);
+	oExtensionControl.Bounds.SetParams(5, 220, 5, nBot, true, true, true, true, -1, -1);
 	oExtensionControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left | g_anchor_bottom);
 	oControl.AddControl(oExtensionControl);
 
 	this.m_oExtensionDiv.style.borderBottom = "1px solid #BEBEBE";
 	this.m_oExtensionDiv.style.borderTop    = "1px solid #BEBEBE";
+
+	if (this.m_bOwnInfo)
+	{
+		var sEditId = sDivId + "D";
+		var oEditAreaElement = this.protected_CreateDivElement(oDiv, sEditId);
+		var oEditAreaControl = CreateControlContainer(sEditId);
+		oEditAreaControl.SetParams(5, 0, 5, 5, true, false, true, true, -1, nEditH);
+		oEditAreaControl.SetAnchor(true, false, true, true);
+		oControl.AddControl(oEditAreaControl);
+
+		var oEditButton             = this.protected_CreateDivElement(oDiv, null, "div");
+		oAddButton.className        = "ButtonCommon";
+		oAddButton.style.textAlign  = "center";
+		oAddButton.style.width      = "100px";
+		oAddButton.style.height     = "25px";
+		oAddButton.style.lineHeight = "23px";
+		oAddButton.style.fontSize   = "14px";
+		oAddButton.style.fontFamily = "'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif";
+		Common.Set_InnerTextToElement(oAddButton, "Add");
+		var oAddControl = CreateControlContainerByElement(oAddButton);
+		oAddControl.SetParams(2, 70, nRightPanelW - 4 - nButtonW, 1000, true, true, true, false, nButtonW, 25);
+		oAddControl.SetAnchor(false, true, true, false);
+		oControl.AddControl(oAddControl);
+	}
 
 	this.private_AddMainInfo();
 };
