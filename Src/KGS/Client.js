@@ -1792,7 +1792,8 @@ CKGSClient.prototype.private_HandlePrivateKeepOut = function(oMessage)
 };
 CKGSClient.prototype.private_HandleIdleWarning = function(oMessage)
 {
-	CreateKGSWindow(EKGSWindowType.Idle, {Client : this, App : this.m_oApp});
+	this.WakeUp();
+	//CreateKGSWindow(EKGSWindowType.Idle, {Client : this, App : this.m_oApp});
 };
 CKGSClient.prototype.private_HandleGameReview = function(oMessage)
 {

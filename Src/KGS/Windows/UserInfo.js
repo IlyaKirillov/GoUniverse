@@ -756,7 +756,7 @@ CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
 {
 	var sDivId = oDiv.id;
 
-	var nEditH = 20;
+	var nEditH = 25;
 	var nBot   = this.m_bOwnInfo ?  nEditH + 10 : 7;
 
 	var sMainInfo  = sDivId + "M";
@@ -786,6 +786,10 @@ CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
 
 	if (this.m_bOwnInfo)
 	{
+		var nEditButtonW   = 75;
+		var nSaveButtonW   = 75;
+		var nCancelButtonW = 75;
+
 		var sEditId = sDivId + "D";
 		var oEditAreaElement = this.protected_CreateDivElement(oDiv, sEditId);
 		var oEditAreaControl = CreateControlContainer(sEditId);
@@ -793,19 +797,28 @@ CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
 		oEditAreaControl.SetAnchor(true, false, true, true);
 		oControl.AddControl(oEditAreaControl);
 
-		var oEditButton             = this.protected_CreateDivElement(oDiv, null, "div");
-		oAddButton.className        = "ButtonCommon";
-		oAddButton.style.textAlign  = "center";
-		oAddButton.style.width      = "100px";
-		oAddButton.style.height     = "25px";
-		oAddButton.style.lineHeight = "23px";
-		oAddButton.style.fontSize   = "14px";
-		oAddButton.style.fontFamily = "'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif";
-		Common.Set_InnerTextToElement(oAddButton, "Add");
-		var oAddControl = CreateControlContainerByElement(oAddButton);
-		oAddControl.SetParams(2, 70, nRightPanelW - 4 - nButtonW, 1000, true, true, true, false, nButtonW, 25);
-		oAddControl.SetAnchor(false, true, true, false);
-		oControl.AddControl(oAddControl);
+		var oThis = this;
+		function private_AddButton(sText, nW, nRight)
+		{
+			var oButton              = oThis.protected_CreateDivElement(oEditAreaElement, null, "div");
+			oButton.className        = "ButtonCommon";
+			oButton.style.textAlign  = "center";
+			oButton.style.width      = "100px";
+			oButton.style.height     = "25px";
+			oButton.style.lineHeight = "23px";
+			oButton.style.fontSize   = "14px";
+			oButton.style.fontFamily = "'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif";
+			Common.Set_InnerTextToElement(oButton, sText);
+			var oButtonControl = CreateControlContainerByElement(oButton);
+			oButtonControl.SetParams(0, 0, nRight, 0, false, true, true, true, nW, nEditH);
+			oButtonControl.SetAnchor(false, true, true, false);
+			oEditAreaControl.AddControl(oButtonControl);
+			return oButton;
+		}
+
+		//var oEditButton   = private_AddButton("Edit", nEditH, 0);
+		var oSaveButton   = private_AddButton("Save", nSaveButtonW, 0 + nCancelButtonW + 3);
+		var oCancelButton = private_AddButton("Cancel", nCancelButtonW, 0);
 	}
 
 	this.private_AddMainInfo();
