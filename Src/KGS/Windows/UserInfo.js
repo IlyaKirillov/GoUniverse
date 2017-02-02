@@ -406,7 +406,7 @@ CKGSUserInfoWindow.prototype.EditUserInfo = function()
 		"emailPrivate"  : this.m_oRawInfo.PrivateEmail,
 		"emailWanted"   : this.m_oRawInfo.EmailWanted,
 		"authLevel"     : this.m_oRawInfo.AuthLevel,
-		"forcedNoRank"  : false
+		"forcedNoRank"  : true
 	});
 };
 CKGSUserInfoWindow.prototype.private_UpdateGameArchiveStats = function()
@@ -662,15 +662,48 @@ CKGSUserInfoWindow.prototype.private_AddMainInfo = function()
 
 	oDiv.appendChild(this.m_oMainInfoTable);
 
-	this.m_oInfoTable.UserName     = this.private_AddConsoleMessage("User name", "");
-	this.m_oInfoTable.Name         = this.private_AddConsoleMessage("Real name", "");
-	this.m_oInfoTable.Rank         = this.private_AddConsoleMessage("Rank", "");
-	this.m_oInfoTable.LastOn       = this.private_AddConsoleMessage("Last on", "");
-	this.m_oInfoTable.RegisteredOn = this.private_AddConsoleMessage("Registered on", "");
-	this.m_oInfoTable.Locale       = this.private_AddConsoleMessage("Locale", "");
-	this.m_oInfoTable.Email        = this.private_AddConsoleMessage("Email", "Private");
-	this.m_oInfoTable.Games        = this.private_AddConsoleMessage("Games", "");
-	this.m_oInfoTable.RecentGames  = this.private_AddConsoleMessage("Recent games", "");
+
+	var oUserName     = this.private_AddConsoleMessage("User name", "");
+	var oName         = this.private_AddConsoleMessage("Real name", "");
+	var oRank         = this.private_AddConsoleMessage("Rank", "");
+	var oLastOn       = this.private_AddConsoleMessage("Last on", "");
+	var oRegisteredOn = this.private_AddConsoleMessage("Registered on", "");
+	var oLocale       = this.private_AddConsoleMessage("Locale", "");
+	var oEmail        = this.private_AddConsoleMessage("Email", "Private");
+	var oGames        = this.private_AddConsoleMessage("Games", "");
+	var oRecentGames  = this.private_AddConsoleMessage("Recent games", "");
+
+	this.m_oInfoTable.UserName     = oUserName.Span;
+	this.m_oInfoTable.Name         = oName.Span;
+	this.m_oInfoTable.Rank         = oRank.Span;
+	this.m_oInfoTable.LastOn       = oLastOn.Span;
+	this.m_oInfoTable.RegisteredOn = oRegisteredOn.Span;
+	this.m_oInfoTable.Locale       = oLocale.Span;
+	this.m_oInfoTable.Email        = oEmail.Span;
+	this.m_oInfoTable.Games        = oGames.Span;
+	this.m_oInfoTable.RecentGames  = oRecentGames.Span;
+
+	if (this.m_bOwnInfo)
+	{
+		var oCell = oName.Cell;
+
+		var oNameEditElement = this.protected_CreateDivElement(oCell, null, "input");
+
+
+		oNameEditElement.style.position = "relative";
+		oNameEditElement.style.display = "block";
+
+		oNameEditElement.style.height  = "19px";
+		oNameEditElement.style.outline = "none";
+
+		oNameEditElement.style.fontFamily = "'Segoe UI', Tahoma, sans-serif";
+		oNameEditElement.style.fontSize   = "16px";
+
+		oNameEditElement.style.display = "none";
+
+		this.m_oNameShowElement = oName.Div;
+		this.m_oNameEditElement = oNameEditElement;
+	}
 };
 CKGSUserInfoWindow.prototype.private_AddConsoleMessage = function(sField, sText)
 {
@@ -691,12 +724,16 @@ CKGSUserInfoWindow.prototype.private_AddConsoleMessage = function(sField, sText)
 	oCell = document.createElement("td");
 	oRow.appendChild(oCell);
 
+	var oDiv = document.createElement("div");
+	oDiv.style.border = "1px solid transparent";
+	oDiv.style.height = "19px";
+	oCell.appendChild(oDiv);
 
 	oTextSpan             = document.createElement("span");
 	oTextSpan.textContent = sText;
-	oCell.appendChild(oTextSpan);
+	oDiv.appendChild(oTextSpan);
 
-	return oTextSpan;
+	return {Cell : oCell, Span : oTextSpan, Div : oDiv};
 };
 CKGSUserInfoWindow.prototype.private_AddEmail = function(sEmail)
 {
@@ -728,7 +765,8 @@ CKGSUserInfoWindow.prototype.private_AddInfo = function(sText)
 	}
 
 	var oTextDiv = document.createElement("div");
-	oTextDiv.style.height = "100%";
+	oTextDiv.style.height      = "100%";
+	oTextDiv.style.paddingLeft = "1px";
 
 	var oInfoDiv = document.createElement("div");
 	var aLines = SplitTextToLines(sText);
@@ -788,8 +826,27 @@ CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
 
 	this.m_oExtensionDiv.style.borderBottom = "1px solid #BEBEBE";
 	this.m_oExtensionDiv.style.borderTop    = "1px solid #BEBEBE";
-	// this.m_oExtensionDiv.style.borderLeft   = "1px solid transparent";
-	// this.m_oExtensionDiv.style.borderRight  = "1px solid transparent";
+
+	var oThis = this;
+	function private_AddButton(oParent, sText, nW, nRight, fOnClick)
+	{
+		var oButton              = oThis.protected_CreateDivElement(oParent, null, "div");
+		oButton.className        = "ButtonCommon";
+		oButton.style.display    = "block";
+		oButton.style.textAlign  = "center";
+		oButton.style.width      = "100px";
+		oButton.style.height     = "25px";
+		oButton.style.lineHeight = "23px";
+		oButton.style.fontSize   = "14px";
+		oButton.style.fontFamily = "'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif";
+		Common.Set_InnerTextToElement(oButton, sText);
+		var oButtonControl = CreateControlContainerByElement(oButton);
+		oButtonControl.SetParams(0, 0, nRight, 0, false, true, true, true, nW, nEditH);
+		oButtonControl.SetAnchor(false, true, true, false);
+		oEditAreaControl.AddControl(oButtonControl);
+		oButton.addEventListener("click", fOnClick, false);
+		return oButton;
+	}
 
 	if (this.m_bOwnInfo)
 	{
@@ -812,30 +869,9 @@ CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
 		oEditAreaControl.SetAnchor(true, false, true, true);
 		oControl.AddControl(oEditAreaControl);
 
-		var oThis = this;
-		function private_AddButton(sText, nW, nRight, fOnClick)
-		{
-			var oButton              = oThis.protected_CreateDivElement(oEditAreaElement, null, "div");
-			oButton.className        = "ButtonCommon";
-			oButton.style.display    = "block";
-			oButton.style.textAlign  = "center";
-			oButton.style.width      = "100px";
-			oButton.style.height     = "25px";
-			oButton.style.lineHeight = "23px";
-			oButton.style.fontSize   = "14px";
-			oButton.style.fontFamily = "'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif";
-			Common.Set_InnerTextToElement(oButton, sText);
-			var oButtonControl = CreateControlContainerByElement(oButton);
-			oButtonControl.SetParams(0, 0, nRight, 0, false, true, true, true, nW, nEditH);
-			oButtonControl.SetAnchor(false, true, true, false);
-			oEditAreaControl.AddControl(oButtonControl);
-			oButton.addEventListener("click", fOnClick, false);
-			return oButton;
-		}
-
-		this.m_oEditButton   = private_AddButton(sEditButton, nEditButtonW, 0, function(){return oThis.private_OnClickEdit()});
-		this.m_oSaveButton   = private_AddButton(sSaveButton, nSaveButtonW, 0 + nCancelButtonW + 3, function(){return oThis.private_OnClickSave()});
-		this.m_oCancelButton = private_AddButton(sCancelButton, nCancelButtonW, 0, function(){return oThis.private_OnClickCancel()});
+		this.m_oEditButton   = private_AddButton(oEditAreaElement, sEditButton, nEditButtonW, 0, function(){return oThis.private_OnClickEdit()});
+		this.m_oSaveButton   = private_AddButton(oEditAreaElement, sSaveButton, nSaveButtonW, 0 + nCancelButtonW + 3, function(){return oThis.private_OnClickSave()});
+		this.m_oCancelButton = private_AddButton(oEditAreaElement, sCancelButton, nCancelButtonW, 0, function(){return oThis.private_OnClickCancel()});
 
 		this.m_oSaveButton.style.display   = "none";
 		this.m_oCancelButton.style.display = "none";
@@ -851,6 +887,8 @@ CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
 		this.m_oExtensionEditDiv.style.fontSize = "16px";
 
 		this.m_oExtensionEditDiv.style.display = "none";
+
+
 	}
 
 	this.private_AddMainInfo();
@@ -1301,8 +1339,11 @@ CKGSUserInfoWindow.prototype.private_OnClickEdit = function()
 	this.m_oCancelButton.style.display = "block";
 
 	this.m_oExtensionEditDiv.style.display = "block";
-
 	this.m_oExtensionEditDiv.value = this.m_oRawInfo.PersonalInfo;
+
+	this.m_oNameShowElement.style.display  = "none";
+	this.m_oNameEditElement.style.display  = "block";
+	this.m_oNameEditElement.value  = this.m_oRawInfo.PersonalName;
 };
 CKGSUserInfoWindow.prototype.private_OnClickSave = function()
 {
@@ -1311,6 +1352,13 @@ CKGSUserInfoWindow.prototype.private_OnClickSave = function()
 	this.m_oCancelButton.style.display = "none";
 
 	this.m_oExtensionEditDiv.style.display = "none";
+	this.m_oRawInfo.PersonalInfo = this.m_oExtensionEditDiv.value;
+
+	this.m_oNameEditElement.style.display  = "none";
+	this.m_oNameShowElement.style.display  = "block";
+	this.m_oRawInfo.PersonalName = this.m_oNameEditElement.value;
+
+	this.EditUserInfo();
 };
 CKGSUserInfoWindow.prototype.private_OnClickCancel = function()
 {
@@ -1319,6 +1367,8 @@ CKGSUserInfoWindow.prototype.private_OnClickCancel = function()
 	this.m_oCancelButton.style.display = "none";
 
 	this.m_oExtensionEditDiv.style.display = "none";
+	this.m_oNameEditElement.style.display  = "none";
+	this.m_oNameShowElement.style.display  = "block";
 };
 
 var EKGSUserInfoGameListRecord = {
