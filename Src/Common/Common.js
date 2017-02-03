@@ -106,7 +106,6 @@ function SplitTextToLines(sText)
 		aLines[nIndex] = aLines[nIndex].replace(">", "&gt;");
 		aLines[nIndex] = aLines[nIndex].replace("\"", "&quot;");
 		aLines[nIndex] = aLines[nIndex].replace("\'", "&apos;");
-		aLines[nIndex] = aLines[nIndex].replace('	', "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
 
 		aLines[nIndex] = aLines[nIndex].replace(urlRegEx, "<a href='$1' target='_blank'>$1</a>");
 	}

@@ -221,6 +221,7 @@ div.Selectable {
 	-webkit-user-select : auto;
 	-moz-user-select    : all;
 	-ms-user-select     : all;
+	white-space         : pre;
 }
 
 .ChatMenuButton {
