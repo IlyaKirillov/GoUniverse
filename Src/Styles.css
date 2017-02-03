@@ -684,3 +684,22 @@ div#divIdClientNameText:hover {
 	text-decoration : underline;
 	cursor          : pointer;
 }
+
+input.userInfoInput {
+	border          : 1px solid transparent;
+	outline         : none;
+	-moz-appearance : none;
+	resize          : none;
+	font-family     : 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif;
+	font-size       : 16px;
+	padding-left    : 3px;
+	height          : 19px;
+
+	background      : rgb(243, 243, 243);
+	color           : black;
+}
+
+input.userInfoInputEditable {
+	border       : 1px solid #969696;
+	background   : rgb(255, 255, 255);
+}

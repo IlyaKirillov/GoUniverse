@@ -689,17 +689,10 @@ CKGSUserInfoWindow.prototype.private_AddMainInfo = function()
 
 		var oNameEditElement = this.protected_CreateDivElement(oCell, null, "input");
 
-
+		oNameEditElement.className      = "userInfoInput userInfoInputEditable";
 		oNameEditElement.style.position = "relative";
-		oNameEditElement.style.display = "block";
+		oNameEditElement.style.display  = "none";
 
-		oNameEditElement.style.height  = "19px";
-		oNameEditElement.style.outline = "none";
-
-		oNameEditElement.style.fontFamily = "'Segoe UI', Tahoma, sans-serif";
-		oNameEditElement.style.fontSize   = "16px";
-
-		oNameEditElement.style.display = "none";
 
 		this.m_oNameShowElement = oName.Div;
 		this.m_oNameEditElement = oNameEditElement;
@@ -838,6 +831,7 @@ CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
 		oButton.style.height     = "25px";
 		oButton.style.lineHeight = "23px";
 		oButton.style.fontSize   = "14px";
+		oButton.style.userSelect = "none";
 		oButton.style.fontFamily = "'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif";
 		Common.Set_InnerTextToElement(oButton, sText);
 		var oButtonControl = CreateControlContainerByElement(oButton);
@@ -845,6 +839,8 @@ CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
 		oButtonControl.SetAnchor(false, true, true, false);
 		oEditAreaControl.AddControl(oButtonControl);
 		oButton.addEventListener("click", fOnClick, false);
+		oButton.addEventListener("selectstart", function(){return false;}, false);
+		oButton.addEventListener("mousedown", function(){return false;}, false);
 		return oButton;
 	}
 
