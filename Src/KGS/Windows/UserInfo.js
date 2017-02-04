@@ -662,41 +662,39 @@ CKGSUserInfoWindow.prototype.private_AddMainInfo = function()
 
 	oDiv.appendChild(this.m_oMainInfoTable);
 
+	var oUserName     = this.private_AddConsoleMessage("User name", "", false);
+	var oName         = this.private_AddConsoleMessage("Real name", "", true);
+	var oRank         = this.private_AddConsoleMessage("Rank", "", false);
+	var oLastOn       = this.private_AddConsoleMessage("Last on", "", false);
+	var oRegisteredOn = this.private_AddConsoleMessage("Registered on", "", false);
+	var oLocale       = this.private_AddConsoleMessage("Locale", "", false);
+	var oEmail        = this.private_AddConsoleMessage("Email", "Private", true);
+	var oGames        = this.private_AddConsoleMessage("Games", "", false);
+	var oRecentGames  = this.private_AddConsoleMessage("Recent games", "", false);
 
-	var oUserName     = this.private_AddConsoleMessage("User name", "");
-	var oName         = this.private_AddConsoleMessage("Real name", "");
-	var oRank         = this.private_AddConsoleMessage("Rank", "");
-	var oLastOn       = this.private_AddConsoleMessage("Last on", "");
-	var oRegisteredOn = this.private_AddConsoleMessage("Registered on", "");
-	var oLocale       = this.private_AddConsoleMessage("Locale", "");
-	var oEmail        = this.private_AddConsoleMessage("Email", "Private");
-	var oGames        = this.private_AddConsoleMessage("Games", "");
-	var oRecentGames  = this.private_AddConsoleMessage("Recent games", "");
+	this.m_oInfoTable.UserName     = oUserName    ;
+	this.m_oInfoTable.Name         = oName        ;
+	this.m_oInfoTable.Rank         = oRank        ;
+	this.m_oInfoTable.LastOn       = oLastOn      ;
+	this.m_oInfoTable.RegisteredOn = oRegisteredOn;
+	this.m_oInfoTable.Locale       = oLocale      ;
+	this.m_oInfoTable.Email        = oEmail       ;
+	this.m_oInfoTable.Games        = oGames       ;
+	this.m_oInfoTable.RecentGames  = oRecentGames ;
 
-	this.m_oInfoTable.UserName     = oUserName.Span;
-	this.m_oInfoTable.Name         = oName.Span;
-	this.m_oInfoTable.Rank         = oRank.Span;
-	this.m_oInfoTable.LastOn       = oLastOn.Span;
-	this.m_oInfoTable.RegisteredOn = oRegisteredOn.Span;
-	this.m_oInfoTable.Locale       = oLocale.Span;
-	this.m_oInfoTable.Email        = oEmail.Span;
-	this.m_oInfoTable.Games        = oGames.Span;
-	this.m_oInfoTable.RecentGames  = oRecentGames.Span;
-
-	if (this.m_bOwnInfo)
-	{
-		var oCell = oName.Cell;
-
-		var oNameEditElement = this.protected_CreateDivElement(oCell, null, "input");
-
-		oNameEditElement.className      = "userInfoInput userInfoInputEditable";
-		oNameEditElement.style.position = "relative";
-		oNameEditElement.style.display  = "none";
-
-
-		this.m_oNameShowElement = oName.Div;
-		this.m_oNameEditElement = oNameEditElement;
-	}
+	// if (this.m_bOwnInfo)
+	// {
+	// 	var oCell = oName.Cell;
+	//
+	// 	var oNameEditElement = this.protected_CreateDivElement(oCell, null, "input");
+	//
+	// 	oNameEditElement.className      = "userInfoInput userInfoInputEditable";
+	// 	oNameEditElement.style.position = "relative";
+	// 	oNameEditElement.style.display  = "none";
+	//
+	// 	this.m_oNameShowElement = oName.Div;
+	// 	this.m_oNameEditElement = oNameEditElement;
+	// }
 };
 CKGSUserInfoWindow.prototype.private_AddConsoleMessage = function(sField, sText)
 {
@@ -717,16 +715,10 @@ CKGSUserInfoWindow.prototype.private_AddConsoleMessage = function(sField, sText)
 	oCell = document.createElement("td");
 	oRow.appendChild(oCell);
 
-	var oDiv = document.createElement("div");
-	oDiv.style.border = "1px solid transparent";
-	oDiv.style.height = "19px";
-	oCell.appendChild(oDiv);
-
-	oTextSpan             = document.createElement("span");
-	oTextSpan.textContent = sText;
-	oDiv.appendChild(oTextSpan);
-
-	return {Cell : oCell, Span : oTextSpan, Div : oDiv};
+	var oInput = document.createElement("input");
+	oInput.className = "userInfoInput userInfoInputEditable";
+	oInput.value     = sText;
+	return oInput;
 };
 CKGSUserInfoWindow.prototype.private_AddEmail = function(sEmail)
 {
