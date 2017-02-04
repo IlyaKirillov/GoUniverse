@@ -202,6 +202,11 @@ CVerticalScroll.prototype.UpdatePosition = function()
 
 	oVerScroll.style.top = (sY + oDiv.offsetTop) + "px";
 };
+CVerticalScroll.prototype.CopyPosition = function(oOtherScroll)
+{
+	this.m_oDiv.scrollTop = oOtherScroll.m_oDiv.scrollTop;
+	this.UpdatePosition();
+};
 CVerticalScroll.prototype.SetStopPropagation = function(isStop)
 {
 	this.m_bStopPropagation = isStop;

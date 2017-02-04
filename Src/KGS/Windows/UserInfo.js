@@ -55,7 +55,9 @@ function CKGSUserInfoWindow()
 	this.m_oSaveButton       = null;
 	this.m_oCancelButton     = null;
 
+	this.m_bEditing          = false;
 	this.m_oExtensionEditDiv = null;
+	this.m_oInfoEditScroll   = null;
 }
 CommonExtend(CKGSUserInfoWindow, CKGSWindowBase);
 
@@ -246,6 +248,9 @@ CKGSUserInfoWindow.prototype.Update_Size = function(bForce)
 	if (this.m_oInfoScroll && 0 === this.m_oTabs.GetCurrentId())
 		this.m_oInfoScroll.CheckVisibility();
 
+	if (this.m_oInfoEditScroll && this.m_oExtensionDiv && 0 === this.m_oTabs.GetCurrentId() && true === this.m_bEditing)
+		this.m_oInfoEditScroll.CheckVisibility();
+
 	if (this.m_oGamesListView && 1 === this.m_oTabs.GetCurrentId())
 		this.m_oGamesListView.Update_Size();
 
@@ -385,15 +390,25 @@ CKGSUserInfoWindow.prototype.OnDetailsUpdate = function(oMessage)
 	this.m_oInfoTable.RegisteredOn.textContent = oRegisterTimeStamp.ToLocaleDate();
 
 	this.private_AddEmail(oMessage.email);
-	this.private_AddInfo(oMessage.personalInfo);
+
+	if (true)//oMessage.personalInfo !== this.m_oRawInfo.PersonalInfo)
+	{
+		this.private_AddInfo(oMessage.personalInfo);
+		this.m_oRawInfo.PersonalInfo = oMessage.personalInfo;
+	}
 
 	this.m_oRawInfo.ChannelId    = oMessage.channelId;
 	this.m_oRawInfo.PersonalName = oMessage.personalName;
 	this.m_oRawInfo.Email        = oMessage.email;
 	this.m_oRawInfo.PrivateEmail = oMessage.emailPrivate ? true : false;
 	this.m_oRawInfo.EmailWanted  = oMessage.emailWanted ? true : false;
-	this.m_oRawInfo.PersonalInfo = oMessage.personalInfo;
 	this.m_oRawInfo.AuthLevel    = oMessage.authLevel ? oMessage.authLevel : "normal";
+
+	if (this.m_oInfoScroll && 0 === this.m_oTabs.GetCurrentId())
+		this.m_oInfoScroll.CheckVisibility();
+
+	if (this.m_oInfoEditScroll && this.m_oExtensionDiv && 0 === this.m_oTabs.GetCurrentId() && true === this.m_bEditing)
+		this.m_oInfoEditScroll.CheckVisibility();
 };
 CKGSUserInfoWindow.prototype.EditUserInfo = function()
 {
@@ -653,6 +668,9 @@ CKGSUserInfoWindow.prototype.Show = function(oPr)
 
 	if (this.m_oInfoScroll)
 		this.m_oInfoScroll.CheckVisibility();
+
+	if (this.m_oInfoEditScroll && this.m_oExtensionDiv && 0 === this.m_oTabs.GetCurrentId() && "block" === this.m_oExtensionDiv.style.display)
+		this.m_oInfoEditScroll.CheckVisibility();
 };
 CKGSUserInfoWindow.prototype.private_AddMainInfo = function()
 {
@@ -696,7 +714,7 @@ CKGSUserInfoWindow.prototype.private_AddMainInfo = function()
 	// 	this.m_oNameEditElement = oNameEditElement;
 	// }
 };
-CKGSUserInfoWindow.prototype.private_AddConsoleMessage = function(sField, sText)
+CKGSUserInfoWindow.prototype.private_AddConsoleMessage = function(sField, sText, bAddInput)
 {
 	var oTable = this.m_oMainInfoTable;
 
@@ -876,7 +894,9 @@ CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
 
 		this.m_oExtensionEditDiv.style.display = "none";
 
-
+		this.m_oInfoEditScroll = new CVerticalScroll();
+		this.m_oInfoEditScroll.Init(this.m_oExtensionEditDiv, "VerScroll", "VerScrollActive", true);
+		this.m_oInfoEditScroll.SetPaddings(0, 0, -1);
 	}
 
 	this.private_AddMainInfo();
@@ -1322,6 +1342,8 @@ CKGSUserInfoWindow.prototype.UpdateFriendsLists = function()
 };
 CKGSUserInfoWindow.prototype.private_OnClickEdit = function()
 {
+	this.m_bEditing = true;
+
 	this.m_oEditButton.style.display   = "none";
 	this.m_oSaveButton.style.display   = "block";
 	this.m_oCancelButton.style.display = "block";
@@ -1329,12 +1351,27 @@ CKGSUserInfoWindow.prototype.private_OnClickEdit = function()
 	this.m_oExtensionEditDiv.style.display = "block";
 	this.m_oExtensionEditDiv.value = this.m_oRawInfo.PersonalInfo;
 
-	this.m_oNameShowElement.style.display  = "none";
-	this.m_oNameEditElement.style.display  = "block";
-	this.m_oNameEditElement.value  = this.m_oRawInfo.PersonalName;
+	// this.m_oNameShowElement.style.display  = "none";
+	// this.m_oNameEditElement.style.display  = "block";
+	// this.m_oNameEditElement.value  = this.m_oRawInfo.PersonalName;
+
+	if (this.m_oInfoEditScroll && this.m_oExtensionDiv && 0 === this.m_oTabs.GetCurrentId() && true === this.m_bEditing)
+		this.m_oInfoEditScroll.CheckVisibility();
+
+	if (this.m_oInfoScroll && this.m_oInfoEditScroll)
+		this.m_oInfoEditScroll.CopyPosition(this.m_oInfoScroll);
 };
 CKGSUserInfoWindow.prototype.private_OnClickSave = function()
 {
+	this.m_bEditing = false;
+
+	if (this.m_oInfoScroll && this.m_oInfoEditScroll)
+		this.m_oInfoScroll.CopyPosition(this.m_oInfoEditScroll);
+
+	if (this.m_oInfoEditScroll)
+		this.m_oInfoEditScroll.Hide();
+
+
 	this.m_oEditButton.style.display   = "block";
 	this.m_oSaveButton.style.display   = "none";
 	this.m_oCancelButton.style.display = "none";
@@ -1342,21 +1379,30 @@ CKGSUserInfoWindow.prototype.private_OnClickSave = function()
 	this.m_oExtensionEditDiv.style.display = "none";
 	this.m_oRawInfo.PersonalInfo = this.m_oExtensionEditDiv.value;
 
-	this.m_oNameEditElement.style.display  = "none";
-	this.m_oNameShowElement.style.display  = "block";
-	this.m_oRawInfo.PersonalName = this.m_oNameEditElement.value;
+	// this.m_oNameEditElement.style.display  = "none";
+	// this.m_oNameShowElement.style.display  = "block";
+	// this.m_oRawInfo.PersonalName = this.m_oNameEditElement.value;
 
 	this.EditUserInfo();
 };
 CKGSUserInfoWindow.prototype.private_OnClickCancel = function()
 {
+	this.m_bEditing = false;
+
+	if (this.m_oInfoScroll && this.m_oInfoEditScroll)
+		this.m_oInfoScroll.CopyPosition(this.m_oInfoEditScroll);
+
+	if (this.m_oInfoEditScroll)
+		this.m_oInfoEditScroll.Hide();
+
+
 	this.m_oEditButton.style.display   = "block";
 	this.m_oSaveButton.style.display   = "none";
 	this.m_oCancelButton.style.display = "none";
 
 	this.m_oExtensionEditDiv.style.display = "none";
-	this.m_oNameEditElement.style.display  = "none";
-	this.m_oNameShowElement.style.display  = "block";
+	// this.m_oNameEditElement.style.display  = "none";
+	// this.m_oNameShowElement.style.display  = "block";
 };
 
 var EKGSUserInfoGameListRecord = {
