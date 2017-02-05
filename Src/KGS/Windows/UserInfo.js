@@ -277,18 +277,18 @@ CKGSUserInfoWindow.prototype.OnUserDetails = function(oDetails)
 		if (oUser.HasAvatar())
 			this.OnUserAvatar();
 
-		this.m_oInfoTable.UserName.textContent = oUser.GetName();
-		this.m_oInfoTable.Rank.textContent     = oUser.GetStringRank();
+		Common.Set_InnerTextToElement(this.m_oInfoTable.UserName, oUser.GetName());
+		Common.Set_InnerTextToElement(this.m_oInfoTable.Rank, oUser.GetStringRank());
 
 
 		if (oUser.IsOnline())
 		{
-			this.m_oInfoTable.LastOn.textContent = "online";
+			Common.Set_InnerTextToElement(this.m_oInfoTable.LastOn, "online");
 		}
 		else
 		{
 			var oTimeStamp = new CTimeStamp(oDetails.lastOn);
-			this.m_oInfoTable.LastOn.textContent = oTimeStamp.GetDifferenceString() + " (" + oTimeStamp.ToLocaleString() + ")";
+			Common.Set_InnerTextToElement(this.m_oInfoTable.LastOn, oTimeStamp.GetDifferenceString() + " (" + oTimeStamp.ToLocaleString() + ")");
 		}
 
 		this.OnDetailsUpdate(oDetails);
@@ -383,8 +383,8 @@ CKGSUserInfoWindow.prototype.OnUserArchiveGameRemove = function(oMessage)
 };
 CKGSUserInfoWindow.prototype.OnDetailsUpdate = function(oMessage)
 {
-	this.m_oInfoTable.Locale.textContent = oMessage.locale;
-	this.m_oInfoTable.Name.textContent   = oMessage.personalName;
+	Common.Set_InnerTextToElement(this.m_oInfoTable.Locale, oMessage.locale);
+	Common.Set_InnerTextToElement(this.m_oInfoTable.Name, oMessage.personalName);
 
 	var oRegisterTimeStamp = new CTimeStamp(oMessage.regStartDate);
 	this.m_oInfoTable.RegisteredOn.textContent = oRegisterTimeStamp.ToLocaleDate();
@@ -471,8 +471,8 @@ CKGSUserInfoWindow.prototype.private_UpdateGameArchiveStats = function()
 		}
 	}
 
-	this.m_oInfoTable.Games.textContent       = "" + nWins + "-" + nLoses + "-" + nUnfinished;
-	this.m_oInfoTable.RecentGames.textContent = sRecentGames;
+	Common.Set_InnerTextToElement(this.m_oInfoTable.Games, "" + nWins + "-" + nLoses + "-" + nUnfinished);
+	Common.Set_InnerTextToElement(this.m_oInfoTable.RecentGames, sRecentGames);
 };
 CKGSUserInfoWindow.prototype.private_UpdateGameArchiveListView = function()
 {
@@ -690,15 +690,15 @@ CKGSUserInfoWindow.prototype.private_AddMainInfo = function()
 	var oGames        = this.private_AddConsoleMessage("Games", "", false);
 	var oRecentGames  = this.private_AddConsoleMessage("Recent games", "", false);
 
-	this.m_oInfoTable.UserName     = oUserName    ;
-	this.m_oInfoTable.Name         = oName        ;
-	this.m_oInfoTable.Rank         = oRank        ;
-	this.m_oInfoTable.LastOn       = oLastOn      ;
-	this.m_oInfoTable.RegisteredOn = oRegisteredOn;
-	this.m_oInfoTable.Locale       = oLocale      ;
-	this.m_oInfoTable.Email        = oEmail       ;
-	this.m_oInfoTable.Games        = oGames       ;
-	this.m_oInfoTable.RecentGames  = oRecentGames ;
+	this.m_oInfoTable.UserName     = oUserName.Div;
+	this.m_oInfoTable.Name         = oName.Div;
+	this.m_oInfoTable.Rank         = oRank.Div;
+	this.m_oInfoTable.LastOn       = oLastOn.Div;
+	this.m_oInfoTable.RegisteredOn = oRegisteredOn.Div;
+	this.m_oInfoTable.Locale       = oLocale.Div;
+	this.m_oInfoTable.Email        = oEmail.Div;
+	this.m_oInfoTable.Games        = oGames.Div;
+	this.m_oInfoTable.RecentGames  = oRecentGames.Div;
 
 	// if (this.m_bOwnInfo)
 	// {
@@ -733,10 +733,28 @@ CKGSUserInfoWindow.prototype.private_AddConsoleMessage = function(sField, sText,
 	oCell = document.createElement("td");
 	oRow.appendChild(oCell);
 
-	var oInput = document.createElement("input");
-	oInput.className = "userInfoInput userInfoInputEditable";
-	oInput.value     = sText;
-	return oInput;
+	var oDiv = document.createElement("div");
+	oCell.appendChild(oDiv);
+
+	oDiv.style.position = "relative";
+	oDiv.style.display  = "block";
+	oDiv.style.top      = "0px";
+	oDiv.style.left     = "0px";
+	Common.Set_InnerTextToElement(oDiv, sText);
+
+	var oInput = null;
+	if (bAddInput && this.m_bOwnInfo)
+	{
+		oInput = document.createElement("input");
+		oInput.className = "userInfoInput userInfoInputEditable";
+		oInput.value     = sText;
+		oInput.style.display  = "none";
+		oInput.style.position = "relative";
+		oInput.style.top      = "0px";
+		oInput.style.left     = "0px";
+	}
+
+	return {Div : oDiv, Input : oInput};
 };
 CKGSUserInfoWindow.prototype.private_AddEmail = function(sEmail)
 {
