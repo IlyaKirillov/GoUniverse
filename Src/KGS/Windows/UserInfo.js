@@ -55,9 +55,11 @@ function CKGSUserInfoWindow()
 	this.m_oSaveButton       = null;
 	this.m_oCancelButton     = null;
 
-	this.m_bEditing          = false;
-	this.m_oExtensionEditDiv = null;
-	this.m_oInfoEditScroll   = null;
+	this.m_bEditing            = false;
+	this.m_oExtensionEditDiv   = null;
+	this.m_oInfoEditScroll     = null;
+	this.m_oInfoEditNameInput  = null;
+	this.m_oInfoEditEmailInput = null;
 }
 CommonExtend(CKGSUserInfoWindow, CKGSWindowBase);
 
@@ -700,19 +702,11 @@ CKGSUserInfoWindow.prototype.private_AddMainInfo = function()
 	this.m_oInfoTable.Games        = oGames.Div;
 	this.m_oInfoTable.RecentGames  = oRecentGames.Div;
 
-	// if (this.m_bOwnInfo)
-	// {
-	// 	var oCell = oName.Cell;
-	//
-	// 	var oNameEditElement = this.protected_CreateDivElement(oCell, null, "input");
-	//
-	// 	oNameEditElement.className      = "userInfoInput userInfoInputEditable";
-	// 	oNameEditElement.style.position = "relative";
-	// 	oNameEditElement.style.display  = "none";
-	//
-	// 	this.m_oNameShowElement = oName.Div;
-	// 	this.m_oNameEditElement = oNameEditElement;
-	// }
+	if (this.m_bOwnInfo)
+	{
+		this.m_oInfoEditNameInput  = oName.Input;
+		this.m_oInfoEditEmailInput = oEmail.Input;
+	}
 };
 CKGSUserInfoWindow.prototype.private_AddConsoleMessage = function(sField, sText, bAddInput)
 {
@@ -736,22 +730,27 @@ CKGSUserInfoWindow.prototype.private_AddConsoleMessage = function(sField, sText,
 	var oDiv = document.createElement("div");
 	oCell.appendChild(oDiv);
 
-	oDiv.style.position = "relative";
-	oDiv.style.display  = "block";
-	oDiv.style.top      = "0px";
-	oDiv.style.left     = "0px";
+	oDiv.style.position    = "relative";
+	oDiv.style.display     = "block";
+	oDiv.style.top         = "0px";
+	oDiv.style.left        = "0px";
+	oDiv.style.border      = "1px solid transparent";
+	oDiv.style.paddingLeft = "3px";
+	oDiv.style.height      = "19px";
+	oDiv.style.lineHeight  = "19px";
 	Common.Set_InnerTextToElement(oDiv, sText);
 
 	var oInput = null;
 	if (bAddInput && this.m_bOwnInfo)
 	{
-		oInput = document.createElement("input");
-		oInput.className = "userInfoInput userInfoInputEditable";
-		oInput.value     = sText;
+		oInput                = document.createElement("input");
+		oInput.className      = "userInfoInput userInfoInputEditable";
+		oInput.value          = sText;
 		oInput.style.display  = "none";
 		oInput.style.position = "relative";
 		oInput.style.top      = "0px";
 		oInput.style.left     = "0px";
+		oCell.appendChild(oInput);
 	}
 
 	return {Div : oDiv, Input : oInput};
@@ -1369,9 +1368,13 @@ CKGSUserInfoWindow.prototype.private_OnClickEdit = function()
 	this.m_oExtensionEditDiv.style.display = "block";
 	this.m_oExtensionEditDiv.value = this.m_oRawInfo.PersonalInfo;
 
-	// this.m_oNameShowElement.style.display  = "none";
-	// this.m_oNameEditElement.style.display  = "block";
-	// this.m_oNameEditElement.value  = this.m_oRawInfo.PersonalName;
+	this.m_oInfoTable.Name.style.display    = "none";
+	this.m_oInfoEditNameInput.style.display = "block";
+	this.m_oInfoEditNameInput.value         = this.m_oRawInfo.PersonalName;
+
+	this.m_oInfoTable.Email.style.display    = "none";
+	this.m_oInfoEditEmailInput.style.display = "block";
+	this.m_oInfoEditEmailInput.value         = this.m_oRawInfo.Email;
 
 	if (this.m_oInfoEditScroll && this.m_oExtensionDiv && 0 === this.m_oTabs.GetCurrentId() && true === this.m_bEditing)
 		this.m_oInfoEditScroll.CheckVisibility();
@@ -1395,11 +1398,15 @@ CKGSUserInfoWindow.prototype.private_OnClickSave = function()
 	this.m_oCancelButton.style.display = "none";
 
 	this.m_oExtensionEditDiv.style.display = "none";
-	this.m_oRawInfo.PersonalInfo = this.m_oExtensionEditDiv.value;
+	this.m_oRawInfo.PersonalInfo           = this.m_oExtensionEditDiv.value;
 
-	// this.m_oNameEditElement.style.display  = "none";
-	// this.m_oNameShowElement.style.display  = "block";
-	// this.m_oRawInfo.PersonalName = this.m_oNameEditElement.value;
+	this.m_oInfoTable.Name.style.display    = "block";
+	this.m_oInfoEditNameInput.style.display = "none";
+	this.m_oRawInfo.PersonalName            = this.m_oInfoEditNameInput.value;
+
+	this.m_oInfoTable.Email.style.display    = "block";
+	this.m_oInfoEditEmailInput.style.display = "none";
+	this.m_oRawInfo.Email                    = this.m_oInfoEditEmailInput.value;
 
 	this.EditUserInfo();
 };
@@ -1418,9 +1425,13 @@ CKGSUserInfoWindow.prototype.private_OnClickCancel = function()
 	this.m_oSaveButton.style.display   = "none";
 	this.m_oCancelButton.style.display = "none";
 
-	this.m_oExtensionEditDiv.style.display = "none";
-	// this.m_oNameEditElement.style.display  = "none";
-	// this.m_oNameShowElement.style.display  = "block";
+	this.m_oExtensionEditDiv.style.display  = "none";
+
+	this.m_oInfoTable.Name.style.display    = "block";
+	this.m_oInfoEditNameInput.style.display = "none";
+
+	this.m_oInfoTable.Email.style.display    = "block";
+	this.m_oInfoEditEmailInput.style.display = "none";
 };
 
 var EKGSUserInfoGameListRecord = {
