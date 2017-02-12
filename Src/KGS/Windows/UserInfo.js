@@ -55,6 +55,9 @@ function CKGSUserInfoWindow()
 	this.m_oSaveButton       = null;
 	this.m_oCancelButton     = null;
 
+	this.m_oMainInfoDiv     = null;
+	this.m_oMainInfoControl = null;
+
 	this.m_bEditing            = false;
 	this.m_oExtensionEditDiv   = null;
 	this.m_oInfoEditScroll     = null;
@@ -298,6 +301,9 @@ CKGSUserInfoWindow.prototype.OnUserDetails = function(oDetails)
 };
 CKGSUserInfoWindow.prototype.OnUserAvatar = function()
 {
+	this.m_oAvatarDiv.style.display = "block";
+	this.m_oMainInfoControl.SetParams(5, 5, 155, 0, true, true, true, false, -1, this.m_nInfoHeight);
+
 	var oImg = document.createElement("img");
 	oImg.style.float  = "right";
 	oImg.style.width  = "141px";
@@ -422,8 +428,7 @@ CKGSUserInfoWindow.prototype.EditUserInfo = function()
 		"personalEmail" : this.m_oRawInfo.Email,
 		"emailPrivate"  : this.m_oRawInfo.PrivateEmail,
 		"emailWanted"   : this.m_oRawInfo.EmailWanted,
-		"authLevel"     : this.m_oRawInfo.AuthLevel,
-		"forcedNoRank"  : true
+		"authLevel"     : this.m_oRawInfo.AuthLevel
 	});
 };
 CKGSUserInfoWindow.prototype.private_UpdateGameArchiveStats = function()
@@ -673,24 +678,46 @@ CKGSUserInfoWindow.prototype.Show = function(oPr)
 
 	if (this.m_oInfoEditScroll && this.m_oExtensionDiv && 0 === this.m_oTabs.GetCurrentId() && "block" === this.m_oExtensionDiv.style.display)
 		this.m_oInfoEditScroll.CheckVisibility();
+
+	this.Update_Size(true);
 };
 CKGSUserInfoWindow.prototype.private_AddMainInfo = function()
 {
-	var oDiv = this.m_oMainInfoDiv;
+	var oDiv     = this.m_oMainInfoDiv;
+	var oControl = this.m_oMainInfoControl;
 
-	this.m_oMainInfoTable = document.createElement("table");
+	var nLeftWidth = 50;
 
-	oDiv.appendChild(this.m_oMainInfoTable);
+	var arrLabels = [];
+	var sUserName = arrLabels[0] = "User name";
+	var sName     = arrLabels[1] = "Real name";
+	var sRank     = arrLabels[2] = "Rank";
+	var sLastOn   = arrLabels[3] = "Last on";
+	var sRegister = arrLabels[4] = "Registered on";
+	var sLocale   = arrLabels[5] = "Locale";
+	var sEmail    = arrLabels[6] = "Email";
+	var sGames    = arrLabels[7] = "Games";
+	var sRecent   = arrLabels[8] = "Recent games";
 
-	var oUserName     = this.private_AddConsoleMessage("User name", "", false);
-	var oName         = this.private_AddConsoleMessage("Real name", "", true);
-	var oRank         = this.private_AddConsoleMessage("Rank", "", false);
-	var oLastOn       = this.private_AddConsoleMessage("Last on", "", false);
-	var oRegisteredOn = this.private_AddConsoleMessage("Registered on", "", false);
-	var oLocale       = this.private_AddConsoleMessage("Locale", "", false);
-	var oEmail        = this.private_AddConsoleMessage("Email", "Private", true);
-	var oGames        = this.private_AddConsoleMessage("Games", "", false);
-	var oRecentGames  = this.private_AddConsoleMessage("Recent games", "", false);
+	g_oTextMeasurer.SetFont("italic bold 16px 'Segoe UI', Tahoma, sans-serif");
+	for (var nIndex = 0, nCount = arrLabels.length; nIndex < nCount; ++nIndex)
+	{
+		var nLabelW = g_oTextMeasurer.Measure(arrLabels[nIndex]);
+		if (nLeftWidth <= nLabelW)
+			nLeftWidth = nLabelW;
+	}
+
+	var nTop = 0;
+
+	var oUserName     = this.private_AddInfoField(oDiv, oControl, nTop, nLeftWidth, sUserName, "", false); nTop += oUserName.Height;
+	var oName         = this.private_AddInfoField(oDiv, oControl, nTop, nLeftWidth, sName, "", true); nTop += oName.Height;
+	var oRank         = this.private_AddInfoField(oDiv, oControl, nTop, nLeftWidth, sRank, "", false); nTop += oRank.Height;
+	var oLastOn       = this.private_AddInfoField(oDiv, oControl, nTop, nLeftWidth, sLastOn, "", false); nTop += oLastOn.Height;
+	var oRegisteredOn = this.private_AddInfoField(oDiv, oControl, nTop, nLeftWidth, sRegister, "", false); nTop += oRegisteredOn.Height;
+	var oLocale       = this.private_AddInfoField(oDiv, oControl, nTop, nLeftWidth, sLocale, "", false); nTop += oLocale.Height;
+	var oEmail        = this.private_AddInfoField(oDiv, oControl, nTop, nLeftWidth, sEmail, "Private", true); nTop += oEmail.Height;
+	var oGames        = this.private_AddInfoField(oDiv, oControl, nTop, nLeftWidth, sGames, "", false); nTop += oGames.Height;
+	var oRecentGames  = this.private_AddInfoField(oDiv, oControl, nTop, nLeftWidth, sRecent, "", false); nTop += oRecentGames.Height;
 
 	this.m_oInfoTable.UserName     = oUserName.Div;
 	this.m_oInfoTable.Name         = oName.Div;
@@ -708,52 +735,62 @@ CKGSUserInfoWindow.prototype.private_AddMainInfo = function()
 		this.m_oInfoEditEmailInput = oEmail.Input;
 	}
 };
-CKGSUserInfoWindow.prototype.private_AddConsoleMessage = function(sField, sText, bAddInput)
+CKGSUserInfoWindow.prototype.private_AddInfoField = function(oParent, oParentControl, nTop, nLeftWidth, sField, sText, bAddInput)
 {
-	var oTable = this.m_oMainInfoTable;
+	var nHeight = 23;
 
-	var oRow = document.createElement("tr");
-	oTable.appendChild(oRow);
-
-	var oCell = document.createElement("td");
-	oRow.appendChild(oCell);
+	var oLabel              = document.createElement("div");
+	oLabel.style.position   = "absolute";
+	oLabel.style.top        = nTop + "px";
+	oLabel.style.left       = "5px";
+	oLabel.style.fontFamily = "'Segoe UI', Tahoma, sans-serif";
+	oLabel.style.fontSize   = "16px";
+	oLabel.style.height     = nHeight + "px";
+	oLabel.style.lineHeight = nHeight + "px";
 
 	var oTextSpan              = document.createElement("span");
 	oTextSpan.style.fontWeight = "bold";
 	oTextSpan.style.fontStyle  = "italic";
 	oTextSpan.textContent      = sField + ": ";
-	oCell.appendChild(oTextSpan);
+	oLabel.appendChild(oTextSpan);
 
-	oCell = document.createElement("td");
-	oRow.appendChild(oCell);
+	oParent.appendChild(oLabel);
 
 	var oDiv = document.createElement("div");
-	oCell.appendChild(oDiv);
+	oParent.appendChild(oDiv);
 
-	oDiv.style.position    = "relative";
+	oDiv.style.position    = "absolute";
 	oDiv.style.display     = "block";
-	oDiv.style.top         = "0px";
-	oDiv.style.left        = "0px";
+	oDiv.style.top         = nTop + "px";
+	oDiv.style.left        = (nLeftWidth + 10) + "px";
 	oDiv.style.border      = "1px solid transparent";
 	oDiv.style.paddingLeft = "3px";
-	oDiv.style.height      = "19px";
-	oDiv.style.lineHeight  = "19px";
+	oDiv.style.height      = (nHeight - 2) + "px";
+	oDiv.style.lineHeight  = (nHeight - 2) + "px";
 	Common.Set_InnerTextToElement(oDiv, sText);
 
 	var oInput = null;
 	if (bAddInput && this.m_bOwnInfo)
 	{
-		oInput                = document.createElement("input");
-		oInput.className      = "userInfoInput userInfoInputEditable";
-		oInput.value          = sText;
-		oInput.style.display  = "none";
-		oInput.style.position = "relative";
-		oInput.style.top      = "0px";
-		oInput.style.left     = "0px";
-		oCell.appendChild(oInput);
+		oInput                  = document.createElement("input");
+		oInput.className        = "userInfoInput userInfoInputEditable";
+		oInput.value            = sText;
+		oInput.style.position   = "absolute";
+		oInput.style.display    = "none";
+		oInput.style.top        = nTop + "px";
+		oInput.style.left       = (nLeftWidth + 10) + "px";
+		oInput.style.right      = "0px";
+		oInput.style.height     = nHeight + "px";
+		oInput.style.lineHeight = nHeight + "px";
+		oParent.appendChild(oInput);
+
+		var oControl = CreateControlContainerByElement(oInput);
+		oControl.Bounds.SetParams((nLeftWidth + 10), nTop, 0, 0, true, true, true, false, -1, nHeight);
+		oControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left);
+		oParentControl.AddControl(oControl);
 	}
 
-	return {Div : oDiv, Input : oInput};
+	return {Div : oDiv, Input : oInput, Height : nHeight};
 };
 CKGSUserInfoWindow.prototype.private_AddEmail = function(sEmail)
 {
@@ -817,6 +854,7 @@ CKGSUserInfoWindow.prototype.private_SetCaption = function(sCaption, bOnline)
 };
 CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
 {
+	var sInfoHeight = 210;
 	var sDivId = oDiv.id;
 
 	var nEditH = 25;
@@ -826,21 +864,26 @@ CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
 	var sAvatar    = sDivId + "A";
 	var sExtension = sDivId + "E";
 
+	this.m_nInfoHeight = sInfoHeight;
+
 	this.m_oMainInfoDiv = this.protected_CreateDivElement(oDiv, sMainInfo);
 	var oMainInfoControl = CreateControlContainer(sMainInfo);
-	oMainInfoControl.Bounds.SetParams(5, 5, 155, 0, true, true, true, false, -1, 210);
+	oMainInfoControl.Bounds.SetParams(5, 5, 5, 0, true, true, true, false, -1, sInfoHeight);
 	oMainInfoControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left);
 	oControl.AddControl(oMainInfoControl);
+	this.m_oMainInfoControl = oMainInfoControl;
 
+	var nAvatarYoffset = (sInfoHeight - 200 + 10) / 2;
 	this.m_oAvatarDiv = this.protected_CreateDivElement(oDiv, sAvatar);
 	var oAvatarControl = CreateControlContainer(sAvatar);
-	oAvatarControl.Bounds.SetParams(0, 10, 5, 0, false, true, true, false, 150, 200);
+	oAvatarControl.Bounds.SetParams(0, nAvatarYoffset, 5, 0, false, true, true, false, 150, 200);
 	oAvatarControl.Anchor = (g_anchor_top | g_anchor_right);
+	this.m_oAvatarDiv.style.display = "none";
 	oControl.AddControl(oAvatarControl);
 
 	this.m_oExtensionDiv = this.protected_CreateDivElement(oDiv, sExtension);
 	var oExtensionControl = CreateControlContainer(sExtension);
-	oExtensionControl.Bounds.SetParams(5, 220, 5, nBot, true, true, true, true, -1, -1);
+	oExtensionControl.Bounds.SetParams(5, sInfoHeight + 10, 5, nBot, true, true, true, true, -1, -1);
 	oExtensionControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left | g_anchor_bottom);
 	oControl.AddControl(oExtensionControl);
 
@@ -901,7 +944,7 @@ CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
 
 		this.m_oExtensionEditDiv = this.protected_CreateDivElement(oDiv, null, "textarea");
 		var oExtensionEditControl = CreateControlContainerByElement(this.m_oExtensionEditDiv);
-		oExtensionEditControl.Bounds.SetParams(5, 220, 5, nBot - 2, true, true, true, true, -1, -1);
+		oExtensionEditControl.Bounds.SetParams(5, sInfoHeight + 10, 5, nBot - 2, true, true, true, true, -1, -1);
 		oExtensionEditControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left | g_anchor_bottom);
 		oControl.AddControl(oExtensionEditControl);
 

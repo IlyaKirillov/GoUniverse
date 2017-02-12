@@ -695,8 +695,6 @@ input.userInfoInput {
 	font-family     : 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif;
 	font-size       : 16px;
 	padding-left    : 3px;
-	height          : 21px;
-	line-height     : 21px;
 
 	background      : rgb(243, 243, 243);
 	color           : black;
