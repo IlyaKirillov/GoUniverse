@@ -82,7 +82,7 @@ CGoUniverseApplication.prototype.Init = function()
 	g_oFadeEffect.In(document.getElementById("divIdConnectionError"), -1);
 
 	//------------------------------------------------------------------------------------------------------------------
-
+	//
 	// //TEST
 	// this.m_oClient = new CKGSClient(this);
 	// this.m_oClient.m_oCurrentUser.Update({
@@ -185,21 +185,24 @@ CGoUniverseApplication.prototype.Init = function()
 	// // this.m_oClient.private_HandlePrivateKeepOut({channelId : -1});
 	// // this.m_oClient.private_HandleIdleWarning({});
 	//
-	// this.m_oClient.m_oAllGames["123"] = new CKGSGameListRecord();
-	// this.m_oClient.m_oAllGames["123"].Update({
-	// 	gameType        : "challenge",
-	// 	players         : {
-	// 		challengeCreator : {
-	// 			name : "KOCMOHABT"
-	// 		}
-	// 	},
-	// 	name            : "Challenge comment",
-	// 	initialProposal : {
-	// 		rules : {}
-	// 	}
-	// });
-	// this.m_oClient.private_HandleChallengeJoin({channelId : 123});
+	// // this.m_oClient.m_oAllGames["123"] = new CKGSGameListRecord();
+	// // this.m_oClient.m_oAllGames["123"].Update({
+	// // 	gameType        : "challenge",
+	// // 	players         : {
+	// // 		challengeCreator : {
+	// // 			name : "KOCMOHABT"
+	// // 		}
+	// // 	},
+	// // 	name            : "Challenge comment",
+	// // 	initialProposal : {
+	// // 		rules : {}
+	// // 	}
+	// // });
+	// // this.m_oClient.private_HandleChallengeJoin({channelId : 123});
 	// //this.m_oClient.CreateChallenge();
+	//
+	// this.m_oClient.LoadUserInfo("GoUniverse");
+	// this.m_oClient.private_HandleDetailsJoin({user : {name : "GoUniverse"}, personalInfo : "Test test test set wer wer werwer"});
 	//
 	// //_____________
 };

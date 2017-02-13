@@ -285,7 +285,6 @@ CKGSUserInfoWindow.prototype.OnUserDetails = function(oDetails)
 		Common.Set_InnerTextToElement(this.m_oInfoTable.UserName, oUser.GetName());
 		Common.Set_InnerTextToElement(this.m_oInfoTable.Rank, oUser.GetStringRank());
 
-
 		if (oUser.IsOnline())
 		{
 			Common.Set_InnerTextToElement(this.m_oInfoTable.LastOn, "online");
@@ -295,6 +294,12 @@ CKGSUserInfoWindow.prototype.OnUserDetails = function(oDetails)
 			var oTimeStamp = new CTimeStamp(oDetails.lastOn);
 			Common.Set_InnerTextToElement(this.m_oInfoTable.LastOn, oTimeStamp.GetDifferenceString() + " (" + oTimeStamp.ToLocaleString() + ")");
 		}
+
+		if (this.m_oInfoCheckboxPrivate && this.m_bOwnInfo)
+			this.m_oInfoCheckboxPrivate.checked = oDetails.privateEmail ? true : false;
+
+		if (this.m_oInfoCheckboxKGSEmail && this.m_bOwnInfo)
+			this.m_oInfoCheckboxKGSEmail.checked = oDetails.emailWanted ? true : false;
 
 		this.OnDetailsUpdate(oDetails);
 	}
@@ -408,7 +413,7 @@ CKGSUserInfoWindow.prototype.OnDetailsUpdate = function(oMessage)
 	this.m_oRawInfo.ChannelId    = oMessage.channelId;
 	this.m_oRawInfo.PersonalName = oMessage.personalName;
 	this.m_oRawInfo.Email        = oMessage.email;
-	this.m_oRawInfo.PrivateEmail = oMessage.emailPrivate ? true : false;
+	this.m_oRawInfo.PrivateEmail = oMessage.privateEmail ? true : false;
 	this.m_oRawInfo.EmailWanted  = oMessage.emailWanted ? true : false;
 	this.m_oRawInfo.AuthLevel    = oMessage.authLevel ? oMessage.authLevel : "normal";
 
@@ -426,7 +431,7 @@ CKGSUserInfoWindow.prototype.EditUserInfo = function()
 		"personalName"  : this.m_oRawInfo.PersonalName,
 		"personalInfo"  : this.m_oRawInfo.PersonalInfo,
 		"personalEmail" : this.m_oRawInfo.Email,
-		"emailPrivate"  : this.m_oRawInfo.PrivateEmail,
+		"privateEmail"  : this.m_oRawInfo.PrivateEmail,
 		"emailWanted"   : this.m_oRawInfo.EmailWanted,
 		"authLevel"     : this.m_oRawInfo.AuthLevel
 	});
@@ -699,6 +704,9 @@ CKGSUserInfoWindow.prototype.private_AddMainInfo = function()
 	var sGames    = arrLabels[7] = "Games";
 	var sRecent   = arrLabels[8] = "Recent games";
 
+	var sPrivateEmail         = "Hide address from other users?";
+	var sReceiveAnnouncements = "Receive KGS announcements?";
+
 	g_oTextMeasurer.SetFont("italic bold 16px 'Segoe UI', Tahoma, sans-serif");
 	for (var nIndex = 0, nCount = arrLabels.length; nIndex < nCount; ++nIndex)
 	{
@@ -716,6 +724,13 @@ CKGSUserInfoWindow.prototype.private_AddMainInfo = function()
 	var oRegisteredOn = this.private_AddInfoField(oDiv, oControl, nTop, nLeftWidth, sRegister, "", false); nTop += oRegisteredOn.Height;
 	var oLocale       = this.private_AddInfoField(oDiv, oControl, nTop, nLeftWidth, sLocale, "", false); nTop += oLocale.Height;
 	var oEmail        = this.private_AddInfoField(oDiv, oControl, nTop, nLeftWidth, sEmail, "Private", true); nTop += oEmail.Height;
+
+	var oPrivateEmail = null, oKGSEmail = null;
+	if (this.m_bOwnInfo)
+	{
+		oPrivateEmail = this.private_AddInfoCheckboxFields(oDiv, oControl, nTop, nLeftWidth, sPrivateEmail, false);	nTop += oPrivateEmail.Height;
+		oKGSEmail     = this.private_AddInfoCheckboxFields(oDiv, oControl, nTop, nLeftWidth, sReceiveAnnouncements, false);	nTop += oKGSEmail.Height;
+	}
 	var oGames        = this.private_AddInfoField(oDiv, oControl, nTop, nLeftWidth, sGames, "", false); nTop += oGames.Height;
 	var oRecentGames  = this.private_AddInfoField(oDiv, oControl, nTop, nLeftWidth, sRecent, "", false); nTop += oRecentGames.Height;
 
@@ -731,8 +746,10 @@ CKGSUserInfoWindow.prototype.private_AddMainInfo = function()
 
 	if (this.m_bOwnInfo)
 	{
-		this.m_oInfoEditNameInput  = oName.Input;
-		this.m_oInfoEditEmailInput = oEmail.Input;
+		this.m_oInfoEditNameInput    = oName.Input;
+		this.m_oInfoEditEmailInput   = oEmail.Input;
+		this.m_oInfoCheckboxPrivate  = oPrivateEmail.CheckBox;
+		this.m_oInfoCheckboxKGSEmail = oKGSEmail.CheckBox;
 	}
 };
 CKGSUserInfoWindow.prototype.private_AddInfoField = function(oParent, oParentControl, nTop, nLeftWidth, sField, sText, bAddInput)
@@ -791,6 +808,43 @@ CKGSUserInfoWindow.prototype.private_AddInfoField = function(oParent, oParentCon
 	}
 
 	return {Div : oDiv, Input : oInput, Height : nHeight};
+};
+CKGSUserInfoWindow.prototype.private_AddInfoCheckboxFields = function(oParent, oParentControl, nTop, nLeftWidth, sLabel, isChecked)
+{
+	var nHeight = 17;
+
+	var oWrapper              = document.createElement("div");
+	oWrapper.style.position   = "absolute";
+	oWrapper.style.top        = nTop + "px";
+	oWrapper.style.left       = nLeftWidth + "px";
+	oWrapper.style.border     = "1px solid transparent";
+	oWrapper.style.height     = nHeight + "px";
+	oParent.appendChild(oWrapper);
+
+	var oCheckBox     = document.createElement("input");
+	oCheckBox.style.position = "relative";
+	oCheckBox.style.top      = (nHeight - 12) / 2 + "px";
+	oCheckBox.style.width    = "12px";
+	oCheckBox.style.height   = "12px";
+	oCheckBox.type           = "checkbox";
+	oCheckBox.checked        = isChecked;
+	oCheckBox.disabled       = "disabled";
+	oWrapper.appendChild(oCheckBox);
+
+	var oLabel               = document.createElement("div");
+	oLabel.style.position    = "absolute";
+	oLabel.style.top         = nTop + "px";
+	oLabel.style.left        = (nLeftWidth + 10) + "px";
+	oLabel.style.border      = "1px solid transparent";
+	oLabel.style.paddingLeft = "3px";
+	oLabel.style.fontFamily  = "'Segoe UI', Tahoma, sans-serif";
+	oLabel.style.fontSize    = "13px";
+	oLabel.style.height      = nHeight + "px";
+	oLabel.style.lineHeight  = nHeight + "px";
+	oLabel.textContent       = sLabel;
+	oParent.appendChild(oLabel);
+
+	return {CheckBox : oCheckBox, Height : nHeight};
 };
 CKGSUserInfoWindow.prototype.private_AddEmail = function(sEmail)
 {
@@ -854,7 +908,7 @@ CKGSUserInfoWindow.prototype.private_SetCaption = function(sCaption, bOnline)
 };
 CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
 {
-	var sInfoHeight = 210;
+	var sInfoHeight = this.m_bOwnInfo ? 210 + 2 * 17 : 210;
 	var sDivId = oDiv.id;
 
 	var nEditH = 25;
@@ -1419,6 +1473,12 @@ CKGSUserInfoWindow.prototype.private_OnClickEdit = function()
 	this.m_oInfoEditEmailInput.style.display = "block";
 	this.m_oInfoEditEmailInput.value         = this.m_oRawInfo.Email;
 
+	this.m_oInfoCheckboxPrivate.disabled = "";
+	this.m_oInfoCheckboxPrivate.checked  = this.m_oRawInfo.PrivateEmail;
+
+	this.m_oInfoCheckboxKGSEmail.disabled = "";
+	this.m_oInfoCheckboxKGSEmail.checked  = this.m_oRawInfo.EmailWanted;
+
 	if (this.m_oInfoEditScroll && this.m_oExtensionDiv && 0 === this.m_oTabs.GetCurrentId() && true === this.m_bEditing)
 		this.m_oInfoEditScroll.CheckVisibility();
 
@@ -1451,6 +1511,13 @@ CKGSUserInfoWindow.prototype.private_OnClickSave = function()
 	this.m_oInfoEditEmailInput.style.display = "none";
 	this.m_oRawInfo.Email                    = this.m_oInfoEditEmailInput.value;
 
+	this.m_oInfoCheckboxKGSEmail.disabled = "disabled";
+	this.m_oInfoCheckboxPrivate.disabled  = "disabled";
+
+	this.m_oRawInfo.PrivateEmail = this.m_oInfoCheckboxPrivate.checked;
+	this.m_oRawInfo.EmailWanted  = this.m_oInfoCheckboxKGSEmail.checked;
+
+
 	this.EditUserInfo();
 };
 CKGSUserInfoWindow.prototype.private_OnClickCancel = function()
@@ -1475,6 +1542,13 @@ CKGSUserInfoWindow.prototype.private_OnClickCancel = function()
 
 	this.m_oInfoTable.Email.style.display    = "block";
 	this.m_oInfoEditEmailInput.style.display = "none";
+
+	this.m_oInfoCheckboxPrivate.disabled = "disabled";
+	this.m_oInfoCheckboxPrivate.checked  = this.m_oRawInfo.PrivateEmail;
+
+	this.m_oInfoCheckboxKGSEmail.disabled = "disabled";
+	this.m_oInfoCheckboxKGSEmail.checked  = this.m_oRawInfo.EmailWanted;
+
 };
 
 var EKGSUserInfoGameListRecord = {
