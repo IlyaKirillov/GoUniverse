@@ -533,7 +533,7 @@ CKGSClient.prototype.CreateChallenge = function()
 	var oWindow = CreateKGSWindow(EKGSWindowType.Challenge, {GameRecord : oGameRecord, Client : this, App: this.m_oApp, Create : true, ChannelId : nCallBackKey, RoomId : this.m_nChatChannelId});
 	this.m_oChallenges[nCallBackKey] = oWindow;
 };
-CKGSClient.prototype.SendCreateChallenge = function(nChannelId, nCallBackKey, nGameType, sComment, nRules, nSize, oTimeSettings)
+CKGSClient.prototype.SendCreateChallenge = function(nChannelId, nCallBackKey, nGameType, sComment, nRules, nSize, oTimeSettings, bPrivate)
 {
 	var oRules = {
 		"rules"      : KGSCommon.GameRulesToString(nRules),
@@ -560,6 +560,7 @@ CKGSClient.prototype.SendCreateChallenge = function(nChannelId, nCallBackKey, nG
 		"callbackKey" : nCallBackKey,
 		"text"        : sComment,
 		"global"      : true,
+		"private"     : bPrivate,
 
 		"proposal" : {
 
@@ -577,7 +578,7 @@ CKGSClient.prototype.SendCreateChallenge = function(nChannelId, nCallBackKey, nG
 		}
 	});
 };
-CKGSClient.prototype.SendSubmitChallenge = function(nChannelId, nGameType, oRules, bNigiri, bCreatorBlack, sCreator)
+CKGSClient.prototype.SendSubmitChallenge = function(nChannelId, nGameType, oRules, bNigiri, bCreatorBlack, sCreator, bPrivate)
 {
 	this.private_SendMessage({
 		"channelId" : nChannelId,
@@ -585,6 +586,7 @@ CKGSClient.prototype.SendSubmitChallenge = function(nChannelId, nGameType, oRule
 		"gameType"  : KGSCommon.GameTypeToString(nGameType),
 		"nigiri"    : bNigiri,
 		"rules"     : oRules,
+		"private"   : bPrivate,
 		"players"   : [{
 			"role" : bCreatorBlack ? "black" : "white",
 			"name" : sCreator
@@ -594,7 +596,7 @@ CKGSClient.prototype.SendSubmitChallenge = function(nChannelId, nGameType, oRule
 		}]
 	});
 };
-CKGSClient.prototype.SendChallengeProposal = function(nChannelId, nGameType, oRules, bNigiri, bCreatorBlack, sCreator, sChallenger)
+CKGSClient.prototype.SendChallengeProposal = function(nChannelId, nGameType, oRules, bNigiri, bCreatorBlack, sCreator, sChallenger, bPrivate)
 {
 	this.private_SendMessage({
 		"channelId" : nChannelId,
@@ -602,6 +604,7 @@ CKGSClient.prototype.SendChallengeProposal = function(nChannelId, nGameType, oRu
 		"gameType"  : KGSCommon.GameTypeToString(nGameType),
 		"nigiri"    : bNigiri,
 		"rules"     : oRules,
+		"private"   : bPrivate,
 		"players"   : [{
 			"role" : bCreatorBlack ? "black" : "white",
 			"name" : sCreator
@@ -611,7 +614,7 @@ CKGSClient.prototype.SendChallengeProposal = function(nChannelId, nGameType, oRu
 		}]
 	});
 };
-CKGSClient.prototype.SendAcceptChallenge = function(nChannelId, nGameType, oRules, bNigiri, bCreatorBlack, sCreator, sChallenger)
+CKGSClient.prototype.SendAcceptChallenge = function(nChannelId, nGameType, oRules, bNigiri, bCreatorBlack, sCreator, sChallenger, bPrivate)
 {
 	this.private_SendMessage({
 		"channelId" : nChannelId,
@@ -619,6 +622,7 @@ CKGSClient.prototype.SendAcceptChallenge = function(nChannelId, nGameType, oRule
 		"gameType"  : KGSCommon.GameTypeToString(nGameType),
 		"nigiri"    : bNigiri,
 		"rules"     : oRules,
+		"private"   : bPrivate,
 		"players"   : [{
 			"role" : bCreatorBlack ? "black" : "white",
 			"name" : sCreator

@@ -750,6 +750,9 @@ CKGSUserInfoWindow.prototype.private_AddMainInfo = function()
 		this.m_oInfoEditEmailInput   = oEmail.Input;
 		this.m_oInfoCheckboxPrivate  = oPrivateEmail.CheckBox;
 		this.m_oInfoCheckboxKGSEmail = oKGSEmail.CheckBox;
+
+		this.m_oInfoEditNameInput.maxLength  = "50";
+		this.m_oInfoEditEmailInput.maxLength = "70";
 	}
 };
 CKGSUserInfoWindow.prototype.private_AddInfoField = function(oParent, oParentControl, nTop, nLeftWidth, sField, sText, bAddInput)
@@ -1011,6 +1014,8 @@ CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
 		this.m_oInfoEditScroll = new CVerticalScroll();
 		this.m_oInfoEditScroll.Init(this.m_oExtensionEditDiv, "VerScroll", "VerScrollActive", true);
 		this.m_oInfoEditScroll.SetPaddings(0, 0, -1);
+
+		this.m_oExtensionEditDiv.maxLength = "1500";
 	}
 
 	this.private_AddMainInfo();

@@ -203,6 +203,7 @@ function CKGSChallengeProposal(oGameRecord)
 	this.m_arrPlayers = [];
 	this.m_oWhite     = null;
 	this.m_oBlack     = null;
+	this.m_bPrivate   = true === oGameRecord.private ? true : false;
 
 	this.private_ParseGameType(oGameRecord.gameType);
 	this.private_ParseRules(oGameRecord.rules);
@@ -280,4 +281,8 @@ CKGSChallengeProposal.prototype.GetTimeSettings = function()
 CKGSChallengeProposal.prototype.GetBlack = function()
 {
 	return this.m_oBlack;
+};
+CKGSChallengeProposal.prototype.IsPrivate = function()
+{
+	return this.m_bPrivate;
 };

@@ -623,7 +623,7 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 
 	var oWrapperDiv     = this.protected_CreateDivElement(oMainDiv);
 	var oWrapperControl = CreateControlContainerByElement(oWrapperDiv);
-	oWrapperControl.SetParams(nLeftWidth, 0, 1000, 1000, true, false, false, false, -1, this.m_nHeaderHeight);
+	oWrapperControl.SetParams(0, this.m_nHeaderHeight, 1000, 1000, true, true, false, false, -1, this.m_nHeaderHeight);
 	oWrapperControl.SetAnchor(false, true, true, false);
 	oMainControl.AddControl(oWrapperControl);
 
@@ -680,7 +680,7 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 	oTypeListControl.SetAnchor(true, true, true, true);
 	oWrapperTypeControl.AddControl(oTypeListControl);
 
-	this.m_nTop = this.m_nHeaderHeight;
+	this.m_nTop = this.m_nHeaderHeight * 2;
 
 	this.m_oCommentInput   = oInput;
 	this.m_oGameTypeSelect = oTypeList;
@@ -708,7 +708,7 @@ CKGSChallengeWindow.prototype.private_CreateAnimatedWaiting = function()
 };
 CKGSChallengeWindow.prototype.private_CreatePlayers = function()
 {
-	var nTop = this.m_nHeaderHeight;
+	var nTop = this.m_nHeaderHeight * 2;
 
 	nTop += 10;
 
@@ -1145,8 +1145,9 @@ CKGSChallengeWindow.prototype.private_CreateChallenge = function()
 	var nSize       = this.m_oSizeInput.value;
 	var oTimeSystem = this.m_oGameRecord.GetProposal().GetTimeSettings();
 	var nRoomId     = this.private_GetSelectedRoomId();
+	var bPrivate    = false;
 
-	this.m_oClient.SendCreateChallenge(nRoomId, this.m_nChannelId, nGameType, sComment, nRules, nSize, oTimeSystem);
+	this.m_oClient.SendCreateChallenge(nRoomId, this.m_nChannelId, nGameType, sComment, nRules, nSize, oTimeSystem, bPrivate);
 
 	this.private_SetState(EKGSChallengeWindowState.Waiting);
 	this.m_nGameType = nGameType;
@@ -1159,6 +1160,7 @@ CKGSChallengeWindow.prototype.private_OkChallenge = function()
 	var oTimeSystem = this.m_oGameRecord.GetProposal().GetTimeSettings();
 	var nHandicap   = this.private_GetHandicap();
 	var dKomi       = this.private_GetKomi();
+	var bPrivate    = false;
 
 	var oRules = {
 		"rules"      : KGSCommon.GameRulesToString(nRules),
@@ -1186,17 +1188,17 @@ CKGSChallengeWindow.prototype.private_OkChallenge = function()
 		if (!this.m_oCurrentChallenger)
 			return;
 
-		this.m_oClient.SendChallengeProposal(this.m_nChannelId, nGameType, oRules, this.m_bNigiri, this.m_bCreatorBlack, this.m_oOwner.GetName(), this.m_oCurrentChallenger.GetName());
+		this.m_oClient.SendChallengeProposal(this.m_nChannelId, nGameType, oRules, this.m_bNigiri, this.m_bCreatorBlack, this.m_oOwner.GetName(), this.m_oCurrentChallenger.GetName(), bPrivate);
 		this.private_SetState(EKGSChallengeWindowState.CreatorWaiting);
 	}
 	else if (EKGSChallengeWindowState.ChallengerSubmit === this.m_nState)
 	{
-		this.m_oClient.SendSubmitChallenge(this.m_nChannelId, nGameType, oRules, this.m_bNigiri, this.m_bCreatorBlack, this.m_oOwner.GetName());
+		this.m_oClient.SendSubmitChallenge(this.m_nChannelId, nGameType, oRules, this.m_bNigiri, this.m_bCreatorBlack, this.m_oOwner.GetName(), bPrivate);
 		this.private_SetState(EKGSChallengeWindowState.ChallengerWaiting);
 	}
 	else if (EKGSChallengeWindowState.ChallengerAccept === this.m_nState)
 	{
-		this.m_oClient.SendAcceptChallenge(this.m_nChannelId, nGameType, oRules, this.m_bNigiri, this.m_bCreatorBlack, this.m_oOwner.GetName(), this.m_oCurrentChallenger.GetName());
+		this.m_oClient.SendAcceptChallenge(this.m_nChannelId, nGameType, oRules, this.m_bNigiri, this.m_bCreatorBlack, this.m_oOwner.GetName(), this.m_oCurrentChallenger.GetName(), bPrivate);
 		this.private_SetState(EKGSChallengeWindowState.Waiting);
 	}
 };
