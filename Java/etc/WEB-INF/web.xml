@@ -1,0 +1,42 @@
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+	http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" 
+	metadata-complete="false"
+	version="3.1"
+	>
+
+	<servlet>
+		<servlet-name>default</servlet-name>
+		<servlet-class>
+			org.apache.catalina.servlets.DefaultServlet
+		</servlet-class>
+		<init-param>
+			<param-name>listings</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet>
+		<servlet-name>JsonClient</servlet-name>
+		<servlet-class>com.gokgs.jsonClient.KJsonClientServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>default</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>JsonClient</servlet-name>
+		<url-pattern>/api/access</url-pattern>
+	</servlet-mapping>
+
+	<welcome-file-list>
+		<welcome-file>default</welcome-file>
+		<welcome-file>index.html</welcome-file>
+	</welcome-file-list>
+
+</web-app>
