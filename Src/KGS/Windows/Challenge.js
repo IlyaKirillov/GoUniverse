@@ -427,7 +427,7 @@ CKGSChallengeWindow.prototype.Update_Size = function(bForce)
 };
 CKGSChallengeWindow.prototype.Get_DefaultWindowSize = function()
 {
-	return {W : 360, H : 482};
+	return {W : 360, H : 512};
 };
 CKGSChallengeWindow.prototype.Close = function()
 {
@@ -632,7 +632,9 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 	oInputControl.SetParams(5, 5, 5, 0, true, true, true, true, -1, -1);
 	oInputControl.SetAnchor(true, true, true, true);
 	oWrapperControl.AddControl(oInputControl);
-	oInput.maxLength = "80";
+	oInput.maxLength         = "80";
+	oInput.placeholder       = "No comment";
+	oInput.style.paddingLeft = "3px";
 
 	var sComment = this.m_oGameRecord.GetComment();
 	if (sComment)
@@ -679,6 +681,35 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 	oTypeListControl.SetParams(5, 5, 5, 0, true, true, true, true, -1, -1);
 	oTypeListControl.SetAnchor(true, true, true, true);
 	oWrapperTypeControl.AddControl(oTypeListControl);
+
+	var nPrivateHeight = this.m_nHeaderHeight - 5;
+	var oWrapperPrivateDiv = this.protected_CreateDivElement(oMainDiv);
+	var oWrapperPrivateControl = CreateControlContainerByElement(oWrapperPrivateDiv);
+	oWrapperPrivateControl.SetParams(nLeftWidth, 5, 0, -1, true, true, true, false, -1, nPrivateHeight);
+	oWrapperPrivateControl.SetAnchor(true, true, true, false);
+	oMainControl.AddControl(oWrapperPrivateControl);
+
+	var oPrivateCheckBox            = document.createElement("input");
+	oPrivateCheckBox.style.position = "relative";
+	oPrivateCheckBox.style.top      = (nPrivateHeight - 12) / 2 + "px";
+	oPrivateCheckBox.style.width    = "12px";
+	oPrivateCheckBox.style.height   = "12px";
+	oPrivateCheckBox.type           = "checkbox";
+	oPrivateCheckBox.checked        = false;
+	oPrivateCheckBox.disabled       = "disabled";
+	oWrapperPrivateDiv.appendChild(oPrivateCheckBox);
+
+	var oPrivateLabel              = document.createElement("div");
+	oPrivateLabel.style.position   = "absolute";
+	oPrivateLabel.style.top        = "0px";
+	oPrivateLabel.style.left       = "15px";
+	oPrivateLabel.style.fontFamily = "'Segoe UI', Tahoma, sans-serif";
+	oPrivateLabel.style.fontSize   = "16px";
+	oPrivateLabel.style.height     = nPrivateHeight + "px";
+	oPrivateLabel.style.lineHeight = nPrivateHeight + "px";
+	oPrivateLabel.textContent      = "Private";
+	oWrapperPrivateDiv.appendChild(oPrivateLabel);
+
 
 	this.m_nTop = this.m_nHeaderHeight * 2;
 
