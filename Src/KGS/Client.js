@@ -334,6 +334,10 @@ CKGSClient.prototype.GetAllRooms = function()
 {
 	return this.m_aAllRooms;
 };
+CKGSClient.prototype.GetRoom = function(nRoomId)
+{
+	return this.m_aAllRooms[nRoomId] ? this.m_aAllRooms[nRoomId] : null;
+};
 CKGSClient.prototype.GetRooms = function()
 {
 	var arrRooms = [];
@@ -560,7 +564,6 @@ CKGSClient.prototype.SendCreateChallenge = function(nChannelId, nCallBackKey, nG
 		"callbackKey" : nCallBackKey,
 		"text"        : sComment,
 		"global"      : true,
-		"private"     : bPrivate,
 
 		"proposal" : {
 
@@ -568,6 +571,8 @@ CKGSClient.prototype.SendCreateChallenge = function(nChannelId, nCallBackKey, nG
 			"nigiri"   : true,
 
 			"rules" : oRules,
+
+			"private" : bPrivate,
 
 			"players" : [{
 				"role" : "white",

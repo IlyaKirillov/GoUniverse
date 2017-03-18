@@ -91,6 +91,7 @@ function CKGSChallengeWindow()
 	this.m_oChallengerSelect  = null;
 	this.m_oChallengerSpan    = null;
 	this.m_oChallengerDiv     = null;
+	this.m_oPrivateCheckBox   = null;
 
 	var oThis = this;
 	this.private_OnChangeRoom = function()
@@ -98,7 +99,26 @@ function CKGSChallengeWindow()
 		if (!oThis.m_oRoomSelect)
 			return;
 
-		oThis.private_GetGlobalSettings().SetKGSChallengeRoomId(oThis.private_GetSelectedRoomId());
+		var nRoomId = oThis.private_GetSelectedRoomId();
+
+		var oRoom = oThis.m_oClient.GetRoom(nRoomId);
+		if (oRoom)
+		{
+			if (true === oRoom.Private)
+			{
+				oThis.m_oPrivateCheckBox.checked  = true;
+				oThis.m_oPrivateCheckBox.disabled = "disabled";
+			}
+			else
+			{
+				if (oThis.m_oPrivateCheckBox.disabled !== "" && false !== oThis.m_oPrivateCheckBox.disabled)
+					oThis.m_oPrivateCheckBox.checked  = false;
+
+				oThis.m_oPrivateCheckBox.disabled = "";
+			}
+		}
+
+		oThis.private_GetGlobalSettings().SetKGSChallengeRoomId(nRoomId);
 	};
 	this.private_OnChangeRules = function()
 	{
@@ -311,6 +331,10 @@ function CKGSChallengeWindow()
 	this.private_OnChangeComment = function()
 	{
 		oThis.private_GetGlobalSettings().SetKGSChallengeComment(oThis.m_oCommentInput.value);
+	};
+	this.private_OnChangePrivate = function()
+	{
+
 	};
 }
 CommonExtend(CKGSChallengeWindow, CKGSWindowBase);
@@ -695,7 +719,7 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 	oPrivateCheckBox.style.width    = "12px";
 	oPrivateCheckBox.style.height   = "12px";
 	oPrivateCheckBox.type           = "checkbox";
-	oPrivateCheckBox.checked        = false;
+	oPrivateCheckBox.checked        = this.m_oGameRecord.IsProposalPrivate();
 	oPrivateCheckBox.disabled       = "disabled";
 	oWrapperPrivateDiv.appendChild(oPrivateCheckBox);
 
@@ -710,11 +734,17 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 	oPrivateLabel.textContent      = "Private";
 	oWrapperPrivateDiv.appendChild(oPrivateLabel);
 
+	if (this.m_nState === EKGSChallengeWindowState.Creation)
+		oPrivateCheckBox.disabled = "";
+	else
+		oPrivateCheckBox.disabled = "disabled";
+
 
 	this.m_nTop = this.m_nHeaderHeight * 2;
 
-	this.m_oCommentInput   = oInput;
-	this.m_oGameTypeSelect = oTypeList;
+	this.m_oCommentInput    = oInput;
+	this.m_oGameTypeSelect  = oTypeList;
+	this.m_oPrivateCheckBox = oPrivateCheckBox;
 
 	var oProposal = this.m_oGameRecord.GetProposal();
 	if (oProposal)
@@ -723,6 +753,7 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 		this.private_SetSelectedGameType(nType);
 	}
 
+	oPrivateCheckBox.onclick = this.private_OnChangePrivate;
 	this.private_AddEventsForSelect(this.private_OnChangeGameType, oTypeList);
 	this.private_AddEventsForInput(this.private_OnChangeComment, oInput);
 };
@@ -1176,7 +1207,7 @@ CKGSChallengeWindow.prototype.private_CreateChallenge = function()
 	var nSize       = this.m_oSizeInput.value;
 	var oTimeSystem = this.m_oGameRecord.GetProposal().GetTimeSettings();
 	var nRoomId     = this.private_GetSelectedRoomId();
-	var bPrivate    = false;
+	var bPrivate    = this.private_IsPrivate();
 
 	this.m_oClient.SendCreateChallenge(nRoomId, this.m_nChannelId, nGameType, sComment, nRules, nSize, oTimeSystem, bPrivate);
 
@@ -1191,7 +1222,7 @@ CKGSChallengeWindow.prototype.private_OkChallenge = function()
 	var oTimeSystem = this.m_oGameRecord.GetProposal().GetTimeSettings();
 	var nHandicap   = this.private_GetHandicap();
 	var dKomi       = this.private_GetKomi();
-	var bPrivate    = false;
+	var bPrivate    = this.private_IsPrivate();
 
 	var oRules = {
 		"rules"      : KGSCommon.GameRulesToString(nRules),
@@ -1656,6 +1687,10 @@ CKGSChallengeWindow.prototype.private_GetKomi = function()
 {
 	return parseFloat(this.m_oKomiInput.value);
 };
+CKGSChallengeWindow.prototype.private_IsPrivate = function()
+{
+	return this.m_oPrivateCheckBox.checked === true ? true : false;
+};
 CKGSChallengeWindow.prototype.private_UpdateButtons = function()
 {
 	if (EKGSChallengeWindowState.Unknown === this.m_nState || EKGSChallengeWindowState.Waiting === this.m_nState || EKGSChallengeWindowState.ChallengerWaiting === this.m_nState)
@@ -1902,6 +1937,7 @@ CKGSChallengeWindow.prototype.private_FillDefaultCreatorValues = function()
 	this.m_oByoYomiTimeInput.value  = nOverTime;
 	this.m_oByoYomiCountInput.value = nOverCount;
 
+	this.private_OnChangeRoom();
 	this.private_OnChangeGameType();
 	this.private_OnChangeComment();
 	this.private_OnChangeRules();

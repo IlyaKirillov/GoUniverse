@@ -190,6 +190,10 @@ CKGSGameListRecord.prototype.IsRobotChallenge = function()
 
 	return true;
 };
+CKGSGameListRecord.prototype.IsProposalPrivate = function()
+{
+	return this.m_oProposal.IsPrivate();
+};
 
 function CKGSChallengeProposal(oGameRecord)
 {
