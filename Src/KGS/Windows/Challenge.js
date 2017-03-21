@@ -1954,6 +1954,10 @@ CKGSChallengeWindow.prototype.private_FillDefaultCreatorValues = function()
 	var nOverTime   = oGlobalSettings.GetKGSChallengeOverTime();
 	var nOverCount  = oGlobalSettings.GetKGSChallengeOverCount();
 
+	var nChatChannelId = this.m_oClient.GetCurrentChatId();
+	if (true !== this.m_oClient.IsPrivateChat(nChatChannelId))
+		nRoomId = nChatChannelId;
+
 	this.private_SetSelectedGameType(nGameType);
 	this.m_oCommentInput.value = sComment;
 	this.private_SetSelectedRoomId(nRoomId);

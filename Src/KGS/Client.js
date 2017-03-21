@@ -503,9 +503,12 @@ CKGSClient.prototype.CreateChallenge = function()
 	}
 
 	var nChannelId = this.m_nChatChannelId;
-
 	if (this.m_oPrivateChats[nChannelId] || !this.m_aAllRooms[nChannelId])
-		return;
+	{
+		nChannelId = this.m_oApp.GetGlobalSettings().GetKGSChallengeRoomId();
+		if (this.m_oPrivateChats[nChannelId] || !this.m_aAllRooms[nChannelId])
+			return;
+	}
 
 	var oGameRecord = new CKGSGameListRecord(this);
 	oGameRecord.Update({
