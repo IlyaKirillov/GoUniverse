@@ -96,7 +96,7 @@ CGoUniverseAboutWindow.prototype.private_InitAboutPage = function(oDiv)
 	oString                  = document.createElement("div");
 	oString.style.paddingTop = "30px";
 	oDivMainPart.appendChild(oString);
-	Common.Set_InnerTextToElement(oString, "© Ilya Kirillov, 2016. All rights reserved.");
+	Common.Set_InnerTextToElement(oString, "© Ilya Kirillov, 2016-2017. All rights reserved.");
 
 	var oDiv = document.createElement("div");
 	oDiv.innerHTML = '<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">\

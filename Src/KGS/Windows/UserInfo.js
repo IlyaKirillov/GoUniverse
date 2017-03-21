@@ -433,7 +433,9 @@ CKGSUserInfoWindow.prototype.EditUserInfo = function()
 		"personalEmail" : this.m_oRawInfo.Email,
 		"privateEmail"  : this.m_oRawInfo.PrivateEmail,
 		"emailWanted"   : this.m_oRawInfo.EmailWanted,
-		"authLevel"     : this.m_oRawInfo.AuthLevel
+		"authLevel"     : this.m_oRawInfo.AuthLevel,
+		"rankWanted"    : true,
+		"forcedNoRank"  : false
 	});
 };
 CKGSUserInfoWindow.prototype.private_UpdateGameArchiveStats = function()

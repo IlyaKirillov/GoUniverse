@@ -326,7 +326,14 @@ function CKGSChallengeWindow()
 	};
 	this.private_OnChangeGameType = function()
 	{
-		oThis.private_GetGlobalSettings().SetKGSChallengeGameType(oThis.private_GetSelectedGameType());
+		var nGameType = oThis.private_GetSelectedGameType();
+		oThis.private_GetGlobalSettings().SetKGSChallengeGameType(nGameType);
+
+		if (EKGSGameType.Ranked === nGameType)
+		{
+			oThis.m_oPrivateCheckBox.disabled = "";
+			oThis.m_oPrivateCheckBox.checked  = false;
+		}
 	};
 	this.private_OnChangeComment = function()
 	{
@@ -334,7 +341,11 @@ function CKGSChallengeWindow()
 	};
 	this.private_OnChangePrivate = function()
 	{
-
+		if (oThis.m_nType === EKGSChallengeWindowType.Regular && true === oThis.m_oPrivateCheckBox.checked && EKGSGameType.Ranked === oThis.private_GetSelectedGameType())
+		{
+			oThis.private_SetSelectedGameType(EKGSGameType.Free);
+			oThis.private_OnChangeGameType();
+		}
 	};
 }
 CommonExtend(CKGSChallengeWindow, CKGSWindowBase);
