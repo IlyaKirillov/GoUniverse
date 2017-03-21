@@ -1822,6 +1822,7 @@ CKGSChallengeWindow.prototype.private_UpdateOnStateChange = function()
 		this.m_oChallengerSelect.className = "challengeSelect challengeSelectDisabled";
 		this.m_oChallengerSelect.disabled  = "disabled";
 		this.m_oChallengerDiv.className    = "challengePlayer";
+		this.m_oPrivateCheckBox.disabled   = "disabled";
 	}
 	else if (EKGSChallengeWindowState.Creation === this.m_nState)
 	{
@@ -1851,8 +1852,8 @@ CKGSChallengeWindow.prototype.private_UpdateOnStateChange = function()
 		this.m_oGameTypeSelect.disabled    = "disabled";
 		this.m_oCommentInput.className     = "challengeInput";
 		this.m_oCommentInput.disabled      = "disabled";
-		this.m_oRoomSelect.className      = "challengeSelect challengeSelectDisabled";
-		this.m_oRoomSelect.disabled       = "disabled";
+		this.m_oRoomSelect.className       = "challengeSelect challengeSelectDisabled";
+		this.m_oRoomSelect.disabled        = "disabled";
 		this.m_oRulesSelect.className      = "challengeSelect challengeSelectDisabled";
 		this.m_oRulesSelect.disabled       = "disabled";
 		this.m_oSizeInput.className        = "challengeInput";
@@ -1866,6 +1867,7 @@ CKGSChallengeWindow.prototype.private_UpdateOnStateChange = function()
 		this.m_oChallengerSelect.className = "challengeSelect challengeSelectEditable";
 		this.m_oChallengerSelect.disabled  = "";
 		this.m_oChallengerDiv.className    = "challengePlayer challengePlayerSelect";
+		this.m_oPrivateCheckBox.disabled   = "disabled";
 	}
 	else if (EKGSChallengeWindowState.ChallengerSubmit === this.m_nState)
 	{
@@ -1888,6 +1890,7 @@ CKGSChallengeWindow.prototype.private_UpdateOnStateChange = function()
 		this.m_oChallengerSelect.className = "challengeSelect challengeSelectDisabled";
 		this.m_oChallengerSelect.disabled  = "disabled";
 		this.m_oChallengerDiv.className    = "challengePlayer";
+		this.m_oPrivateCheckBox.disabled   = "disabled";
 
 
 		this.m_oCurrentChallenger        = this.m_oClient.GetCurrentUser();
