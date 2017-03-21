@@ -108,6 +108,9 @@ function CKGSChallengeWindow()
 			{
 				oThis.m_oPrivateCheckBox.checked  = true;
 				oThis.m_oPrivateCheckBox.disabled = "disabled";
+
+				if (EKGSGameType.Ranked === oThis.private_GetSelectedGameType())
+					oThis.private_SetSelectedGameType(EKGSGameType.Free);
 			}
 			else
 			{
@@ -327,12 +330,22 @@ function CKGSChallengeWindow()
 	this.private_OnChangeGameType = function()
 	{
 		var nGameType = oThis.private_GetSelectedGameType();
-		oThis.private_GetGlobalSettings().SetKGSChallengeGameType(nGameType);
+		var nRoomId   = oThis.private_GetSelectedRoomId();
+		var oRoom     = oThis.m_oClient.GetRoom(nRoomId);
 
-		if (EKGSGameType.Ranked === nGameType)
+		if (oRoom && true === oRoom.Private && EKGSGameType.Ranked === nGameType)
 		{
-			oThis.m_oPrivateCheckBox.disabled = "";
-			oThis.m_oPrivateCheckBox.checked  = false;
+			oThis.private_SetSelectedGameType(EKGSGameType.Free);
+		}
+		else
+		{
+			oThis.private_GetGlobalSettings().SetKGSChallengeGameType(nGameType);
+
+			if (EKGSGameType.Ranked === nGameType)
+			{
+				oThis.m_oPrivateCheckBox.disabled = "";
+				oThis.m_oPrivateCheckBox.checked  = false;
+			}
 		}
 	};
 	this.private_OnChangeComment = function()
