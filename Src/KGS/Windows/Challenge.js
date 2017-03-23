@@ -1631,10 +1631,10 @@ CKGSChallengeWindow.prototype.private_UpdateTimeSystemFields = function()
 		this.m_oByoYomiCountInput.disabled = "disabled";
 	}
 };
-CKGSChallengeWindow.prototype.private_GetDefaultHandicap = function()
+CKGSChallengeWindow.prototype.private_GetDefaultHandicap = function(bNigiri)
 {
 	var bDefaultNigiri = this.private_GetDefaultNigiri();
-	if (true === bDefaultNigiri)
+	if (true === bDefaultNigiri || true === bNigiri)
 		return 0;
 
 	var oCreator    = this.m_oOwner;
@@ -1649,12 +1649,12 @@ CKGSChallengeWindow.prototype.private_GetDefaultHandicap = function()
 
 	return nHandicap;
 };
-CKGSChallengeWindow.prototype.private_GetDefaultKomi = function()
+CKGSChallengeWindow.prototype.private_GetDefaultKomi = function(bNigiri)
 {
 	var nRules = this.private_GetSelectedRules();
 
 	var bDefaultNigiri = this.private_GetDefaultNigiri();
-	if (true === bDefaultNigiri)
+	if (true === bDefaultNigiri || true === bNigiri)
 	{
 		if (EKGSGameRules.Japanese === nRules)
 			return 6.5;
@@ -1923,8 +1923,8 @@ CKGSChallengeWindow.prototype.private_UpdateKomiAndHandicapFields = function()
 	}
 	else
 	{
-		this.m_oKomiInput.value         = this.private_GetDefaultKomi();
-		this.m_oHandicapInput.value     = this.private_GetDefaultHandicap();
+		this.m_oKomiInput.value         = this.private_GetDefaultKomi(this.m_bNigiri);
+		this.m_oHandicapInput.value     = this.private_GetDefaultHandicap(this.m_bNigiri);
 		this.m_oKomiInput.className     = "challengeInput";
 		this.m_oKomiInput.disabled      = "disabled";
 		this.m_oHandicapInput.className = "challengeInput";
