@@ -34,11 +34,15 @@ function CGoUniverseGlobalSettings(oApp)
 	this.m_nKGSChallengeOverTime   = 30;
 	this.m_nKGSChallengeOverCount  = 5;
 
+	this.m_bKGSUserInfoRecentOnlyRanked = true;
+
 	this.private_ParseChatSplitterPosition();
 
 	this.private_ParseKGSSavePassword();
 	this.private_ParseKGSLogin();
 	this.private_ParseKGSPassword();
+
+	this.private_ParseKGSUserInfoRecentOnlyRanked();
 }
 CGoUniverseGlobalSettings.prototype.ParseUserSettings = function()
 {
@@ -359,4 +363,23 @@ CGoUniverseGlobalSettings.prototype.private_ParseKGSPassword = function()
 		this.m_sKGSPassword = this.private_GetValue("KGSPassword");
 	else
 		this.m_sKGSPassword = "";
+};
+CGoUniverseGlobalSettings.prototype.SetKGSUserInfoRecentOnlyRanked = function(bOnlyRanked)
+{
+	this.m_bKGSUserInfoRecentOnlyRanked = bOnlyRanked;
+	this.private_SetValue("KGSUserInfoRecentOnlyRanked", bOnlyRanked ? "1" : "0");
+};
+CGoUniverseGlobalSettings.prototype.GetKGSUserInfoRecentOnlyRanked = function()
+{
+	return this.m_bKGSUserInfoRecentOnlyRanked;
+};
+CGoUniverseGlobalSettings.prototype.private_ParseKGSUserInfoRecentOnlyRanked = function()
+{
+	var nValue = this.private_GetValue("KGSUserInfoRecentOnlyRanked");
+	if (null === nValue
+		|| undefined === nValue
+		|| "0" === nValue)
+		this.m_bKGSUserInfoRecentOnlyRanked = false;
+	else
+		this.m_bKGSUserInfoRecentOnlyRanked = true;
 };

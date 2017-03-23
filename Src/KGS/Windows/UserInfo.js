@@ -63,6 +63,12 @@ function CKGSUserInfoWindow()
 	this.m_oInfoEditScroll     = null;
 	this.m_oInfoEditNameInput  = null;
 	this.m_oInfoEditEmailInput = null;
+
+	this.m_arrAllRecentGames          = [];
+	this.m_arrRankedRecentGames       = [];
+	this.m_bShowOnlyRankedRecentGames = true;
+	this.m_sAllGamesStats             = "";
+	this.m_sRankedGamesStats          = "";
 }
 CommonExtend(CKGSUserInfoWindow, CKGSWindowBase);
 
@@ -111,6 +117,8 @@ CKGSUserInfoWindow.prototype.Init = function(sDivId, oPr)
 		{
 			this.m_bOwnInfo = false;
 		}
+
+		this.m_bShowOnlyRankedRecentGames = this.m_oClient.m_oApp.GetGlobalSettings().GetKGSUserInfoRecentOnlyRanked();
 	}
 
 	this.Set_Caption(this.m_sUserName);
@@ -441,11 +449,31 @@ CKGSUserInfoWindow.prototype.EditUserInfo = function()
 CKGSUserInfoWindow.prototype.private_UpdateGameArchiveStats = function()
 {
 	var nWins = 0, nLoses = 0, nUnfinished = 0;
+	var nWinsR = 0, nLosesR = 0, nUnfinishedR = 0;
 
-	var nRecentGamesCount = 20;
-	var sRecentGames = "";
+	var nAllRecentGamesCount    = 20;
+	var nRankedRecentGamesCount = 20;
 
 	var sUserName = this.m_sUserName.toLocaleLowerCase();
+
+	var arrAllRecent    = [];
+	var arrRankedRecent = [];
+
+	var oThis = this;
+	function privateCreateRecentLink(sUrl, sLabel, sText)
+	{
+		var oSpan = document.createElement("span");
+		oSpan.className = "recentGamesSpan";
+		oSpan.title     = sLabel;
+		Common.Set_InnerTextToElement(oSpan, sText);
+		oSpan.onclick = function()
+		{
+			privateLoadSgfByUrl(sUrl, privateViewGame, oThis.m_oClient, oThis.m_oClient ? oThis.m_oClient.m_oApp : null);
+		};
+		return oSpan;
+	}
+
+	var sWin = "O", sLose = "\u2715";
 
 	for (var nIndex = 0, nCount = this.m_arrGameArchive.length; nIndex < nCount; ++nIndex)
 	{
@@ -454,39 +482,67 @@ CKGSUserInfoWindow.prototype.private_UpdateGameArchiveStats = function()
 		var nType = oArchiveRecord.GetType();
 		if (EKGSGameType.Ranked === nType || EKGSGameType.Free === nType)
 		{
-			var sBlack = oArchiveRecord.GetBlackName().toLowerCase();
-			var sWhite = oArchiveRecord.GetWhiteName().toLowerCase();
+			var sBlack    = oArchiveRecord.GetBlackName().toLowerCase();
+			var sWhite    = oArchiveRecord.GetWhiteName().toLowerCase();
 			var bBlackWon = oArchiveRecord.IsBlackWon();
+			var sGameUrl  = oArchiveRecord.GetUrl();
+			var sLabel    = oArchiveRecord.GetLabel();
 
 			if (null === bBlackWon)
 			{
 				nUnfinished++;
+
+				if (EKGSGameType.Ranked === nType)
+					nUnfinishedR++;
 			}
 			else if ((true === bBlackWon && sBlack === sUserName)
 				|| (true !== bBlackWon && sWhite === sUserName))
 			{
 				nWins++;
 
-				if (nRecentGamesCount > 0)
+				if (nAllRecentGamesCount > 0)
 				{
-					sRecentGames += "W";
-					nRecentGamesCount--;
+					arrAllRecent.push(privateCreateRecentLink(sGameUrl, sLabel, sWin));
+					nAllRecentGamesCount--;
 				}
+
+				if (nRankedRecentGamesCount > 0 && EKGSGameType.Ranked === nType)
+				{
+					arrRankedRecent.push(privateCreateRecentLink(sGameUrl, sLabel, sWin));
+					nRankedRecentGamesCount--;
+				}
+
+				if (EKGSGameType.Ranked === nType)
+					nWinsR++;
 			}
 			else
 			{
 				nLoses++;
-				if (nRecentGamesCount > 0)
+				if (nAllRecentGamesCount > 0)
 				{
-					sRecentGames += "L";
-					nRecentGamesCount--;
+					arrAllRecent.push(privateCreateRecentLink(sGameUrl, sLabel, sLose));
+					nAllRecentGamesCount--;
 				}
+
+
+				if (nRankedRecentGamesCount > 0 && EKGSGameType.Ranked === nType)
+				{
+					arrRankedRecent.push(privateCreateRecentLink(sGameUrl, sLabel, sLose));
+					nRankedRecentGamesCount--;
+				}
+
+				if (EKGSGameType.Ranked === nType)
+					nLosesR++;
 			}
 		}
 	}
 
-	Common.Set_InnerTextToElement(this.m_oInfoTable.Games, "" + nWins + "-" + nLoses + "-" + nUnfinished);
-	Common.Set_InnerTextToElement(this.m_oInfoTable.RecentGames, sRecentGames);
+	this.m_arrAllRecentGames    = arrAllRecent;
+	this.m_arrRankedRecentGames = arrRankedRecent;
+
+	this.m_sAllGamesStats = "" + nWins + "-" + nLoses + "-" + nUnfinished;
+	this.m_sRankedGamesStats = "" + nWinsR + "-" + nLosesR + "-" + nUnfinishedR;
+	this.private_FillGamesStats();
 };
 CKGSUserInfoWindow.prototype.private_UpdateGameArchiveListView = function()
 {
@@ -676,6 +732,20 @@ CKGSUserInfoWindow.prototype.private_DrawNoRank = function()
 	var nTextWidth = g_oTextMeasurer.Measure(sText);
 	oContext.fillText(sText, (nW - nTextWidth) / 2, (nH - 20) / 2);
 };
+CKGSUserInfoWindow.prototype.private_FillGamesStats = function()
+{
+	var arrRecent = this.m_bShowOnlyRankedRecentGames ? this.m_arrRankedRecentGames : this.m_arrAllRecentGames;
+	var sStats    = this.m_bShowOnlyRankedRecentGames ? this.m_sRankedGamesStats : this.m_sAllGamesStats;
+
+	var oDiv = this.m_oInfoTable.RecentGames;
+	Common.ClearNode(oDiv);
+	for (var nIndex = 0, nCount = arrRecent.length; nIndex < nCount; ++nIndex)
+	{
+		oDiv.appendChild(arrRecent[nIndex]);
+	}
+
+	Common.Set_InnerTextToElement(this.m_oInfoTable.Games, sStats);
+};
 CKGSUserInfoWindow.prototype.Show = function(oPr)
 {
 	CKGSUserInfoWindow.superclass.Show.call(this, oPr);
@@ -708,6 +778,7 @@ CKGSUserInfoWindow.prototype.private_AddMainInfo = function()
 
 	var sPrivateEmail         = "Hide address from other users?";
 	var sReceiveAnnouncements = "Receive KGS announcements?";
+	var sOnlyRanked           = "Only ranked gamese";
 
 	g_oTextMeasurer.SetFont("italic bold 16px 'Segoe UI', Tahoma, sans-serif");
 	for (var nIndex = 0, nCount = arrLabels.length; nIndex < nCount; ++nIndex)
@@ -735,6 +806,7 @@ CKGSUserInfoWindow.prototype.private_AddMainInfo = function()
 	}
 	var oGames        = this.private_AddInfoField(oDiv, oControl, nTop, nLeftWidth, sGames, "", false); nTop += oGames.Height;
 	var oRecentGames  = this.private_AddInfoField(oDiv, oControl, nTop, nLeftWidth, sRecent, "", false); nTop += oRecentGames.Height;
+	var oOnlyRanked   = this.private_AddInfoCheckboxFields(oDiv, oControl, nTop, nLeftWidth, sOnlyRanked, false); nTop += oOnlyRanked.Height;
 
 	this.m_oInfoTable.UserName     = oUserName.Div;
 	this.m_oInfoTable.Name         = oName.Div;
@@ -745,6 +817,26 @@ CKGSUserInfoWindow.prototype.private_AddMainInfo = function()
 	this.m_oInfoTable.Email        = oEmail.Div;
 	this.m_oInfoTable.Games        = oGames.Div;
 	this.m_oInfoTable.RecentGames  = oRecentGames.Div;
+
+	var oThis = this;
+	function privateChangeOnlyRanked()
+	{
+		var isChecked = oOnlyRanked.CheckBox.checked;
+		oThis.m_bShowOnlyRankedRecentGames = isChecked ? true : false;
+		oThis.private_FillGamesStats();
+
+		if (oThis.m_oClient)
+			oThis.m_oClient.m_oApp.GetGlobalSettings().SetKGSUserInfoRecentOnlyRanked(oThis.m_bShowOnlyRankedRecentGames);
+	}
+
+	oOnlyRanked.CheckBox.checked  = this.m_bShowOnlyRankedRecentGames;
+	oOnlyRanked.CheckBox.disabled = "";
+	oOnlyRanked.CheckBox.onclick  = privateChangeOnlyRanked;
+	oOnlyRanked.Label.onclick     = function()
+	{
+		oOnlyRanked.CheckBox.checked = !oOnlyRanked.CheckBox.checked;
+		privateChangeOnlyRanked();
+	};
 
 	if (this.m_bOwnInfo)
 	{
@@ -849,7 +941,7 @@ CKGSUserInfoWindow.prototype.private_AddInfoCheckboxFields = function(oParent, o
 	oLabel.textContent       = sLabel;
 	oParent.appendChild(oLabel);
 
-	return {CheckBox : oCheckBox, Height : nHeight};
+	return {CheckBox : oCheckBox, Height : nHeight, Label : oLabel};
 };
 CKGSUserInfoWindow.prototype.private_AddEmail = function(sEmail)
 {
@@ -913,7 +1005,7 @@ CKGSUserInfoWindow.prototype.private_SetCaption = function(sCaption, bOnline)
 };
 CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
 {
-	var sInfoHeight = this.m_bOwnInfo ? 210 + 2 * 17 : 210;
+	var sInfoHeight = this.m_bOwnInfo ? 227 + 2 * 17 : 227;
 	var sDivId = oDiv.id;
 
 	var nEditH = 25;
@@ -1792,26 +1884,6 @@ CKGSUserInfoGamesList.prototype.Handle_RightClick = function(oRecord, e)
 		return false;
 	}
 
-	function privateLoadSgfByUrl(sUrl, fCallBack)
-	{
-		sUrl        = decodeURIComponent(sUrl);
-		var rawFile = new XMLHttpRequest();
-		rawFile["open"]("GET", sUrl + '?_=' + new Date().getTime(), false);
-
-		rawFile["onreadystatechange"] = function ()
-		{
-			if (rawFile["readyState"] === 4)
-			{
-				if (rawFile["status"] === 200 || rawFile["status"] == 0)
-				{
-					fCallBack(sUrl, rawFile.responseText);
-				}
-			}
-		};
-		rawFile["send"](null);
-	}
-
-
 	if (true === oRecord.IsInPlay())
 	{
 		oContextMenu.AddListItem("Observe", function()
@@ -1823,13 +1895,7 @@ CKGSUserInfoGamesList.prototype.Handle_RightClick = function(oRecord, e)
 	{
 		oContextMenu.AddListItem("View", function(e)
 		{
-			function privateViewGame(sUrl, sSgf)
-			{
-				var oWindow = CreateKGSWindow(EKGSWindowType.SgfViewer, {Client : oClient, App : oThis.m_oApp, Url : sUrl, Sgf : sSgf});
-				oWindow.Focus();
-			}
-
-			privateLoadSgfByUrl(sUrl, privateViewGame);
+			privateLoadSgfByUrl(sUrl, privateViewGame, oClient, oThis.m_oApp);
 		}, isPrivate || isDemo, false);
 		oContextMenu.AddListItem("Download to disk", function(e)
 		{
@@ -2546,3 +2612,35 @@ CKGSUserInfoGameArchiveRecord.prototype.GetUrl = function()
 {
 	return this.m_sUrl;
 };
+CKGSUserInfoGameArchiveRecord.prototype.GetLabel = function()
+{
+	if (this.m_oWhite && this.m_oBlack)
+		return this.m_oWhite.GetName() + "[" + this.m_oWhite.GetStringRank() + "]" + " vs. " + this.m_oBlack.GetName() + "[" + this.m_oBlack.GetStringRank() + "]";
+
+	return "";
+};
+
+function privateLoadSgfByUrl(sUrl, fCallBack, oClient, oApp)
+{
+	sUrl        = decodeURIComponent(sUrl);
+	var rawFile = new XMLHttpRequest();
+	rawFile["open"]("GET", sUrl + '?_=' + new Date().getTime(), false);
+
+	rawFile["onreadystatechange"] = function ()
+	{
+		if (rawFile["readyState"] === 4)
+		{
+			if (rawFile["status"] === 200 || rawFile["status"] == 0)
+			{
+				fCallBack(sUrl, rawFile.responseText, oClient, oApp);
+			}
+		}
+	};
+	rawFile["send"](null);
+}
+
+function privateViewGame(sUrl, sSgf, oClient, oApp)
+{
+	var oWindow = CreateKGSWindow(EKGSWindowType.SgfViewer, {Client : oClient, App : oApp, Url : sUrl, Sgf : sSgf});
+	oWindow.Focus();
+}

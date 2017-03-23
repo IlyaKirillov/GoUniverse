@@ -704,3 +704,14 @@ input.userInfoInputEditable {
 	border       : 1px solid #969696;
 	background   : rgb(255, 255, 255);
 }
+
+span.recentGamesSpan {
+	float      : left;
+	text-align : center;
+}
+
+span.recentGamesSpan:hover {
+	color           : rgb(0, 130, 114);
+	text-decoration : underline;
+	cursor          : pointer;
+}
