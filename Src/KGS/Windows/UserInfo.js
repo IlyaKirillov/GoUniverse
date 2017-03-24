@@ -778,7 +778,7 @@ CKGSUserInfoWindow.prototype.private_AddMainInfo = function()
 
 	var sPrivateEmail         = "Hide address from other users?";
 	var sReceiveAnnouncements = "Receive KGS announcements?";
-	var sOnlyRanked           = "Only ranked gamese";
+	var sOnlyRanked           = "Only ranked games";
 
 	g_oTextMeasurer.SetFont("italic bold 16px 'Segoe UI', Tahoma, sans-serif");
 	for (var nIndex = 0, nCount = arrLabels.length; nIndex < nCount; ++nIndex)
