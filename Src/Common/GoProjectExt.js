@@ -656,8 +656,6 @@ CGoUniverseDrawingComments.prototype.private_AddUserTextMessage = function(sText
 	var sMessageText = sText.substr(nPos + 1);
 
 
-
-
 	var oTextSpan;
 
 	var bMessageForMe = false;
@@ -687,6 +685,8 @@ CGoUniverseDrawingComments.prototype.private_AddUserTextMessage = function(sText
 	oTextDiv.appendChild(document.createElement("br"));
 
 	oDiv.appendChild(oTextDiv);
+
+	ProcessUserGameLinks(oDiv);
 
 	if (sUserName === sCurUserName)
 		this.private_CheckScrollTop(true);

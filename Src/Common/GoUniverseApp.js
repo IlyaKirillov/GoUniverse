@@ -439,7 +439,7 @@ CGoUniverseApplication.prototype.AddConsoleMessage = function(sField, sText)
 		oTextDiv.appendChild(oTextSpan);
 		oTextDiv.appendChild(document.createElement("br"));
 	}
-
+	ProcessUserGameLinks(oTextDiv, this.m_oClient);
 	oDiv.appendChild(oTextDiv);
 	oDiv.scrollTop = oDiv.scrollHeight;
 
@@ -527,6 +527,7 @@ CGoUniverseApplication.prototype.OnAddChatMessage = function(nChatRoomId, sUserN
 		oTextDiv.appendChild(document.createElement("br"));
 	}
 
+	ProcessUserGameLinks(oTextDiv, this.m_oClient);
 	oDiv.appendChild(oTextDiv);
 
 	var oTab = this.m_oChatRoomTabs.GetTab(nChatRoomId);

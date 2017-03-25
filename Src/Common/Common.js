@@ -41,6 +41,8 @@ function EncodeSurrogateChar(nUnicode)
 }
 
 var urlRegEx = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-]*)?\??(?:[\-\+=&;%@\.\w]*)#?(?:[\.\-\!\/\\\w]*))?)/g;
+var userRegEx = /(\\user=)([A-Za-z0-9]{1,20})(;)/g;
+
 function SplitTextToLines(sText)
 {
 	var aLines = [];
@@ -108,10 +110,27 @@ function SplitTextToLines(sText)
 		aLines[nIndex] = aLines[nIndex].replace("\'", "&apos;");
 
 		aLines[nIndex] = aLines[nIndex].replace(urlRegEx, "<a href='$1' target='_blank'>$1</a>");
+
+		aLines[nIndex] = aLines[nIndex].replace(userRegEx, "<span class='UserLink'>$2</span>");
 	}
 
 	return aLines;
 }
+
+function ProcessUserGameLinks(oDiv, oClient)
+{
+	var arrUsers = oDiv.getElementsByClassName("UserLink");
+	for (var nIndex = 0, nCount = arrUsers.length; nIndex < nCount; ++nIndex)
+	{
+		var oUserLinkSpan = arrUsers[nIndex];
+		var sUserName     = oUserLinkSpan.innerText;
+		oUserLinkSpan.onclick = function()
+		{
+			oClient.LoadUserInfo(sUserName);
+		}
+	}
+}
+
 
 function CFadeEffect()
 {

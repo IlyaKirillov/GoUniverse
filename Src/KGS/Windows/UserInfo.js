@@ -990,6 +990,8 @@ CKGSUserInfoWindow.prototype.private_AddInfo = function(sText)
 	oTextDiv.appendChild(oInfoDiv);
 	oDiv.appendChild(oTextDiv);
 
+	ProcessUserGameLinks(oTextDiv, this.m_oClient);
+
 	this.m_oInfoScroll = new CVerticalScroll();
 	this.m_oInfoScroll.Init(oTextDiv, "VerScroll", "VerScrollActive", true);
 	this.m_oInfoScroll.SetPaddings(-1, 1, 1);
