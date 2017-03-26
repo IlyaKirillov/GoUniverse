@@ -686,7 +686,8 @@ CGoUniverseDrawingComments.prototype.private_AddUserTextMessage = function(sText
 
 	oDiv.appendChild(oTextDiv);
 
-	ProcessUserGameLinks(oDiv);
+	ProcessUserLinks(oDiv, this.m_oClient);
+	ProcessGameLinks(oDiv, this.m_oClient);
 
 	if (sUserName === sCurUserName)
 		this.private_CheckScrollTop(true);

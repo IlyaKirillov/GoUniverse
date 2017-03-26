@@ -116,7 +116,7 @@ CKGSRoomInfoWindow.prototype.private_CreateInfoArea = function(oParentDiv)
 			oTextDiv.appendChild(document.createElement("br"));
 		}
 
-		ProcessUserGameLinks(oTextDiv, this.m_oClient);
+		ProcessUserLinks(oTextDiv, this.m_oClient);
 		oDiv.appendChild(oTextDiv);
 
 		this.m_oInfoScroll = new CVerticalScroll();

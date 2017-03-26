@@ -439,7 +439,8 @@ CGoUniverseApplication.prototype.AddConsoleMessage = function(sField, sText)
 		oTextDiv.appendChild(oTextSpan);
 		oTextDiv.appendChild(document.createElement("br"));
 	}
-	ProcessUserGameLinks(oTextDiv, this.m_oClient);
+	ProcessUserLinks(oTextDiv, this.m_oClient);
+	ProcessGameLinks(oTextDiv, this.m_oClient);
 	oDiv.appendChild(oTextDiv);
 	oDiv.scrollTop = oDiv.scrollHeight;
 
@@ -527,7 +528,8 @@ CGoUniverseApplication.prototype.OnAddChatMessage = function(nChatRoomId, sUserN
 		oTextDiv.appendChild(document.createElement("br"));
 	}
 
-	ProcessUserGameLinks(oTextDiv, this.m_oClient);
+	ProcessUserLinks(oTextDiv, this.m_oClient);
+	ProcessGameLinks(oTextDiv, this.m_oClient);
 	oDiv.appendChild(oTextDiv);
 
 	var oTab = this.m_oChatRoomTabs.GetTab(nChatRoomId);
@@ -1453,9 +1455,10 @@ CGoUniverseApplication.prototype.ShowGamesListContextMenu = function(nX, nY, nGa
 	var oClient = this.m_oClient;
 	var oContextMenu = new CVisualContextMenu(this, nX, nY);
 
+	var oGameRecord = null;
 	if (null !== nGameId)
 	{
-		var oGameRecord = this.m_oClient.GetGame(nGameId);
+		oGameRecord = this.m_oClient.GetGame(nGameId);
 		var bChallenge = oGameRecord && oGameRecord.IsChallenge() ? true : false;
 		oContextMenu.AddCheckBoxItem(false, bChallenge ? "Join" : "Observe", function ()
 		{
@@ -1485,6 +1488,18 @@ CGoUniverseApplication.prototype.ShowGamesListContextMenu = function(nX, nY, nGa
 	{
 		oClient.SetGamesListType(EKGSGamesListType.Followed);
 	});
+	if (!bChallenge && null !== oGameRecord)
+	{
+		oContextMenu.AddHorizontalLine();
+		oContextMenu.AddCheckBoxItem(false, "Copy link to chat", function()
+		{
+			var sMessage = "\\game=" + nGameId + ";" + oGameRecord.GetGameTitle() + ";";
+			var oInputArea   = document.getElementById("inputChatId");
+
+			oInputArea.value += " " + sMessage + " ";
+			oInputArea.focus();
+		});
+	}
 	oContextMenu.Show();
 
 	return oContextMenu;

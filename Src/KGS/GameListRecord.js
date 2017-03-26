@@ -194,6 +194,32 @@ CKGSGameListRecord.prototype.IsProposalPrivate = function()
 {
 	return this.m_oProposal.IsPrivate();
 };
+CKGSGameListRecord.prototype.GetGameTitle = function()
+{
+	if (this.m_nGameType === EKGSGameType.Challenge)
+	{
+		if (this.m_oOwner)
+			return "Challenge " + this.m_oOwner.GetName() + "[" + this.m_oOwner.GetStringRank() + "]";
+		else
+			return "Challenge";
+	}
+	else if (this.m_nGameType === EKGSGameType.Demonstration)
+	{
+		if (this.m_oOwner)
+			return "Demonstration " + this.m_oOwner.GetName() + "[" + this.m_oOwner.GetStringRank() + "]";
+		else
+			return "Demonstration";
+	}
+	else
+	{
+		if (this.m_oBlack && this.m_oWhite && this.m_oBlack2 && this.m_oWhite2)
+			return "Match " + this.m_oWhite.GetName() + "[" + this.m_oWhite.GetStringRank() + "], " + this.m_oWhite2.GetName() + "[" + this.m_oWhite2.GetStringRank() + "] vs. " + this.m_oBlack.GetName() + "[" + this.m_oBlack.GetStringRank() + "], " + this.m_oBlack2.GetName() + "[" + this.m_oBlack2.GetStringRank() + "]";
+		else if (this.m_oBlack && this.m_oWhite)
+			return "Match " + this.m_oWhite.GetName() + "[" + this.m_oWhite.GetStringRank() + "] vs. " + this.m_oBlack.GetName() + "[" + this.m_oBlack.GetStringRank() + "]";
+		else
+			return "Match";
+	}
+};
 
 function CKGSChallengeProposal(oGameRecord)
 {

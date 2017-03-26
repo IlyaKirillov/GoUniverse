@@ -380,13 +380,25 @@ span.UserChatSpan:hover {
 }
 
 span.UserLink {
+	color           : #008272;
 	text-decoration : none;
 	font-weight     : bold;
 	cursor          : pointer
 }
 
 span.UserLink:hover {
-	text-decoration: underline;
+	text-decoration : underline;
+}
+
+span.GameLink {
+	color           : #008272;
+	text-decoration : none;
+	font-weight     : bold;
+	cursor          : pointer
+}
+
+span.GameLink:hover {
+	text-decoration : underline;
 }
 
 div.VerScroll {
