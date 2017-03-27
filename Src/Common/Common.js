@@ -120,33 +120,41 @@ function SplitTextToLines(sText)
 
 function ProcessUserLinks(oDiv, oClient)
 {
-	var arrUsers = oDiv.getElementsByClassName("UserLink");
-	for (var nIndex = 0, nCount = arrUsers.length; nIndex < nCount; ++nIndex)
+	function privateProcess(oSpan, oClient)
 	{
-		var oUserLinkSpan = arrUsers[nIndex];
-		var sUserName     = oUserLinkSpan.innerText;
-		oUserLinkSpan.onclick = function()
+		var sUserName = oSpan.innerText;
+		oSpan.onclick = function()
 		{
 			oClient.LoadUserInfo(sUserName);
 		}
 	}
+
+	var arrUsers = oDiv.getElementsByClassName("UserLink");
+	for (var nIndex = 0, nCount = arrUsers.length; nIndex < nCount; ++nIndex)
+	{
+		privateProcess(arrUsers[nIndex], oClient);
+	}
 }
 function ProcessGameLinks(oDiv, oClient)
 {
-	var arrGames = oDiv.getElementsByClassName("GameLink");
-	for (var nIndex = 0, nCount = arrGames.length; nIndex < nCount; ++nIndex)
+	function privateProcess(oSpan, oClient)
 	{
-		var oGameLinkSpan = arrGames[nIndex];
-
-		var oChild = oGameLinkSpan.children[0];
+		var oChild = oSpan.children[0];
 		if (!oChild)
-			continue;
+			return;
 
 		var nGameId = parseInt(oChild.innerText);
-		oGameLinkSpan.onclick = function()
+		oSpan.onclick = function()
 		{
 			oClient.EnterToGameRoom(nGameId);
 		}
+	}
+
+
+	var arrGames = oDiv.getElementsByClassName("GameLink");
+	for (var nIndex = 0, nCount = arrGames.length; nIndex < nCount; ++nIndex)
+	{
+		privateProcess(arrGames[nIndex], oClient);
 	}
 }
 
