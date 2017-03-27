@@ -41,8 +41,8 @@ function EncodeSurrogateChar(nUnicode)
 }
 
 var urlRegEx = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-]*)?\??(?:[\-\+=&;%@\.\w]*)#?(?:[\.\-\!\/\\\w]*))?)/g;
-var userRegEx = /(\\user=)([A-Za-z0-9]{1,20})(;)/g;
-var gameRegEx = /(\\game=)([0-9]*)(;)([A-Za-z .0-9\]\[?-]*)(;)/g;
+var userRegEx = /(\\user=)([A-Za-z0-9]+)(;)/g;
+var gameRegEx = /(\\game=)([0-9]*)(;)([^(;)]+)(;)/g;
 
 function SplitTextToLines(sText)
 {
