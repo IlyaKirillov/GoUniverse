@@ -439,7 +439,7 @@ CKGSUserInfoWindow.prototype.EditUserInfo = function()
 		"personalName"  : this.m_oRawInfo.PersonalName,
 		"personalInfo"  : this.m_oRawInfo.PersonalInfo,
 		"personalEmail" : this.m_oRawInfo.Email,
-		"privateEmail"  : this.m_oRawInfo.PrivateEmail,
+		"emailPrivate"  : this.m_oRawInfo.PrivateEmail,
 		"emailWanted"   : this.m_oRawInfo.EmailWanted,
 		"authLevel"     : this.m_oRawInfo.AuthLevel,
 		"rankWanted"    : true,
