@@ -66,6 +66,8 @@ CKGSUser.prototype.Update = function(oUserRecord)
 
 	if (oUserRecord.flags)
 		this.private_ParseFlags(oUserRecord.flags);
+	else
+		this.private_ParseFlags("");		
 
 	if (oUserRecord.authLevel)
 		this.private_ParseLevel(oUserRecord.authLevel);
