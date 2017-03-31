@@ -433,7 +433,7 @@ CKGSUserInfoWindow.prototype.OnDetailsUpdate = function(oMessage)
 };
 CKGSUserInfoWindow.prototype.EditUserInfo = function()
 {
-	this.m_oClient.private_SendMessage({
+	var oMessage = {
 		"type"          : "DETAILS_CHANGE",
 		"channelId"     : this.m_oRawInfo.ChannelId,
 		"personalName"  : this.m_oRawInfo.PersonalName,
@@ -444,7 +444,8 @@ CKGSUserInfoWindow.prototype.EditUserInfo = function()
 		"authLevel"     : this.m_oRawInfo.AuthLevel,
 		"rankWanted"    : true,
 		"forcedNoRank"  : false
-	});
+	};
+	this.m_oClient.private_SendMessage(oMessage);
 };
 CKGSUserInfoWindow.prototype.private_UpdateGameArchiveStats = function()
 {
@@ -2617,7 +2618,15 @@ CKGSUserInfoGameArchiveRecord.prototype.GetUrl = function()
 CKGSUserInfoGameArchiveRecord.prototype.GetLabel = function()
 {
 	if (this.m_oWhite && this.m_oBlack)
-		return this.m_oWhite.GetName() + "[" + this.m_oWhite.GetStringRank() + "]" + " vs. " + this.m_oBlack.GetName() + "[" + this.m_oBlack.GetStringRank() + "]";
+	{
+		var sResult = this.m_oWhite.GetName() + "[" + this.m_oWhite.GetStringRank() + "]" + " vs. " + this.m_oBlack.GetName() + "[" + this.m_oBlack.GetStringRank() + "]";
+		var sScore = this.GetScore();
+
+		if ("" !== sScore)
+			sResult += " " + sScore;
+
+		return sResult;
+	}
 
 	return "";
 };
