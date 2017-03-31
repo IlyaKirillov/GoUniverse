@@ -1514,6 +1514,20 @@ CKGSClient.prototype.private_HandleUserUpdate = function(oMessage)
 	{
 		oUserInfo.Window.OnUserUpdate();
 	}
+
+	if (this.m_aAllRooms[this.m_nChatChannelId].Users[oUser.GetName()])
+	{
+		this.m_oPlayersListView.Handle_Record([0, oUser.GetName(), oUser.GetRank(), oUser.IsFriend(), oUser]);
+
+		//this.m_oPlayersListView.Update_Size();
+	}
+
+	for (var nChannelId in this.m_aGames)
+	{
+		var oGame = this.m_aGames[nChannelId];
+		if (oGame.IsUserInRoom(oUser))
+			oGame.HandleUserUpdate(oUser);
+	}
 };
 CKGSClient.prototype.private_HandleJoinComplete = function(oMessage)
 {

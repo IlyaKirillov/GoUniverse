@@ -43,6 +43,7 @@ function CKGSGameRoom(oClient, nGameRoomId)
 	this.m_bUndoForbidden      = false;
 	this.m_oBlackInfoHandler   = null;
 	this.m_oWhiteInfoHandler   = null;
+	this.m_oUsers              = {};
 }
 CKGSGameRoom.prototype.GetRoomId = function()
 {
@@ -505,6 +506,17 @@ CKGSGameRoom.prototype.HandleUserRemoved = function(oUser)
 {
 	this.m_oPlayersList.Handle_Record([1, oUser.GetName(), oUser]);
 	this.m_oPlayersList.Update_Size();
+};
+CKGSGameRoom.prototype.HandleUserUpdate = function(oUser)
+{
+	this.m_oPlayersList.Handle_Record([0, oUser.GetName(), oUser]);
+};
+CKGSGameRoom.prototype.IsUserInRoom = function(oUser)
+{
+	if (this.m_oPlayersList.Get_RecordById(oUser.GetName()))
+		return true;
+
+	return false;
 };
 CKGSGameRoom.prototype.OnStartReview = function(nNewChannelId, oOwner)
 {
