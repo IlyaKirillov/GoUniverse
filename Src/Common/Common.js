@@ -44,6 +44,8 @@ var urlRegEx = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]
 var userRegEx = /(\\user=)([A-Za-z0-9]+)(;)/g;
 var gameRegEx = /(\\game=)([0-9]*)(;)([^(;)]+)(;)/g;
 
+var smileRoflRegEx = /(:D)/g;
+
 function SplitTextToLines(sText)
 {
 	var aLines = [];
@@ -113,6 +115,8 @@ function SplitTextToLines(sText)
 		aLines[nIndex] = aLines[nIndex].replace(urlRegEx, "<a href='$1' target='_blank'>$1</a>");
 		aLines[nIndex] = aLines[nIndex].replace(userRegEx, "<span class='UserLink'>$2</span>");
 		aLines[nIndex] = aLines[nIndex].replace(gameRegEx, "<span class='GameLink'><span style='display: none'>$2</span>$4</span>");
+
+		aLines[nIndex] = aLines[nIndex].replace(smileRoflRegEx, "<img src='./Files/Smiles/ag.gif' alt=':D'>");
 	}
 
 	return aLines;
