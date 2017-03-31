@@ -72,6 +72,10 @@ CKGSUser.prototype.Update = function(oUserRecord)
 	if (oUserRecord.authLevel)
 		this.private_ParseLevel(oUserRecord.authLevel);
 };
+CKGSUser.prototype.IsRankHided = function()
+{
+	return (this.GetRank() === -1);
+};
 CKGSUser.prototype.IsTeacher = function()
 {
 	return (this.m_nLevel === KGSUSER_LEVEL_TEACHER ? true : false);

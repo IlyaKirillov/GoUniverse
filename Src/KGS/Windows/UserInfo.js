@@ -9,11 +9,14 @@
  * Time     22:54
  */
 
+// TODO: Admin stuff. Implement forcedNoRank
+
 function CKGSUserInfoWindow()
 {
 	CKGSUserInfoWindow.superclass.constructor.call(this);
 
 	this.m_sUserName        = "";
+	this.m_oUser            = null;
 	this.m_oClient          = null;
 	this.m_oContainerDiv    = null;
 	this.m_oInfoScroll      = null;
@@ -63,12 +66,15 @@ function CKGSUserInfoWindow()
 	this.m_oInfoEditScroll     = null;
 	this.m_oInfoEditNameInput  = null;
 	this.m_oInfoEditEmailInput = null;
+	this.m_oInfoRankWanted     = null;
 
 	this.m_arrAllRecentGames          = [];
 	this.m_arrRankedRecentGames       = [];
 	this.m_bShowOnlyRankedRecentGames = true;
 	this.m_sAllGamesStats             = "";
 	this.m_sRankedGamesStats          = "";
+
+	this.m_nCheckBoxHeight = 17;
 }
 CommonExtend(CKGSUserInfoWindow, CKGSWindowBase);
 
@@ -285,6 +291,7 @@ CKGSUserInfoWindow.prototype.OnUserDetails = function(oDetails)
 	{
 		var oUser = this.m_oClient.private_HandleUserRecord(oDetails.user, true);
 		this.m_sUserName = oUser.GetName();
+		this.m_oUser     = oUser;
 		this.private_SetCaption(this.m_sUserName, oUser.IsOnline());
 
 		if (oUser.HasAvatar())
@@ -308,6 +315,9 @@ CKGSUserInfoWindow.prototype.OnUserDetails = function(oDetails)
 
 		if (this.m_oInfoCheckboxKGSEmail && this.m_bOwnInfo)
 			this.m_oInfoCheckboxKGSEmail.checked = oDetails.emailWanted ? true : false;
+
+		if (this.m_oInfoRankWanted && this.m_bOwnInfo && oUser)
+			this.m_oInfoRankWanted.checked = !oUser.IsRankHided() && true !== oDetails.forcedNoRank;
 
 		this.OnDetailsUpdate(oDetails);
 	}
@@ -424,6 +434,8 @@ CKGSUserInfoWindow.prototype.OnDetailsUpdate = function(oMessage)
 	this.m_oRawInfo.PrivateEmail = oMessage.privateEmail ? true : false;
 	this.m_oRawInfo.EmailWanted  = oMessage.emailWanted ? true : false;
 	this.m_oRawInfo.AuthLevel    = oMessage.authLevel ? oMessage.authLevel : "normal";
+	this.m_oRawInfo.ForcedNoRank = oMessage.forcedNoRank;
+	this.m_oRawInfo.RankWanted   = (this.m_oUser && !this.m_oUser.IsRankHided() && true !== oMessage.forcedNoRank);
 
 	if (this.m_oInfoScroll && 0 === this.m_oTabs.GetCurrentId())
 		this.m_oInfoScroll.CheckVisibility();
@@ -442,7 +454,7 @@ CKGSUserInfoWindow.prototype.EditUserInfo = function()
 		"emailPrivate"  : this.m_oRawInfo.PrivateEmail,
 		"emailWanted"   : this.m_oRawInfo.EmailWanted,
 		"authLevel"     : this.m_oRawInfo.AuthLevel,
-		"rankWanted"    : true,
+		"rankWanted"    : this.m_oRawInfo.RankWanted,
 		"forcedNoRank"  : false
 	};
 	this.m_oClient.private_SendMessage(oMessage);
@@ -794,6 +806,13 @@ CKGSUserInfoWindow.prototype.private_AddMainInfo = function()
 	var oUserName     = this.private_AddInfoField(oDiv, oControl, nTop, nLeftWidth, sUserName, "", false); nTop += oUserName.Height;
 	var oName         = this.private_AddInfoField(oDiv, oControl, nTop, nLeftWidth, sName, "", true); nTop += oName.Height;
 	var oRank         = this.private_AddInfoField(oDiv, oControl, nTop, nLeftWidth, sRank, "", false); nTop += oRank.Height;
+
+	var oRankWanted = null;
+	if (this.m_bOwnInfo)
+	{
+		oRankWanted = this.private_AddInfoCheckboxFields(oDiv, oControl, nTop - (oRank.Height + this.m_nCheckBoxHeight) / 2, nLeftWidth, "", false);
+	}
+
 	var oLastOn       = this.private_AddInfoField(oDiv, oControl, nTop, nLeftWidth, sLastOn, "", false); nTop += oLastOn.Height;
 	var oRegisteredOn = this.private_AddInfoField(oDiv, oControl, nTop, nLeftWidth, sRegister, "", false); nTop += oRegisteredOn.Height;
 	var oLocale       = this.private_AddInfoField(oDiv, oControl, nTop, nLeftWidth, sLocale, "", false); nTop += oLocale.Height;
@@ -808,6 +827,7 @@ CKGSUserInfoWindow.prototype.private_AddMainInfo = function()
 	var oGames        = this.private_AddInfoField(oDiv, oControl, nTop, nLeftWidth, sGames, "", false); nTop += oGames.Height;
 	var oRecentGames  = this.private_AddInfoField(oDiv, oControl, nTop, nLeftWidth, sRecent, "", false); nTop += oRecentGames.Height;
 	var oOnlyRanked   = this.private_AddInfoCheckboxFields(oDiv, oControl, nTop, nLeftWidth, sOnlyRanked, false); nTop += oOnlyRanked.Height;
+
 
 	this.m_oInfoTable.UserName     = oUserName.Div;
 	this.m_oInfoTable.Name         = oName.Div;
@@ -845,6 +865,7 @@ CKGSUserInfoWindow.prototype.private_AddMainInfo = function()
 		this.m_oInfoEditEmailInput   = oEmail.Input;
 		this.m_oInfoCheckboxPrivate  = oPrivateEmail.CheckBox;
 		this.m_oInfoCheckboxKGSEmail = oKGSEmail.CheckBox;
+		this.m_oInfoRankWanted       = oRankWanted.CheckBox;
 
 		this.m_oInfoEditNameInput.maxLength  = "50";
 		this.m_oInfoEditEmailInput.maxLength = "70";
@@ -909,12 +930,12 @@ CKGSUserInfoWindow.prototype.private_AddInfoField = function(oParent, oParentCon
 };
 CKGSUserInfoWindow.prototype.private_AddInfoCheckboxFields = function(oParent, oParentControl, nTop, nLeftWidth, sLabel, isChecked)
 {
-	var nHeight = 17;
+	var nHeight = this.m_nCheckBoxHeight;
 
 	var oWrapper              = document.createElement("div");
 	oWrapper.style.position   = "absolute";
 	oWrapper.style.top        = nTop + "px";
-	oWrapper.style.left       = nLeftWidth + "px";
+	oWrapper.style.left       = (nLeftWidth - 2) + "px";
 	oWrapper.style.border     = "1px solid transparent";
 	oWrapper.style.height     = nHeight + "px";
 	oParent.appendChild(oWrapper);
@@ -1581,6 +1602,9 @@ CKGSUserInfoWindow.prototype.private_OnClickEdit = function()
 	this.m_oInfoCheckboxKGSEmail.disabled = "";
 	this.m_oInfoCheckboxKGSEmail.checked  = this.m_oRawInfo.EmailWanted;
 
+	this.m_oInfoRankWanted.disabled = (true !== this.m_oRawInfo.ForcedNoRank ? "" : "disabled");
+	this.m_oInfoRankWanted.checked  = this.m_oRawInfo.RankWanted;
+
 	if (this.m_oInfoEditScroll && this.m_oExtensionDiv && 0 === this.m_oTabs.GetCurrentId() && true === this.m_bEditing)
 		this.m_oInfoEditScroll.CheckVisibility();
 
@@ -1615,10 +1639,11 @@ CKGSUserInfoWindow.prototype.private_OnClickSave = function()
 
 	this.m_oInfoCheckboxKGSEmail.disabled = "disabled";
 	this.m_oInfoCheckboxPrivate.disabled  = "disabled";
+	this.m_oInfoRankWanted.disabled       = "disabled";
 
 	this.m_oRawInfo.PrivateEmail = this.m_oInfoCheckboxPrivate.checked;
 	this.m_oRawInfo.EmailWanted  = this.m_oInfoCheckboxKGSEmail.checked;
-
+	this.m_oRawInfo.RankWanted   = this.m_oInfoRankWanted.checked;
 
 	this.EditUserInfo();
 };
@@ -1651,6 +1676,8 @@ CKGSUserInfoWindow.prototype.private_OnClickCancel = function()
 	this.m_oInfoCheckboxKGSEmail.disabled = "disabled";
 	this.m_oInfoCheckboxKGSEmail.checked  = this.m_oRawInfo.EmailWanted;
 
+	this.m_oInfoRankWanted.disabled = "disabled";
+	this.m_oInfoRankWanted.checked  = (this.m_oUser && !oUser.IsRankHided() && true !== this.m_oRawInfo.ForcedNoRank ? true : false);
 };
 
 var EKGSUserInfoGameListRecord = {
