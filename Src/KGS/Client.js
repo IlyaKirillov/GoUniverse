@@ -1515,10 +1515,9 @@ CKGSClient.prototype.private_HandleUserUpdate = function(oMessage)
 		oUserInfo.Window.OnUserUpdate();
 	}
 
-	if (this.m_aAllRooms[this.m_nChatChannelId].Users[oUser.GetName()])
+	if (this.m_aAllRooms[this.m_nChatChannelId] && this.m_aAllRooms[this.m_nChatChannelId].Users && this.m_aAllRooms[this.m_nChatChannelId].Users[oUser.GetName()])
 	{
 		this.m_oPlayersListView.Handle_Record([0, oUser.GetName(), oUser.GetRank(), oUser.IsFriend(), oUser]);
-
 		//this.m_oPlayersListView.Update_Size();
 	}
 
