@@ -285,6 +285,22 @@ CKGSUserInfoWindow.prototype.Update_Size = function(bForce)
 	if (this.m_oFollowedListView && 5 === this.m_oTabs.GetCurrentId())
 		this.m_oFollowedListView.Update_Size();
 };
+CKGSUserInfoWindow.prototype.OnUserUpdate = function()
+{
+	if (true === this.m_bEditing || !this.m_oUser || !this.m_oInfoTable.Rank)
+		return;
+
+	if (true === this.m_oRawInfo.ForcedNoRank)
+	{
+		Common.Set_InnerTextToElement(this.m_oInfoTable.Rank, "-");
+		this.m_oRawInfo.RankWanted = false;
+	}
+	else
+	{
+		Common.Set_InnerTextToElement(this.m_oInfoTable.Rank, this.m_oUser.GetStringRank());
+		this.m_oRawInfo.RankWanted = (this.m_oUser && !this.m_oUser.IsRankHided());
+	}
+};
 CKGSUserInfoWindow.prototype.OnUserDetails = function(oDetails)
 {
 	if (oDetails)
@@ -773,6 +789,8 @@ CKGSUserInfoWindow.prototype.Show = function(oPr)
 };
 CKGSUserInfoWindow.prototype.private_AddMainInfo = function()
 {
+	var oThis = this;
+
 	var oDiv     = this.m_oMainInfoDiv;
 	var oControl = this.m_oMainInfoControl;
 
@@ -811,6 +829,14 @@ CKGSUserInfoWindow.prototype.private_AddMainInfo = function()
 	if (this.m_bOwnInfo)
 	{
 		oRankWanted = this.private_AddInfoCheckboxFields(oDiv, oControl, nTop - (oRank.Height + this.m_nCheckBoxHeight) / 2, nLeftWidth, "", false);
+
+		oRankWanted.CheckBox.onclick = function()
+		{
+			if (true === oRankWanted.CheckBox.checked && oThis.m_oUser)
+				Common.Set_InnerTextToElement(oRank.Div, oThis.m_oUser.GetStringRank());
+			else
+				Common.Set_InnerTextToElement(oRank.Div, "-");
+		};
 	}
 
 	var oLastOn       = this.private_AddInfoField(oDiv, oControl, nTop, nLeftWidth, sLastOn, "", false); nTop += oLastOn.Height;
@@ -839,7 +865,6 @@ CKGSUserInfoWindow.prototype.private_AddMainInfo = function()
 	this.m_oInfoTable.Games        = oGames.Div;
 	this.m_oInfoTable.RecentGames  = oRecentGames.Div;
 
-	var oThis = this;
 	function privateChangeOnlyRanked()
 	{
 		var isChecked = oOnlyRanked.CheckBox.checked;
@@ -1677,7 +1702,10 @@ CKGSUserInfoWindow.prototype.private_OnClickCancel = function()
 	this.m_oInfoCheckboxKGSEmail.checked  = this.m_oRawInfo.EmailWanted;
 
 	this.m_oInfoRankWanted.disabled = "disabled";
-	this.m_oInfoRankWanted.checked  = (this.m_oUser && !oUser.IsRankHided() && true !== this.m_oRawInfo.ForcedNoRank ? true : false);
+	this.m_oInfoRankWanted.checked  = (this.m_oUser && !this.m_oUser.IsRankHided() && true !== this.m_oRawInfo.ForcedNoRank);
+
+	// Вызываем, чтобы обновить рейтинг, если он был скрыт
+	this.OnUserUpdate();
 };
 
 var EKGSUserInfoGameListRecord = {

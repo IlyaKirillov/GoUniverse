@@ -1508,6 +1508,12 @@ CKGSClient.prototype.private_HandleUserUpdate = function(oMessage)
 			}
 		}
 	}
+
+	var oUserInfo = this.m_oUserInfo[sUserName.toLowerCase()];
+	if (oUserInfo)
+	{
+		oUserInfo.Window.OnUserUpdate();
+	}
 };
 CKGSClient.prototype.private_HandleJoinComplete = function(oMessage)
 {
