@@ -116,7 +116,7 @@ function SplitTextToLines(sText)
 		aLines[nIndex] = aLines[nIndex].replace(userRegEx, "<span class='UserLink'>$2</span>");
 		aLines[nIndex] = aLines[nIndex].replace(gameRegEx, "<span class='GameLink'><span style='display: none'>$2</span>$4</span>");
 
-		aLines[nIndex] = aLines[nIndex].replace(smileRoflRegEx, "<img src='./Files/Smiles/ag.gif' alt=':D'>");
+		//aLines[nIndex] = aLines[nIndex].replace(smileRoflRegEx, "<img src='./Files/Smiles/ag.gif' alt=':D'>");
 	}
 
 	return aLines;
@@ -127,10 +127,17 @@ function ProcessUserLinks(oDiv, oClient)
 	function privateProcess(oSpan, oClient)
 	{
 		var sUserName = oSpan.innerText;
-		oSpan.onclick = function()
+		oSpan.addEventListener("click", function()
 		{
 			oClient.LoadUserInfo(sUserName);
-		}
+		}, false);
+		oSpan.addEventListener("contextmenu", function(e)
+		{
+			if (oApp)
+				oApp.ShowUserContextMenu(e.pageX - 2, e.pageY + 2, sUserName);
+			e.preventDefault();
+			return false;
+		}, false);
 	}
 
 	var arrUsers = oDiv.getElementsByClassName("UserLink");
