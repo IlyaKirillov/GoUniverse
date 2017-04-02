@@ -76,12 +76,6 @@ CGoUniverseApplication.prototype.Init = function()
 	this.OnResize();
 
 	//------------------------------------------------------------------------------------------------------------------
-	// Пока не попоправится баг с баном выдаем сообщение с предупреждением.
-
-	document.getElementById("divIdConnectionErrorText").innerHTML = "Warning! This program is in Beta. Please note that you may receive a ban from KGS due to other player misconduct while using this client. We are not responsible for bans and you must contact KGS to remove the ban. Until that bug is fixed, please use this interface at your own risk.";
-	g_oFadeEffect.In(document.getElementById("divIdConnectionError"), -1);
-
-	//------------------------------------------------------------------------------------------------------------------
 	//
 	// //TEST
 	// this.m_oClient = new CKGSClient(this);

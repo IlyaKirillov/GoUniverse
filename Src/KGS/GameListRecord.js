@@ -198,8 +198,8 @@ CKGSGameListRecord.prototype.GetGameTitle = function()
 {
 	if (this.m_nGameType === EKGSGameType.Challenge)
 	{
-		if (this.m_oOwner)
-			return "Challenge " + this.m_oOwner.GetName() + "[" + this.m_oOwner.GetStringRank() + "]";
+		if (this.m_oChallengeCreator)
+			return "Challenge " + this.m_oChallengeCreator.GetName() + "[" + this.m_oChallengeCreator.GetStringRank() + "]";
 		else
 			return "Challenge";
 	}
