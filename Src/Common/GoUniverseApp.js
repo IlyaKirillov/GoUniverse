@@ -1193,6 +1193,7 @@ CGoUniverseApplication.prototype.private_RemoveAllPopups = function()
 };
 CGoUniverseApplication.prototype.ShowUserContextMenu = function(nX, nY, sUserName)
 {
+	var oThis   = this;
 	var oClient = this.m_oClient;
 	var oContextMenu = new CVisualContextMenu(this, nX, nY);
 	oContextMenu.AddCheckBoxItem(false, "Talk to...", function()
@@ -1225,6 +1226,26 @@ CGoUniverseApplication.prototype.ShowUserContextMenu = function(nX, nY, sUserNam
 		else
 			oClient.AddToFollowerList(sUserName);
 	});
+	oContextMenu.AddHorizontalLine();
+	oContextMenu.AddCheckBoxItem(false, "Copy link to chat", function()
+	{
+		var sMessage   = "\\user=" + sUserName + ";";
+
+		var oCurrentTab = oThis.m_oGameRoomTabs.GetCurrent();
+		if (oCurrentTab)
+		{
+			var oInputArea = oCurrentTab.GetChatInputElement();
+			if (oInputArea)
+			{
+				if ("" !== oInputArea.value && ' ' !== oInputArea.value.charAt(oInputArea.value.length - 1))
+					oInputArea.value += " ";
+
+				oInputArea.value += sMessage + " ";
+				oInputArea.focus();
+			}
+		}
+	});
+
 	oContextMenu.Show();
 	return oContextMenu;
 };
@@ -1488,7 +1509,7 @@ CGoUniverseApplication.prototype.ShowGamesListContextMenu = function(nX, nY, nGa
 	{
 		oClient.SetGamesListType(EKGSGamesListType.Followed);
 	});
-	if (!bChallenge && null !== oGameRecord)
+	if (null !== oGameRecord)
 	{
 		oContextMenu.AddHorizontalLine();
 		oContextMenu.AddCheckBoxItem(false, "Copy link to chat", function()

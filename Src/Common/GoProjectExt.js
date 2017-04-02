@@ -515,6 +515,13 @@ CDrawing.prototype.GoUniverseUpdateScoresDone = function(bWhiteDone, bBlackDone)
 {
 	this.m_oCountingScores.UpdateDoneState(bWhiteDone, bBlackDone);
 };
+CDrawing.prototype.GoUniverseGetChatInputElement = function()
+{
+	if (this.m_oChatInput)
+		return this.m_oChatInput;
+
+	return null;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Специальный класс с комментариями
 //----------------------------------------------------------------------------------------------------------------------

@@ -176,6 +176,25 @@ CKGSInGamePlayersList.prototype.Handle_RightClick = function(Record, e)
 			else
 				oClient.AddToFollowerList(sUserName);
 		});
+		oContextMenu.AddHorizontalLine();
+		oContextMenu.AddCheckBoxItem(false, "Copy link to chat", function()
+		{
+			var sMessage   = "\\user=" + sUserName + ";";
+
+			var oCurrentTab = oThis.m_oApp.m_oGameRoomTabs.GetCurrent();
+			if (oCurrentTab)
+			{
+				var oInputArea = oCurrentTab.GetChatInputElement();
+				if (oInputArea)
+				{
+					if ("" !== oInputArea.value && ' ' !== oInputArea.value.charAt(oInputArea.value.length - 1))
+						oInputArea.value += " ";
+
+					oInputArea.value += sMessage + " ";
+					oInputArea.focus();
+				}
+			}
+		});
 		oContextMenu.Show();
 
 		return oContextMenu;

@@ -507,6 +507,21 @@ CVisualGameRoomTab.prototype.GetGameTree = function()
 {
 	return this.m_oGameTree;
 };
+CVisualGameRoomTab.prototype.GetChatInputElement = function()
+{
+	if (!this.m_oGameTree)
+	{
+		return document.getElementById("inputChatId");
+	}
+	else
+	{
+		var oDrawing = this.m_oGameTree.Get_Drawing();
+		if (oDrawing)
+			return oDrawing.GoUniverseGetChatInputElement();
+	}
+
+	return null;
+};
 
 function CVisualChatRoomTabs()
 {
