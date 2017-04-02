@@ -1517,7 +1517,10 @@ CGoUniverseApplication.prototype.ShowGamesListContextMenu = function(nX, nY, nGa
 			var sMessage = "\\game=" + nGameId + ";" + oGameRecord.GetGameTitle() + ";";
 			var oInputArea   = document.getElementById("inputChatId");
 
-			oInputArea.value += " " + sMessage + " ";
+			if ("" !== oInputArea.value && ' ' !== oInputArea.value.charAt(oInputArea.value.length - 1))
+				oInputArea.value += " ";
+
+			oInputArea.value += sMessage + " ";
 			oInputArea.focus();
 		});
 	}
