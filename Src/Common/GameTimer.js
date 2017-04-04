@@ -477,7 +477,7 @@ CTimeSettings.prototype.GetCountDownLimit = function()
 {
 	if (this.IsAbsolute() || this.IsCanadian())
 		return 60;
-	else (this.IsByoYomi())
+	else if (this.IsByoYomi())
 		return 10;
 
 	return 0;
