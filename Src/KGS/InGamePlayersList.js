@@ -35,6 +35,8 @@ function CKGSInGamePlayersList(oApp, nGameId)
 	this.m_oWhite  = null;
 	this.m_oOwner  = null;
 	this.m_oEditor = null;
+	this.m_oBlack2 = null;
+	this.m_oWhite2 = null;
 
 	this.m_sUserName = oApp.GetClient().GetUserName();
 	this.m_nGameId   = nGameId;
@@ -218,14 +220,24 @@ CKGSInGamePlayersList.prototype.SetEditor = function(oUser)
 };
 CKGSInGamePlayersList.prototype.IsBlack = function(sUserName)
 {
-	if (this.m_oBlack && sUserName === this.m_oBlack.GetName())
+	if ((this.m_oBlack && sUserName === this.m_oBlack.GetName())
+		|| (this.m_oBlack2 && sUserName === this.m_oBlack2.GetName()))
 		return true;
 
 	return false;
 };
+CKGSInGamePlayersList.prototype.SetBlack2 = function(oUser)
+{
+	this.m_oBlack2 = oUser;
+};
+CKGSInGamePlayersList.prototype.SetWhite2 = function(oUser)
+{
+	this.m_oWhite2 = oUser;
+};
 CKGSInGamePlayersList.prototype.IsWhite = function(sUserName)
 {
-	if (this.m_oWhite && sUserName === this.m_oWhite.GetName())
+	if ((this.m_oWhite && sUserName === this.m_oWhite.GetName())
+		|| (this.m_oWhite2 && sUserName === this.m_oWhite2.GetName()))
 		return true;
 
 	return false;

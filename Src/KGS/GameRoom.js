@@ -485,6 +485,8 @@ CKGSGameRoom.prototype.UpdatePlayersList = function(arrUsers)
 	oListObject.SetBlack(this.m_oBlack);
 	oListObject.SetWhite(this.m_oWhite);
 	oListObject.SetOwner(this.m_oOwner);
+	oListObject.SetBlack2(this.m_oBlack2);
+	oListObject.SetWhite2(this.m_oWhite2);
 
 	if (arrUsers)
 	{
@@ -1160,11 +1162,19 @@ CKGSGameRoom.prototype.IsPlayer = function()
 };
 CKGSGameRoom.prototype.IsBlackPlayer = function()
 {
-	return (this.m_oBlack && this.m_oBlack.GetName() === this.m_oClient.GetUserName() ? true : false);
+	if ((this.m_oBlack && this.m_oBlack.GetName() === this.m_oClient.GetUserName())
+		|| (this.m_oBlack2 && this.m_oBlack2.GetName() === this.m_oClient.GetUserName()))
+		return true;
+
+	return false;
 };
 CKGSGameRoom.prototype.IsWhitePlayer = function()
 {
-	return (this.m_oWhite && this.m_oWhite.GetName() === this.m_oClient.GetUserName() ? true : false);
+	if ((this.m_oWhite && this.m_oWhite.GetName() === this.m_oClient.GetUserName())
+		|| (this.m_oWhite2 && this.m_oWhite2.GetName() === this.m_oClient.GetUserName()))
+		return true;
+
+	return false;
 };
 CKGSGameRoom.prototype.IsOurMove = function()
 {
