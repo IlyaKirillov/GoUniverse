@@ -2074,6 +2074,8 @@ CKGSUserInfoGamesListRecord.prototype.Update = function(aLine)
 	this.m_bInPlay    = oArchiveRecord.IsInPlay();
 	this.m_bAdjourned = oArchiveRecord.IsAbjourned();
 	this.m_sUrl       = oArchiveRecord.GetUrl();
+	this.m_oBlack2    = oArchiveRecord.GetBlack2();
+	this.m_oWhite2    = oArchiveRecord.GetWhite2();
 };
 CKGSUserInfoGamesListRecord.prototype.GetTimeStamp = function()
 {
@@ -2153,6 +2155,8 @@ CKGSUserInfoGamesListRecord.prototype.private_GetWhiteRank = function()
 {
 	if (this.m_oOwner)
 		return this.m_oOwner.GetStringRank();
+	else if (this.m_oWhite2 && this.m_oWhite)
+		return this.m_oWhite.GetStringRank() + "," + this.m_oWhite2.GetStringRank();
 	else if (this.m_oWhite)
 		return this.m_oWhite.GetStringRank();
 	else
@@ -2167,6 +2171,10 @@ CKGSUserInfoGamesListRecord.prototype.private_GetWhiteName = function()
 
 		if (this.m_oWhite && this.m_oBlack)
 			sResult +=  " (" + this.m_oWhite.GetName() + "[" + this.m_oWhite.GetStringRank() + "] vs. " +  this.m_oBlack.GetName() + "[" + this.m_oBlack.GetStringRank() + "])";
+	}
+	else if (this.m_oWhite2 && this.m_oWhite)
+	{
+		sResult = this.m_oWhite.GetName() + ", " + this.m_oWhite2.GetName();
 	}
 	else if (this.m_oWhite)
 	{
@@ -2184,15 +2192,25 @@ CKGSUserInfoGamesListRecord.prototype.private_GetVs = function()
 };
 CKGSUserInfoGamesListRecord.prototype.private_GetBlackRank = function()
 {
-	if (null === this.m_oOwner && this.m_oBlack)
-		return this.m_oBlack.GetStringRank();
+	if (null === this.m_oOwner)
+	{
+		if (this.m_oBlack2 && this.m_oBlack)
+			return this.m_oBlack.GetStringRank() + "," + this.m_oBlack2.GetStringRank();
+		if (this.m_oBlack)
+			return this.m_oBlack.GetStringRank();
+	}
 
 	return "";
 };
 CKGSUserInfoGamesListRecord.prototype.private_GetBlackName = function()
 {
-	if (null === this.m_oOwner && this.m_oBlack)
-		return this.m_oBlack.GetName();
+	if (null === this.m_oOwner)
+	{
+		if (this.m_oBlack && this.m_oBlack2)
+			return this.m_oBlack.GetName() + ", " + this.m_oBlack2.GetName();
+		else if (this.m_oBlack)
+			return this.m_oBlack.GetName();
+	}
 
 	return "";
 };
@@ -2473,6 +2491,8 @@ CKGSUserInfoGameArchiveRecord.prototype.Parse = function(oRecord)
 	this.m_oBlack    = null;
 	this.m_oWhite    = null;
 	this.m_oOwner    = null;
+	this.m_oBlack2   = null;
+	this.m_oWhite2   = null;
 
 	if (oRecord.players)
 	{
@@ -2649,6 +2669,14 @@ CKGSUserInfoGameArchiveRecord.prototype.GetWhite = function()
 CKGSUserInfoGameArchiveRecord.prototype.GetOwner = function()
 {
 	return this.m_oOwner;
+};
+CKGSUserInfoGameArchiveRecord.prototype.GetBlack2 = function()
+{
+	return this.m_oBlack2;
+};
+CKGSUserInfoGameArchiveRecord.prototype.GetWhite2 = function()
+{
+	return this.m_oWhite2;
 };
 CKGSUserInfoGameArchiveRecord.prototype.GetBoardSize = function()
 {
