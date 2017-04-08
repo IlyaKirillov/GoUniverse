@@ -351,8 +351,8 @@ CVisualGameRoomTab.prototype.InitGameRoom = function(sDivIdContainer, oGame)
 	// Кнопка для закрытия таба
 	var oCloseButton           = document.createElement("button");
 	oCloseButton.tabIndex      = "0";
-	oCloseButton["aria-label"] = "Close room";
-	oCloseButton.title         = "Close room";
+	oCloseButton["aria-label"] = "Close game room";
+	oCloseButton.title         = "Close game room";
 	oCloseButton.className += " " + "ButtonCloseGameRoom";
 	oCloseButton.addEventListener("click", function()
 	{
