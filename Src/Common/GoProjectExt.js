@@ -248,12 +248,13 @@ CDrawing.prototype.private_GoUniverseCreateMenuButton = function(oParentControl,
 	oMenuButtonControl.Anchor = (g_anchor_top | g_anchor_left);
 	oParentControl.AddControl(oMenuButtonControl);
 
-	var oDrawingMenuButton = new CDrawingButtonFileMenu(this, true);
+	var oDrawingMenuButton = new CDrawingButtonFileMenu(this);
 	oDrawingMenuButton.Init(sMenuButton, this.m_oGameTree);
 	this.Register_MenuButton(oDrawingMenuButton);
 	this.m_aElements.push(oDrawingMenuButton);
 
 	this.m_oGoUniversePr.MenuButtonControl = oMenuButtonControl;
+	this.m_oGoUniversePr.MenuButton        = oDrawingMenuButton;
 };
 CDrawing.prototype.private_GoUniverseCreateEditButton = function(oParentControl, oParentDiv, sDivId)
 {
@@ -477,7 +478,8 @@ CDrawing.prototype.GoUniverseOnMatch = function()
 	oPr.ManagerControl.HtmlElement.style.display      = "none";
 	oPr.MatchToolbarControl.HtmlElement.style.display = "block";
 	oPr.EditButtonControl.HtmlElement.style.display   = "none";
-	oPr.MenuButtonControl.HtmlElement.style.display   = "none";
+
+	this.m_oGoUniversePr.MenuButton.GoUniverseInitMenuForMatch(this.m_oGameRoom);
 
 	oPr.MatchToolbarControl.SetParams(0, oPr.GameInfoH + oPr.InfoH, 0, 1000, true, true, true, false, -1, oPr.ToolbarH - 1);
 	oPr.ChatsContol.SetParams(0, oPr.GameInfoH + oPr.InfoH + oPr.ToolbarH + 1, 0, 1000, true, true, true, false, -1, -1);
@@ -491,7 +493,8 @@ CDrawing.prototype.GoUniverseOnView = function()
 	oPr.ManagerControl.HtmlElement.style.display      = "block";
 	oPr.MatchToolbarControl.HtmlElement.style.display = "none";
 	oPr.EditButtonControl.HtmlElement.style.display   = "block";
-	oPr.MenuButtonControl.HtmlElement.style.display   = "block";
+
+	this.m_oGoUniversePr.MenuButton.InitDefaultMenu(true);
 
 	oPr.ChatsContol.SetParams(0, oPr.GameInfoH + oPr.InfoH + oPr.ManagerH + 1, 0, 1000, true, true, true, false, -1, -1);
 	this.Update_Size();
@@ -1441,7 +1444,7 @@ CGoUniverseButtonEditorControl.prototype.Hide_Menu = function(bFast)
 };
 CGoUniverseButtonEditorControl.prototype.Update_Size = function()
 {
-	CDrawingButtonFileMenu.superclass.Update_Size.apply(this, arguments);
+	CGoUniverseButtonEditorControl.superclass.Update_Size.apply(this, arguments);
 	var oOffset = this.m_oDrawing.Get_ElementOffset(this.HtmlElement.Control.HtmlElement);
 
 	var nLeft = oOffset.X;
@@ -1849,4 +1852,30 @@ CGoUniverseDrawingCountDown.prototype.Show = function()
 CGoUniverseDrawingCountDown.prototype.Hide = function()
 {
 	this.m_oMainDiv.style.display = "none";
+};
+//----------------------------------------------------------------------------------------------------------------------
+// Дополнительная обработка кнопки меню
+//----------------------------------------------------------------------------------------------------------------------
+CDrawingButtonFileMenu.prototype.GoUniverseInitMenuForMatch = function(oGameRoom)
+{
+	var oMenuElementWrapper = this.m_oMenuElement;
+
+	oMenuElementWrapper.style.display = "block";
+	oMenuElementWrapper.style.opacity = null;
+	oMenuElementWrapper.style.height  = null;
+
+	Common.ClearNode(oMenuElementWrapper);
+
+	var oThis = this;
+	this.private_CreateMenuItem(oMenuElementWrapper, "Add 1 minute", function()
+	{
+		oGameRoom.AddTimeToOpponent(60);
+	});
+	this.private_CreateMenuItem(oMenuElementWrapper, "Add 5 minutes", function()
+	{
+		oGameRoom.AddTimeToOpponent(300);
+	});
+
+	this.m_nHeight = oMenuElementWrapper.clientHeight;
+	oMenuElementWrapper.style.display = "none";
 };

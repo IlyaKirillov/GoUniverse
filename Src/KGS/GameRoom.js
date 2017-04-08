@@ -1430,6 +1430,15 @@ CKGSGameRoom.prototype.GetWhite2Player = function()
 {
 	return this.m_oWhite2;
 };
+CKGSGameRoom.prototype.AddTimeToOpponent = function(nTime)
+{
+	this.m_oClient.private_SendMessage({
+		"type"      : "GAME_ADD_TIME",
+		"channelId" : this.GetRoomId(),
+		"role"      : this.IsBlackPlayer() ? "white" : "black",
+		"time"      : nTime
+	});
+};
 
 function CKGSEditorHandler(oClient, oGame)
 {
