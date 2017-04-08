@@ -140,10 +140,22 @@ CTimeSettings.prototype.SetCanadian = function(nMainTime, nOverTime, nMovesCount
 };
 CTimeSettings.prototype.CorrectMainTime = function(nTime)
 {
+	if (nTime > 0)
+	{
+		if (this.m_oTimer.IsTick())
+			this.m_oTimer.Start(nTime);
+
+		this.m_nOverTimeCur  = this.m_nOverTime;
+		this.m_nOverCountCur = this.m_nOverCount;
+	}
+
 	this.m_nMainTime = nTime;
 };
 CTimeSettings.prototype.CorrectOverTime = function(nOverTime, nOverCount)
 {
+	if (this.m_oTimer.IsTick())
+		this.m_oTimer.Start(nOverTime);
+
 	this.m_nOverTimeCur  = nOverTime;
 	this.m_nOverCountCur = nOverCount;
 };
@@ -205,7 +217,6 @@ CTimeSettings.prototype.private_OnTickTimer = function(nSecondsLeft)
 	}
 	case ETimeSettings.ByoYomi:
 	{
-
 		if (this.m_nMainTime > 0)
 		{
 			this.m_nMainTime = Math.max(0, nSecondsLeft);
