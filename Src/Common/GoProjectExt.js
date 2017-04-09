@@ -1091,8 +1091,16 @@ CGoUniverseDrawingPlayerInfo.prototype.private_Update = function()
 		var oSpan = document.createElement("span");
 		Common.Set_InnerTextToElement(oSpan, oUser.GetName() + "[" + oUser.GetStringRank() + "]");
 		oNameDiv.appendChild(oSpan);
-		oSpan.addEventListener("click", function(){
+		oSpan.addEventListener("click", function()
+		{
 			oUser.m_oClient.LoadUserInfo(oUser.GetName());
+		}, false);
+		oSpan.addEventListener("contextmenu", function(e)
+		{
+			if (oApp)
+				oApp.ShowUserContextMenu(e.pageX - 2, e.pageY + 2, oUser.GetName());
+			e.preventDefault();
+			return false;
 		}, false);
 		oSpan.className = "UserChatSpan";
 		oSpan.style.cursor = "pointer";
