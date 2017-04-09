@@ -202,7 +202,7 @@ CKGSGameRoom.prototype.SetPlayers = function(oGameRecord)
 		}
 
 
-		if (true === this.IsPlayer())
+		if (true === this.IsPlayer() && !this.IsDemonstration())
 		{
 			this.private_OpponentMove();
 			var oHandler = new CKGSMatchHandler(this.m_oClient, this);
