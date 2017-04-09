@@ -87,12 +87,14 @@ CDrawing.prototype.Create_GoUniverseViewerTemplate = function(sDivId, oApp, oTab
 	this.m_oGameRoom      = oGameRoom;
 
 	this.m_oCountingScores = new CGoUniverseDrawingCountingScores(this, oGameRoom);
+	this.m_oReviewPanel    = new CGoUniverseDrawingReviewPanel(this, oGameRoom);
 
 	this.m_oGoUniversePr = {
 		GameInfoH: 37,
 		InfoH    : 200,
 		ManagerH : 200,
 		ToolbarH : 36 + 2, // 36 - buttons + 1 space + 1px top border
+		ReviewH  : this.m_oReviewPanel.GetHeight(),
 		CountingH: this.m_oCountingScores.GetHeight(),
 
 		CountingControl    : null,
@@ -100,7 +102,8 @@ CDrawing.prototype.Create_GoUniverseViewerTemplate = function(sDivId, oApp, oTab
 		ChatsContol        : null,
 		MenuButtonControl  : null,
 		EditButtonControl  : null,
-		ManagerControl     : null
+		ManagerControl     : null,
+		ReviewControl      : null
 	};
 
 	this.private_GoUniverseCreateWrappingMainDiv(sDivId);
@@ -150,6 +153,7 @@ CDrawing.prototype.private_GoUniverseCreateHorFullTemplate = function()
 	var ManagerH   = this.m_oGoUniversePr.ManagerH;
 	var ToolbarH   = this.m_oGoUniversePr.ToolbarH;
 	var CountingH  = this.m_oGoUniversePr.CountingH;
+	var ReviewH    = this.m_oGoUniversePr.ReviewH;
 	//------------------------------------------------------------------------------------------------------------------
 	// Информация об партии
 	//------------------------------------------------------------------------------------------------------------------
@@ -166,6 +170,10 @@ CDrawing.prototype.private_GoUniverseCreateHorFullTemplate = function()
 	// Кнопка редактирования
 	//------------------------------------------------------------------------------------------------------------------
 	this.private_GoUniverseCreateEditButton(oPanelControl, oPanelControl.HtmlElement, sPanelDivId + "E");
+	//------------------------------------------------------------------------------------------------------------------
+	// Панелька с кнопкой разбора игры после окончания партии
+	//------------------------------------------------------------------------------------------------------------------
+	this.private_GoUniverseCreateReviewPanel(oPanelControl, oPanelControl.HtmlElement, sPanelDivId + "R", GameInfoH + InfoH, ReviewH);
 	//------------------------------------------------------------------------------------------------------------------
 	// Навигатор и панель управления
 	//------------------------------------------------------------------------------------------------------------------
@@ -432,6 +440,22 @@ CDrawing.prototype.private_GoUniverseCreateMatchToolbar = function(oParentContro
 
 	this.m_aElements.push(oDrawingToolbar);
 };
+CDrawing.prototype.private_GoUniverseCreateReviewPanel = function(oParentControl, oParentDiv, sDivId, nTop, nH)
+{
+	this.private_CreateDiv(oParentDiv, sDivId);
+	var oReviewPanelControlWrapper = CreateControlContainer(sDivId);
+	oReviewPanelControlWrapper.Bounds.SetParams(0, nTop, 0, 0, true, true, true, false, -1, nH);
+	oReviewPanelControlWrapper.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right);
+	oParentControl.AddControl(oReviewPanelControlWrapper);
+
+	oReviewPanelControlWrapper.HtmlElement.style.borderTop  = "1px solid rgb(172, 172, 172)";
+
+	this.m_oReviewPanel.Init(sDivId);
+	oReviewPanelControlWrapper.HtmlElement.style.display = "none";
+	this.m_aElements.push(this.m_oReviewPanel);
+
+	this.m_oGoUniversePr.ReviewControl = oReviewPanelControlWrapper;
+};
 CDrawing.prototype.private_GoUniverseCreateCountingScoresPanel = function(oParentControl, oParentDiv, sDivId, nTop, nH)
 {
 	var sCountingDivId = sDivId;
@@ -466,6 +490,7 @@ CDrawing.prototype.GoUniverseOnCounting = function()
 	oPr.MatchToolbarControl.HtmlElement.style.display = "none";
 	oPr.EditButtonControl.HtmlElement.style.display   = "none";
 	oPr.MenuButtonControl.HtmlElement.style.display   = "none";
+	oPr.ReviewControl.HtmlElement.style.display       = "none";
 
 	oPr.ChatsContol.SetParams(0, oPr.GameInfoH + oPr.InfoH + oPr.CountingH + 1, 0, 1000, true, true, true, false, -1, -1);
 	this.Update_Size();
@@ -478,6 +503,7 @@ CDrawing.prototype.GoUniverseOnMatch = function()
 	oPr.ManagerControl.HtmlElement.style.display      = "none";
 	oPr.MatchToolbarControl.HtmlElement.style.display = "block";
 	oPr.EditButtonControl.HtmlElement.style.display   = "none";
+	oPr.ReviewControl.HtmlElement.style.display       = "none";
 
 	this.m_oGoUniversePr.MenuButton.GoUniverseInitMenuForMatch(this.m_oGameRoom);
 
@@ -494,9 +520,22 @@ CDrawing.prototype.GoUniverseOnView = function()
 	oPr.MatchToolbarControl.HtmlElement.style.display = "none";
 	oPr.EditButtonControl.HtmlElement.style.display   = "block";
 
+	var oGameRoom = this.m_oGameRoom;
+	if (!oGameRoom.IsDemonstration() && oGameRoom.IsPlayer())
+	{
+		oPr.ReviewControl.HtmlElement.style.display = "block";
+		oPr.ManagerControl.SetParams(0, oPr.GameInfoH + oPr.InfoH + oPr.ReviewH, 0, 0, true, true, true, false, -1, this.m_oGoUniversePr.ManagerH);
+		oPr.ChatsContol.SetParams(0, oPr.GameInfoH + oPr.InfoH + oPr.ReviewH + oPr.ManagerH + 1, 0, 1000, true, true, true, false, -1, -1);
+	}
+	else
+	{
+		oPr.ReviewControl.HtmlElement.style.display = "none";
+		oPr.ManagerControl.SetParams(0, oPr.GameInfoH + oPr.InfoH, 0, 0, true, true, true, false, -1, this.m_oGoUniversePr.ManagerH);
+		oPr.ChatsContol.SetParams(0, oPr.GameInfoH + oPr.InfoH + oPr.ManagerH + 1, 0, 1000, true, true, true, false, -1, -1);
+	}
+
 	this.m_oGoUniversePr.MenuButton.InitDefaultMenu(true);
 
-	oPr.ChatsContol.SetParams(0, oPr.GameInfoH + oPr.InfoH + oPr.ManagerH + 1, 0, 1000, true, true, true, false, -1, -1);
 	this.Update_Size();
 };
 CDrawing.prototype.GoUniverseOnMatchAnalyze = function()
@@ -524,6 +563,10 @@ CDrawing.prototype.GoUniverseGetChatInputElement = function()
 		return this.m_oChatInput;
 
 	return null;
+};
+CDrawing.prototype.GoUniverseOnStartReview = function()
+{
+	this.GoUniverseOnView();
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Специальный класс с комментариями
@@ -1878,4 +1921,70 @@ CDrawingButtonFileMenu.prototype.GoUniverseInitMenuForMatch = function(oGameRoom
 
 	this.m_nHeight = oMenuElementWrapper.clientHeight;
 	oMenuElementWrapper.style.display = "none";
+};
+//----------------------------------------------------------------------------------------------------------------------
+// Панелька с кнопкой для разбора партии
+//----------------------------------------------------------------------------------------------------------------------
+function CGoUniverseDrawingReviewPanel(oDrawing, oGameRoom)
+{
+	this.m_oDrawing  = oDrawing;
+	this.m_oGameRoom = oGameRoom;
+
+	this.m_oMainControl = null;
+	this.m_oMainDiv     = null;
+
+	this.nButtonH = 30;
+}
+CGoUniverseDrawingReviewPanel.prototype.Init = function(sDivId)
+{
+	this.m_oMainControl = CreateControlContainer(sDivId);
+	this.m_oMainDiv     = this.m_oMainControl.HtmlElement;
+
+	var nButtonH = this.nButtonH;
+
+	var oAcceptDiv = this.private_CreateDiv(this.m_oMainDiv);
+	this.private_CreateReviewButton(3, nButtonH, oAcceptDiv);
+};
+CGoUniverseDrawingReviewPanel.prototype.private_CreateDiv = function(oParent)
+{
+	var oElement = document.createElement("div");
+	oElement.setAttribute("style", "position:absolute;padding:0;margin:0;");
+	oElement.setAttribute("oncontextmenu", "return false;");
+	oParent.appendChild(oElement);
+	return oElement;
+};
+CGoUniverseDrawingReviewPanel.prototype.Update_Size = function()
+{
+	this.m_oMainControl.Resize(this.m_oMainDiv.width, this.m_oMainDiv.height);
+};
+CGoUniverseDrawingReviewPanel.prototype.private_CreateReviewButton = function(nTop, nH, oButtonDiv)
+{
+	var oButtonControl = CreateControlContainerByElement(oButtonDiv);
+	oButtonControl.Bounds.SetParams(0, nTop, 0, 0, true, true, true, true, -1, nH);
+	oButtonControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right);
+	this.m_oMainControl.AddControl(oButtonControl);
+
+	var oButton = document.createElement("div");
+	oButtonDiv.appendChild(oButton);
+	oButton.innerHTML = "Start review";
+	oButton.className = "ButtonGreen";
+	oButton.style.textAlign   = "center";
+	oButton.style.width       = "200px";
+	oButton.style.height      = (nH - 5) + "px";
+	oButton.style.display     = "block";
+	oButton.style.marginLeft  = "auto";
+	oButton.style.marginRight = "auto";
+	oButton.style.lineHeight  = (nH - 5 - 2) + "px";
+	oButton.style.fontSize    = "14px";
+	oButton.style.fontFamily  = "'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif";
+
+	var oThis = this;
+	oButton.addEventListener("click", function()
+	{
+		oThis.m_oGameRoom.StartReview();
+	}, false);
+};
+CGoUniverseDrawingReviewPanel.prototype.GetHeight = function()
+{
+	return (this.nButtonH + 3);
 };

@@ -280,6 +280,7 @@ CVisualGameRoomTab.prototype.InitGameRoom = function(sDivIdContainer, oGame)
 
 		oDrawing.Update_Size(true);
 		oGameTree.Set_EditingFlags({LoadFile : false, GameInfo : false, RemoveNodes : false});
+		oGame.SetDrawing(oDrawing);
 	}
 
 	// Создаем дивку под таб

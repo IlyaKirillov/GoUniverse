@@ -44,6 +44,7 @@ function CKGSGameRoom(oClient, nGameRoomId)
 	this.m_oBlackInfoHandler   = null;
 	this.m_oWhiteInfoHandler   = null;
 	this.m_oUsers              = {};
+	this.m_oDrawing            = null;
 }
 CKGSGameRoom.prototype.GetRoomId = function()
 {
@@ -547,6 +548,9 @@ CKGSGameRoom.prototype.OnStartReview = function(nNewChannelId, oOwner)
 		// Такого не должно быть
 		this.m_oGameTree.Set_GameTranscriber("unknown");
 	}
+
+	if (this.m_oDrawing)
+		this.m_oDrawing.GoUniverseOnStartReview();
 };
 CKGSGameRoom.prototype.private_ReadSgfEvents = function(arrSgfEvents)
 {
@@ -1153,8 +1157,15 @@ CKGSGameRoom.prototype.RemoveOwnChanges = function()
 };
 CKGSGameRoom.prototype.ReturnControlToOwner = function()
 {
-	if (true === this.m_bEditor && this.m_oOwner)
+	if ((true === this.m_bEditor || this.IsOwner()) && this.m_oOwner)
 		this.m_oClient.GiveGameControl(this.m_nGameRoomId, this.m_oOwner.GetName());
+};
+CKGSGameRoom.prototype.IsOwner = function()
+{
+	if (this.m_oOwner && this.m_oOwner.GetName() === this.m_oClient.GetUserName())
+		return true;
+
+	return false;
 };
 CKGSGameRoom.prototype.IsPlayer = function()
 {
@@ -1438,6 +1449,17 @@ CKGSGameRoom.prototype.AddTimeToOpponent = function(nTime)
 		"role"      : this.IsBlackPlayer() ? "white" : "black",
 		"time"      : nTime
 	});
+};
+CKGSGameRoom.prototype.StartReview = function()
+{
+	this.m_oClient.private_SendMessage({
+		"type"      : "GAME_START_REVIEW",
+		"channelId" : this.GetRoomId()
+	});
+};
+CKGSGameRoom.prototype.SetDrawing = function(oDrawing)
+{
+	this.m_oDrawing = oDrawing;
 };
 
 function CKGSEditorHandler(oClient, oGame)
