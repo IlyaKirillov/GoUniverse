@@ -2420,3 +2420,19 @@ CKGSClient.prototype.IsAlreadyPlaying = function()
 {
 	return this.private_IsAlreadyPlaying();
 };
+CKGSClient.prototype.GetAdminsInRoom = function(nRoomId)
+{
+	var arrAdmins = [];
+	var oRoom = this.m_aAllRooms[nRoomId];
+	if (oRoom && oRoom.Users)
+	{
+		for (var sUserName in oRoom.Users)
+		{
+			var oUser = oRoom.Users[sUserName];
+			if (oUser.IsAdmin())
+				arrAdmins.push(oUser.GetName());
+		}
+	}
+
+	return arrAdmins;
+};

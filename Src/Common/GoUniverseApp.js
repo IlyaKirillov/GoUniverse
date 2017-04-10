@@ -293,8 +293,25 @@ CGoUniverseApplication.prototype.SendChatMessage = function(e)
 		if ("" !== oInputArea.value)
 		{
 			var sMessage = oInputArea.value;
-			sMessage = sMessage.replace(/\u000A/g, String.fromCharCode(0xFF0A));
-			this.m_oClient.SendChatMessage(sMessage);
+
+			if (0 === sMessage.indexOf("\\admin"))
+			{
+				var nCurrentRoomId = this.m_oChatRoomTabs.GetCurrent().GetId();
+				var arrAdmins      = this.m_oClient.GetAdminsInRoom(nCurrentRoomId);
+
+				var sAdmins = arrAdmins.length ? "Admins currently online:\n" : "There is no admins in this room online.";
+				for (var nIndex = 0, nCount = arrAdmins.length; nIndex < nCount; ++nIndex)
+				{
+					sAdmins += "\\user=" + arrAdmins[nIndex] + "; ";
+				}
+
+				this.AddRoomGreetingMessage(nCurrentRoomId, sAdmins);
+			}
+			else
+			{
+				sMessage = sMessage.replace(/\u000A/g, String.fromCharCode(0xFF0A));
+				this.m_oClient.SendChatMessage(sMessage);
+			}
 		}
 
 		oInputArea.value = "";
