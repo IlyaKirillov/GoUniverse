@@ -260,6 +260,10 @@ CKGSInGamePlayersList.prototype.GetVerLinesPositions = function()
 {
 	return [2];
 };
+CKGSInGamePlayersList.prototype.SetGameId = function(nGameId)
+{
+	this.m_nGameId = nGameId;
+};
 
 function CKGSInGamePlayersListRecord(oListObject, oClient)
 {

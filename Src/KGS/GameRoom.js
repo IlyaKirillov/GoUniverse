@@ -533,6 +533,8 @@ CKGSGameRoom.prototype.OnStartReview = function(nNewChannelId, oOwner)
 	this.m_oWhiteInfoHandler.StopCountDown();
 	this.m_oBlackInfoHandler.StopCountDown();
 
+	this.m_oPlayersList.GetListObject().SetGameId(nNewChannelId);
+
 	if (oOwner)
 	{
 		this.m_oOwner = oOwner;
