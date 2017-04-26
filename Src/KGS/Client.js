@@ -1211,6 +1211,7 @@ CKGSClient.prototype.private_HandleLoginSuccess = function(oMessage)
 	this.m_oApp.OnConnect();
 
 	this.SetGamesListType(this.m_oGlobalSettings.GetKGSGamesListType());
+	this.m_oApp.OnChangeGamesListType(this.m_oGlobalSettings.GetKGSGamesListType());
 };
 CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
 {
@@ -2296,6 +2297,7 @@ CKGSClient.prototype.SetGamesListType = function(eType)
 		this.m_eGamesListType = eType;
 		this.m_oApp.GetGlobalSettings().SetKGSGamesListType(eType);
 		this.private_UpdateGamesList();
+		this.m_oApp.OnChangeGamesListType(eType);
 	}
 };
 CKGSClient.prototype.private_UpdateGamesList = function()

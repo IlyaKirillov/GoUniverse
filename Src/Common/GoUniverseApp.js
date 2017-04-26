@@ -949,13 +949,6 @@ CGoUniverseApplication.prototype.private_InitMainRoom = function()
 	oGamesListControl.HtmlElement.style.background = "#F3F3F3";
 	oGamesListWrapperControl.AddControl(oGamesListControl);
 
-	// // Табы для списка игр и вызовов
-	// var oGamesListTabsControl = CreateControlContainer("divIdLGamesListTabs");
-	// oGamesListTabsControl.SetParams(0, 0, 0, 0, true, false, true, true, -1, 25);
-	// oGamesListTabsControl.SetAnchor(true, false, true, true);
-	// oGamesListWrapperControl.AddControl(oGamesListTabsControl);
-	// oGamesListTabsControl.HtmlElement.style.background = "red";
-
 	// Часть под чат
 	var oChatControl = CreateControlContainer("divIdLChat");
 	oChatControl.Bounds.SetParams(0, dSplitterPosition, 1000, 1000, false, false, false, false, -1, -1);
@@ -987,12 +980,12 @@ CGoUniverseApplication.prototype.private_InitChats = function(oChatControl)
 {
 	// Табы чата
 	var oChatTabsBack = CreateControlContainer("divIdLChatTabsBack");
-	oChatTabsBack.Bounds.SetParams(0, 0, 2, 0, true, true, true, false, -1, 24);
+	oChatTabsBack.Bounds.SetParams(0, 5, 2, 0, true, true, true, false, -1, 24);
 	oChatTabsBack.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left);
 	oChatControl.AddControl(oChatTabsBack);
 
 	var oChatTabs = this.m_oChatRoomTabs.Init("divIdLChatTabs");
-	oChatTabs.Bounds.SetParams(0, 1, 64, 0, true, true, true, false, -1, 25);
+	oChatTabs.Bounds.SetParams(0, 6, 64, 0, true, true, true, false, -1, 25);
 	oChatTabs.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left);
 	oChatControl.AddControl(oChatTabs);
 
@@ -1002,19 +995,19 @@ CGoUniverseApplication.prototype.private_InitChats = function(oChatControl)
 
 	// Кнопка добавления чата
 	var oChatAddControl = this.private_InitChannelAddButton("divIdLChatAdd");
-	oChatAddControl.Bounds.SetParams(0, 1, 1, 0, false, true, true, false, 30, 24);
+	oChatAddControl.Bounds.SetParams(0, 6, 1, 0, false, true, true, false, 30, 24);
 	oChatAddControl.Anchor = (g_anchor_top | g_anchor_right);
 	oChatControl.AddControl(oChatAddControl);
 
 	// Кнопка добавления чата
 	var oChaToggleControl = this.private_InitChannelToggleButton("divIdLChatTabsToggle");
-	oChaToggleControl.Bounds.SetParams(0, 1, 32, 0, false, true, true, false, 30, 24);
+	oChaToggleControl.Bounds.SetParams(0, 6, 32, 0, false, true, true, false, 30, 24);
 	oChaToggleControl.Anchor = (g_anchor_top | g_anchor_right);
 	oChatControl.AddControl(oChaToggleControl);
 
 	// Все сообщения
 	var oChatTextAreaControl = CreateControlContainer("divIdLChatTextArea");
-	oChatTextAreaControl.Bounds.SetParams(0, 26, 2, 52, true, true, true, true, -1, -1);
+	oChatTextAreaControl.Bounds.SetParams(0, 31, 2, 52, true, true, true, true, -1, -1);
 	oChatTextAreaControl.Anchor = (g_anchor_bottom | g_anchor_right | g_anchor_left);
 	oChatControl.AddControl(oChatTextAreaControl);
 
@@ -1154,12 +1147,12 @@ CGoUniverseApplication.prototype.private_InitOmnibox = function()
 CGoUniverseApplication.prototype.private_InitGamesListTabs = function(oParentControl)
 {
 	var oTabsControl = this.m_oGamesListTabs.Init("divIdLGamesListTabs");
-	oTabsControl.SetParams(0, 0, 0, 0, true, false, true, true, -1, 25);
+	oTabsControl.SetParams(0, 0, 1, 0, true, false, true, true, -1, 26);
 	oTabsControl.SetAnchor(true, false, true, true);
 	oParentControl.AddControl(oTabsControl);
 
 	oTabsControl.HtmlElement.style.backgroundColor = "#F3F3F3";
-	//oTabsControl.HtmlElement.style.borderTop       = "1px solid rgb(190, 190, 190)";
+	oTabsControl.HtmlElement.style.borderRight     = "1px solid rgb(190, 190, 190)";
 
 	var oTab = new CVisualGamesListTab(this);
 	oTab.Init(EKGSGamesListType.AllGames, "Games");
@@ -1167,6 +1160,10 @@ CGoUniverseApplication.prototype.private_InitGamesListTabs = function(oParentCon
 
 	var oTab = new CVisualGamesListTab(this);
 	oTab.Init(EKGSGamesListType.AllChallenges, "Challenges");
+	this.m_oGamesListTabs.AddTab(oTab);
+
+	var oTab = new CVisualGamesListTab(this);
+	oTab.Init(EKGSGamesListType.AllChallengesNoBots, "Challenges (no bots)");
 	this.m_oGamesListTabs.AddTab(oTab);
 
 	var oTab = new CVisualGamesListTab(this);
@@ -1691,4 +1688,10 @@ CGoUniverseApplication.prototype.OnCancelAutomatch = function()
 
 	if (this.m_oAutomatchAnimatedLogo)
 		this.m_oAutomatchAnimatedLogo.Stop();
+};
+CGoUniverseApplication.prototype.OnChangeGamesListType = function(eType)
+{
+	var oTab = this.m_oGamesListTabs.GetTab(eType);
+	if (oTab)
+		oTab.OnClick(false);
 };
