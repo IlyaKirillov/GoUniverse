@@ -577,7 +577,7 @@ function CVisualChatRoomTab(oApp)
 	this.m_oMessagesDiv      = null;
 	this.m_oPopup            = null;
 
-	this.m_nMinWidth         = 4 * 26 + 2;
+	this.m_nMinWidth         = 200;//4 * 26 + 2;
 }
 CVisualChatRoomTab.prototype.Init = function(nId, sRoomName, bPrivate)
 {

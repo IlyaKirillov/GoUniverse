@@ -949,9 +949,19 @@ CGoUniverseApplication.prototype.private_InitMainRoom = function()
 	oGamesListControl.HtmlElement.style.background = "#F3F3F3";
 	oGamesListWrapperControl.AddControl(oGamesListControl);
 
+	this.m_nChatTabsWidth = 200;
+
+	// Табы для чата
+	var oChatTabsControl = CreateControlContainer("divIdLChatTabsWrapper");
+	oChatTabsControl.SetParams(0, dSplitterPosition, 1000, 1000, false, false, false, false, this.m_nChatTabsWidth, -1);
+	oChatTabsControl.SetAnchor(true, true, false, true);
+	oChatTabsControl.HtmlElement.style.background = "#F3F3F3";
+	oLeftPartControl.AddControl(oChatTabsControl);
+	this.m_oChatTabsControl = oChatTabsControl;
+
 	// Часть под чат
 	var oChatControl = CreateControlContainer("divIdLChat");
-	oChatControl.Bounds.SetParams(0, dSplitterPosition, 1000, 1000, false, false, false, false, -1, -1);
+	oChatControl.Bounds.SetParams(this.m_nChatTabsWidth, dSplitterPosition, 1000, 1000, true, false, false, false, -1, -1);
 	oChatControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
 	oLeftPartControl.AddControl(oChatControl);
 	this.m_oChatWrapperControl = oChatControl;
@@ -964,6 +974,7 @@ CGoUniverseApplication.prototype.private_InitMainRoom = function()
 	this.m_oChatDragHandlerControl = oChatDragHandlerControl;
 
 	this.private_InitChats(oChatControl);
+	this.private_InitChatsTabs(oChatTabsControl);
 	this.private_InitGamesListTabs(oGamesListWrapperControl);
 };
 CGoUniverseApplication.prototype.private_InitUserNameLink = function()
@@ -978,36 +989,27 @@ CGoUniverseApplication.prototype.private_InitUserNameLink = function()
 };
 CGoUniverseApplication.prototype.private_InitChats = function(oChatControl)
 {
-	// Табы чата
-	var oChatTabsBack = CreateControlContainer("divIdLChatTabsBack");
-	oChatTabsBack.Bounds.SetParams(0, 5, 2, 0, true, true, true, false, -1, 24);
-	oChatTabsBack.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left);
-	oChatControl.AddControl(oChatTabsBack);
-
-	var oChatTabs = this.m_oChatRoomTabs.Init("divIdLChatTabs");
-	oChatTabs.Bounds.SetParams(0, 6, 64, 0, true, true, true, false, -1, 25);
-	oChatTabs.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left);
-	oChatControl.AddControl(oChatTabs);
-
-	this.m_oChatTabsScroll = new CVerticalScroll();
-	this.m_oChatTabsScroll.Init(oChatTabs.HtmlElement, "VerScroll", "VerScrollActive", false);
-	this.m_oChatTabsScroll.SetPaddings(24, 1, 0);
-
-	// Кнопка добавления чата
-	var oChatAddControl = this.private_InitChannelAddButton("divIdLChatAdd");
-	oChatAddControl.Bounds.SetParams(0, 6, 1, 0, false, true, true, false, 30, 24);
-	oChatAddControl.Anchor = (g_anchor_top | g_anchor_right);
-	oChatControl.AddControl(oChatAddControl);
-
-	// Кнопка добавления чата
-	var oChaToggleControl = this.private_InitChannelToggleButton("divIdLChatTabsToggle");
-	oChaToggleControl.Bounds.SetParams(0, 6, 32, 0, false, true, true, false, 30, 24);
-	oChaToggleControl.Anchor = (g_anchor_top | g_anchor_right);
-	oChatControl.AddControl(oChaToggleControl);
+	// // Табы чата
+	// var oChatTabsBack = CreateControlContainer("divIdLChatTabsBack");
+	// oChatTabsBack.Bounds.SetParams(0, 0, 2, 0, true, true, true, false, -1, 24);
+	// oChatTabsBack.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left);
+	// oChatControl.AddControl(oChatTabsBack);
+	//
+	// // Кнопка добавления чата
+	// var oChatAddControl = this.private_InitChannelAddButton("divIdLChatAdd");
+	// oChatAddControl.Bounds.SetParams(0, 16, 1, 0, false, true, true, false, 30, 24);
+	// oChatAddControl.Anchor = (g_anchor_top | g_anchor_right);
+	// oChatControl.AddControl(oChatAddControl);
+	//
+	// // Кнопка добавления чата
+	// var oChaToggleControl = this.private_InitChannelToggleButton("divIdLChatTabsToggle");
+	// oChaToggleControl.Bounds.SetParams(0, 1, 32, 0, false, true, true, false, 30, 24);
+	// oChaToggleControl.Anchor = (g_anchor_top | g_anchor_right);
+	// oChatControl.AddControl(oChaToggleControl);
 
 	// Все сообщения
 	var oChatTextAreaControl = CreateControlContainer("divIdLChatTextArea");
-	oChatTextAreaControl.Bounds.SetParams(0, 31, 2, 52, true, true, true, true, -1, -1);
+	oChatTextAreaControl.Bounds.SetParams(0, 0, 2, 52, true, true, true, true, -1, -1);
 	oChatTextAreaControl.Anchor = (g_anchor_bottom | g_anchor_right | g_anchor_left);
 	oChatControl.AddControl(oChatTextAreaControl);
 
@@ -1028,6 +1030,17 @@ CGoUniverseApplication.prototype.private_InitChats = function(oChatControl)
 	{
 		oThis.SendChatMessage(e);
 	});
+};
+CGoUniverseApplication.prototype.private_InitChatsTabs = function(oWrapperControl)
+{
+	var oChatTabs = this.m_oChatRoomTabs.Init("divIdLChatTabs");
+	oChatTabs.SetParams(0, 0, 1000, 1000, true, true, false, false, -1, -1);
+	oChatTabs.SetAnchor(true, true, true, true);
+	oWrapperControl.AddControl(oChatTabs);
+
+	this.m_oChatTabsScroll = new CVerticalScroll();
+	this.m_oChatTabsScroll.Init(oChatTabs.HtmlElement, "VerScroll", "VerScrollActive", false);
+	this.m_oChatTabsScroll.SetPaddings(24, 1, 0);
 };
 CGoUniverseApplication.prototype.private_InitChannelAddButton = function(sDivId)
 {
@@ -1314,7 +1327,7 @@ CGoUniverseApplication.prototype.private_OpenChatTabs = function()
 	oTabs.className = "ChatOpenPanel";
 
 	var nClientHeight = (nMaxLines * 25 - 1);
-	oTabs.style.height          = nClientHeight + "px";
+	//oTabs.style.height          = nClientHeight + "px";
 	oTabs.style.backgroundColor = "#F3F3F3";
 	oTabs.style.borderBottom    = "1px solid #BEBEBE";
 	oTabs.style.borderRight     = "1px solid #BEBEBE";
@@ -1329,7 +1342,7 @@ CGoUniverseApplication.prototype.private_CollapseChatTabs = function()
 {
 	var oTabs = document.getElementById("divIdLChatTabs");
 	oTabs.className = "";
-	oTabs.style.height          = "25px";
+	//oTabs.style.height          = "25px";
 	oTabs.style.minHeight       = "";
 	oTabs.style.maxHeight       = "";
 	oTabs.style.backgroundColor = "transparent";
@@ -1338,7 +1351,7 @@ CGoUniverseApplication.prototype.private_CollapseChatTabs = function()
 	oTabs.style.overflowY       = "hidden";
 	oTabs.style.boxShadow       = "";
 
-	document.getElementById("divIdLChatTabsToggleInnerSpan").style.transform = "rotate(90deg)";
+//	document.getElementById("divIdLChatTabsToggleInnerSpan").style.transform = "rotate(90deg)";
 
 	this.m_oChatTabsScroll.Hide();
 	this.ScrollChatTabsToCurrent();
@@ -1394,7 +1407,7 @@ CGoUniverseApplication.prototype.UpdateDropDownChatTabsButton = function()
 
 	if (nCount <= 0)
 	{
-		document.getElementById("divIdLChatTabsToggle").style.display = "none";
+//		document.getElementById("divIdLChatTabsToggle").style.display = "none";
 		return;
 	}
 
@@ -1404,11 +1417,11 @@ CGoUniverseApplication.prototype.UpdateDropDownChatTabsButton = function()
 
 	if (nLines > 1)
 	{
-		document.getElementById("divIdLChatTabsToggle").style.display = "block";
+		//document.getElementById("divIdLChatTabsToggle").style.display = "block";
 	}
 	else
 	{
-		document.getElementById("divIdLChatTabsToggle").style.display = "none";
+		//document.getElementById("divIdLChatTabsToggle").style.display = "none";
 	}
 };
 CGoUniverseApplication.prototype.private_OpenGameTabs = function()
@@ -1427,7 +1440,7 @@ CGoUniverseApplication.prototype.private_OpenGameTabs = function()
 
 	var nClientHeight = (nMaxLines * 50 - 1);
 	document.getElementById("divIdTabPanel").style.height = nClientHeight + 5 + "px";
-	oTabs.style.height          = nClientHeight + "px";
+	//oTabs.style.height          = nClientHeight + "px";
 	oTabs.style.backgroundColor = "#050708";
 	oTabs.style.boxShadow       = "0px 1px 5px rgba(0,0,0,0.8)";
 
@@ -1440,7 +1453,7 @@ CGoUniverseApplication.prototype.private_CollapseGameTabs = function()
 {
 	var oTabs = document.getElementById("divIdTabPanelRooms");
 	oTabs.className = "";
-	oTabs.style.height          = "50px";
+	//oTabs.style.height          = "50px";
 	oTabs.style.backgroundColor = "transparent";
 	oTabs.style.boxShadow       = "";
 
@@ -1595,15 +1608,18 @@ CGoUniverseApplication.prototype.private_InitChatDragHandler = function ()
 		{
 			var dPosition = 1000 * nY / nH;
 			oThis.m_oGamesListWrapperControl.Bounds.SetParams(0, 0, 1000, dPosition, false, false, false, false, -1, -1);
-			oThis.m_oChatWrapperControl.Bounds.SetParams(0, dPosition, 1000, 1000, false, false, false, false, -1, -1);
 			oThis.m_oChatDragHandlerControl.Bounds.SetParams(0, dPosition, 1000, 1000, false, false, false, false, -1, 5);
+			oThis.m_oChatWrapperControl.Bounds.SetParams(oThis.m_nChatTabsWidth, dPosition, 1000, 1000, true, false, false, false, -1, -1);
+			oThis.m_oChatTabsControl.SetParams(0, dPosition, 1000, 1000, false, false, false, false, oThis.m_nChatTabsWidth, -1);
 			oThis.m_oGlobalSettings.SetChatSplitterPosition(dPosition);
 		}
 		else
 		{
 			oThis.m_oGamesListWrapperControl.Bounds.SetParams(0, 0, 1000, 0, false, false, false, false, -1, nY);
-			oThis.m_oChatWrapperControl.Bounds.SetParams(0, nY, 1000, 1000, false, true, false, false, -1, -1);
 			oThis.m_oChatDragHandlerControl.Bounds.SetParams(0, nY, 1000, 1000, false, true, false, false, -1, 5);
+			oThis.m_oChatWrapperControl.Bounds.SetParams(oThis.m_nChatTabsWidth, nY, 1000, 1000, true, true, false, false, -1, -1);
+			oThis.m_oChatTabsControl.SetParams(0, nY, 1000, 1000, false, true, false, false, oThis.m_nChatTabsWidth, -1);
+
 		}
 		oThis.OnResize(true);
 		oThis.m_oGamesListView.private_ScrollByY(0);
