@@ -26,6 +26,7 @@ function CGoUniverseApplication()
 
 	this.m_oGameRoomTabs       = new CVisualGameRoomTabs();
 	this.m_oChatRoomTabs       = new CVisualChatRoomTabs();
+	this.m_oGamesListTabs      = new CVisualTabs();
 
 	this.m_arrPopups           = [];
 	
@@ -853,6 +854,13 @@ CGoUniverseApplication.prototype.private_InitTabPanel = function(oTabsControl)
 
 		oContextMenu.AddHorizontalLine();
 
+		oContextMenu.AddListItem("Start demonstration", function()
+		{
+
+		}, false);
+
+		oContextMenu.AddHorizontalLine();
+
 		var arrAllChallenges = oClient.GetAllChallenges();
 		for (var nIndex = 0, nCount = arrAllChallenges.length; nIndex < nCount; ++nIndex)
 		{
@@ -936,10 +944,17 @@ CGoUniverseApplication.prototype.private_InitMainRoom = function()
 	this.m_oGamesListWrapperControl = oGamesListWrapperControl;
 
 	var oGamesListControl = this.m_oGamesListView.Init("divIdLGames", new CKGSGamesList(this));
-	oGamesListControl.Bounds.SetParams(0, 0, 2, 0, true, false, true, true, -1, -1);
+	oGamesListControl.Bounds.SetParams(0, 0, 2, 25, true, false, true, true, -1, -1);
 	oGamesListControl.Anchor = (g_anchor_top |g_anchor_bottom | g_anchor_right | g_anchor_left);
 	oGamesListControl.HtmlElement.style.background = "#F3F3F3";
 	oGamesListWrapperControl.AddControl(oGamesListControl);
+
+	// // Табы для списка игр и вызовов
+	// var oGamesListTabsControl = CreateControlContainer("divIdLGamesListTabs");
+	// oGamesListTabsControl.SetParams(0, 0, 0, 0, true, false, true, true, -1, 25);
+	// oGamesListTabsControl.SetAnchor(true, false, true, true);
+	// oGamesListWrapperControl.AddControl(oGamesListTabsControl);
+	// oGamesListTabsControl.HtmlElement.style.background = "red";
 
 	// Часть под чат
 	var oChatControl = CreateControlContainer("divIdLChat");
@@ -956,6 +971,7 @@ CGoUniverseApplication.prototype.private_InitMainRoom = function()
 	this.m_oChatDragHandlerControl = oChatDragHandlerControl;
 
 	this.private_InitChats(oChatControl);
+	this.private_InitGamesListTabs(oGamesListWrapperControl);
 };
 CGoUniverseApplication.prototype.private_InitUserNameLink = function()
 {
@@ -1134,6 +1150,32 @@ CGoUniverseApplication.prototype.private_InitOmnibox = function()
 	{
 		this.value = "";
 	}, false);
+};
+CGoUniverseApplication.prototype.private_InitGamesListTabs = function(oParentControl)
+{
+	var oTabsControl = this.m_oGamesListTabs.Init("divIdLGamesListTabs");
+	oTabsControl.SetParams(0, 0, 0, 0, true, false, true, true, -1, 25);
+	oTabsControl.SetAnchor(true, false, true, true);
+	oParentControl.AddControl(oTabsControl);
+
+	oTabsControl.HtmlElement.style.backgroundColor = "#F3F3F3";
+	//oTabsControl.HtmlElement.style.borderTop       = "1px solid rgb(190, 190, 190)";
+
+	var oTab = new CVisualGamesListTab(this);
+	oTab.Init(EKGSGamesListType.AllGames, "Games");
+	this.m_oGamesListTabs.AddTab(oTab);
+
+	var oTab = new CVisualGamesListTab(this);
+	oTab.Init(EKGSGamesListType.AllChallenges, "Challenges");
+	this.m_oGamesListTabs.AddTab(oTab);
+
+	var oTab = new CVisualGamesListTab(this);
+	oTab.Init(EKGSGamesListType.Room, "Rooms");
+	this.m_oGamesListTabs.AddTab(oTab);
+
+	var oTab = new CVisualGamesListTab(this);
+	oTab.Init(EKGSGamesListType.Followed, "Followed");
+	this.m_oGamesListTabs.AddTab(oTab);
 };
 CGoUniverseApplication.prototype.private_ClearClient = function()
 {

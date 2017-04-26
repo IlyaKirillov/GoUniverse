@@ -156,7 +156,7 @@ CKGSClient.prototype.LoadGameInRoom = function(sTimeStamp, nRoomId, isPrivate)
 	{
 		this.private_SendMessage({
 			"type"      : "ROOM_LOAD_GAME",
-			"timestamp" : sTimeStamp,
+			"timestamp" : "",
 			"channelId" : nRoomId
 		});
 	}
@@ -561,6 +561,31 @@ CKGSClient.prototype.SendCreateChallenge = function(nChannelId, nCallBackKey, nG
 		oRules["byoYomiStones"] = oTimeSettings.GetOverCount();
 	}
 
+	// this.private_SendMessage({
+	// 	"channelId"   : nChannelId,
+	// 	"type"        : "CHALLENGE_CREATE",
+	// 	"callbackKey" : nCallBackKey,
+	// 	"text"        : sComment,
+	// 	"global"      : true,
+	//
+	// 	"proposal" : {
+	//
+	// 		"gameType" : KGSCommon.GameTypeToString(nGameType),
+	// 		"nigiri"   : true,
+	//
+	// 		"rules" : oRules,
+	//
+	// 		"private" : bPrivate,
+	//
+	// 		"players" : [{
+	// 			"role" : "white",
+	// 			"name" : this.m_oCurrentUser.GetName()
+	// 		}, {
+	// 			"role" : "black"
+	// 		}]
+	// 	}
+	// });
+
 	this.private_SendMessage({
 		"channelId"   : nChannelId,
 		"type"        : "CHALLENGE_CREATE",
@@ -570,7 +595,7 @@ CKGSClient.prototype.SendCreateChallenge = function(nChannelId, nCallBackKey, nG
 
 		"proposal" : {
 
-			"gameType" : KGSCommon.GameTypeToString(nGameType),
+			"gameType" : KGSCommon.GameTypeToString(EKGSGameType.Demonstration),
 			"nigiri"   : true,
 
 			"rules" : oRules,
@@ -578,10 +603,8 @@ CKGSClient.prototype.SendCreateChallenge = function(nChannelId, nCallBackKey, nG
 			"private" : bPrivate,
 
 			"players" : [{
-				"role" : "white",
+				"role" : "owner",
 				"name" : this.m_oCurrentUser.GetName()
-			}, {
-				"role" : "black"
 			}]
 		}
 	});
@@ -654,6 +677,10 @@ CKGSClient.prototype.DeclineChallenge = function(nChannelId, sUserName)
 		"type"     : "CHALLENGE_DECLINE",
 		"name"     : sUserName
 	});
+};
+CKGSClient.prototype.CreateDemonstration = function()
+{
+
 };
 CKGSClient.prototype.SendSync = function(oClass)
 {
