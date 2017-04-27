@@ -238,7 +238,7 @@ div.Selectable {
 	-webkit-appearance     : none;
 	-webkit-border-radius : 0;
 	overflow              : visible;
-	color                 : #111111;
+	color                 : rgb(220, 220, 220);
 	line-height           : 20px;
 	float                 : left;
 	height                : 100%;
@@ -248,11 +248,11 @@ div.Selectable {
 }
 
 .ChatMenuButton:active {
-	color : #008272;
+	color : rgb(255, 255, 255);;
 }
 
 .ChatMenuButton:hover {
-	color : #009983;
+	color : rgb(255, 255, 255);;
 }
 
 .ChatMenuButton center div {
