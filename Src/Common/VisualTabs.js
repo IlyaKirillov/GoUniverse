@@ -727,10 +727,15 @@ CVisualChatRoomTab.prototype.private_InitTab = function(sRoomName)
 	DivTab.style.whiteSpace         = "nowrap";
 	DivTab.style.textOverflow       = "ellipsis";
 	DivTab.style.borderBottom       = "1px solid #BEBEBE";
+	DivTab.style.cursor             = "pointer";
 	DivTab.addEventListener("selectstart", function()
 	{
 		return false;
 	}, false);
+	DivTab.addEventListener("click", function()
+	{
+		oThis.OnClick();
+	});
 
 	var NewTab                             = document.createElement("button");
 	NewTab.tabIndex                        = "0";
@@ -738,7 +743,6 @@ CVisualChatRoomTab.prototype.private_InitTab = function(sRoomName)
 	NewTab.style.transitionDuration        = ".25s";
 	NewTab.style.background                = "none";
 	NewTab.style.outline                   = "none";
-	NewTab.style.cursor                    = "pointer";
 	NewTab.style["-webkit-appearance"]     = "none";
 	NewTab.style["-webkit-border-radius"]  = "0";
 	NewTab.style.overflow                  = "visible";
@@ -755,10 +759,6 @@ CVisualChatRoomTab.prototype.private_InitTab = function(sRoomName)
 	NewTab.style.maxWidth                  = "200px";
 	NewTab.style.overflow                  = "hidden";
 	NewTab.style.float                     = "left";
-	NewTab.addEventListener("click", function()
-	{
-		oThis.OnClick();
-	});
 
 	var NewTabDiv = document.createElement("div");
 	NewTabDiv.style.textAlign = "left";
