@@ -743,6 +743,7 @@ CVisualChatRoomTab.prototype.private_InitTab = function(sRoomName)
 	NewTab.style.transitionDuration        = ".25s";
 	NewTab.style.background                = "none";
 	NewTab.style.outline                   = "none";
+	NewTab.style.cursor                    = "pointer";
 	NewTab.style["-webkit-appearance"]     = "none";
 	NewTab.style["-webkit-border-radius"]  = "0";
 	NewTab.style.overflow                  = "visible";
