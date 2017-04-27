@@ -625,24 +625,11 @@ CVisualChatRoomTab.prototype.OnClick = function()
 	var oOldTab = this.m_oParent.OnClick(this);
 	if (oOldTab)
 	{
-		oOldTab.m_oBackDiv.style.borderTop          = "1px solid #BEBEBE";
-		oOldTab.m_oBackDiv.style.borderRight        = "1px solid #BEBEBE";
-		oOldTab.m_oBackDiv.style.borderLeft         = "1px solid transparent";
-
-		oOldTab.m_oTabDiv.style.borderBottom = "1px solid #BEBEBE";
-		oOldTab.m_oTabDiv.style.borderTop    = "3px solid #F3F3F3";
 		oOldTab.m_oMenuSpan.style.visibility = "hidden";
 		oOldTab.m_oTabDiv.style.background   = "transparent";
 		oOldTab.m_oButton.style.color        = "rgb(0, 0, 0)";
 	}
 
-	this.m_oBackDiv.style.borderTop          = "1px solid rgb(0, 130, 114)";
-	this.m_oBackDiv.style.borderRight        = "1px solid rgb(0, 130, 114)";
-	this.m_oBackDiv.style.borderLeft         = "1px solid rgb(0, 130, 114)";
-
-
-	this.m_oTabDiv.style.borderBottom = "1px solid #F3F3F3";
-	this.m_oTabDiv.style.borderTop    = "3px solid rgb(0, 130, 114)";
 	this.m_nNewMessagesCount          = 0;
 	this.m_oMessagesDiv.innerHTML     = "";
 	this.m_oMenuSpan.style.visibility = "visible";
@@ -722,23 +709,7 @@ CVisualChatRoomTab.prototype.private_InitTab = function(sRoomName)
 {
 	var oThis      = this;
 	this.m_oTabDiv = document.createElement("div");
-	var sHeight    = "21px";
-
-
-	var oBackDiv               = document.createElement("div");
-	oBackDiv.style.position    = "absolute";
-	oBackDiv.style.top         = "-4px";
-	oBackDiv.style.left        = "-1px";
-	oBackDiv.style.right       = "-1px";
-	oBackDiv.style.height      = "3px";
-	oBackDiv.style.borderTop   = "1px solid #BEBEBE";
-	oBackDiv.style.borderRight = "1px solid #BEBEBE";
-	oBackDiv.style.borderLeft  = "1px solid transparent";
-
-	this.m_oBackDiv = oBackDiv;
-
-	this.m_oTabDiv.appendChild(oBackDiv);
-
+	var sHeight    = "24px";
 
 	var DivTab                      = this.m_oTabDiv;
 	DivTab.style.overflow           = "visible";
@@ -746,7 +717,7 @@ CVisualChatRoomTab.prototype.private_InitTab = function(sRoomName)
 	DivTab["aria-label"]            = sRoomName;
 	DivTab.title                    = sRoomName;
 	DivTab.style.transitionProperty = "width,height,background,margin,border,padding";
-	DivTab.style.transitionDuration = ".25s";
+	DivTab.style.transitionDuration = ".3s";
 	DivTab.style.float              = "left";
 	DivTab.style.height             = sHeight;
 	DivTab.style.minWidth           = this.m_nMinWidth + "px";
@@ -755,8 +726,6 @@ CVisualChatRoomTab.prototype.private_InitTab = function(sRoomName)
 	DivTab.style.color              = "#000";
 	DivTab.style.whiteSpace         = "nowrap";
 	DivTab.style.textOverflow       = "ellipsis";
-	DivTab.style.borderTop          = "3px solid transparent";
-	DivTab.style.borderRight        = "1px solid #BEBEBE";
 	DivTab.style.borderBottom       = "1px solid #BEBEBE";
 	DivTab.addEventListener("selectstart", function()
 	{
