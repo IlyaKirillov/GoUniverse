@@ -87,6 +87,7 @@ CKGSRoomInfoWindow.prototype.private_CreateInfoArea = function(oParentDiv)
 	oInfoArea.id               = oElement.id + "I";
 	oInfoArea.style.position   = "absolute";
 	oInfoArea.style.fontFamily = "'Segoe UI',Helvetica,Tahoma,Geneva,Verdana,sans-serif";
+	oInfoArea.style.fontSize   = "14px";
 	oElement.appendChild(oInfoArea);
 	oParentDiv.appendChild(oElement);
 
