@@ -1768,6 +1768,28 @@ CVisualChatTabsPanel.prototype.private_InitTopPanel = function(oParent)
 {
 	oParent.style.borderBottom = "1px solid rgb(190, 190, 190)";
 
+	var oSearchIcon              = document.createElement("div");
+	oSearchIcon.style.position   = "absolute";
+	oSearchIcon.style.left       = "25px";
+	oSearchIcon.style.top        = "5px";
+	oSearchIcon.style.fontSize   = "12px";
+	oSearchIcon.style.fontFamily = "NotoEmoji";
+	oSearchIcon.innerHTML        = "🔍";
+	oParent.appendChild(oSearchIcon);
+
+	var oCancelIcon = document.createElement("div");
+	oCancelIcon.style.position   = "absolute";
+	oCancelIcon.style.right      = "0px";
+	oCancelIcon.style.top        = "5px";
+	oCancelIcon.style.fontSize   = "14px";
+	oCancelIcon.style.width      = "24px";
+	oCancelIcon.style.textAlign  = "center";
+	oCancelIcon.style.fontFamily = "NotoEmoji";
+	oCancelIcon.innerHTML        = "\u2715";
+	oCancelIcon.style.display    = "none";
+	oCancelIcon.style.cursor     = "pointer";
+	oParent.appendChild(oCancelIcon);
+
 	var oInput = document.createElement("input");
 	oInput.type = "text";
 	oInput.className += "chatTabsSearch";
@@ -1775,14 +1797,14 @@ CVisualChatTabsPanel.prototype.private_InitTopPanel = function(oParent)
 	oInput["aria-label"]  = "Search";
 	oInput["placeholder"] = "Search";
 
-
 	oParent.appendChild(oInput);
 
 	var oThis = this;
-	oInput.addEventListener("input", function()
+
+	function OnInputChange()
 	{
 		var oTabs  = oThis.m_oChatTabs;
-		var sValue = (this.value).toLowerCase();
+		var sValue = (oInput.value).toLowerCase();
 
 		for (var nIndex = 0, nCount = oTabs.GetCount(); nIndex < nCount; ++nIndex)
 		{
@@ -1798,5 +1820,24 @@ CVisualChatTabsPanel.prototype.private_InitTopPanel = function(oParent)
 				oTab.HideTab();
 			}
 		}
+
+		if (!sValue || "" === sValue)
+			oCancelIcon.style.display = "none";
+		else
+			oCancelIcon.style.display = "block";
+	}
+
+	oInput.addEventListener("input", function()
+	{
+		OnInputChange();
 	});
+
+	oCancelIcon.addEventListener("click", function()
+	{
+		oInput.value = "";
+		OnInputChange();
+
+		if (oInput.focus)
+			oInput.focus();
+	}, false);
 };
