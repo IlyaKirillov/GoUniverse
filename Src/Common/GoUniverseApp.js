@@ -39,6 +39,7 @@ function CGoUniverseApplication()
 	this.m_oChatTabsScroll = null;
 	this.m_oChatScroll     = null;
 	this.m_oChatTabs       = new CVisualChatTabsPanel();
+	this.m_bChatTabsFullHeight = false;
 
 	this.m_oGamesListWrapperControl = null;
 	this.m_oChatWrapperControl      = null;
@@ -951,6 +952,7 @@ CGoUniverseApplication.prototype.private_InitMainRoom = function()
 	oGamesListWrapperControl.AddControl(oGamesListControl);
 
 	this.m_nChatTabsWidth = 200;
+	this.m_bChatTabsFullHeight = this.m_oGlobalSettings.GetChatTabsFullHeight();
 
 	// Табы для чата
 	var oChatTabsControl = CreateControlContainer("divIdLChatTabsWrapper");
@@ -974,6 +976,7 @@ CGoUniverseApplication.prototype.private_InitMainRoom = function()
 	oLeftPartControl.AddControl(oChatDragHandlerControl);
 	this.m_oChatDragHandlerControl = oChatDragHandlerControl;
 
+	this.private_OnChangeChatTabsFullHeight();
 	this.private_InitChats(oChatControl);
 	this.private_InitChatsTabs(oChatTabsControl);
 	this.private_InitGamesListTabs(oGamesListWrapperControl);
@@ -1034,7 +1037,34 @@ CGoUniverseApplication.prototype.private_InitChats = function(oChatControl)
 };
 CGoUniverseApplication.prototype.private_InitChatsTabs = function(oWrapperControl)
 {
-	this.m_oChatTabs.Init(this.m_oChatRoomTabs, oWrapperControl);
+	this.m_oChatTabs.Init(this.m_oChatRoomTabs, oWrapperControl, this.m_bChatTabsFullHeight);
+
+	var oThis = this;
+	this.m_oChatTabs.SetOnChangeHeightCallback(function(bFullHeight)
+	{
+		oThis.m_bChatTabsFullHeight = bFullHeight;
+		oThis.private_OnChangeChatTabsFullHeight();
+		oThis.m_oGlobalSettings.SetChatTabsFullHeight(bFullHeight);
+		oThis.OnResize(true);
+	});
+};
+CGoUniverseApplication.prototype.private_OnChangeChatTabsFullHeight = function()
+{
+	var dPosition = this.m_oGlobalSettings.GetChatSplitterPosition();
+	if (this.m_bChatTabsFullHeight)
+	{
+		this.m_oGamesListWrapperControl.Bounds.SetParams(this.m_nChatTabsWidth, 0, 1000, dPosition, true, false, false, false, -1, -1);
+		this.m_oChatDragHandlerControl.Bounds.SetParams(this.m_nChatTabsWidth, dPosition, 1000, 1000, true, false, false, false, -1, 5);
+		this.m_oChatWrapperControl.Bounds.SetParams(this.m_nChatTabsWidth, dPosition, 1000, 1000, true, false, false, false, -1, -1);
+		this.m_oChatTabsControl.SetParams(0, 0, 1000, 1000, false, false, false, false, this.m_nChatTabsWidth, -1);
+	}
+	else
+	{
+		this.m_oGamesListWrapperControl.Bounds.SetParams(0, 0, 1000, dPosition, false, false, false, false, -1, -1);
+		this.m_oChatDragHandlerControl.Bounds.SetParams(0, dPosition, 1000, 1000, false, false, false, false, -1, 5);
+		this.m_oChatWrapperControl.Bounds.SetParams(this.m_nChatTabsWidth, dPosition, 1000, 1000, true, false, false, false, -1, -1);
+		this.m_oChatTabsControl.SetParams(0, dPosition, 1000, 1000, false, false, false, false, this.m_nChatTabsWidth, -1);
+	}
 };
 CGoUniverseApplication.prototype.private_InitChannelAddButton = function(sDivId)
 {
@@ -1598,23 +1628,45 @@ CGoUniverseApplication.prototype.private_InitChatDragHandler = function ()
 	var oThis = this;
 	function privateOnDrag(nY, isKoef)
 	{
-		if (true === isKoef)
+		if (oThis.m_bChatTabsFullHeight)
 		{
-			var dPosition = 1000 * nY / nH;
-			oThis.m_oGamesListWrapperControl.Bounds.SetParams(0, 0, 1000, dPosition, false, false, false, false, -1, -1);
-			oThis.m_oChatDragHandlerControl.Bounds.SetParams(0, dPosition, 1000, 1000, false, false, false, false, -1, 5);
-			oThis.m_oChatWrapperControl.Bounds.SetParams(oThis.m_nChatTabsWidth, dPosition, 1000, 1000, true, false, false, false, -1, -1);
-			oThis.m_oChatTabsControl.SetParams(0, dPosition, 1000, 1000, false, false, false, false, oThis.m_nChatTabsWidth, -1);
-			oThis.m_oGlobalSettings.SetChatSplitterPosition(dPosition);
+			if (true === isKoef)
+			{
+				var dPosition = 1000 * nY / nH;
+				oThis.m_oGamesListWrapperControl.Bounds.SetParams(oThis.m_nChatTabsWidth, 0, 1000, dPosition, true, false, false, false, -1, -1);
+				oThis.m_oChatDragHandlerControl.Bounds.SetParams(oThis.m_nChatTabsWidth, dPosition, 1000, 1000, true, false, false, false, -1, 5);
+				oThis.m_oChatWrapperControl.Bounds.SetParams(oThis.m_nChatTabsWidth, dPosition, 1000, 1000, true, false, false, false, -1, -1);
+				oThis.m_oChatTabsControl.SetParams(0, 0, 1000, 1000, false, false, false, false, oThis.m_nChatTabsWidth, -1);
+				oThis.m_oGlobalSettings.SetChatSplitterPosition(dPosition);
+			}
+			else
+			{
+				oThis.m_oGamesListWrapperControl.Bounds.SetParams(oThis.m_nChatTabsWidth, 0, 1000, 0, true, false, false, false, -1, nY);
+				oThis.m_oChatDragHandlerControl.Bounds.SetParams(oThis.m_nChatTabsWidth, nY, 1000, 1000, true, true, false, false, -1, 5);
+				oThis.m_oChatWrapperControl.Bounds.SetParams(oThis.m_nChatTabsWidth, nY, 1000, 1000, true, true, false, false, -1, -1);
+				oThis.m_oChatTabsControl.SetParams(0, 0, 1000, 1000, false, false, false, false, oThis.m_nChatTabsWidth, -1);
+			}
 		}
 		else
 		{
-			oThis.m_oGamesListWrapperControl.Bounds.SetParams(0, 0, 1000, 0, false, false, false, false, -1, nY);
-			oThis.m_oChatDragHandlerControl.Bounds.SetParams(0, nY, 1000, 1000, false, true, false, false, -1, 5);
-			oThis.m_oChatWrapperControl.Bounds.SetParams(oThis.m_nChatTabsWidth, nY, 1000, 1000, true, true, false, false, -1, -1);
-			oThis.m_oChatTabsControl.SetParams(0, nY, 1000, 1000, false, true, false, false, oThis.m_nChatTabsWidth, -1);
-
+			if (true === isKoef)
+			{
+				var dPosition = 1000 * nY / nH;
+				oThis.m_oGamesListWrapperControl.Bounds.SetParams(0, 0, 1000, dPosition, false, false, false, false, -1, -1);
+				oThis.m_oChatDragHandlerControl.Bounds.SetParams(0, dPosition, 1000, 1000, false, false, false, false, -1, 5);
+				oThis.m_oChatWrapperControl.Bounds.SetParams(oThis.m_nChatTabsWidth, dPosition, 1000, 1000, true, false, false, false, -1, -1);
+				oThis.m_oChatTabsControl.SetParams(0, dPosition, 1000, 1000, false, false, false, false, oThis.m_nChatTabsWidth, -1);
+				oThis.m_oGlobalSettings.SetChatSplitterPosition(dPosition);
+			}
+			else
+			{
+				oThis.m_oGamesListWrapperControl.Bounds.SetParams(0, 0, 1000, 0, false, false, false, false, -1, nY);
+				oThis.m_oChatDragHandlerControl.Bounds.SetParams(0, nY, 1000, 1000, false, true, false, false, -1, 5);
+				oThis.m_oChatWrapperControl.Bounds.SetParams(oThis.m_nChatTabsWidth, nY, 1000, 1000, true, true, false, false, -1, -1);
+				oThis.m_oChatTabsControl.SetParams(0, nY, 1000, 1000, false, true, false, false, oThis.m_nChatTabsWidth, -1);
+			}
 		}
+
 		oThis.OnResize(true);
 		oThis.m_oGamesListView.private_ScrollByY(0);
 	}
@@ -1710,17 +1762,21 @@ CGoUniverseApplication.prototype.OnChangeGamesListType = function(eType)
  * Спецаильный класс для работы с табами чата
  * @constructor
  */
-function CVisualChatTabsPanel()
+function CVisualChatTabsPanel(bFullHeight)
 {
 	this.m_oChatTabs       = null;
 	this.m_oChatTabsScroll = null;
 
 	this.m_nTopPanelH = 30;
 	this.m_nBotPanelH = 100;
+
+	this.m_bFullHeight     = false;
+	this.m_fOnChangeHeight = null;
 }
-CVisualChatTabsPanel.prototype.Init = function(oChatTabs, oParentControl)
+CVisualChatTabsPanel.prototype.Init = function(oChatTabs, oParentControl, bFullHeight)
 {
-	this.m_oChatTabs = oChatTabs;
+	this.m_oChatTabs   = oChatTabs;
+	this.m_bFullHeight = bFullHeight ? true : false;
 
 	var oParentElement = oParentControl.HtmlElement;
 
@@ -1799,6 +1855,34 @@ CVisualChatTabsPanel.prototype.private_InitTopPanel = function(oParent)
 
 	oParent.appendChild(oInput);
 
+	// Кнопка для изменения расположения всей панели с табами
+	var oMenuButton      = document.createElement("button");
+	oMenuButton.tabIndex = "0";
+	oMenuButton.className += " ChatMenuButton";
+	oMenuButton.style.position = "absolute";
+	oMenuButton.style.left     = "0px";
+	oMenuButton.style.top      = "0px";
+	oMenuButton.style.color    = "rgb(0, 0, 0)";
+
+	var oCenter    = document.createElement("center");
+	var oCenterDiv = document.createElement("div");
+	var oMenuSpan  = document.createElement("span");
+
+	oMenuSpan.className += " ChatMenuSpan";
+	oMenuSpan.style.color = "black";
+	oCenterDiv.appendChild(oMenuSpan);
+
+	oMenuSpan.style.transition = "all 0.3s ease";
+
+	if (this.m_bFullHeight)
+		oMenuSpan.style.transform = "rotate(90deg)";
+	else
+		oMenuSpan.style.transform = "rotate(270deg)";
+
+	oCenter.appendChild(oCenterDiv);
+	oMenuButton.appendChild(oCenter);
+	oParent.appendChild(oMenuButton);
+
 	var oThis = this;
 
 	function OnInputChange()
@@ -1840,4 +1924,25 @@ CVisualChatTabsPanel.prototype.private_InitTopPanel = function(oParent)
 		if (oInput.focus)
 			oInput.focus();
 	}, false);
+
+	oMenuButton.addEventListener("click", function()
+	{
+		oThis.m_bFullHeight = !oThis.m_bFullHeight;
+
+		if (oThis.m_bFullHeight)
+			oMenuSpan.style.transform = "rotate(90deg)";
+		else
+			oMenuSpan.style.transform = "rotate(270deg)";
+
+		oThis.private_OnChangeHeight();
+	}, false);
+};
+CVisualChatTabsPanel.prototype.SetOnChangeHeightCallback = function(fCallback)
+{
+	this.m_fOnChangeHeight = fCallback;
+};
+CVisualChatTabsPanel.prototype.private_OnChangeHeight = function()
+{
+	if (this.m_fOnChangeHeight)
+		this.m_fOnChangeHeight(this.m_bFullHeight);
 };

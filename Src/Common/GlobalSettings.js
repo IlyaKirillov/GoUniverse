@@ -15,6 +15,7 @@ function CGoUniverseGlobalSettings(oApp)
 
 	// Common
 	this.m_dChatSplitterPosition = 500;
+	this.m_bChatTabsFullHeight   = false;
 
 
 	// KGS specific
@@ -37,6 +38,7 @@ function CGoUniverseGlobalSettings(oApp)
 	this.m_bKGSUserInfoRecentOnlyRanked = true;
 
 	this.private_ParseChatSplitterPosition();
+	this.private_ParseChatTabsFullHeight();
 
 	this.private_ParseKGSSavePassword();
 	this.private_ParseKGSLogin();
@@ -80,6 +82,25 @@ CGoUniverseGlobalSettings.prototype.private_ParseChatSplitterPosition = function
 		|| this.m_dChatSplitterPosition < 0
 		|| this.m_dChatSplitterPosition > 1000)
 		this.m_dChatSplitterPosition = 500;
+};
+CGoUniverseGlobalSettings.prototype.SetChatTabsFullHeight = function(bValue)
+{
+	this.m_bChatTabsFullHeight = bValue;
+	this.private_SetValue("ChatTabsFullHeight", bValue ? "1" : "0");
+};
+CGoUniverseGlobalSettings.prototype.GetChatTabsFullHeight = function()
+{
+	return this.m_bChatTabsFullHeight;
+};
+CGoUniverseGlobalSettings.prototype.private_ParseChatTabsFullHeight = function()
+{
+	var nValue = this.private_GetValue("ChatTabsFullHeight");
+	if (null === nValue
+		|| undefined === nValue
+		|| "0" === nValue)
+		this.m_bChatTabsFullHeight = false;
+	else
+		this.m_bChatTabsFullHeight = true;
 };
 CGoUniverseGlobalSettings.prototype.SetKGSGamesListType = function(nValue)
 {
