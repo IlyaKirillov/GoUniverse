@@ -1185,7 +1185,7 @@ CGoUniverseApplication.prototype.private_InitOmnibox = function()
 CGoUniverseApplication.prototype.private_InitGamesListTabs = function(oParentControl)
 {
 	var oTabsControl = this.m_oGamesListTabs.Init("divIdLGamesListTabs");
-	oTabsControl.SetParams(0, 0, 1, 0, true, false, true, true, -1, 26);
+	oTabsControl.SetParams(1, 0, 1, 0, true, false, true, true, -1, 26);
 	oTabsControl.SetAnchor(true, false, true, true);
 	oParentControl.AddControl(oTabsControl);
 
@@ -1864,7 +1864,7 @@ CVisualChatTabsPanel.prototype.private_InitTopPanel = function(oParent)
 
 	var oCancelIcon = document.createElement("div");
 	oCancelIcon.style.position   = "absolute";
-	oCancelIcon.style.right      = "0px";
+	oCancelIcon.style.right      = "24px";
 	oCancelIcon.style.top        = "5px";
 	oCancelIcon.style.fontSize   = "14px";
 	oCancelIcon.style.width      = "24px";
@@ -1874,6 +1874,19 @@ CVisualChatTabsPanel.prototype.private_InitTopPanel = function(oParent)
 	oCancelIcon.style.display    = "none";
 	oCancelIcon.style.cursor     = "pointer";
 	oParent.appendChild(oCancelIcon);
+
+	var oAddButton = document.createElement("div");
+	oAddButton.style.position   = "absolute";
+	oAddButton.style.right      = "0px";
+	oAddButton.style.top        = "5px";
+	oAddButton.style.fontSize   = "20px";
+	oAddButton.style.lineHeight = "20px";
+	oAddButton.style.width      = "24px";
+	oAddButton.style.textAlign  = "center";
+	oAddButton.style.fontFamily = "NotoEmoji";
+	oAddButton.innerHTML        = "\u002B";
+	oAddButton.style.cursor     = "pointer";
+	oParent.appendChild(oAddButton);
 
 	var oInput = document.createElement("input");
 	oInput.type = "text";
@@ -1951,11 +1964,21 @@ CVisualChatTabsPanel.prototype.private_InitTopPanel = function(oParent)
 		{
 			oClient.EnterPrivateChat(oInput.value);
 		}
+
+		oInput.value = "";
+		oThis.OnInputChange();
 	}, false);
 
 	this.m_oAddRoomElement.addEventListener("click", function()
 	{
 		CreateKGSWindow(EKGSWindowType.RoomList, {Client : oThis.m_oApp.GetClient(), App : oThis.m_oApp, Text : oInput.value});
+		oInput.value = "";
+		oThis.OnInputChange();
+	}, false);
+
+	oAddButton.addEventListener("click", function()
+	{
+		CreateKGSWindow(EKGSWindowType.RoomList, {Client : oThis.m_oApp.GetClient(), App : oThis.m_oApp});
 	}, false);
 };
 CVisualChatTabsPanel.prototype.SetOnChangeHeightCallback = function(fCallback)
