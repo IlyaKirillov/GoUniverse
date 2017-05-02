@@ -763,7 +763,7 @@ CVisualChatRoomTab.prototype.private_InitTab = function(sRoomName)
 	NewTab.style.height                    = "100%";
 	NewTab.style.margin                    = "0px";
 	NewTab.style.padding                   = "0px 0px 0px 14px";
-	NewTab.style.maxWidth                  = "200px";
+	NewTab.style.maxWidth                  = "174px";
 	NewTab.style.overflow                  = "hidden";
 	NewTab.style.float                     = "left";
 
@@ -774,6 +774,7 @@ CVisualChatRoomTab.prototype.private_InitTab = function(sRoomName)
 	{
 		oCaptionDiv.style.fontWeight = "bold";
 	}
+	oCaptionDiv.style.textOverflow = "ellipsis";
 	oCaptionDiv.innerHTML = sRoomName;
 	NewTabDiv.appendChild(oCaptionDiv);
 	NewTabDiv.addEventListener("selectstart", function()
