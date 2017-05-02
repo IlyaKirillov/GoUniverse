@@ -764,3 +764,21 @@ input.chatTabsSearch:hover {
 	color         : black;
 	border-bottom : 1px solid rgb(0, 130, 114);
 }
+
+div.chatTabsAdditionalSearchButtons {
+
+	text-align      : center;
+	font-size       : 14px;
+	font-family     : 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif;
+	cursor          : pointer;
+	text-decoration : underline;
+	color           : rgb(0, 130, 114);
+	margin          : 0px 10px 0px 10px;
+
+}
+
+div.chatTabsAdditionalSearchButtons:hover {
+
+	text-decoration : underline;
+
+}

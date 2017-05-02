@@ -51,8 +51,14 @@ CKGSRoomListWindow.prototype.Init = function(sDivId, oPr)
 
 	this.Update_Size(true);
 	this.Show(oPr);
+
+	if (oPr.Text)
+	{
+		this.m_oFindInputElement.value = oPr.Text;
+		this.private_OnInputChange();
+	}
 };
-CKGSRoomListWindow.prototype.Show = function()
+CKGSRoomListWindow.prototype.Show = function(oPr)
 {
 	CKGSRoomListWindow.superclass.Show.call(this);
 
@@ -78,6 +84,12 @@ CKGSRoomListWindow.prototype.Show = function()
 
 	this.m_oRoomListView.Update();
 	this.m_oRoomListView.Update_Size();
+
+	if (oPr.Text)
+	{
+		this.m_oFindInputElement.value = oPr.Text;
+		this.private_OnInputChange();
+	}
 };
 CKGSRoomListWindow.prototype.Update_Size = function(bForce)
 {
@@ -124,37 +136,41 @@ CKGSRoomListWindow.prototype.private_CreateFindInput = function(sInputId, oParen
 
 	oFindInput.addEventListener("input", function()
 	{
-		var oClient       = oThis.m_oClient;
-		var oRoomListView = oThis.m_oRoomListView;
-
-		if (!oClient || !oRoomListView)
-			return;
-
-		var sValue = this.value;
-		var oRooms = oClient.GetAllRooms();
-		oRoomListView.Clear();
-		if ("" === sValue)
-		{
-			for (var nRoomId in oRooms)
-			{
-				var oRoom = oRooms[nRoomId];
-				if (oRoom.Name && "" !== oRoom.Name)
-					oRoomListView.Handle_Record([0, oRoom.ChannelId, oRoom.Name, oRoom.CategoryName, oRoom.Private]);
-			}
-		}
-		else
-		{
-			for (var nRoomId in oRooms)
-			{
-				var oRoom = oRooms[nRoomId];
-				if (oRoom.Name && "" !== oRoom.Name && -1 !== oRoom.Name.toLowerCase().indexOf(sValue.toLowerCase()))
-					oRoomListView.Handle_Record([0, oRoom.ChannelId, oRoom.Name, oRoom.CategoryName, oRoom.Private]);
-			}
-		}
-
-		oRoomListView.Update();
-		oRoomListView.Update_Size();
+		oThis.private_OnInputChange();
 	});
 
 	this.m_oFindInputElement = oFindInput;
+};
+CKGSRoomListWindow.prototype.private_OnInputChange = function()
+{
+	var oClient       = this.m_oClient;
+	var oRoomListView = this.m_oRoomListView;
+
+	if (!oClient || !oRoomListView)
+		return;
+
+	var sValue = this.m_oFindInputElement.value;
+	var oRooms = oClient.GetAllRooms();
+	oRoomListView.Clear();
+	if ("" === sValue)
+	{
+		for (var nRoomId in oRooms)
+		{
+			var oRoom = oRooms[nRoomId];
+			if (oRoom.Name && "" !== oRoom.Name)
+				oRoomListView.Handle_Record([0, oRoom.ChannelId, oRoom.Name, oRoom.CategoryName, oRoom.Private]);
+		}
+	}
+	else
+	{
+		for (var nRoomId in oRooms)
+		{
+			var oRoom = oRooms[nRoomId];
+			if (oRoom.Name && "" !== oRoom.Name && -1 !== oRoom.Name.toLowerCase().indexOf(sValue.toLowerCase()))
+				oRoomListView.Handle_Record([0, oRoom.ChannelId, oRoom.Name, oRoom.CategoryName, oRoom.Private]);
+		}
+	}
+
+	oRoomListView.Update();
+	oRoomListView.Update_Size();
 };

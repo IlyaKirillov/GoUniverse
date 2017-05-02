@@ -38,7 +38,7 @@ function CGoUniverseApplication()
 	this.m_oGameTabsScroll = null;
 	this.m_oChatTabsScroll = null;
 	this.m_oChatScroll     = null;
-	this.m_oChatTabs       = new CVisualChatTabsPanel();
+	this.m_oChatTabs       = new CVisualChatTabsPanel(this);
 	this.m_bChatTabsFullHeight = false;
 
 	this.m_oGamesListWrapperControl = null;
@@ -374,6 +374,7 @@ CGoUniverseApplication.prototype.AddChatRoom = function(nChatRoomId, sRoomName, 
 	oTab.Init(nChatRoomId, sRoomName, bPrivate);
 	this.m_oChatRoomTabs.AddTab(oTab);
 	this.UpdateDropDownChatTabsButton();
+	this.m_oChatTabs.OnAddChatRoom();
 };
 CGoUniverseApplication.prototype.SetCurrentChatRoom = function(nChatRoomId)
 {
@@ -1762,8 +1763,9 @@ CGoUniverseApplication.prototype.OnChangeGamesListType = function(eType)
  * Спецаильный класс для работы с табами чата
  * @constructor
  */
-function CVisualChatTabsPanel(bFullHeight)
+function CVisualChatTabsPanel(oApp)
 {
+	this.m_oApp            = oApp;
 	this.m_oChatTabs       = null;
 	this.m_oChatTabsScroll = null;
 
@@ -1772,6 +1774,9 @@ function CVisualChatTabsPanel(bFullHeight)
 
 	this.m_bFullHeight     = false;
 	this.m_fOnChangeHeight = null;
+
+	this.m_oSearchInput    = null;
+	this.m_oCancelIcon     = null;
 }
 CVisualChatTabsPanel.prototype.Init = function(oChatTabs, oParentControl, bFullHeight)
 {
@@ -1805,6 +1810,30 @@ CVisualChatTabsPanel.prototype.Init = function(oChatTabs, oParentControl, bFullH
 	oBottomControl.SetParams(0, 0, 1000, 0, false, false, false, true, -1, this.m_nBotPanelH);
 	oBottomControl.SetAnchor(true, false, true, true);
 	oParentControl.AddControl(oBottomControl);
+
+	// Кнопка для добавления новой комнаты
+	var oAddRoomElement = this.private_CreateDiv(oParentElement);
+	var oAddRoomControl = CreateControlContainerByElement(oAddRoomElement);
+	oAddRoomControl.SetParams(0, this.m_nTopPanelH + 20, 1000, this.m_nBotPanelH, true, true, false, true, -1, 50);
+	oAddRoomControl.SetAnchor(true, true, true, false);
+	oParentControl.AddControl(oAddRoomControl);
+	var oAddRoomElementInner = this.private_CreateDiv(oAddRoomElement);
+	oAddRoomElementInner.innerHTML = "Search in the list of all rooms";
+	oAddRoomElementInner.className = "chatTabsAdditionalSearchButtons";
+	oAddRoomElement.style.display = "none";
+	this.m_oAddRoomElement = oAddRoomElement;
+
+	// Кнопка для добавления разговора
+	var oAddPrivateChatElement = this.private_CreateDiv(oParentElement);
+	var oAddPrivateChatControl = CreateControlContainerByElement(oAddPrivateChatElement);
+	oAddPrivateChatControl.SetParams(0, this.m_nTopPanelH + 70, 1000, this.m_nBotPanelH, true, true, false, true, -1, 50);
+	oAddPrivateChatControl.SetAnchor(true, true, true, false);
+	oParentControl.AddControl(oAddPrivateChatControl);
+	var oAddPrivateChatElementInner = this.private_CreateDiv(oAddPrivateChatElement);
+	oAddPrivateChatElementInner.innerHTML = "Start private chat with that user";
+	oAddPrivateChatElementInner.className = "chatTabsAdditionalSearchButtons";
+	oAddPrivateChatElement.style.display = "none";
+	this.m_oAddPrivateChatElement = oAddPrivateChatElement;
 
 
 	//oBottomElement.style.background = "green";
@@ -1883,43 +1912,20 @@ CVisualChatTabsPanel.prototype.private_InitTopPanel = function(oParent)
 	oMenuButton.appendChild(oCenter);
 	oParent.appendChild(oMenuButton);
 
+	this.m_oSearchInput = oInput;
+	this.m_oCancelIcon  = oCancelIcon;
+
 	var oThis = this;
-
-	function OnInputChange()
-	{
-		var oTabs  = oThis.m_oChatTabs;
-		var sValue = (oInput.value).toLowerCase();
-
-		for (var nIndex = 0, nCount = oTabs.GetCount(); nIndex < nCount; ++nIndex)
-		{
-			var oTab      = oTabs.GetTabByIndex(nIndex);
-			var sRoomName = (oTab.GetRoomName()).toLowerCase();
-
-			if (!sValue || "" === sValue || -1 !== sRoomName.indexOf(sValue))
-			{
-				oTab.ShowTab();
-			}
-			else
-			{
-				oTab.HideTab();
-			}
-		}
-
-		if (!sValue || "" === sValue)
-			oCancelIcon.style.display = "none";
-		else
-			oCancelIcon.style.display = "block";
-	}
 
 	oInput.addEventListener("input", function()
 	{
-		OnInputChange();
+		oThis.OnInputChange();
 	});
 
 	oCancelIcon.addEventListener("click", function()
 	{
 		oInput.value = "";
-		OnInputChange();
+		oThis.OnInputChange();
 
 		if (oInput.focus)
 			oInput.focus();
@@ -1936,6 +1942,21 @@ CVisualChatTabsPanel.prototype.private_InitTopPanel = function(oParent)
 
 		oThis.private_OnChangeHeight();
 	}, false);
+
+
+	this.m_oAddPrivateChatElement.addEventListener("click", function()
+	{
+		var oClient = oThis.m_oApp.GetClient();
+		if (oClient)
+		{
+			oClient.EnterPrivateChat(oInput.value);
+		}
+	}, false);
+
+	this.m_oAddRoomElement.addEventListener("click", function()
+	{
+		CreateKGSWindow(EKGSWindowType.RoomList, {Client : oThis.m_oApp.GetClient(), App : oThis.m_oApp, Text : oInput.value});
+	}, false);
 };
 CVisualChatTabsPanel.prototype.SetOnChangeHeightCallback = function(fCallback)
 {
@@ -1945,4 +1966,50 @@ CVisualChatTabsPanel.prototype.private_OnChangeHeight = function()
 {
 	if (this.m_fOnChangeHeight)
 		this.m_fOnChangeHeight(this.m_bFullHeight);
+};
+CVisualChatTabsPanel.prototype.OnInputChange = function()
+{
+	var oInput      = this.m_oSearchInput;
+	var oCancelIcon = this.m_oCancelIcon;
+
+	var oTabs   = this.m_oChatTabs;
+	var sValue  = (oInput.value).toLowerCase();
+	var bFinded = false;
+
+	for (var nIndex = 0, nCount = oTabs.GetCount(); nIndex < nCount; ++nIndex)
+	{
+		var oTab      = oTabs.GetTabByIndex(nIndex);
+		var sRoomName = (oTab.GetRoomName()).toLowerCase();
+
+		if (!sValue || "" === sValue || -1 !== sRoomName.indexOf(sValue))
+		{
+			oTab.ShowTab();
+			bFinded = true;
+		}
+		else
+		{
+			oTab.HideTab();
+		}
+	}
+
+	if (!sValue || "" === sValue)
+		oCancelIcon.style.display = "none";
+	else
+		oCancelIcon.style.display = "block";
+
+
+	if (bFinded)
+	{
+		this.m_oAddRoomElement.style.display        = "none";
+		this.m_oAddPrivateChatElement.style.display = "none";
+	}
+	else
+	{
+		this.m_oAddRoomElement.style.display        = "block";
+		this.m_oAddPrivateChatElement.style.display = "block";
+	}
+};
+CVisualChatTabsPanel.prototype.OnAddChatRoom = function()
+{
+	this.OnInputChange();
 };

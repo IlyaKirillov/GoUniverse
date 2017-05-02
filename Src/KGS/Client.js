@@ -1031,6 +1031,10 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
 	{
 		this.private_HandleLoginFailedKeepOut(oMessage);
 	}
+	else if ("CONVO_NO_SUCH_USER" === oMessage.type)
+	{
+		this.private_HandleConvoNoSuchUser(oMessage);
+	}
 	else
 	{
 		console.log(oMessage);
@@ -2103,8 +2107,20 @@ CKGSClient.prototype.private_HandleLoginFailedKeepOut = function(oMessage)
 	if (true === this.m_bLoggedIn)
 	{
 		this.m_bLoggedIn = false;
-		this.m_oApp.Logout("You can't log in, an admin has blocked you. \<br/\>\<strong\>Note: \</strong\>perhaps it is not you, who was blocked, but there is an issue with ban system and this new client. We are very sorry if you have suffered because of this." + "\<br/\>\<strong\>Ban reason: \</strong\>" + oMessage["text"]);
+		this.m_oApp.Logout("You can't log in, an admin has blocked you. \<br/\>\<strong\>Ban reason: \</strong\>" + oMessage["text"]);
 	}
+};
+CKGSClient.prototype.private_HandleConvoNoSuchUser = function(oMessage)
+{
+	CreateKGSWindow(EKGSWindowType.Information, {
+		Client : this,
+		App    : this.m_oApp,
+		Caption: "Warning",
+		Text   : "There is no such user.",
+		Image  : "WarningSpanWarning",
+		W      : 370,
+		H      : 144
+	});
 };
 CKGSClient.prototype.private_AddUserToRoom = function(oUser, oRoom)
 {
