@@ -22,6 +22,12 @@ CVisualTabs.prototype.Init = function(sDivId)
 	this.m_oPanelControl = CreateControlContainer(sDivId);
 	return this.m_oPanelControl;
 };
+CVisualTabs.prototype.InitByElement = function(oElement)
+{
+	this.m_oPanelElement = oElement;
+	this.m_oPanelControl = CreateControlContainerByElement(oElement);
+	return this.m_oPanelControl;
+};
 CVisualTabs.prototype.Clear = function()
 {
 	while (this.m_arrTabs.length > 0)
@@ -767,7 +773,6 @@ CVisualChatRoomTab.prototype.private_InitTab = function(sRoomName)
 	if (true === this.m_bPrivateChat)
 	{
 		oCaptionDiv.style.fontWeight = "bold";
-		oCaptionDiv.style.color      = "#008272";
 	}
 	oCaptionDiv.innerHTML = sRoomName;
 	NewTabDiv.appendChild(oCaptionDiv);
@@ -931,6 +936,14 @@ CVisualChatRoomTab.prototype.OnToggleSound = function()
 	this.m_oMenuSoundButton.Button.title         = sHint;
 
 	this.m_oMenuSoundButton.Span.className = sSpanClass;
+};
+CVisualChatRoomTab.prototype.ShowTab = function()
+{
+	this.m_oTabDiv.style.display = "block";
+};
+CVisualChatRoomTab.prototype.HideTab = function()
+{
+	this.m_oTabDiv.style.display = "none";
 };
 
 function CVisualGamesListTab(oApp)

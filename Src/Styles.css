@@ -739,3 +739,28 @@ span.recentGamesSpan:hover {
 	background : rgb(0, 130, 114);
 	cursor     : pointer;
 }
+
+input.chatTabsSearch {
+	border-top    : none;
+	border-left   : none;
+	border-right  : none;
+	border-bottom : 1px solid rgb(220, 220, 220);
+	font-size     : 14px;
+	font-family   : 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif;
+	background   : transparent;
+	padding      : 5px 25px 0px 25px;
+	width        : 165px;
+	outline      : none;
+	color        : rgb(220, 220, 220);
+	margin-left  : 25px;
+}
+
+input.chatTabsSearch:focus {
+	color         : black;
+	border-bottom : 1px solid rgb(0, 130, 114);
+}
+
+input.chatTabsSearch:hover {
+	color         : black;
+	border-bottom : 1px solid rgb(0, 130, 114);
+}

@@ -38,6 +38,7 @@ function CGoUniverseApplication()
 	this.m_oGameTabsScroll = null;
 	this.m_oChatTabsScroll = null;
 	this.m_oChatScroll     = null;
+	this.m_oChatTabs       = new CVisualChatTabsPanel();
 
 	this.m_oGamesListWrapperControl = null;
 	this.m_oChatWrapperControl      = null;
@@ -1033,14 +1034,7 @@ CGoUniverseApplication.prototype.private_InitChats = function(oChatControl)
 };
 CGoUniverseApplication.prototype.private_InitChatsTabs = function(oWrapperControl)
 {
-	var oChatTabs = this.m_oChatRoomTabs.Init("divIdLChatTabs");
-	oChatTabs.SetParams(0, 0, 1000, 1000, true, true, false, false, -1, -1);
-	oChatTabs.SetAnchor(true, true, true, true);
-	oWrapperControl.AddControl(oChatTabs);
-
-	this.m_oChatTabsScroll = new CVerticalScroll();
-	this.m_oChatTabsScroll.Init(oChatTabs.HtmlElement, "VerScroll", "VerScrollActive", false);
-	this.m_oChatTabsScroll.SetPaddings(24, 1, 0);
+	this.m_oChatTabs.Init(this.m_oChatRoomTabs, oWrapperControl);
 };
 CGoUniverseApplication.prototype.private_InitChannelAddButton = function(sDivId)
 {
@@ -1335,41 +1329,41 @@ CGoUniverseApplication.prototype.private_OpenChatTabs = function()
 
 	document.getElementById("divIdLChatTabsToggleInnerSpan").style.transform = "rotate(270deg)";
 
-	if (nLines > nMaxLines)
-		this.m_oChatTabsScroll.Show(nClientHeight);
+	// if (nLines > nMaxLines)
+	// 	this.m_oChatTabsScroll.Show(nClientHeight);
 };
 CGoUniverseApplication.prototype.private_CollapseChatTabs = function()
 {
-	var oTabs = document.getElementById("divIdLChatTabs");
-	oTabs.className = "";
-	//oTabs.style.height          = "25px";
-	oTabs.style.minHeight       = "";
-	oTabs.style.maxHeight       = "";
-	oTabs.style.backgroundColor = "transparent";
-	oTabs.style.borderBottom    = "1px none #BEBEBE";
-	oTabs.style.borderRight     = "1px none #BEBEBE";
-	oTabs.style.overflowY       = "hidden";
-	oTabs.style.boxShadow       = "";
+	// var oTabs = document.getElementById("divIdLChatTabs");
+	// oTabs.className = "";
+	// //oTabs.style.height          = "25px";
+	// oTabs.style.minHeight       = "";
+	// oTabs.style.maxHeight       = "";
+	// oTabs.style.backgroundColor = "transparent";
+	// oTabs.style.borderBottom    = "1px none #BEBEBE";
+	// oTabs.style.borderRight     = "1px none #BEBEBE";
+	// oTabs.style.overflowY       = "hidden";
+	// oTabs.style.boxShadow       = "";
 
 //	document.getElementById("divIdLChatTabsToggleInnerSpan").style.transform = "rotate(90deg)";
 
-	this.m_oChatTabsScroll.Hide();
+	//this.m_oChatTabsScroll.Hide();
 	this.ScrollChatTabsToCurrent();
 };
 CGoUniverseApplication.prototype.ScrollChatTabsToCurrent = function()
 {
-	var nChatRoomId = this.m_oChatRoomTabs.GetCurrentId();
-	var oTab = this.m_oChatRoomTabs.GetTab(nChatRoomId);
-	if (!oTab)
-		return;
-
-	var oTabDiv = oTab.m_oTabDiv;
-	var nOffsetTop = oTabDiv.offsetTop;
-
-	var nLine = parseInt((nOffsetTop + 1) / 25);
-
-	var oTabs = document.getElementById("divIdLChatTabs");
-	oTabs.scrollTop = nLine * 25;
+	// var nChatRoomId = this.m_oChatRoomTabs.GetCurrentId();
+	// var oTab = this.m_oChatRoomTabs.GetTab(nChatRoomId);
+	// if (!oTab)
+	// 	return;
+	//
+	// var oTabDiv = oTab.m_oTabDiv;
+	// var nOffsetTop = oTabDiv.offsetTop;
+	//
+	// var nLine = parseInt((nOffsetTop + 1) / 25);
+	//
+	// var oTabs = document.getElementById("divIdLChatTabs");
+	// oTabs.scrollTop = nLine * 25;
 };
 CGoUniverseApplication.prototype.IsTypingChatMessage = function()
 {
@@ -1402,27 +1396,27 @@ CGoUniverseApplication.prototype.UpdateDropDownChatTabsButton = function()
 {
 	// Проверяем, нужна ли нам кнопка
 
-	var oTabs     = document.getElementById("divIdLChatTabs");
-	var nCount    = oTabs.childElementCount;
+// 	var oTabs     = document.getElementById("divIdLChatTabs");
+// 	var nCount    = oTabs.childElementCount;
+//
+// 	if (nCount <= 0)
+// 	{
+// //		document.getElementById("divIdLChatTabsToggle").style.display = "none";
+// 		return;
+// 	}
+//
+// 	var oLastNode = oTabs.children[nCount - 1];
+// 	var nOffset   = oLastNode.offsetTop;
+// 	var nLines    = (((nOffset + 1) / 25) | 0) + 1;
 
-	if (nCount <= 0)
-	{
-//		document.getElementById("divIdLChatTabsToggle").style.display = "none";
-		return;
-	}
-
-	var oLastNode = oTabs.children[nCount - 1];
-	var nOffset   = oLastNode.offsetTop;
-	var nLines    = (((nOffset + 1) / 25) | 0) + 1;
-
-	if (nLines > 1)
-	{
-		//document.getElementById("divIdLChatTabsToggle").style.display = "block";
-	}
-	else
-	{
-		//document.getElementById("divIdLChatTabsToggle").style.display = "none";
-	}
+	// if (nLines > 1)
+	// {
+	// 	//document.getElementById("divIdLChatTabsToggle").style.display = "block";
+	// }
+	// else
+	// {
+	// 	//document.getElementById("divIdLChatTabsToggle").style.display = "none";
+	// }
 };
 CGoUniverseApplication.prototype.private_OpenGameTabs = function()
 {
@@ -1710,4 +1704,99 @@ CGoUniverseApplication.prototype.OnChangeGamesListType = function(eType)
 	var oTab = this.m_oGamesListTabs.GetTab(eType);
 	if (oTab)
 		oTab.OnClick(false);
+};
+
+/**
+ * Спецаильный класс для работы с табами чата
+ * @constructor
+ */
+function CVisualChatTabsPanel()
+{
+	this.m_oChatTabs       = null;
+	this.m_oChatTabsScroll = null;
+
+	this.m_nTopPanelH = 30;
+	this.m_nBotPanelH = 100;
+}
+CVisualChatTabsPanel.prototype.Init = function(oChatTabs, oParentControl)
+{
+	this.m_oChatTabs = oChatTabs;
+
+	var oParentElement = oParentControl.HtmlElement;
+
+	// Табы
+	var oTabsElement = this.private_CreateDiv(oParentElement);
+	var oTabsControl = oChatTabs.InitByElement(oTabsElement);
+	oTabsControl.SetParams(0, this.m_nTopPanelH, 1000, this.m_nBotPanelH, true, true, false, true, -1, -1);
+	oTabsControl.SetAnchor(true, true, true, true);
+	oParentControl.AddControl(oTabsControl);
+
+	// Скролл для табов
+	this.m_oChatTabsScroll = new CVerticalScroll();
+	this.m_oChatTabsScroll.Init(oTabsControl.HtmlElement, "VerScroll", "VerScrollActive", false);
+	this.m_oChatTabsScroll.SetPaddings(24, 1, 0);
+
+	// Верхняя панелька с поиском
+	var oTopElement = this.private_CreateDiv(oParentElement);
+	var oTopControl = CreateControlContainerByElement(oTopElement);
+	oTopControl.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, this.m_nTopPanelH);
+	oTopControl.SetAnchor(true, true, true, false);
+	oParentControl.AddControl(oTopControl);
+
+	// Нижняя панелька
+	var oBottomElement = this.private_CreateDiv(oParentElement);
+	var oBottomControl = CreateControlContainerByElement(oBottomElement);
+	oBottomControl.SetParams(0, 0, 1000, 0, false, false, false, true, -1, this.m_nBotPanelH);
+	oBottomControl.SetAnchor(true, false, true, true);
+	oParentControl.AddControl(oBottomControl);
+
+
+	//oBottomElement.style.background = "green";
+
+	this.private_InitTopPanel(oTopElement);
+};
+CVisualChatTabsPanel.prototype.private_CreateDiv = function(oParent)
+{
+	var oDiv = document.createElement("div");
+	oDiv.style.position = "absolute";
+	oDiv.style.left     = "0px";
+	oDiv.style.top      = "0px";
+	oParent.appendChild(oDiv);
+	return oDiv;
+};
+CVisualChatTabsPanel.prototype.private_InitTopPanel = function(oParent)
+{
+	oParent.style.borderBottom = "1px solid rgb(190, 190, 190)";
+
+	var oInput = document.createElement("input");
+	oInput.type = "text";
+	oInput.className += "chatTabsSearch";
+
+	oInput["aria-label"]  = "Search";
+	oInput["placeholder"] = "Search";
+
+
+	oParent.appendChild(oInput);
+
+	var oThis = this;
+	oInput.addEventListener("input", function()
+	{
+		var oTabs  = oThis.m_oChatTabs;
+		var sValue = (this.value).toLowerCase();
+
+		for (var nIndex = 0, nCount = oTabs.GetCount(); nIndex < nCount; ++nIndex)
+		{
+			var oTab      = oTabs.GetTabByIndex(nIndex);
+			var sRoomName = (oTab.GetRoomName()).toLowerCase();
+
+			if (!sValue || "" === sValue || -1 !== sRoomName.indexOf(sValue))
+			{
+				oTab.ShowTab();
+			}
+			else
+			{
+				oTab.HideTab();
+			}
+		}
+	});
 };
