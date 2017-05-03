@@ -783,19 +783,7 @@ div.chatTabsAdditionalSearchButtons:hover {
 
 }
 
-div.roomStatsL {
-	text-align      : left;
-	font-size       : 14px;
-	font-family     : 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif;
-	line-height     : 20px;
-	cursor          : default;
-	color           : rgb(0, 0, 0);
-	height          : 20px;
-	float           : right;
-	width           : 100%;
-}
-
-div.roomStatsR {
+div.roomStats {
 	text-align      : left;
 	font-size       : 14px;
 	font-family     : 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif;
