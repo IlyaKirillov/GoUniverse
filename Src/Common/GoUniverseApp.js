@@ -1835,10 +1835,8 @@ CVisualChatTabsPanel.prototype.Init = function(oChatTabs, oParentControl, bFullH
 	oAddPrivateChatElement.style.display = "none";
 	this.m_oAddPrivateChatElement = oAddPrivateChatElement;
 
-
-	//oBottomElement.style.background = "green";
-
 	this.private_InitTopPanel(oTopElement);
+	this.private_InitBottomPanel(oBottomElement, oBottomControl);
 };
 CVisualChatTabsPanel.prototype.private_CreateDiv = function(oParent)
 {
@@ -2035,4 +2033,64 @@ CVisualChatTabsPanel.prototype.OnInputChange = function()
 CVisualChatTabsPanel.prototype.OnAddChatRoom = function()
 {
 	this.OnInputChange();
+};
+CVisualChatTabsPanel.prototype.private_InitBottomPanel = function(oParent, oParentControl)
+{
+	oParent.style.borderTop = "1px solid rgb(190, 190, 190)";
+
+	var sUsers = "Users";
+	var sGames = "Games";
+	var sChallenges = "Challenges";
+
+	g_oTextMeasurer.SetFont("14px 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif");
+
+	var nLeftWidth = Math.max(g_oTextMeasurer.Measure(sUsers), g_oTextMeasurer.Measure(sGames), g_oTextMeasurer.Measure(sChallenges));
+	nLeftWidth += 20 + g_oTextMeasurer.Measure(" :") + 5;
+
+	var nRightW = 70;
+
+	var oElement, oControl, oDiv;
+
+	oElement = this.private_CreateDiv(oParent);
+	oControl = CreateControlContainerByElement(oElement);
+	oControl.SetParams(nLeftWidth, 0, 1000, 1000, true, false, false, false, -1, -1);
+	oControl.SetAnchor(true, true, true, true);
+	oParentControl.AddControl(oControl);
+
+	oDiv = document.createElement("div");
+	oDiv.className = "roomStatsL";
+	oDiv.innerHTML = "12";
+	oElement.appendChild(oDiv);
+
+	oDiv = document.createElement("div");
+	oDiv.className = "roomStatsL";
+	oDiv.innerHTML = "12";
+	oElement.appendChild(oDiv);
+
+	oDiv = document.createElement("div");
+	oDiv.className = "roomStatsL";
+	oDiv.innerHTML = "12";
+	oElement.appendChild(oDiv);
+
+
+	oElement = this.private_CreateDiv(oParent);
+	oControl = CreateControlContainerByElement(oElement);
+	oControl.SetParams(20, 0, 1000, 1000, true, false, false, false, nLeftWidth - 20, -1);
+	oControl.SetAnchor(true, true, false, true);
+	oParentControl.AddControl(oControl);
+
+	oDiv = document.createElement("div");
+	oDiv.className = "roomStatsR";
+	oDiv.innerHTML = "Users" + " :";
+	oElement.appendChild(oDiv);
+
+	oDiv = document.createElement("div");
+	oDiv.className = "roomStatsR";
+	oDiv.innerHTML = "Games" + " :";
+	oElement.appendChild(oDiv);
+
+	oDiv = document.createElement("div");
+	oDiv.className = "roomStatsR";
+	oDiv.innerHTML = "Challenges" + " :";
+	oElement.appendChild(oDiv);
 };
