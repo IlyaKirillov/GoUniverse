@@ -314,6 +314,8 @@ CKGSClient.prototype.SetCurrentChatRoom = function(nChatRoomId)
 
 	if (EKGSGamesListType.Room === this.m_eGamesListType)
 		this.private_UpdateGamesList();
+
+	this.private_UpdateRoomStats();
 };
 CKGSClient.prototype.EnterPrivateChat = function(sUserName)
 {
@@ -1125,7 +1127,10 @@ CKGSClient.prototype.private_HandleRoomJoin = function(oMessage)
 	}
 
 	if (oMessage.channelId == this.m_nChatChannelId)
+	{
 		this.private_UpdatePlayersList();
+		this.private_UpdateRoomStats();
+	}
 
 	if (EKGSGamesListType.AllGames === this.m_eGamesListType || EKGSGamesListType.AllChallenges === this.m_eGamesListType || EKGSGamesListType.AllChallengesNoBots === this.m_eGamesListType ||  (EKGSGamesListType.Room === this.m_eGamesListType && oMessage.channelId == this.m_nChatChannelId))
 		this.private_UpdateGamesList();
@@ -1202,7 +1207,10 @@ CKGSClient.prototype.private_HandleLoginSuccess = function(oMessage)
 			TournamentOnly  : false,
 			GlobalGamesOnly : false,
 			Users           : [],
-			Games           : []
+			Games           : [],
+			UsersCount      : 0,
+			GamesCount      : 0,
+			ChallengesCount : 0
 		};
 
 		arrAllRoomChannelIds.push(nChannelId);
@@ -1437,7 +1445,7 @@ CKGSClient.prototype.private_HandleUserAdded = function(oMessage)
 		{
 			this.m_oPlayersListView.Handle_Record([0, oUser.GetName(), oUser.GetRank(), oUser.IsFriend(), oUser]);
 			this.m_oPlayersListView.Update_Size();
-			this.m_oApp.OnRoomStatsChanged(oRoom.UsersCount);
+			this.private_UpdateRoomStats();
 		}
 	}
 	else if (oGame)
@@ -1465,7 +1473,7 @@ CKGSClient.prototype.private_HandleUserRemoved = function(oMessage)
 		{
 			this.m_oPlayersListView.Handle_Record([1, oUser.GetName(), -2, false, oUser]);
 			this.m_oPlayersListView.Update_Size();
-			this.m_oApp.OnRoomStatsChanged(oRoom.UsersCount);
+			this.private_UpdateRoomStats();
 		}
 	}
 	else if (oGame)
@@ -1700,6 +1708,7 @@ CKGSClient.prototype.private_HandleConvoJoin = function(oMessage)
 	{
 		this.m_nChatChannelId = nChannelId;
 		this.m_oApp.SetCurrentChatRoomTab(nChannelId);
+		this.private_UpdateRoomStats();
 	}
 };
 CKGSClient.prototype.private_HandleArchiveJoin = function(oMessage)
@@ -2489,4 +2498,26 @@ CKGSClient.prototype.GetAdminsInRoom = function(nRoomId)
 	}
 
 	return arrAdmins;
+};
+CKGSClient.prototype.private_UpdateRoomStats = function()
+{
+	var oRoom    = this.m_aAllRooms[this.m_nChatChannelId];
+	var oPrivate = this.m_oPrivateChats[this.m_nChatChannelId];
+	if (oRoom)
+	{
+		this.m_oApp.OnRoomStatsChanged(oRoom.UsersCount, oRoom.GamesCount, oRoom.ChallengesCount, 0);
+	}
+	else if (oPrivate)
+	{
+		var nUsersCount = 0;
+		for (var sUserName in oPrivate.Users)
+		{
+			nUsersCount++;
+		}
+		this.m_oApp.OnRoomStatsChanged(nUsersCount, 0, 0, 0);
+	}
+	else
+	{
+		this.m_oApp.OnRoomStatsChanged(0, 0, 0, 0);
+	}
 };

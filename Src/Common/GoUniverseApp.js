@@ -1758,9 +1758,9 @@ CGoUniverseApplication.prototype.OnChangeGamesListType = function(eType)
 	if (oTab)
 		oTab.OnClick(false);
 };
-CGoUniverseApplication.prototype.OnRoomStatsChanged = function(nUsersCount)
+CGoUniverseApplication.prototype.OnRoomStatsChanged = function(nUsersCount, nGamesCount, nChallengesCount)
 {
-	this.m_oChatTabs.UpdateStats(nUsersCount, 0, 0 ,0);
+	this.m_oChatTabs.UpdateStats(nUsersCount, nGamesCount, nChallengesCount ,0);
 };
 
 /**
