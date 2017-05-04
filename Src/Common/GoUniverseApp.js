@@ -1758,6 +1758,10 @@ CGoUniverseApplication.prototype.OnChangeGamesListType = function(eType)
 	if (oTab)
 		oTab.OnClick(false);
 };
+CGoUniverseApplication.prototype.OnRoomStatsChanged = function(nUsersCount)
+{
+	this.m_oChatTabs.UpdateStats(nUsersCount, 0, 0 ,0);
+};
 
 /**
  * Спецаильный класс для работы с табами чата
@@ -2036,6 +2040,10 @@ CVisualChatTabsPanel.prototype.OnInputChange = function()
 	}
 };
 CVisualChatTabsPanel.prototype.OnAddChatRoom = function()
+{
+	this.OnInputChange();
+};
+CVisualChatTabsPanel.prototype.OnRemoveChatRoom = function()
 {
 	this.OnInputChange();
 };

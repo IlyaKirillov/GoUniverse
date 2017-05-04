@@ -1110,7 +1110,8 @@ CKGSClient.prototype.private_HandleRoomJoin = function(oMessage)
 	var oRoom = this.m_aAllRooms[oMessage.channelId];
 	if (oRoom)
 	{
-		oRoom.Users = {};
+		oRoom.Users      = {};
+		oRoom.UsersCount = 0;
 
 		var Users = oMessage.users;
 		if (Users && Users.length > 0)
@@ -1436,6 +1437,7 @@ CKGSClient.prototype.private_HandleUserAdded = function(oMessage)
 		{
 			this.m_oPlayersListView.Handle_Record([0, oUser.GetName(), oUser.GetRank(), oUser.IsFriend(), oUser]);
 			this.m_oPlayersListView.Update_Size();
+			this.m_oApp.OnRoomStatsChanged(oRoom.UsersCount);
 		}
 	}
 	else if (oGame)
@@ -1454,12 +1456,16 @@ CKGSClient.prototype.private_HandleUserRemoved = function(oMessage)
 	var oChallenge = this.m_oChallenges[oMessage.channelId];
 	if (oRoom)
 	{
+		if (oRoom.Users[oUser.GetName()])
+			oRoom.UsersCount = Math.max(0, oRoom.UsersCount - 1);
+
 		delete oRoom.Users[oUser.GetName()];
 
 		if (oMessage.channelId === this.m_nChatChannelId)
 		{
 			this.m_oPlayersListView.Handle_Record([1, oUser.GetName(), -2, false, oUser]);
 			this.m_oPlayersListView.Update_Size();
+			this.m_oApp.OnRoomStatsChanged(oRoom.UsersCount);
 		}
 	}
 	else if (oGame)
@@ -2124,6 +2130,9 @@ CKGSClient.prototype.private_HandleConvoNoSuchUser = function(oMessage)
 };
 CKGSClient.prototype.private_AddUserToRoom = function(oUser, oRoom)
 {
+	if (!oRoom.Users[oUser.GetName()])
+		oRoom.UsersCount++;
+
 	oRoom.Users[oUser.GetName()] = oUser;
 };
 CKGSClient.prototype.GetRank = function(sRank)
