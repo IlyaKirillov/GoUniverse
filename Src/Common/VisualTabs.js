@@ -471,7 +471,6 @@ CVisualGameRoomTab.prototype.OnClick = function()
 	}
 	else if (null === this.m_oGameTree)
 	{
-		this.m_oApp.UpdateDropDownChatTabsButton();
 		this.m_oApp.ScrollChatTabsToCurrent();
 	}
 
@@ -653,7 +652,7 @@ CVisualChatRoomTab.prototype.OnClickClose = function()
 	if (false === this.m_oParent.OnClickClose(this))
 		this.m_oApp.SetCurrentChatRoom(-1);
 
-	this.m_oApp.UpdateDropDownChatTabsButton();
+	this.m_oApp.OnRemoveChatRoom();
 };
 CVisualChatRoomTab.prototype.IncreaseMessagesCount = function()
 {
@@ -662,7 +661,7 @@ CVisualChatRoomTab.prototype.IncreaseMessagesCount = function()
 };
 CVisualChatRoomTab.prototype.OnCloseTab = function()
 {
-	this.m_oApp.UpdateDropDownChatTabsButton();
+	this.m_oApp.OnRemoveChatRoom();
 };
 CVisualChatRoomTab.prototype.private_CreatePopup = function()
 {

@@ -1503,6 +1503,9 @@ CKGSClient.prototype.private_HandleGameList = function(oMessage)
 			this.private_HandleGameRecord(oGameRecord, true);
 	}
 	this.m_oGamesListView.Update_Size();
+
+	if (oMessage.channelId === this.m_nChatChannelId)
+		this.private_UpdateRoomStats();
 };
 CKGSClient.prototype.private_HandleGameContainerRemoveGame = function(oMessage)
 {
@@ -1521,6 +1524,9 @@ CKGSClient.prototype.private_HandleGameContainerRemoveGame = function(oMessage)
 		this.m_oGamesListView.Handle_Record([1, oMessage.gameId]);
 		this.m_oGamesListView.Update_Size();
 	}
+
+	if (oMessage.channelId === this.m_nChatChannelId)
+		this.private_UpdateRoomStats();
 };
 CKGSClient.prototype.private_HandleUserUpdate = function(oMessage)
 {
@@ -1669,6 +1675,9 @@ CKGSClient.prototype.private_HandleGlobalGamesJoin = function(oMessage)
 		|| (EKGSGamesListType.AllChallengesNoBots === this.m_eGamesListType && "CHALLENGES" === oMessage.containerType)
 		|| (EKGSGamesListType.Followed === this.m_eGamesListType && "FANS" === oMessage.containerType))
 		this.private_UpdateGamesList();
+
+	if (oMessage.channelId === this.m_nChatChannelId)
+		this.private_UpdateRoomStats();
 };
 CKGSClient.prototype.private_HandleLoginFailedBadPassword = function(oMessage)
 {
@@ -2279,9 +2288,16 @@ CKGSClient.prototype.private_OnAddGameListRecord = function(nRoomId, oRecord)
 		this.m_oAllGames[nGameId] = oGameRecord;
 	}
 
+	var isOldGameRecord = false, isOldGameRecordChallenge = false;
 	var oRoom = this.m_aAllRooms[nRoomId];
 	if (oRoom)
 	{
+		if (oRoom.Games[nGameId])
+		{
+			isOldGameRecord          = true;
+			isOldGameRecordChallenge = oRoom.Games[nGameId].IsChallenge();
+		}
+
 		oRoom.Games[nGameId] = oGameRecord;
 	}
 	else if (nRoomId === this.m_nFollowersGamesChannelId)
@@ -2291,6 +2307,22 @@ CKGSClient.prototype.private_OnAddGameListRecord = function(nRoomId, oRecord)
 
 	oGameRecord.Update(oRecord);
 	oGameRecord.AddRoom(nRoomId);
+
+	if (oRoom)
+	{
+		if (isOldGameRecord)
+		{
+			if (isOldGameRecordChallenge)
+				oRoom.ChallengesCount--;
+			else
+				oRoom.GamesCount--;
+		}
+
+		if (oGameRecord.IsChallenge())
+			oRoom.ChallengesCount++;
+		else
+			oRoom.GamesCount++;
+	}
 
 	return oGameRecord;
 };
@@ -2304,9 +2336,18 @@ CKGSClient.prototype.private_OnRemoveGameListRecord = function(nRoomId, nGameId)
 
 		var oRoom = this.m_aAllRooms[nRoomId];
 		if (oRoom)
+		{
+			if (oGameRecord.IsChallenge())
+				oRoom.ChallengesCount--;
+			else
+				oRoom.GamesCount--;
+
 			delete oRoom.Games[nGameId];
+		}
 		else if (nRoomId === this.m_nFollowersGamesChannelId)
+		{
 			delete this.m_oFollowersGames[nGameId];
+		}
 	}
 
 	return oGameRecord;

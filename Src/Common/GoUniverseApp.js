@@ -36,9 +36,9 @@ function CGoUniverseApplication()
 	this.m_bFocused            = true;
 
 	this.m_oGameTabsScroll = null;
-	this.m_oChatTabsScroll = null;
 	this.m_oChatScroll     = null;
-	this.m_oChatTabs       = new CVisualChatTabsPanel(this);
+
+	this.m_oChatTabsPanel      = new CVisualChatTabsPanel(this);
 	this.m_bChatTabsFullHeight = false;
 
 	this.m_oGamesListWrapperControl = null;
@@ -276,10 +276,10 @@ CGoUniverseApplication.prototype.OnResize = function(bSkipChatHandler)
 
 	this.private_UpdateChatScroll();
 	this.private_CollapsePopups(true);
-	this.private_CollapseChatTabs();
 	this.private_CollapseGameTabs();
-	this.UpdateDropDownChatTabsButton();
 	this.UpdateDropDownGameTabsButton();
+
+	this.m_oChatTabsPanel.OnResize();
 
 	if (true !== bSkipChatHandler)
 		this.private_InitChatDragHandler();
@@ -373,15 +373,12 @@ CGoUniverseApplication.prototype.AddChatRoom = function(nChatRoomId, sRoomName, 
 	var oTab = new CVisualChatRoomTab(this);
 	oTab.Init(nChatRoomId, sRoomName, bPrivate);
 	this.m_oChatRoomTabs.AddTab(oTab);
-	this.UpdateDropDownChatTabsButton();
-	this.m_oChatTabs.OnAddChatRoom();
+	this.m_oChatTabsPanel.OnAddChatRoom();
 };
 CGoUniverseApplication.prototype.SetCurrentChatRoom = function(nChatRoomId)
 {
 	if (this.m_oClient)
 		this.m_oClient.SetCurrentChatRoom(nChatRoomId);
-
-	this.private_CollapseChatTabs();
 
 	var oDiv = document.getElementById("textareaChatId");
 	for (var nIndex = 0, nCount = oDiv.childNodes.length; nIndex < nCount; ++nIndex)
@@ -994,24 +991,6 @@ CGoUniverseApplication.prototype.private_InitUserNameLink = function()
 };
 CGoUniverseApplication.prototype.private_InitChats = function(oChatControl)
 {
-	// // Табы чата
-	// var oChatTabsBack = CreateControlContainer("divIdLChatTabsBack");
-	// oChatTabsBack.Bounds.SetParams(0, 0, 2, 0, true, true, true, false, -1, 24);
-	// oChatTabsBack.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left);
-	// oChatControl.AddControl(oChatTabsBack);
-	//
-	// // Кнопка добавления чата
-	// var oChatAddControl = this.private_InitChannelAddButton("divIdLChatAdd");
-	// oChatAddControl.Bounds.SetParams(0, 16, 1, 0, false, true, true, false, 30, 24);
-	// oChatAddControl.Anchor = (g_anchor_top | g_anchor_right);
-	// oChatControl.AddControl(oChatAddControl);
-	//
-	// // Кнопка добавления чата
-	// var oChaToggleControl = this.private_InitChannelToggleButton("divIdLChatTabsToggle");
-	// oChaToggleControl.Bounds.SetParams(0, 1, 32, 0, false, true, true, false, 30, 24);
-	// oChaToggleControl.Anchor = (g_anchor_top | g_anchor_right);
-	// oChatControl.AddControl(oChaToggleControl);
-
 	// Все сообщения
 	var oChatTextAreaControl = CreateControlContainer("divIdLChatTextArea");
 	oChatTextAreaControl.Bounds.SetParams(0, 0, 2, 52, true, true, true, true, -1, -1);
@@ -1038,10 +1017,10 @@ CGoUniverseApplication.prototype.private_InitChats = function(oChatControl)
 };
 CGoUniverseApplication.prototype.private_InitChatsTabs = function(oWrapperControl)
 {
-	this.m_oChatTabs.Init(this.m_oChatRoomTabs, oWrapperControl, this.m_bChatTabsFullHeight);
+	this.m_oChatTabsPanel.Init(this.m_oChatRoomTabs, oWrapperControl, this.m_bChatTabsFullHeight);
 
 	var oThis = this;
-	this.m_oChatTabs.SetOnChangeHeightCallback(function(bFullHeight)
+	this.m_oChatTabsPanel.SetOnChangeHeightCallback(function(bFullHeight)
 	{
 		oThis.m_bChatTabsFullHeight = bFullHeight;
 		oThis.private_OnChangeChatTabsFullHeight();
@@ -1066,54 +1045,6 @@ CGoUniverseApplication.prototype.private_OnChangeChatTabsFullHeight = function()
 		this.m_oChatWrapperControl.Bounds.SetParams(this.m_nChatTabsWidth, dPosition, 1000, 1000, true, false, false, false, -1, -1);
 		this.m_oChatTabsControl.SetParams(0, dPosition, 1000, 1000, false, false, false, false, this.m_nChatTabsWidth, -1);
 	}
-};
-CGoUniverseApplication.prototype.private_InitChannelAddButton = function(sDivId)
-{
-	var oThis = this;
-
-	var oElement = document.getElementById(sDivId);
-	var oControl = CreateControlContainer(sDivId);
-
-	oElement.title           = "Add a channel";
-	oElement.style.fontSize  = "24px";
-	oElement.style.textAlign = "center";
-	oElement.addEventListener("selectstart", function()
-	{
-		return false;
-	}, false);
-	oElement.addEventListener("click", function()
-	{
-		oThis.OpenRoomList();
-	});
-
-	return oControl;
-};
-CGoUniverseApplication.prototype.private_InitChannelToggleButton = function(sDivId)
-{
-	var oThis = this;
-
-	var oElement = document.getElementById(sDivId);
-	var oControl = CreateControlContainer(sDivId);
-
-	oElement.title           = "Open tabs";
-	oElement.style.fontSize  = "24px";
-	oElement.style.textAlign = "center";
-	oElement.addEventListener("selectstart", function()
-	{
-		return false;
-	}, false);
-	oElement.addEventListener("click", function()
-	{
-		var oTabs = document.getElementById("divIdLChatTabs");
-		var sHeight = parseFloat(oTabs.style.height);
-
-		if (sHeight < 35)
-			oThis.private_OpenChatTabs();
-		else
-			oThis.private_CollapseChatTabs();
-	});
-
-	return oControl;
 };
 CGoUniverseApplication.prototype.private_InitGameTabsToggleButton = function(sDivId)
 {
@@ -1337,64 +1268,9 @@ CGoUniverseApplication.prototype.ShowUserContextMenu = function(nX, nY, sUserNam
 	oContextMenu.Show();
 	return oContextMenu;
 };
-CGoUniverseApplication.prototype.private_OpenChatTabs = function()
-{
-	var oTabs     = document.getElementById("divIdLChatTabs");
-	var nCount    = oTabs.childElementCount;
-	var oLastNode = oTabs.children[nCount - 1];
-	var nOffset   = oLastNode.offsetTop;
-	var nLines    = (((nOffset + 1) / 25) | 0) + 1;
-
-	var nMaxLines = Math.max(Math.min(5, nLines), 1);
-	if (1 === nMaxLines)
-		return;
-
-	oTabs.className = "ChatOpenPanel";
-
-	var nClientHeight = (nMaxLines * 25 - 1);
-	//oTabs.style.height          = nClientHeight + "px";
-	oTabs.style.backgroundColor = "#F3F3F3";
-	oTabs.style.borderBottom    = "1px solid #BEBEBE";
-	oTabs.style.borderRight     = "1px solid #BEBEBE";
-	oTabs.style.boxShadow       = "0px 1px 4px rgba(0,0,0,0.2)";
-
-	document.getElementById("divIdLChatTabsToggleInnerSpan").style.transform = "rotate(270deg)";
-
-	// if (nLines > nMaxLines)
-	// 	this.m_oChatTabsScroll.Show(nClientHeight);
-};
-CGoUniverseApplication.prototype.private_CollapseChatTabs = function()
-{
-	// var oTabs = document.getElementById("divIdLChatTabs");
-	// oTabs.className = "";
-	// //oTabs.style.height          = "25px";
-	// oTabs.style.minHeight       = "";
-	// oTabs.style.maxHeight       = "";
-	// oTabs.style.backgroundColor = "transparent";
-	// oTabs.style.borderBottom    = "1px none #BEBEBE";
-	// oTabs.style.borderRight     = "1px none #BEBEBE";
-	// oTabs.style.overflowY       = "hidden";
-	// oTabs.style.boxShadow       = "";
-
-//	document.getElementById("divIdLChatTabsToggleInnerSpan").style.transform = "rotate(90deg)";
-
-	//this.m_oChatTabsScroll.Hide();
-	this.ScrollChatTabsToCurrent();
-};
 CGoUniverseApplication.prototype.ScrollChatTabsToCurrent = function()
 {
-	// var nChatRoomId = this.m_oChatRoomTabs.GetCurrentId();
-	// var oTab = this.m_oChatRoomTabs.GetTab(nChatRoomId);
-	// if (!oTab)
-	// 	return;
-	//
-	// var oTabDiv = oTab.m_oTabDiv;
-	// var nOffsetTop = oTabDiv.offsetTop;
-	//
-	// var nLine = parseInt((nOffsetTop + 1) / 25);
-	//
-	// var oTabs = document.getElementById("divIdLChatTabs");
-	// oTabs.scrollTop = nLine * 25;
+	this.m_oChatTabsPanel.ScrollChatTabsToCurrentTab();
 };
 CGoUniverseApplication.prototype.IsTypingChatMessage = function()
 {
@@ -1423,31 +1299,9 @@ CGoUniverseApplication.prototype.Blur = function()
 {
 	this.m_bFocused = false;
 };
-CGoUniverseApplication.prototype.UpdateDropDownChatTabsButton = function()
+CGoUniverseApplication.prototype.OnRemoveChatRoom = function()
 {
-	// Проверяем, нужна ли нам кнопка
-
-// 	var oTabs     = document.getElementById("divIdLChatTabs");
-// 	var nCount    = oTabs.childElementCount;
-//
-// 	if (nCount <= 0)
-// 	{
-// //		document.getElementById("divIdLChatTabsToggle").style.display = "none";
-// 		return;
-// 	}
-//
-// 	var oLastNode = oTabs.children[nCount - 1];
-// 	var nOffset   = oLastNode.offsetTop;
-// 	var nLines    = (((nOffset + 1) / 25) | 0) + 1;
-
-	// if (nLines > 1)
-	// {
-	// 	//document.getElementById("divIdLChatTabsToggle").style.display = "block";
-	// }
-	// else
-	// {
-	// 	//document.getElementById("divIdLChatTabsToggle").style.display = "none";
-	// }
+	this.m_oChatTabsPanel.OnRemoveChatRoom();
 };
 CGoUniverseApplication.prototype.private_OpenGameTabs = function()
 {
@@ -1465,7 +1319,7 @@ CGoUniverseApplication.prototype.private_OpenGameTabs = function()
 
 	var nClientHeight = (nMaxLines * 50 - 1);
 	document.getElementById("divIdTabPanel").style.height = nClientHeight + 5 + "px";
-	//oTabs.style.height          = nClientHeight + "px";
+	oTabs.style.height          = nClientHeight + "px";
 	oTabs.style.backgroundColor = "#050708";
 	oTabs.style.boxShadow       = "0px 1px 5px rgba(0,0,0,0.8)";
 
@@ -1478,7 +1332,7 @@ CGoUniverseApplication.prototype.private_CollapseGameTabs = function()
 {
 	var oTabs = document.getElementById("divIdTabPanelRooms");
 	oTabs.className = "";
-	//oTabs.style.height          = "50px";
+	oTabs.style.height          = "50px";
 	oTabs.style.backgroundColor = "transparent";
 	oTabs.style.boxShadow       = "";
 
@@ -1760,7 +1614,7 @@ CGoUniverseApplication.prototype.OnChangeGamesListType = function(eType)
 };
 CGoUniverseApplication.prototype.OnRoomStatsChanged = function(nUsersCount, nGamesCount, nChallengesCount)
 {
-	this.m_oChatTabs.UpdateStats(nUsersCount, nGamesCount, nChallengesCount ,0);
+	this.m_oChatTabsPanel.UpdateStats(nUsersCount, nGamesCount, nChallengesCount ,0);
 };
 
 /**
@@ -1774,7 +1628,7 @@ function CVisualChatTabsPanel(oApp)
 	this.m_oChatTabsScroll = null;
 
 	this.m_nTopPanelH = 30;
-	this.m_nBotPanelH = 105;
+	this.m_nBotPanelH = 85;
 
 	this.m_bFullHeight     = false;
 	this.m_fOnChangeHeight = null;
@@ -1785,7 +1639,8 @@ function CVisualChatTabsPanel(oApp)
 	this.m_oElementUsers      = null;
 	this.m_oElementGames      = null;
 	this.m_oElementChallenges = null;
-	this.m_oElementAdmins     = null;
+
+	this.m_oElementTabs       = null;
 }
 CVisualChatTabsPanel.prototype.Init = function(oChatTabs, oParentControl, bFullHeight)
 {
@@ -1797,14 +1652,15 @@ CVisualChatTabsPanel.prototype.Init = function(oChatTabs, oParentControl, bFullH
 	// Табы
 	var oTabsElement = this.private_CreateDiv(oParentElement);
 	var oTabsControl = oChatTabs.InitByElement(oTabsElement);
-	oTabsControl.SetParams(0, this.m_nTopPanelH, 1000, this.m_nBotPanelH, true, true, false, true, -1, -1);
+	oTabsControl.SetParams(0, this.m_nTopPanelH, 1000, this.m_nBotPanelH - 1, true, true, false, true, -1, -1);
 	oTabsControl.SetAnchor(true, true, true, true);
 	oParentControl.AddControl(oTabsControl);
+	this.m_oElementTabs = oTabsElement;
 
 	// Скролл для табов
 	this.m_oChatTabsScroll = new CVerticalScroll();
 	this.m_oChatTabsScroll.Init(oTabsControl.HtmlElement, "VerScroll", "VerScrollActive", false);
-	this.m_oChatTabsScroll.SetPaddings(24, 1, 0);
+	this.m_oChatTabsScroll.SetPaddings(0, 2, 0);
 
 	// Верхняя панелька с поиском
 	var oTopElement = this.private_CreateDiv(oParentElement);
@@ -2038,6 +1894,8 @@ CVisualChatTabsPanel.prototype.OnInputChange = function()
 		this.m_oAddRoomElement.style.display        = "block";
 		this.m_oAddPrivateChatElement.style.display = "block";
 	}
+
+	this.m_oChatTabsScroll.CheckVisibility();
 };
 CVisualChatTabsPanel.prototype.OnAddChatRoom = function()
 {
@@ -2054,12 +1912,11 @@ CVisualChatTabsPanel.prototype.private_InitBottomPanel = function(oParent, oPare
 	var sUsers      = "Users";
 	var sGames      = "Games";
 	var sChallenges = "Challenges";
-	var sAdmins     = "Admins";
 	var sStatistics = "Statistics of the room";
 
 	g_oTextMeasurer.SetFont("14px 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif");
 
-	var nLeftWidth = Math.max(g_oTextMeasurer.Measure(sUsers), g_oTextMeasurer.Measure(sGames), g_oTextMeasurer.Measure(sChallenges), g_oTextMeasurer.Measure(sAdmins));
+	var nLeftWidth = Math.max(g_oTextMeasurer.Measure(sUsers), g_oTextMeasurer.Measure(sGames), g_oTextMeasurer.Measure(sChallenges));
 	nLeftWidth += 20 + 5;
 	var nHeaderHeight = 20;
 
@@ -2089,12 +1946,6 @@ CVisualChatTabsPanel.prototype.private_InitBottomPanel = function(oParent, oPare
 	oElement.appendChild(oDiv);
 	this.m_oElementChallenges = oDiv;
 
-	oDiv = document.createElement("div");
-	oDiv.className = "roomStats";
-	oDiv.innerHTML = "0";
-	oElement.appendChild(oDiv);
-	this.m_oElementAdmins = oDiv;
-
 	oElement = this.private_CreateDiv(oParent);
 	oControl = CreateControlContainerByElement(oElement);
 	oControl.SetParams(20, nHeaderHeight, 1000, 1000, true, true, false, false, nLeftWidth - 20, -1);
@@ -2116,11 +1967,6 @@ CVisualChatTabsPanel.prototype.private_InitBottomPanel = function(oParent, oPare
 	oDiv.innerHTML = sChallenges;
 	oElement.appendChild(oDiv);
 
-	oDiv = document.createElement("div");
-	oDiv.className = "roomStats";
-	oDiv.innerHTML = sAdmins;
-	oElement.appendChild(oDiv);
-
 	oElement = this.private_CreateDiv(oParent);
 	oControl = CreateControlContainerByElement(oElement);
 	oControl.SetParams(10, 0, 1000, 1000, true, false, false, false, -1, nHeaderHeight);
@@ -2133,18 +1979,29 @@ CVisualChatTabsPanel.prototype.private_InitBottomPanel = function(oParent, oPare
 	oDiv.innerHTML = sStatistics;
 	oElement.appendChild(oDiv);
 };
-CVisualChatTabsPanel.prototype.UpdateStats = function(nUsers, nGames, nChallenges, nAdmins)
+CVisualChatTabsPanel.prototype.UpdateStats = function(nUsers, nGames, nChallenges)
 {
 	this.m_oElementUsers.innerHTML      = "" + nUsers;
 	this.m_oElementGames.innerHTML      = "" + nGames;
 	this.m_oElementChallenges.innerHTML = "" + nChallenges;
+};
+CVisualChatTabsPanel.prototype.OnResize = function()
+{
+	this.m_oChatTabsScroll.CheckVisibility();
+};
+CVisualChatTabsPanel.prototype.ScrollChatTabsToCurrentTab = function()
+{
+	var nChatRoomId = this.m_oChatTabs.GetCurrentId();
+	var oTab        = this.m_oChatTabs.GetTab(nChatRoomId);
+	if (!oTab)
+		return;
 
-	if (nAdmins <= 0)
-	{
-		this.m_oElementAdmins.innerHTML = "" + nAdmins;
-	}
-	else
-	{
-		this.m_oElementAdmins.innerHTML = "" + nAdmins;
-	}
+	var oTabDiv = oTab.m_oTabDiv;
+	var nOffsetTop = oTabDiv.offsetTop;
+
+	var nLine = parseInt((nOffsetTop + 1) / 25);
+
+	this.m_oElementTabs.scrollTop = nLine * 25;
+
+	this.m_oChatTabsScroll.UpdatePosition();
 };
