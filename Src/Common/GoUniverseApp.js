@@ -1138,7 +1138,7 @@ CGoUniverseApplication.prototype.private_InitGamesListTabs = function(oParentCon
 	this.m_oGamesListTabs.AddTab(oTab);
 
 	var oTab = new CVisualGamesListTab(this);
-	oTab.Init(EKGSGamesListType.Room, "Rooms");
+	oTab.Init(EKGSGamesListType.Room, "Room");
 	this.m_oGamesListTabs.AddTab(oTab);
 
 	var oTab = new CVisualGamesListTab(this);
@@ -1445,7 +1445,7 @@ CGoUniverseApplication.prototype.ShowGamesListContextMenu = function(nX, nY, nGa
 	{
 		oClient.SetGamesListType(EKGSGamesListType.AllChallengesNoBots);
 	});
-	oContextMenu.AddCheckBoxItem(EKGSGamesListType.Room === nGamesListType ? true : false, "Rooms", function ()
+	oContextMenu.AddCheckBoxItem(EKGSGamesListType.Room === nGamesListType ? true : false, "Room", function ()
 	{
 		oClient.SetGamesListType(EKGSGamesListType.Room);
 	});
