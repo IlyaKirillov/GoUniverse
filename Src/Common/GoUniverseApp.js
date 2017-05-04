@@ -409,6 +409,8 @@ CGoUniverseApplication.prototype.SetCurrentChatRoomTab = function(nChatRoomId)
 		oTab.OnClick();
 	else if (this.m_oClient)
 		this.m_oClient.EnterChatRoom(nChatRoomId);
+
+	this.m_oChatTabsPanel.ScrollChatTabsToCurrentTab();
 };
 CGoUniverseApplication.prototype.AddRoomGreetingMessage = function(nChatRoomId, sGreetingMessage)
 {
@@ -1895,7 +1897,7 @@ CVisualChatTabsPanel.prototype.OnInputChange = function()
 		this.m_oAddPrivateChatElement.style.display = "block";
 	}
 
-	this.m_oChatTabsScroll.CheckVisibility();
+	this.private_CheckScrollVisibility();
 };
 CVisualChatTabsPanel.prototype.OnAddChatRoom = function()
 {
@@ -1907,7 +1909,8 @@ CVisualChatTabsPanel.prototype.OnRemoveChatRoom = function()
 };
 CVisualChatTabsPanel.prototype.private_InitBottomPanel = function(oParent, oParentControl)
 {
-	oParent.style.borderTop = "1px solid rgb(190, 190, 190)";
+	oParent.style.borderTop  = "1px solid rgb(190, 190, 190)";
+	oParent.style.background = "rgb(243, 243, 243)";
 
 	var sUsers      = "Users";
 	var sGames      = "Games";
@@ -1987,7 +1990,7 @@ CVisualChatTabsPanel.prototype.UpdateStats = function(nUsers, nGames, nChallenge
 };
 CVisualChatTabsPanel.prototype.OnResize = function()
 {
-	this.m_oChatTabsScroll.CheckVisibility();
+	this.private_CheckScrollVisibility();
 };
 CVisualChatTabsPanel.prototype.ScrollChatTabsToCurrentTab = function()
 {
@@ -2004,4 +2007,15 @@ CVisualChatTabsPanel.prototype.ScrollChatTabsToCurrentTab = function()
 	this.m_oElementTabs.scrollTop = nLine * 25;
 
 	this.m_oChatTabsScroll.UpdatePosition();
+};
+CVisualChatTabsPanel.prototype.private_CheckScrollVisibility = function()
+{
+	var isHidden = this.m_oChatTabsScroll.IsHidden();
+
+	this.m_oChatTabsScroll.CheckVisibility();
+
+	if (isHidden !== this.m_oChatTabsScroll.IsHidden())
+	{
+		this.m_oChatTabs.OnScrollShowHide(!this.m_oChatTabsScroll.IsHidden());
+	}
 };

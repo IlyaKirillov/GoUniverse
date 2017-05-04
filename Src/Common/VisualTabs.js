@@ -532,12 +532,15 @@ CVisualGameRoomTab.prototype.GetChatInputElement = function()
 function CVisualChatRoomTabs()
 {
 	CVisualChatRoomTabs.superclass.constructor.call(this);
+
+	this.m_bScrollShow = false;
 }
 CommonExtend(CVisualChatRoomTabs, CVisualTabs);
 CVisualChatRoomTabs.prototype.AddTab = function(oTab)
 {
 	this.m_arrTabs.push(oTab);
 	oTab.SetParent(this);
+	oTab.OnScrollShowHide(this.m_bScrollShow);
 
 	var sName   = oTab.GetRoomName();
 	var oTabDiv = oTab.GetDiv();
@@ -565,6 +568,19 @@ CVisualChatRoomTabs.prototype.AddTab = function(oTab)
 		this.m_oPanelElement.appendChild(oTabDiv);
 	}
 };
+CVisualChatRoomTabs.prototype.OnScrollShowHide = function(isShow)
+{
+	if (this.m_bScrollShow !== isShow)
+	{
+		this.m_bScrollShow = isShow;
+
+		for (var nIndex = 0, nCount = this.GetCount(); nIndex < nCount; ++nIndex)
+		{
+			var oTab = this.GetTabByIndex(nIndex);
+			oTab.OnScrollShowHide(isShow)
+		}
+	}
+};
 
 function CVisualChatRoomTab(oApp)
 {
@@ -581,8 +597,6 @@ function CVisualChatRoomTab(oApp)
 	this.m_nNewMessagesCount = 0;
 	this.m_oMessagesDiv      = null;
 	this.m_oPopup            = null;
-
-	this.m_nMinWidth         = 200;//4 * 26 + 2;
 }
 CVisualChatRoomTab.prototype.Init = function(nId, sRoomName, bPrivate)
 {
@@ -721,11 +735,11 @@ CVisualChatRoomTab.prototype.private_InitTab = function(sRoomName)
 	DivTab.style.position           = "relative";
 	DivTab["aria-label"]            = sRoomName;
 	DivTab.title                    = sRoomName;
-	DivTab.style.transitionProperty = "width,height,background,margin,border,padding";
+	DivTab.style.transitionProperty = "width,height,background,margin,border";
 	DivTab.style.transitionDuration = ".3s";
 	DivTab.style.float              = "left";
 	DivTab.style.height             = sHeight;
-	DivTab.style.minWidth           = this.m_nMinWidth + "px";
+	DivTab.style.minWidth           = "200px";
 	DivTab.style.margin             = "0px";
 	DivTab.style.padding            = "0px";
 	DivTab.style.color              = "#000";
@@ -944,6 +958,21 @@ CVisualChatRoomTab.prototype.ShowTab = function()
 CVisualChatRoomTab.prototype.HideTab = function()
 {
 	this.m_oTabDiv.style.display = "none";
+};
+CVisualChatRoomTab.prototype.OnScrollShowHide = function(isShow)
+{
+	if (isShow)
+	{
+		this.m_oTabDiv.style.minWidth     = "185px";
+		this.m_oTabDiv.style.paddingRight = "15px";
+		this.m_oButton.style.maxWidth     = "159px";
+	}
+	else
+	{
+		this.m_oTabDiv.style.minWidth     = "200px";
+		this.m_oTabDiv.style.paddingRight = "0px";
+		this.m_oButton.style.maxWidth     = "174px";
+	}
 };
 
 function CVisualGamesListTab(oApp)
