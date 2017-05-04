@@ -744,14 +744,14 @@ input.chatTabsSearch {
 	border-top    : none;
 	border-left   : none;
 	border-right  : none;
-	border-bottom : 1px solid rgb(220, 220, 220);
+	border-bottom : 1px solid rgb(190, 190, 190);
 	font-size     : 14px;
 	font-family   : 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif;
 	background   : transparent;
 	padding      : 5px 25px 0px 25px;
 	width        : 147px;
 	outline      : none;
-	color        : rgb(220, 220, 220);
+	color        : rgb(190, 190, 190);
 	margin-left  : 25px;
 }
 
@@ -767,20 +767,19 @@ input.chatTabsSearch:hover {
 
 div.chatTabsAdditionalSearchButtons {
 
-	text-align      : center;
-	font-size       : 14px;
-	font-family     : 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif;
-	cursor          : pointer;
-	text-decoration : underline;
-	color           : rgb(0, 130, 114);
-	margin          : 0px 10px 0px 10px;
-
+	text-align  : center;
+	font-size   : 14px;
+	font-family : 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif;
+	margin      : 5px 20px 5px 20px;
+	line-height : 23px;
+	height      : 25px;
+	width       : 160px;
 }
 
-div.chatTabsAdditionalSearchButtons:hover {
-
-	text-decoration : underline;
-
+div.chatTabsAdditionalSearchButtonsWrapper {
+	height      : 35px;
+	width       : 200px;
+	float       : right;
 }
 
 div.roomStats {

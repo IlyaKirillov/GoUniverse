@@ -1679,28 +1679,28 @@ CVisualChatTabsPanel.prototype.Init = function(oChatTabs, oParentControl, bFullH
 	oParentControl.AddControl(oBottomControl);
 
 	// Кнопка для добавления новой комнаты
-	var oAddRoomElement = this.private_CreateDiv(oParentElement);
-	var oAddRoomControl = CreateControlContainerByElement(oAddRoomElement);
-	oAddRoomControl.SetParams(0, this.m_nTopPanelH + 20, 1000, this.m_nBotPanelH, true, true, false, true, -1, 50);
-	oAddRoomControl.SetAnchor(true, true, true, false);
-	oParentControl.AddControl(oAddRoomControl);
-	var oAddRoomElementInner = this.private_CreateDiv(oAddRoomElement);
-	oAddRoomElementInner.innerHTML = "Search in the list of all rooms";
-	oAddRoomElementInner.className = "chatTabsAdditionalSearchButtons";
-	oAddRoomElement.style.display = "none";
-	this.m_oAddRoomElement = oAddRoomElement;
+	var oAddRoomElementWrapper       = document.createElement("div");
+	oAddRoomElementWrapper.className = "chatTabsAdditionalSearchButtonsWrapper";
+
+	var oAddRoomElement           = document.createElement("div");
+	oAddRoomElement.innerHTML     = "Find room";
+	oAddRoomElement["aria-label"] = "Search in the list of all rooms";
+	oAddRoomElement.title         = "Search in the list of all rooms";
+	oAddRoomElement.className     = "ButtonGreen chatTabsAdditionalSearchButtons";
+	this.m_oAddRoomElement        = oAddRoomElementWrapper;
+	oAddRoomElementWrapper.appendChild(oAddRoomElement);
 
 	// Кнопка для добавления разговора
-	var oAddPrivateChatElement = this.private_CreateDiv(oParentElement);
-	var oAddPrivateChatControl = CreateControlContainerByElement(oAddPrivateChatElement);
-	oAddPrivateChatControl.SetParams(0, this.m_nTopPanelH + 70, 1000, this.m_nBotPanelH, true, true, false, true, -1, 50);
-	oAddPrivateChatControl.SetAnchor(true, true, true, false);
-	oParentControl.AddControl(oAddPrivateChatControl);
-	var oAddPrivateChatElementInner = this.private_CreateDiv(oAddPrivateChatElement);
-	oAddPrivateChatElementInner.innerHTML = "Start private chat with that user";
-	oAddPrivateChatElementInner.className = "chatTabsAdditionalSearchButtons";
-	oAddPrivateChatElement.style.display = "none";
-	this.m_oAddPrivateChatElement = oAddPrivateChatElement;
+	var oAddPrivateChatElementWrappper       = document.createElement("div");
+	oAddPrivateChatElementWrappper.className = "chatTabsAdditionalSearchButtonsWrapper";
+
+	var oAddPrivateChatElement           = document.createElement("div");
+	oAddPrivateChatElement.innerHTML     = "Find user";
+	oAddPrivateChatElement["aria-label"] = "Start private chat with that user";
+	oAddPrivateChatElement.title         = "Start private chat with that user";
+	oAddPrivateChatElement.className     = "ButtonGreen chatTabsAdditionalSearchButtons";
+	this.m_oAddPrivateChatElement        = oAddPrivateChatElementWrappper;
+	oAddPrivateChatElementWrappper.appendChild(oAddPrivateChatElement);
 
 	this.private_InitTopPanel(oTopElement);
 	this.private_InitBottomPanel(oBottomElement, oBottomControl);
@@ -1862,7 +1862,6 @@ CVisualChatTabsPanel.prototype.OnInputChange = function()
 
 	var oTabs   = this.m_oChatTabs;
 	var sValue  = (oInput.value).toLowerCase();
-	var bFinded = false;
 
 	for (var nIndex = 0, nCount = oTabs.GetCount(); nIndex < nCount; ++nIndex)
 	{
@@ -1872,7 +1871,6 @@ CVisualChatTabsPanel.prototype.OnInputChange = function()
 		if (!sValue || "" === sValue || -1 !== sRoomName.indexOf(sValue))
 		{
 			oTab.ShowTab();
-			bFinded = true;
 		}
 		else
 		{
@@ -1880,21 +1878,22 @@ CVisualChatTabsPanel.prototype.OnInputChange = function()
 		}
 	}
 
+	var oTabsDiv = this.m_oChatTabs.GetMainElement();
 	if (!sValue || "" === sValue)
-		oCancelIcon.style.display = "none";
-	else
-		oCancelIcon.style.display = "block";
-
-
-	if (bFinded)
 	{
-		this.m_oAddRoomElement.style.display        = "none";
-		this.m_oAddPrivateChatElement.style.display = "none";
+		if (this.m_oAddRoomElement.parentNode === oTabsDiv)
+			oTabsDiv.removeChild(this.m_oAddRoomElement);
+
+		if (this.m_oAddPrivateChatElement.parentNode === oTabsDiv)
+			oTabsDiv.removeChild(this.m_oAddPrivateChatElement);
+
+		oCancelIcon.style.display = "none";
 	}
 	else
 	{
-		this.m_oAddRoomElement.style.display        = "block";
-		this.m_oAddPrivateChatElement.style.display = "block";
+		oTabsDiv.appendChild(this.m_oAddRoomElement);
+		oTabsDiv.appendChild(this.m_oAddPrivateChatElement);
+		oCancelIcon.style.display = "block";
 	}
 
 	this.private_CheckScrollVisibility();

@@ -152,6 +152,10 @@ CVisualTabs.prototype.MoveTabToStart = function(oTab)
 		this.m_oPanelElement.insertBefore(oTabDiv, this.m_oPanelElement.children[0]);
 	}
 };
+CVisualTabs.prototype.GetMainElement = function()
+{
+	return this.m_oPanelElement;
+};
 
 function CVisualGameRoomTabs()
 {
