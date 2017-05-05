@@ -539,8 +539,49 @@ CKGSClient.prototype.CreateChallenge = function()
 		}
 	});
 
-	var oWindow = CreateKGSWindow(EKGSWindowType.Challenge, {GameRecord : oGameRecord, Client : this, App: this.m_oApp, Create : true, ChannelId : nCallBackKey, RoomId : this.m_nChatChannelId});
+	var oWindow = CreateKGSWindow(EKGSWindowType.Challenge, {GameRecord : oGameRecord, Client : this, App: this.m_oApp, Create : true, ChannelId : nCallBackKey, RoomId : this.m_nChatChannelId, Demonstration : false});
 	this.m_oChallenges[nCallBackKey] = oWindow;
+};
+CKGSClient.prototype.CreateDemonstration = function()
+{
+
+	var nChannelId = this.m_nChatChannelId;
+	if (this.m_oPrivateChats[nChannelId] || !this.m_aAllRooms[nChannelId])
+	{
+		nChannelId = this.m_oApp.GetGlobalSettings().GetKGSChallengeRoomId();
+		if (this.m_oPrivateChats[nChannelId] || !this.m_aAllRooms[nChannelId])
+			return;
+	}
+
+	var oGameRecord = new CKGSGameListRecord(this);
+	oGameRecord.Update({
+		gameType        : "challenge",
+		channelId       : -1,
+		roomId          : nChannelId,
+		private         : false,
+		players         : {
+			challengeCreator : {
+				name : this.m_oCurrentUser.GetName(),
+				rank : this.m_oCurrentUser.GetStringRank()
+			}
+		},
+		name            : "",
+		initialProposal : {
+			gameType : "demonstration",
+			rules    : {
+				rules          : "japanese",
+				komi           : "6.5",
+				size           : 19,
+				timeSystem     : "byo_yomi",
+				mainTime       : 600,
+				byoYomiTime    : 30,
+				byoYomiPeriods : 5
+			}
+		}
+	});
+
+	var nCallBackKey = -2;
+	var oWindow = CreateKGSWindow(EKGSWindowType.Challenge, {GameRecord : oGameRecord, Client : this, App: this.m_oApp, Create : true, ChannelId : nCallBackKey, RoomId : this.m_nChatChannelId, Demonstration : true});
 };
 CKGSClient.prototype.SendCreateChallenge = function(nChannelId, nCallBackKey, nGameType, sComment, nRules, nSize, oTimeSettings, bPrivate)
 {
@@ -563,37 +604,58 @@ CKGSClient.prototype.SendCreateChallenge = function(nChannelId, nCallBackKey, nG
 		oRules["byoYomiStones"] = oTimeSettings.GetOverCount();
 	}
 
-	// this.private_SendMessage({
-	// 	"channelId"   : nChannelId,
-	// 	"type"        : "CHALLENGE_CREATE",
-	// 	"callbackKey" : nCallBackKey,
-	// 	"text"        : sComment,
-	// 	"global"      : true,
-	//
-	// 	"proposal" : {
-	//
-	// 		"gameType" : KGSCommon.GameTypeToString(nGameType),
-	// 		"nigiri"   : true,
-	//
-	// 		"rules" : oRules,
-	//
-	// 		"private" : bPrivate,
-	//
-	// 		"players" : [{
-	// 			"role" : "white",
-	// 			"name" : this.m_oCurrentUser.GetName()
-	// 		}, {
-	// 			"role" : "black"
-	// 		}]
-	// 	}
-	// });
-
 	this.private_SendMessage({
 		"channelId"   : nChannelId,
 		"type"        : "CHALLENGE_CREATE",
 		"callbackKey" : nCallBackKey,
 		"text"        : sComment,
 		"global"      : true,
+
+		"proposal" : {
+
+			"gameType" : KGSCommon.GameTypeToString(nGameType),
+			"nigiri"   : true,
+
+			"rules" : oRules,
+
+			"private" : bPrivate,
+
+			"players" : [{
+				"role" : "white",
+				"name" : this.m_oCurrentUser.GetName()
+			}, {
+				"role" : "black"
+			}]
+		}
+	});
+};
+CKGSClient.prototype.SendCreateDemonstration = function(nChannelId, nCallBackKey, nRules, nSize, oTimeSettings, bPrivate)
+{
+	var oRules = {
+		"rules"      : KGSCommon.GameRulesToString(nRules),
+		"size"       : nSize,
+		"komi"       : 6.5,
+		"timeSystem" : oTimeSettings.GetTypeInKGSString(),
+		"mainTime"   : oTimeSettings.GetMainTime()
+	};
+
+	if (oTimeSettings.IsByoYomi())
+	{
+		oRules["byoYomiTime"]    = oTimeSettings.GetOverTime();
+		oRules["byoYomiPeriods"] = oTimeSettings.GetOverCount();
+	}
+	else if (oTimeSettings.IsCanadian())
+	{
+		oRules["byoYomiTime"]   = oTimeSettings.GetOverTime();
+		oRules["byoYomiStones"] = oTimeSettings.GetOverCount();
+	}
+
+	this.private_SendMessage({
+		"channelId"   : nChannelId,
+		"type"        : "CHALLENGE_CREATE",
+		"callbackKey" : nCallBackKey,
+		"global"      : true,
+		"text"        : "",
 
 		"proposal" : {
 
@@ -679,10 +741,6 @@ CKGSClient.prototype.DeclineChallenge = function(nChannelId, sUserName)
 		"type"     : "CHALLENGE_DECLINE",
 		"name"     : sUserName
 	});
-};
-CKGSClient.prototype.CreateDemonstration = function()
-{
-
 };
 CKGSClient.prototype.SendSync = function(oClass)
 {

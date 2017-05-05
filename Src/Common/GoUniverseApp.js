@@ -858,7 +858,7 @@ CGoUniverseApplication.prototype.private_InitTabPanel = function(oTabsControl)
 
 		oContextMenu.AddListItem("Start demonstration", function()
 		{
-
+			oThis.m_oClient.CreateDemonstration();
 		}, false);
 
 		oContextMenu.AddHorizontalLine();

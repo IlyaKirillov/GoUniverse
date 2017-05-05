@@ -27,10 +27,11 @@ var EKGSChallengeWindowState = {
 };
 
 var EKGSChallengeWindowType = {
-	Regular   : 0,
-	Unranked  : 1,
-	Rengo     : 2,
-	Simulation: 3
+	Regular       : 0,
+	Unranked      : 1,
+	Rengo         : 2,
+	Simulation    : 3,
+	Demonstration : 4
 };
 
 function CKGSChallengeWindow()
@@ -69,7 +70,8 @@ function CKGSChallengeWindow()
 		Left   : 0,
 		Top    : 0,
 		Height : 0,
-		Width  : 0
+		Width  : 0,
+		Hided  : false
 	};
 
 	this.m_oCurrentChallenger = null;
@@ -350,7 +352,8 @@ function CKGSChallengeWindow()
 	};
 	this.private_OnChangeComment = function()
 	{
-		oThis.private_GetGlobalSettings().SetKGSChallengeComment(oThis.m_oCommentInput.value);
+		if (oThis.m_oCommentInput)
+			oThis.private_GetGlobalSettings().SetKGSChallengeComment(oThis.m_oCommentInput.value);
 	};
 	this.private_OnChangePrivate = function()
 	{
@@ -399,7 +402,12 @@ CKGSChallengeWindow.prototype.Init = function(sDivId, oPr)
 	var oChallengeCreator = this.m_oGameRecord.GetChallengeCreator();
 	this.m_oOwner         = oChallengeCreator;
 
-	if (true === oPr.Create)
+	if (true === oPr.Demonstration)
+	{
+		this.m_nState = EKGSChallengeWindowState.Creation;
+		this.m_nType  = EKGSChallengeWindowType.Demonstration;
+	}
+	else if (true === oPr.Create)
 	{
 		this.m_nState = EKGSChallengeWindowState.Creation;
 		this.m_nType  = EKGSChallengeWindowType.Unranked;
@@ -449,6 +457,8 @@ CKGSChallengeWindow.prototype.Init = function(sDivId, oPr)
 		this.private_FillDefaultChallengerValues();
 
 	this.private_UpdateOnStateChange();
+
+	this.private_UpdateSize();
 };
 CKGSChallengeWindow.prototype.Update_Size = function(bForce)
 {
@@ -475,12 +485,19 @@ CKGSChallengeWindow.prototype.Update_Size = function(bForce)
 };
 CKGSChallengeWindow.prototype.Get_DefaultWindowSize = function()
 {
-	return {W : 360, H : 512};
+	if (this.m_nType === EKGSChallengeWindowType.Demonstration)
+		return {W : 360, H : 512 - this.m_nHeaderHeight - 60};
+	else
+		return {W : 360, H : 512};
 };
 CKGSChallengeWindow.prototype.Close = function()
 {
 	CKGSChallengeWindow.superclass.Close.call(this);
-	this.m_oClient.CloseChallenge(this.m_nChannelId);
+
+	if (this.m_nType === EKGSChallengeWindowType.Demonstration)
+		RemoveWindow(this);
+	else
+		this.m_oClient.CloseChallenge(this.m_nChannelId);
 };
 CKGSChallengeWindow.prototype.OnSubmit = function(oUser, oProposal)
 {
@@ -623,6 +640,7 @@ CKGSChallengeWindow.prototype.Hide = function()
 	this.m_oSavedPosition.Top    = oMainDiv.style.top;
 	this.m_oSavedPosition.Height = oMainDiv.style.height;
 	this.m_oSavedPosition.Width  = oMainDiv.style.width;
+	this.m_oSavedPosition.Hided  = true;
 
 	var oLocation = oApp.GetButtonPlayLocation();
 
@@ -635,6 +653,14 @@ CKGSChallengeWindow.prototype.Hide = function()
 };
 CKGSChallengeWindow.prototype.Show = function()
 {
+	if (true !== this.m_oSavedPosition.Hided)
+	{
+		this.Focus();
+		return;
+	}
+
+	this.m_oSavedPosition.Hided  = false;
+
 	var oMainDiv = this.HtmlElement.Control.HtmlElement;
 
 	g_oFadeEffect.In(oMainDiv, -1, null);
@@ -675,18 +701,24 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 	oWrapperControl.SetAnchor(false, true, true, false);
 	oMainControl.AddControl(oWrapperControl);
 
-	var oInput = this.protected_CreateDivElement(oWrapperDiv, null, "input");
-	var oInputControl = CreateControlContainerByElement(oInput);
-	oInputControl.SetParams(5, 5, 5, 0, true, true, true, true, -1, -1);
-	oInputControl.SetAnchor(true, true, true, true);
-	oWrapperControl.AddControl(oInputControl);
-	oInput.maxLength         = "80";
-	oInput.placeholder       = "No comment";
-	oInput.style.paddingLeft = "3px";
+	if (this.m_nType !== EKGSChallengeWindowType.Demonstration)
+	{
+		var oInput        = this.protected_CreateDivElement(oWrapperDiv, null, "input");
+		var oInputControl = CreateControlContainerByElement(oInput);
+		oInputControl.SetParams(5, 5, 5, 0, true, true, true, true, -1, -1);
+		oInputControl.SetAnchor(true, true, true, true);
+		oWrapperControl.AddControl(oInputControl);
+		oInput.maxLength         = "80";
+		oInput.placeholder       = "No comment";
+		oInput.style.paddingLeft = "3px";
 
-	var sComment = this.m_oGameRecord.GetComment();
-	if (sComment)
-		oInput.value = sComment;
+		var sComment = this.m_oGameRecord.GetComment();
+		if (sComment)
+			oInput.value = sComment;
+
+		this.m_oCommentInput = oInput;
+		this.private_AddEventsForInput(this.private_OnChangeComment, oInput);
+	}
 
 	var oWrapperTypeDiv     = this.protected_CreateDivElement(oMainDiv);
 	var oWrapperTypeControl = CreateControlContainerByElement(oWrapperTypeDiv);
@@ -721,6 +753,11 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 		case EKGSChallengeWindowType.Simulation:
 		{
 			this.private_AddOptionToSelect(oTypeList, "Simulation");
+			break;
+		}
+		case EKGSChallengeWindowType.Demonstration:
+		{
+			this.private_AddOptionToSelect(oTypeList, "Demonstration");
 			break;
 		}
 	}
@@ -763,10 +800,15 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 	else
 		oPrivateCheckBox.disabled = "disabled";
 
+	if (this.m_nType !== EKGSChallengeWindowType.Demonstration)
+	{
+		this.m_nTop = this.m_nHeaderHeight * 2;
+	}
+	else
+	{
+		this.m_nTop = this.m_nHeaderHeight;
+	}
 
-	this.m_nTop = this.m_nHeaderHeight * 2;
-
-	this.m_oCommentInput    = oInput;
 	this.m_oGameTypeSelect  = oTypeList;
 	this.m_oPrivateCheckBox = oPrivateCheckBox;
 
@@ -779,7 +821,6 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 
 	oPrivateCheckBox.onclick = this.private_OnChangePrivate;
 	this.private_AddEventsForSelect(this.private_OnChangeGameType, oTypeList);
-	this.private_AddEventsForInput(this.private_OnChangeComment, oInput);
 };
 CKGSChallengeWindow.prototype.private_CreateAnimatedWaiting = function()
 {
@@ -794,6 +835,9 @@ CKGSChallengeWindow.prototype.private_CreateAnimatedWaiting = function()
 };
 CKGSChallengeWindow.prototype.private_CreatePlayers = function()
 {
+	if (this.m_nType === EKGSChallengeWindowType.Demonstration)
+		return;
+
 	var nTop = this.m_nHeaderHeight * 2;
 
 	nTop += 10;
@@ -1225,18 +1269,28 @@ CKGSChallengeWindow.prototype.private_CreateButtons = function()
 };
 CKGSChallengeWindow.prototype.private_CreateChallenge = function()
 {
-	var sComment    = this.m_oCommentInput.value;
-	var nGameType   = this.private_GetSelectedGameType();
 	var nRules      = this.private_GetSelectedRules();
 	var nSize       = this.m_oSizeInput.value;
 	var oTimeSystem = this.m_oGameRecord.GetProposal().GetTimeSettings();
 	var nRoomId     = this.private_GetSelectedRoomId();
 	var bPrivate    = this.private_IsPrivate();
 
-	this.m_oClient.SendCreateChallenge(nRoomId, this.m_nChannelId, nGameType, sComment, nRules, nSize, oTimeSystem, bPrivate);
+	if (this.m_nType === EKGSChallengeWindowType.Demonstration)
+	{
+		this.m_oClient.SendCreateDemonstration(nRoomId, this.m_nChannelId, nRules, nSize, oTimeSystem, bPrivate);
+		this.Close();
+	}
+	else
+	{
+		var sComment  = this.m_oCommentInput.value;
+		var nGameType = this.private_GetSelectedGameType();
 
-	this.private_SetState(EKGSChallengeWindowState.Waiting);
-	this.m_nGameType = nGameType;
+		this.m_oClient.SendCreateChallenge(nRoomId, this.m_nChannelId, nGameType, sComment, nRules, nSize, oTimeSystem, bPrivate);
+
+		this.private_SetState(EKGSChallengeWindowState.Waiting);
+		this.m_nGameType = nGameType;
+
+	}
 };
 CKGSChallengeWindow.prototype.private_OkChallenge = function()
 {
@@ -1833,10 +1887,21 @@ CKGSChallengeWindow.prototype.private_UpdateOnStateChange = function()
 	}
 	else if (EKGSChallengeWindowState.Creation === this.m_nState)
 	{
-		this.m_oGameTypeSelect.className   = "challengeSelect challengeSelectEditable";
-		this.m_oGameTypeSelect.disabled    = "";
-		this.m_oCommentInput.className     = "challengeInput challengeInputEditable";
-		this.m_oCommentInput.disabled      = "";
+		if (EKGSChallengeWindowType.Demonstration !== this.m_nType)
+		{
+			this.m_oCommentInput.className     = "challengeInput challengeInputEditable";
+			this.m_oCommentInput.disabled      = "";
+			this.m_oChallengerSelect.className = "challengeSelect challengeSelectDisabled";
+			this.m_oChallengerSelect.disabled  = "disabled";
+			this.m_oChallengerDiv.className    = "challengePlayer";
+			this.m_oGameTypeSelect.className   = "challengeSelect challengeSelectEditable";
+			this.m_oGameTypeSelect.disabled    = "";
+		}
+		else
+		{
+			this.m_oGameTypeSelect.className = "challengeSelect challengeSelectDisabled";
+			this.m_oGameTypeSelect.disabled  = "disabled";
+		}
 		this.m_oRoomSelect.className       = "challengeSelect challengeSelectEditable";
 		this.m_oRoomSelect.disabled        = "";
 		this.m_oRulesSelect.className      = "challengeSelect challengeSelectEditable";
@@ -1849,9 +1914,6 @@ CKGSChallengeWindow.prototype.private_UpdateOnStateChange = function()
 		this.m_oHandicapInput.disabled     = "disabled";
 		this.m_oTimeSystemSelect.className = "challengeSelect challengeSelectEditable";
 		this.m_oTimeSystemSelect.disabled  = "";
-		this.m_oChallengerSelect.className = "challengeSelect challengeSelectDisabled";
-		this.m_oChallengerSelect.disabled  = "disabled";
-		this.m_oChallengerDiv.className    = "challengePlayer";
 	}
 	else if (EKGSChallengeWindowState.CreatorProposal === this.m_nState)
 	{
@@ -1966,7 +2028,10 @@ CKGSChallengeWindow.prototype.private_FillDefaultCreatorValues = function()
 		nRoomId = nChatChannelId;
 
 	this.private_SetSelectedGameType(nGameType);
-	this.m_oCommentInput.value = sComment;
+
+	if (this.m_oCommentInput)
+		this.m_oCommentInput.value = sComment;
+
 	this.private_SetSelectedRoomId(nRoomId);
 	this.private_SetSelectedRules(nRules);
 	this.m_oSizeInput.value = nSize;
