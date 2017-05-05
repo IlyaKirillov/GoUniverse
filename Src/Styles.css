@@ -771,13 +771,13 @@ div.chatTabsAdditionalSearchButtons {
 	font-size   : 14px;
 	font-family : 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif;
 	margin      : 5px 20px 5px 20px;
-	line-height : 23px;
-	height      : 25px;
+	line-height : 17px;
+	height      : 19px;
 	width       : 160px;
 }
 
 div.chatTabsAdditionalSearchButtonsWrapper {
-	height      : 35px;
+	height      : 29px;
 	width       : 200px;
 	float       : right;
 }
