@@ -34,6 +34,8 @@ function CKGSGameListRecord(oClient)
 	this.m_oChallengeCreator = null;
 	this.m_oProposal         = null;
 	this.m_sComment          = "";
+
+	this.m_oLoadingGameTree  = null;
 }
 CKGSGameListRecord.prototype.Update = function(oGameRecord)
 {
@@ -219,6 +221,14 @@ CKGSGameListRecord.prototype.GetGameTitle = function()
 		else
 			return "Match";
 	}
+};
+CKGSGameListRecord.prototype.GetLoadingGameTree = function()
+{
+	return this.m_oLoadingGameTree;
+};
+CKGSGameListRecord.prototype.SetLoadingGameTree = function(oGameTree)
+{
+	this.m_oLoadingGameTree = oGameTree;
 };
 
 function CKGSChallengeProposal(oGameRecord)

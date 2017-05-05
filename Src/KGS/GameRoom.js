@@ -1463,6 +1463,10 @@ CKGSGameRoom.prototype.SetDrawing = function(oDrawing)
 {
 	this.m_oDrawing = oDrawing;
 };
+CKGSGameRoom.prototype.LoadFile = function(oGameTree)
+{
+	console.log(oGameTree);
+};
 
 function CKGSEditorHandler(oClient, oGame)
 {

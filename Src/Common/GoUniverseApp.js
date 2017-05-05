@@ -861,6 +861,15 @@ CGoUniverseApplication.prototype.private_InitTabPanel = function(oTabsControl)
 			oThis.m_oClient.CreateDemonstration();
 		}, false);
 
+		oContextMenu.AddListItem("Load file", function()
+		{
+			var oGameTree = new CGameTree(null);
+			Common.OpenFileDialog(oGameTree, function()
+			{
+				oThis.m_oClient.LoadFile(oGameTree);
+			});
+		}, false);
+
 		oContextMenu.AddHorizontalLine();
 
 		var arrAllChallenges = oClient.GetAllChallenges();

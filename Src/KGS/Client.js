@@ -39,6 +39,8 @@ function CKGSClient(oApp)
 	this.m_oUserInfo       = {}; // Список открытых окон с информацией пользователя
 	this.m_oCurrentUser    = new CKGSUser(this);
 	this.m_oChallenges     = {};
+	this.m_oLoadingGames   = {};
+	this.m_nLoadingCounter = 0;
 
 	this.m_oPrivateChats           = {};
 	this.m_oPrivateChatsByUserName = {};
@@ -544,7 +546,6 @@ CKGSClient.prototype.CreateChallenge = function()
 };
 CKGSClient.prototype.CreateDemonstration = function()
 {
-
 	var nChannelId = this.m_nChatChannelId;
 	if (this.m_oPrivateChats[nChannelId] || !this.m_aAllRooms[nChannelId])
 	{
@@ -582,6 +583,50 @@ CKGSClient.prototype.CreateDemonstration = function()
 
 	var nCallBackKey = -2;
 	var oWindow = CreateKGSWindow(EKGSWindowType.Challenge, {GameRecord : oGameRecord, Client : this, App: this.m_oApp, Create : true, ChannelId : nCallBackKey, RoomId : this.m_nChatChannelId, Demonstration : true});
+};
+CKGSClient.prototype.LoadFile = function(oGameTree)
+{
+	this.m_nLoadingCounter++;
+
+	this.m_oLoadingGames[this.m_nLoadingCounter] = oGameTree;
+
+	var nSize        = oGameTree.Get_Board().Get_Size().X;
+	var nKomi        = oGameTree.Get_Komi();
+	var nCallBackKey = this.m_nLoadingCounter;
+	var nChannelId   = this.m_nChatChannelId;
+	var bPrivate     = false;
+	var nRules       = EKGSGameRules.Japanese;
+
+	var oRules = {
+		"rules"      : KGSCommon.GameRulesToString(nRules),
+		"size"       : nSize,
+		"komi"       : nKomi,
+		"timeSystem" : "none",
+		"mainTime"   : 0
+	};
+
+	this.private_SendMessage({
+		"channelId"   : nChannelId,
+		"type"        : "CHALLENGE_CREATE",
+		"callbackKey" : nCallBackKey,
+		"global"      : true,
+		"text"        : "",
+
+		"proposal" : {
+
+			"gameType" : KGSCommon.GameTypeToString(EKGSGameType.Demonstration),
+			"nigiri"   : true,
+
+			"rules" : oRules,
+
+			"private" : bPrivate,
+
+			"players" : [{
+				"role" : "owner",
+				"name" : this.m_oCurrentUser.GetName()
+			}]
+		}
+	});
 };
 CKGSClient.prototype.SendCreateChallenge = function(nChannelId, nCallBackKey, nGameType, sComment, nRules, nSize, oTimeSettings, bPrivate)
 {
@@ -1421,6 +1466,7 @@ CKGSClient.prototype.private_HandleUserRecord = function(oUserRecord, bUpdateUse
 };
 CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 {
+	console.log(oMessage);
 	var nGameRoomId = oMessage.channelId;
 
 	if (this.m_aGames[nGameRoomId])
@@ -1433,6 +1479,13 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 	if (this.m_oAllGames[nGameRoomId])
 	{
 		oGameRecord = this.m_oAllGames[nGameRoomId];
+
+		if (this.m_oGameNotify[nGameRoomId])
+		{
+			oGameRecord = this.m_oGameNotify[nGameRoomId];
+			delete this.m_oGameNotify[nGameRoomId];
+			console.log("1");
+		}
 	}
 	else if (this.m_oGameNotify[nGameRoomId])
 	{
@@ -1461,6 +1514,10 @@ CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 			oWindow.Close();
 		}
 	}
+
+	var oLoadingGameTree = oGameRecord.GetLoadingGameTree();
+	if (oLoadingGameTree)
+		oGame.LoadFile(LoadingGameTree);
 };
 CKGSClient.prototype.private_HandleGameUpdate = function(oMessage)
 {
@@ -2016,6 +2073,7 @@ CKGSClient.prototype.private_HandleArchiveGamesChanged = function(oMessage)
 };
 CKGSClient.prototype.private_HandleGameNotify = function(oMessage)
 {
+	console.log(oMessage);
 	var oRecord = oMessage.game;
 	if (!oRecord)
 		return;
@@ -2025,6 +2083,16 @@ CKGSClient.prototype.private_HandleGameNotify = function(oMessage)
 	var oGameRecord = new CKGSGameListRecord(this);
 	oGameRecord.Update(oRecord);
 	this.m_oGameNotify[nGameId] = oGameRecord;
+
+	var nCallBackKey = oMessage["callbackKey"];
+
+	console.log("3");
+	if (this.m_oLoadingGames[nCallBackKey])
+	{
+		oGameRecord.SetLoadingGameTree(this.m_oLoadingGames[nCallBackKey]);
+		delete this.m_oLoadingGames[nCallBackKey];
+		console.log("2");
+	}
 };
 CKGSClient.prototype.private_HandleArchiveGameRemoved = function(oMessage)
 {
