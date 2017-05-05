@@ -757,7 +757,7 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 		}
 		case EKGSChallengeWindowType.Demonstration:
 		{
-			this.private_AddOptionToSelect(oTypeList, "Demonstration");
+			this.private_AddOptionToSelect(oTypeList, "Demo");
 			break;
 		}
 	}
@@ -1823,7 +1823,10 @@ CKGSChallengeWindow.prototype.private_UpdateCaption = function()
 	var bAnimatedWaiting = false;
 	if (EKGSChallengeWindowState.Creation === this.m_nState)
 	{
-		this.Set_Caption("Create a new challenge");
+		if (this.m_nType === EKGSChallengeWindowType.Demonstration)
+			this.Set_Caption("Create a new demonstration");
+		else
+			this.Set_Caption("Create a new challenge");
 	}
 	else if (EKGSChallengeWindowState.CreatorProposal === this.m_nState)
 	{
