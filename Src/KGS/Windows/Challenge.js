@@ -513,6 +513,7 @@ CKGSChallengeWindow.prototype.OnSubmit = function(oUser, oProposal)
 		this.m_oChallengerSelect.selectedIndex = 1;
 		this.private_OnChangeChallenger();
 		this.Update_Size(); // Для обсчета кнопки Ok
+		this.m_oClient.m_oApp.GetSound().PlayChallenger();
 	}
 
 	this.m_oClient.SendChallengeNotification(this.m_nChannelId);
