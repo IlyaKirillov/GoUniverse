@@ -876,7 +876,7 @@ CKGSClient.prototype.private_SendMessage = function(oMessage)
 			}
 		}
 	};
-	req.open("POST", "http://www.gokgs.com/json/access", true);
+	req.open("POST", "https://www.gokgs.com/json-cors/access", true);
 	req.setRequestHeader("content-type", "application/json;charset=UTF-8"); // Make sure Unicode is used.
 	req.send(this.private_TranslateUnicodeMessage(JSON.stringify(oMessage)));
 };
@@ -915,7 +915,7 @@ CKGSClient.prototype.private_ReceiveMessage = function()
 			}
 		}
 	};
-	req.open("GET", "http://www.gokgs.com/json/access", true);
+	req.open("GET", "https://www.gokgs.com/json-cors/access", true);
 	req.send();
 };
 CKGSClient.prototype.private_HandleMessage = function(oMessage)
