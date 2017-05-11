@@ -17,8 +17,8 @@ function CKGSPlayersList(oApp)
 	this.m_oHeaders = {
 		Sizes : [0, 105],
 		Count : 2,
-		1     : g_oTranslation.GetMainRoomPlayersListHeaderName(),
-		2     : g_oTranslation.GetMainRoomPlayersListHeaderRank()
+		1     : g_oLocalization.GetMainRoomPlayersListHeaderName(),
+		2     : g_oLocalization.GetMainRoomPlayersListHeaderRank()
 	};
 
 	this.m_nSortType = -EKGSPlayersListRecord.Rank;

@@ -770,8 +770,8 @@ CGoUniverseApplication.prototype.private_InitTabPanel = function(oTabsControl)
 {
 	g_oTextMeasurer.SetFont("24px 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif");
 
-	var sMainRoom = g_oTranslation.GetMainRoomRoomsButton();
-	var sPlay     = g_oTranslation.GetMainRoomPlayButton();
+	var sMainRoom = g_oLocalization.GetMainRoomRoomsButton();
+	var sPlay     = g_oLocalization.GetMainRoomPlayButton();
 
 	var nHomeW = g_oTextMeasurer.Measure(sMainRoom) + 42;
 	var nPlayW = g_oTextMeasurer.Measure(sPlay) + 42;
@@ -819,14 +819,14 @@ CGoUniverseApplication.prototype.private_InitTabPanel = function(oTabsControl)
 		if (!oOwnChallenge)
 		{
 			var bDisabled = oClient.GetRooms().length <= 0 ? true : false;
-			var oListEntry = oContextMenu.AddListItem(g_oTranslation.GetMainRoomPlayMenuCreateChallenge(), function()
+			var oListEntry = oContextMenu.AddListItem(g_oLocalization.GetMainRoomPlayMenuCreateChallenge(), function()
 			{
 				oThis.m_oClient.CreateChallenge();
 			}, bDisabled);
 		}
 		else
 		{
-			var oListEntry = oContextMenu.AddListItem(g_oTranslation.GetMainRoomPlayMenuYourChallenge(), function()
+			var oListEntry = oContextMenu.AddListItem(g_oLocalization.GetMainRoomPlayMenuYourChallenge(), function()
 			{
 				oOwnChallenge.Show();
 			}, false);
@@ -838,31 +838,31 @@ CGoUniverseApplication.prototype.private_InitTabPanel = function(oTabsControl)
 
 		if (oClient.IsOnAutomatch())
 		{
-			oContextMenu.AddListItem(g_oTranslation.GetMainRoomPlayMenuCancelAutomatch(), function()
+			oContextMenu.AddListItem(g_oLocalization.GetMainRoomPlayMenuCancelAutomatch(), function()
 			{
 				oClient.CancelAutomatch();
 			}, false);
 		}
 		else
 		{
-			oContextMenu.AddListItem(g_oTranslation.GetMainRoomPlayMenuStartAutomatch(), function()
+			oContextMenu.AddListItem(g_oLocalization.GetMainRoomPlayMenuStartAutomatch(), function()
 			{
 				oClient.StartAutomatch();
 			}, oClient.IsAlreadyPlaying());
 		}
-		oContextMenu.AddListItem(g_oTranslation.GetMainRoomPlayMenuAutomatchPreferences(), function()
+		oContextMenu.AddListItem(g_oLocalization.GetMainRoomPlayMenuAutomatchPreferences(), function()
 		{
 			CreateKGSWindow(EKGSWindowType.AutomatchPr, {App : oApp, Client : oApp.GetClient()});
 		}, false);
 
 		oContextMenu.AddHorizontalLine();
 
-		oContextMenu.AddListItem(g_oTranslation.GetMainRoomPlayMenuStartDemonstration(), function()
+		oContextMenu.AddListItem(g_oLocalization.GetMainRoomPlayMenuStartDemonstration(), function()
 		{
 			oThis.m_oClient.CreateDemonstration();
 		}, false);
 
-		oContextMenu.AddListItem(g_oTranslation.GetMainRoomPlayMenuLoadFile(), function()
+		oContextMenu.AddListItem(g_oLocalization.GetMainRoomPlayMenuLoadFile(), function()
 		{
 			var oGameTree = new CGameTree(null);
 			Common.OpenFileDialog(oGameTree, function()
@@ -902,7 +902,7 @@ CGoUniverseApplication.prototype.private_InitTabPanel = function(oTabsControl)
 
 
 	g_oTextMeasurer.SetFont("14px 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif");
-	var nExitW = g_oTextMeasurer.Measure(g_oTranslation.GetMainRoomExitButton());
+	var nExitW = g_oTextMeasurer.Measure(g_oLocalization.GetMainRoomExitButton());
 	var nRightPanelW = 120 + 100 + 35 + nExitW;
 
 	// Правая панелька с поиском, ником и кнопкой выхода
@@ -1141,23 +1141,23 @@ CGoUniverseApplication.prototype.private_InitGamesListTabs = function(oParentCon
 	oTabsControl.HtmlElement.style.borderRight     = "1px solid rgb(190, 190, 190)";
 
 	var oTab = new CVisualGamesListTab(this);
-	oTab.Init(EKGSGamesListType.AllGames, g_oTranslation.GetMainRoomGamesTabsGames());
+	oTab.Init(EKGSGamesListType.AllGames, g_oLocalization.GetMainRoomGamesTabsGames());
 	this.m_oGamesListTabs.AddTab(oTab);
 
 	oTab = new CVisualGamesListTab(this);
-	oTab.Init(EKGSGamesListType.AllChallenges, g_oTranslation.GetMainRoomGamesTabsChallenges());
+	oTab.Init(EKGSGamesListType.AllChallenges, g_oLocalization.GetMainRoomGamesTabsChallenges());
 	this.m_oGamesListTabs.AddTab(oTab);
 
 	oTab = new CVisualGamesListTab(this);
-	oTab.Init(EKGSGamesListType.AllChallengesNoBots, g_oTranslation.GetMainRoomGamesTabsChallengesNoBots());
+	oTab.Init(EKGSGamesListType.AllChallengesNoBots, g_oLocalization.GetMainRoomGamesTabsChallengesNoBots());
 	this.m_oGamesListTabs.AddTab(oTab);
 
 	oTab = new CVisualGamesListTab(this);
-	oTab.Init(EKGSGamesListType.Room, g_oTranslation.GetMainRoomGamesTabsRoom());
+	oTab.Init(EKGSGamesListType.Room, g_oLocalization.GetMainRoomGamesTabsRoom());
 	this.m_oGamesListTabs.AddTab(oTab);
 
 	oTab = new CVisualGamesListTab(this);
-	oTab.Init(EKGSGamesListType.Followed, g_oTranslation.GetMainRoomGamesTabsFollowed());
+	oTab.Init(EKGSGamesListType.Followed, g_oLocalization.GetMainRoomGamesTabsFollowed());
 	this.m_oGamesListTabs.AddTab(oTab);
 };
 CGoUniverseApplication.prototype.private_ClearClient = function()
@@ -1232,30 +1232,30 @@ CGoUniverseApplication.prototype.ShowUserContextMenu = function(nX, nY, sUserNam
 	var oThis   = this;
 	var oClient = this.m_oClient;
 	var oContextMenu = new CVisualContextMenu(this, nX, nY);
-	oContextMenu.AddCheckBoxItem(false, g_oTranslation.GetMainRoomPlayersListContextMenuTalkTo(), function()
+	oContextMenu.AddCheckBoxItem(false, g_oLocalization.GetMainRoomPlayersListContextMenuTalkTo(), function()
 	{
 		oClient.EnterPrivateChat(sUserName);
 	});
-	oContextMenu.AddCheckBoxItem(false, g_oTranslation.GetMainRoomPlayersListContextMenuViewInfo(), function()
+	oContextMenu.AddCheckBoxItem(false, g_oLocalization.GetMainRoomPlayersListContextMenuViewInfo(), function()
 	{
 		oClient.LoadUserInfo(sUserName);
 	});
 	oContextMenu.AddHorizontalLine();
-	oContextMenu.AddCheckBoxItem(oClient.IsUserInFriendList(sUserName), g_oTranslation.GetMainRoomPlayersListContextMenuFriend(), function()
+	oContextMenu.AddCheckBoxItem(oClient.IsUserInFriendList(sUserName), g_oLocalization.GetMainRoomPlayersListContextMenuFriend(), function()
 	{
 		if (oClient.IsUserInFriendList(sUserName))
 			oClient.RemoveFromFriendList(sUserName);
 		else
 			oClient.AddToFriendList(sUserName);
 	});
-	oContextMenu.AddCheckBoxItem(oClient.IsUserInBlackList(sUserName), g_oTranslation.GetMainRoomPlayersListContextMenuCensored(), function()
+	oContextMenu.AddCheckBoxItem(oClient.IsUserInBlackList(sUserName), g_oLocalization.GetMainRoomPlayersListContextMenuCensored(), function()
 	{
 		if (oClient.IsUserInBlackList(sUserName))
 			oClient.RemoveFromBlackList(sUserName);
 		else
 			oClient.AddToBlackList(sUserName);
 	});
-	oContextMenu.AddCheckBoxItem(oClient.IsUserInFollowerList(sUserName), g_oTranslation.GetMainRoomPlayersListContextMenuFollow(), function()
+	oContextMenu.AddCheckBoxItem(oClient.IsUserInFollowerList(sUserName), g_oLocalization.GetMainRoomPlayersListContextMenuFollow(), function()
 	{
 		if (oClient.IsUserInFollowerList(sUserName))
 			oClient.RemoveFromFollowerList(sUserName);
@@ -1263,7 +1263,7 @@ CGoUniverseApplication.prototype.ShowUserContextMenu = function(nX, nY, sUserNam
 			oClient.AddToFollowerList(sUserName);
 	});
 	oContextMenu.AddHorizontalLine();
-	oContextMenu.AddCheckBoxItem(false, g_oTranslation.GetMainRoomPlayersListContextMenuCopyLink(), function()
+	oContextMenu.AddCheckBoxItem(false, g_oLocalization.GetMainRoomPlayersListContextMenuCopyLink(), function()
 	{
 		var sMessage   = "\\user=" + sUserName + ";";
 
@@ -1440,7 +1440,7 @@ CGoUniverseApplication.prototype.ShowGamesListContextMenu = function(nX, nY, nGa
 	{
 		oGameRecord = this.m_oClient.GetGame(nGameId);
 		var bChallenge = oGameRecord && oGameRecord.IsChallenge() ? true : false;
-		oContextMenu.AddCheckBoxItem(false, bChallenge ? g_oTranslation.GetMainRoomGamesListContextMenuJoin() : g_oTranslation.GetMainRoomGamesListContextMenuObserve(), function ()
+		oContextMenu.AddCheckBoxItem(false, bChallenge ? g_oLocalization.GetMainRoomGamesListContextMenuJoin() : g_oLocalization.GetMainRoomGamesListContextMenuObserve(), function ()
 		{
 			oThis.SetCurrentGameRoomTab(nGameId);
 		});
@@ -1448,30 +1448,30 @@ CGoUniverseApplication.prototype.ShowGamesListContextMenu = function(nX, nY, nGa
 	}
 
 	var nGamesListType = oClient.GetGamesListType();
-	oContextMenu.AddCheckBoxItem(EKGSGamesListType.AllGames === nGamesListType ? true : false, g_oTranslation.GetMainRoomGamesTabsGames(), function ()
+	oContextMenu.AddCheckBoxItem(EKGSGamesListType.AllGames === nGamesListType ? true : false, g_oLocalization.GetMainRoomGamesTabsGames(), function ()
 	{
 		oClient.SetGamesListType(EKGSGamesListType.AllGames);
 	});
-	oContextMenu.AddCheckBoxItem(EKGSGamesListType.AllChallenges === nGamesListType ? true : false, g_oTranslation.GetMainRoomGamesTabsChallenges(), function ()
+	oContextMenu.AddCheckBoxItem(EKGSGamesListType.AllChallenges === nGamesListType ? true : false, g_oLocalization.GetMainRoomGamesTabsChallenges(), function ()
 	{
 		oClient.SetGamesListType(EKGSGamesListType.AllChallenges);
 	});
-	oContextMenu.AddCheckBoxItem(EKGSGamesListType.AllChallengesNoBots === nGamesListType ? true : false, g_oTranslation.GetMainRoomGamesTabsChallengesNoBots(), function ()
+	oContextMenu.AddCheckBoxItem(EKGSGamesListType.AllChallengesNoBots === nGamesListType ? true : false, g_oLocalization.GetMainRoomGamesTabsChallengesNoBots(), function ()
 	{
 		oClient.SetGamesListType(EKGSGamesListType.AllChallengesNoBots);
 	});
-	oContextMenu.AddCheckBoxItem(EKGSGamesListType.Room === nGamesListType ? true : false, g_oTranslation.GetMainRoomGamesTabsRoom(), function ()
+	oContextMenu.AddCheckBoxItem(EKGSGamesListType.Room === nGamesListType ? true : false, g_oLocalization.GetMainRoomGamesTabsRoom(), function ()
 	{
 		oClient.SetGamesListType(EKGSGamesListType.Room);
 	});
-	oContextMenu.AddCheckBoxItem(EKGSGamesListType.Followed === nGamesListType ? true : false, g_oTranslation.GetMainRoomGamesTabsFollowed(), function ()
+	oContextMenu.AddCheckBoxItem(EKGSGamesListType.Followed === nGamesListType ? true : false, g_oLocalization.GetMainRoomGamesTabsFollowed(), function ()
 	{
 		oClient.SetGamesListType(EKGSGamesListType.Followed);
 	});
 	if (null !== oGameRecord)
 	{
 		oContextMenu.AddHorizontalLine();
-		oContextMenu.AddCheckBoxItem(false, g_oTranslation.GetMainRoomGamesListContextMenuCopyLink(), function()
+		oContextMenu.AddCheckBoxItem(false, g_oLocalization.GetMainRoomGamesListContextMenuCopyLink(), function()
 		{
 			var sMessage = "\\game=" + nGameId + ";" + oGameRecord.GetGameTitle() + ";";
 			var oInputArea   = document.getElementById("inputChatId");
@@ -1636,16 +1636,16 @@ CGoUniverseApplication.prototype.OnRoomStatsChanged = function(nUsersCount, nGam
 CGoUniverseApplication.prototype.UpdateTranslation = function()
 {
 	// LoginScreen
-	document.getElementById("inputLoginId")["placeholder"] = g_oTranslation.GetLoginScreenLogin();
-	document.getElementById("inputPasswordId")["placeholder"] = g_oTranslation.GetLoginScreenPassword();
-	document.getElementById("checkboxSavePasswordLabelId").innerHTML = g_oTranslation.GetLoginScreenRemember();
-	document.getElementById("connectDivId").innerHTML = g_oTranslation.GetLoginScreenConnect();
+	document.getElementById("inputLoginId")["placeholder"] = g_oLocalization.GetLoginScreenLogin();
+	document.getElementById("inputPasswordId")["placeholder"] = g_oLocalization.GetLoginScreenPassword();
+	document.getElementById("checkboxSavePasswordLabelId").innerHTML = g_oLocalization.GetLoginScreenRemember();
+	document.getElementById("connectDivId").innerHTML = g_oLocalization.GetLoginScreenConnect();
 
-	document.getElementById("divIdAboutButton").innerHTML = g_oTranslation.GetLoginScreenAbout();
+	document.getElementById("divIdAboutButton").innerHTML = g_oLocalization.GetLoginScreenAbout();
 
 	// MainRoom
-	document.getElementById("OmniboxInput")["placeholder"] = g_oTranslation.GetMainRoomFindPlayer();
-	document.getElementById("divIdExitButtonLabel").innerHTML = g_oTranslation.GetMainRoomExitButton();
+	document.getElementById("OmniboxInput")["placeholder"] = g_oLocalization.GetMainRoomFindPlayer();
+	document.getElementById("divIdExitButtonLabel").innerHTML = g_oLocalization.GetMainRoomExitButton();
 
 
 
@@ -1715,7 +1715,7 @@ CVisualChatTabsPanel.prototype.Init = function(oChatTabs, oParentControl, bFullH
 	oAddRoomElementWrapper.className = "chatTabsAdditionalSearchButtonsWrapper";
 
 	var oAddRoomElement           = document.createElement("div");
-	oAddRoomElement.innerHTML     = g_oTranslation.GetMainRoomSearchRoom();
+	oAddRoomElement.innerHTML     = g_oLocalization.GetMainRoomSearchRoom();
 	oAddRoomElement["aria-label"] = "Search in the list of all rooms";
 	oAddRoomElement.title         = "Search in the list of all rooms";
 	oAddRoomElement.className     = "ButtonGreen chatTabsAdditionalSearchButtons";
@@ -1727,7 +1727,7 @@ CVisualChatTabsPanel.prototype.Init = function(oChatTabs, oParentControl, bFullH
 	oAddPrivateChatElementWrappper.className = "chatTabsAdditionalSearchButtonsWrapper";
 
 	var oAddPrivateChatElement           = document.createElement("div");
-	oAddPrivateChatElement.innerHTML     = g_oTranslation.GetMainRoomSearchPlayer();
+	oAddPrivateChatElement.innerHTML     = g_oLocalization.GetMainRoomSearchPlayer();
 	oAddPrivateChatElement["aria-label"] = "Start private chat with that user";
 	oAddPrivateChatElement.title         = "Start private chat with that user";
 	oAddPrivateChatElement.className     = "ButtonGreen chatTabsAdditionalSearchButtons";
@@ -1789,8 +1789,8 @@ CVisualChatTabsPanel.prototype.private_InitTopPanel = function(oParent)
 	oInput.type = "text";
 	oInput.className += "chatTabsSearch";
 
-	oInput["aria-label"]  = g_oTranslation.GetMainRoomSearch();
-	oInput["placeholder"] = g_oTranslation.GetMainRoomSearch();
+	oInput["aria-label"]  = g_oLocalization.GetMainRoomSearch();
+	oInput["placeholder"] = g_oLocalization.GetMainRoomSearch();
 
 	oParent.appendChild(oInput);
 
@@ -1943,10 +1943,10 @@ CVisualChatTabsPanel.prototype.private_InitBottomPanel = function(oParent, oPare
 	oParent.style.borderTop  = "1px solid rgb(190, 190, 190)";
 	oParent.style.background = "rgb(243, 243, 243)";
 
-	var sUsers      = g_oTranslation.GetMainRoomStatisticsUsers();
-	var sGames      = g_oTranslation.GetMainRoomStatisticsGames();
-	var sChallenges = g_oTranslation.GetMainRoomStatisticsChallenges();
-	var sStatistics = g_oTranslation.GetMainRoomStatisticsLabel();
+	var sUsers      = g_oLocalization.GetMainRoomStatisticsUsers();
+	var sGames      = g_oLocalization.GetMainRoomStatisticsGames();
+	var sChallenges = g_oLocalization.GetMainRoomStatisticsChallenges();
+	var sStatistics = g_oLocalization.GetMainRoomStatisticsLabel();
 
 	g_oTextMeasurer.SetFont("14px 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif");
 

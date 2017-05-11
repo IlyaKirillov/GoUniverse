@@ -9,7 +9,7 @@
  * Time     16:35
  */
 
-var g_oTranslation_enEN = {
+var g_oLocalization_enEN = {
 
 	loginScreen : {
 

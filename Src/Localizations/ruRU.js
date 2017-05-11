@@ -9,7 +9,7 @@
  * Time     17:10
  */
 
-var g_oTranslation_ruRU = {
+var g_oLocalization_ruRU = {
 
 	loginScreen : {
 
