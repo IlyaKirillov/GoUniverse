@@ -144,34 +144,34 @@ CKGSInGamePlayersList.prototype.Handle_RightClick = function(Record, e)
 
 		var oContextMenu = new CVisualContextMenu(this.m_oApp, nX, nY);
 		var oThis = this;
-		oContextMenu.AddCheckBoxItem(false, "Talk to...", function()
+		oContextMenu.AddCheckBoxItem(false, g_oTranslation.GetMainRoomPlayersListContextMenuTalkTo(), function()
 		{
 			oClient.EnterPrivateChat(sUserName);
 		});
-		oContextMenu.AddCheckBoxItem(false, "View info", function()
+		oContextMenu.AddCheckBoxItem(false, g_oTranslation.GetMainRoomPlayersListContextMenuViewInfo(), function()
 		{
 			oClient.LoadUserInfo(sUserName);
 		});
-		oContextMenu.AddCheckBoxItem(false, "Give control", function()
+		oContextMenu.AddCheckBoxItem(false, g_oTranslation.GetMainRoomPlayersListContextMenuGiveControl(), function()
 		{
 			oClient.GiveGameControl(oThis.m_nGameId, sUserName);
 		}, (this.IsOwner(this.m_sUserName) || (this.IsEditor(this.m_sUserName) && this.IsOwner(sUserName)) ? false : true));
 		oContextMenu.AddHorizontalLine();
-		oContextMenu.AddCheckBoxItem(oClient.IsUserInFriendList(sUserName), "Buddy", function()
+		oContextMenu.AddCheckBoxItem(oClient.IsUserInFriendList(sUserName), g_oTranslation.GetMainRoomPlayersListContextMenuFriend(), function()
 		{
 			if (oClient.IsUserInFriendList(sUserName))
 				oClient.RemoveFromFriendList(sUserName);
 			else
 				oClient.AddToFriendList(sUserName);
 		});
-		oContextMenu.AddCheckBoxItem(oClient.IsUserInBlackList(sUserName), "Censored", function()
+		oContextMenu.AddCheckBoxItem(oClient.IsUserInBlackList(sUserName), g_oTranslation.GetMainRoomPlayersListContextMenuCensored(), function()
 		{
 			if (oClient.IsUserInBlackList(sUserName))
 				oClient.RemoveFromBlackList(sUserName);
 			else
 				oClient.AddToBlackList(sUserName);
 		});
-		oContextMenu.AddCheckBoxItem(oClient.IsUserInFollowerList(sUserName), "Follow", function()
+		oContextMenu.AddCheckBoxItem(oClient.IsUserInFollowerList(sUserName), g_oTranslation.GetMainRoomPlayersListContextMenuFollow(), function()
 		{
 			if (oClient.IsUserInFollowerList(sUserName))
 				oClient.RemoveFromFollowerList(sUserName);
@@ -179,7 +179,7 @@ CKGSInGamePlayersList.prototype.Handle_RightClick = function(Record, e)
 				oClient.AddToFollowerList(sUserName);
 		});
 		oContextMenu.AddHorizontalLine();
-		oContextMenu.AddCheckBoxItem(false, "Copy link to chat", function()
+		oContextMenu.AddCheckBoxItem(false, g_oTranslation.GetMainRoomPlayersListContextMenuCopyLink(), function()
 		{
 			var sMessage   = "\\user=" + sUserName + ";";
 

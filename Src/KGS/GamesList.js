@@ -26,17 +26,17 @@ function CKGSGamesList(oApp)
 	this.m_oHeaders = {
 		Sizes : [0, 16, 46, 186, 211, 241, 361, 430, 495, 589, 764],
 		Count : 11,
-		1     : "Type",
-		2     : "wr",
-		3     : "White",
+		1     : g_oTranslation.GetMainRoomGamesListHeaderType(),
+		2     : g_oTranslation.GetMainRoomGamesListHeaderWhiteRank(),
+		3     : g_oTranslation.GetMainRoomGamesListHeaderWhiteName(),
 		4     : "",
-		5     : "br",
-		6     : "Black",
+		5     : g_oTranslation.GetMainRoomGamesListHeaderBlackRank(),
+		6     : g_oTranslation.GetMainRoomGamesListHeaderBlackName(),
 		7     : "",
-		8     : "Observers",
-		9     : "Move",
-		10    : "Room",
-		11    : "Comment"
+		8     : g_oTranslation.GetMainRoomGamesListHeaderObservers(),
+		9     : g_oTranslation.GetMainRoomGamesListHeaderMove(),
+		10    : g_oTranslation.GetMainRoomGamesListHeaderRoom(),
+		11    : g_oTranslation.GetMainRoomGamesListHeaderComment()
 	};
 
 	this.m_nSortType = -EKGSGameListRecord.Vs;
@@ -324,31 +324,31 @@ CKGSGamesList.prototype.Handle_RightClick = function(Record, e)
 };
 CKGSGamesList.prototype.ResetToChallangesList = function()
 {
-	this.m_oHeaders[1]  = "Type";
-	this.m_oHeaders[2]  = "rank";
-	this.m_oHeaders[3]  = "Name";
+	this.m_oHeaders[1]  = g_oTranslation.GetMainRoomGamesListHeaderType();
+	this.m_oHeaders[2]  = g_oTranslation.GetMainRoomGamesListHeaderRank();
+	this.m_oHeaders[3]  = g_oTranslation.GetMainRoomGamesListHeaderName();
 	this.m_oHeaders[4]  = "";
-	this.m_oHeaders[5]  = "Time";
+	this.m_oHeaders[5]  = g_oTranslation.GetMainRoomGamesListHeaderTime();
 	this.m_oHeaders[6]  = "";
-	this.m_oHeaders[7]  = "Size";
-	this.m_oHeaders[8]  = "Rules";
+	this.m_oHeaders[7]  = g_oTranslation.GetMainRoomGamesListHeaderSize();
+	this.m_oHeaders[8]  = g_oTranslation.GetMainRoomGamesListHeaderRules();
 	this.m_oHeaders[9]  = "";
-	this.m_oHeaders[10] = "Room";
-	this.m_oHeaders[11] = "Comment";
+	this.m_oHeaders[10] = g_oTranslation.GetMainRoomGamesListHeaderRoom();
+	this.m_oHeaders[11] = g_oTranslation.GetMainRoomGamesListHeaderComment();
 };
 CKGSGamesList.prototype.ResetToGamesList = function()
 {
-	this.m_oHeaders[1]  = "Type";
-	this.m_oHeaders[2]  = "wr";
-	this.m_oHeaders[3]  = "White";
+	this.m_oHeaders[1]  = g_oTranslation.GetMainRoomGamesListHeaderType();
+	this.m_oHeaders[2]  = g_oTranslation.GetMainRoomGamesListHeaderWhiteRank();
+	this.m_oHeaders[3]  = g_oTranslation.GetMainRoomGamesListHeaderWhiteName();
 	this.m_oHeaders[4]  = "";
-	this.m_oHeaders[5]  = "br";
-	this.m_oHeaders[6]  = "Black";
+	this.m_oHeaders[5]  = g_oTranslation.GetMainRoomGamesListHeaderBlackRank();
+	this.m_oHeaders[6]  = g_oTranslation.GetMainRoomGamesListHeaderBlackName();
 	this.m_oHeaders[7]  = "";
-	this.m_oHeaders[8]  = "Observers";
-	this.m_oHeaders[9]  = "Move";
-	this.m_oHeaders[10] = "Room";
-	this.m_oHeaders[11] = "Comment";
+	this.m_oHeaders[8]  = g_oTranslation.GetMainRoomGamesListHeaderObservers();
+	this.m_oHeaders[9]  = g_oTranslation.GetMainRoomGamesListHeaderMove();
+	this.m_oHeaders[10] = g_oTranslation.GetMainRoomGamesListHeaderRoom();
+	this.m_oHeaders[11] = g_oTranslation.GetMainRoomGamesListHeaderComment();
 };
 
 

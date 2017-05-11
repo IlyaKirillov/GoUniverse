@@ -12,6 +12,8 @@ window.onresize       = OnDocumentResize;
 var oApp = null;
 function OnDocumentReady()
 {
+	g_oTranslation = new CTranslationManager();
+
 	oApp = new CGoUniverseApplication();
 	oApp.Init();
 }
