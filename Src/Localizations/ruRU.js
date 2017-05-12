@@ -15,7 +15,7 @@ var g_oLocalization_ruRU = {
 
 		login    : "Логин",
 		password : "Пароль",
-		connect  : "Присоединиться к КГС",
+		connect  : "Играть на KGS",
 		remember : "Запомнить мой пароль",
 
 		about : "О программе"
@@ -43,17 +43,17 @@ var g_oLocalization_ruRU = {
 
 
 		gamesTabs : {
-			games            : "Матчи",
+			games            : "Партии",
 			challenges       : "Вызовы",
 			challengesNoBots : "Вызовы (без роботов)",
 			room             : "Комната",
-			followed         : "Следить"
+			followed         : "Наблюдаемые"
 		},
 
 		statistics : {
 			label      : "Статистика комнаты",
 			users      : "Пользователей",
-			games      : "Матчей",
+			games      : "Партий",
 			challenges : "Вызовов"
 		},
 
@@ -82,8 +82,8 @@ var g_oLocalization_ruRU = {
 		},
 
 		playersList : {
-			contextMenuTalkTo      : "Поговорить...",
-			contextMenuViewInfo    : "Посмотреть инфо",
+			contextMenuTalkTo      : "Говорить с...",
+			contextMenuViewInfo    : "Посмотреть информацию",
 			contextMenuFriend      : "Друзья",
 			contextMenuCensored    : "Заглушен",
 			contextMenuFollow      : "Следить",
@@ -94,7 +94,14 @@ var g_oLocalization_ruRU = {
 			listHeaderRank : "Разряд"
 		}
 
-	}
+	},
 
+	window : {
+
+		roomsList : {
+			caption : "Список комнат"
+		}
+
+	}
 
 };

@@ -15,7 +15,7 @@ var g_oLocalization_enEN = {
 
 		login    : "Login",
 		password : "Password",
-		connect  : "Connect to KGS server",
+		connect  : "Play on KGS",
 		remember : "Remember my password",
 
 		about : "About"
@@ -93,5 +93,23 @@ var g_oLocalization_enEN = {
 			listHeaderRank : "Rank"
 		}
 
+	},
+
+	KGS : {
+		window : {
+			roomsList : {
+				caption             : "Room list",
+				searchPlaceholder   : "Enter room name here",
+				listHeaderName      : "Name",
+				listHeaderCategory  : "Category",
+				categoryMain        : "Main",
+				categoryClubs       : "Clubs",
+				categoryNational    : "National",
+				categoryNewRooms    : "New rooms",
+				categoryLessons     : "Lessons",
+				categorySocial      : "Social",
+				categoryTournaments : "Tournaments"
+			}
+		}
 	}
 };
