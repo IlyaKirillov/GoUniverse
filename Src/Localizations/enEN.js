@@ -95,6 +95,11 @@ var g_oLocalization_enEN = {
 
 	},
 
+	Common : {
+		ok    : "OK",
+		canel : "Cancel"
+	},
+
 	KGS : {
 		window : {
 			roomsList : {
@@ -109,6 +114,19 @@ var g_oLocalization_enEN = {
 				categoryLessons     : "Lessons",
 				categorySocial      : "Social",
 				categoryTournaments : "Tournaments"
+			},
+
+			automatchSetup : {
+				caption     : "Automatch setup",
+				human       : "Human",
+				robot       : "Robot",
+				unranked    : "Unranked opponent",
+				maxHandicap : "Max handicap",
+				ranked      : "Ranked game",
+				free        : "Free game",
+				medium      : "Medium",
+				fast        : "Fast",
+				blitz       : "Blitz"
 			}
 		}
 	}

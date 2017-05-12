@@ -91,17 +91,41 @@ var g_oLocalization_ruRU = {
 			contextMenuGiveControl : "Передать контроль",
 
 			listHeaderName : "Имя",
-			listHeaderRank : "Разряд"
+			listHeaderRank : "Рейтинг"
 		}
 
 	},
 
-	window : {
+	KGS : {
+		window : {
+			roomsList : {
+				caption             : "Список комнат",
+				searchPlaceholder   : "Введите название комнаты",
+				listHeaderName      : "Название",
+				listHeaderCategory  : "Категория",
+				categoryMain        : "Основные",
+				categoryClubs       : "Клубы",
+				categoryNational    : "Национальные",
+				categoryNewRooms    : "Новые",
+				categoryLessons     : "Обучающие",
+				categorySocial      : "Общение",
+				categoryTournaments : "Турнирные"
+			},
 
-		roomsList : {
-			caption : "Список комнат"
+			automatchSetup : {
+				caption     : "Настройки автоподбора",
+				human       : "Человек",
+				robot       : "Робот",
+				unranked    : "Соперник без рейтинга",
+				maxHandicap : "Максимальная фора",
+				ranked      : "Рейтинговая игра",
+				free        : "Свободная игра",
+				medium      : "Медленная",
+				fast        : "Быстрая",
+				blitz       : "Блиц"
+			}
 		}
-
 	}
-
 };
+
+ExtendLocalization(g_oLocalization_ruRU, g_oDefaultLocalization);

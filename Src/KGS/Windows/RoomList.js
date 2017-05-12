@@ -28,7 +28,7 @@ CKGSRoomListWindow.prototype.Init = function(sDivId, oPr)
 {
 	CKGSRoomListWindow.superclass.Init.apply(this, arguments);
 
-	this.Set_Caption("Room list");
+	this.Set_Caption(g_oLocalization.KGS.window.roomsList.caption);
 
 	var oMainDiv     = this.HtmlElement.InnerDiv;
 	var oMainControl = this.HtmlElement.InnerControl;
@@ -119,8 +119,8 @@ CKGSRoomListWindow.prototype.private_CreateFindInput = function(sInputId, oParen
 
 	oFindInput.type           = "text";
 	oFindInput.maxLength      = "256";
-	oFindInput["aria-label"]  = "Enter room name here";
-	oFindInput["placeholder"] = "Enter room name here";
+	oFindInput["aria-label"]  = g_oLocalization.KGS.window.roomsList.searchPlaceholder;
+	oFindInput["placeholder"] = g_oLocalization.KGS.window.roomsList.searchPlaceholder;
 
 	oFindInput.className += " inputKGSWindow";
 	oFindInput.style.padding = "0px 6px 0px 6px";

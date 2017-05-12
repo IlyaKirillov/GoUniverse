@@ -144,34 +144,34 @@ CKGSInGamePlayersList.prototype.Handle_RightClick = function(Record, e)
 
 		var oContextMenu = new CVisualContextMenu(this.m_oApp, nX, nY);
 		var oThis = this;
-		oContextMenu.AddCheckBoxItem(false, g_oLocalization.GetMainRoomPlayersListContextMenuTalkTo(), function()
+		oContextMenu.AddCheckBoxItem(false, g_oLocalization.mainRoom.playersList.contextMenuTalkTo, function()
 		{
 			oClient.EnterPrivateChat(sUserName);
 		});
-		oContextMenu.AddCheckBoxItem(false, g_oLocalization.GetMainRoomPlayersListContextMenuViewInfo(), function()
+		oContextMenu.AddCheckBoxItem(false, g_oLocalization.mainRoom.playersList.contextMenuViewInfo, function()
 		{
 			oClient.LoadUserInfo(sUserName);
 		});
-		oContextMenu.AddCheckBoxItem(false, g_oLocalization.GetMainRoomPlayersListContextMenuGiveControl(), function()
+		oContextMenu.AddCheckBoxItem(false, g_oLocalization.mainRoom.playersList.contextMenuGiveControl, function()
 		{
 			oClient.GiveGameControl(oThis.m_nGameId, sUserName);
 		}, (this.IsOwner(this.m_sUserName) || (this.IsEditor(this.m_sUserName) && this.IsOwner(sUserName)) ? false : true));
 		oContextMenu.AddHorizontalLine();
-		oContextMenu.AddCheckBoxItem(oClient.IsUserInFriendList(sUserName), g_oLocalization.GetMainRoomPlayersListContextMenuFriend(), function()
+		oContextMenu.AddCheckBoxItem(oClient.IsUserInFriendList(sUserName), g_oLocalization.mainRoom.playersList.contextMenuFriend, function()
 		{
 			if (oClient.IsUserInFriendList(sUserName))
 				oClient.RemoveFromFriendList(sUserName);
 			else
 				oClient.AddToFriendList(sUserName);
 		});
-		oContextMenu.AddCheckBoxItem(oClient.IsUserInBlackList(sUserName), g_oLocalization.GetMainRoomPlayersListContextMenuCensored(), function()
+		oContextMenu.AddCheckBoxItem(oClient.IsUserInBlackList(sUserName), g_oLocalization.mainRoom.playersList.contextMenuCensored, function()
 		{
 			if (oClient.IsUserInBlackList(sUserName))
 				oClient.RemoveFromBlackList(sUserName);
 			else
 				oClient.AddToBlackList(sUserName);
 		});
-		oContextMenu.AddCheckBoxItem(oClient.IsUserInFollowerList(sUserName), g_oLocalization.GetMainRoomPlayersListContextMenuFollow(), function()
+		oContextMenu.AddCheckBoxItem(oClient.IsUserInFollowerList(sUserName), g_oLocalization.mainRoom.playersList.contextMenuFollow, function()
 		{
 			if (oClient.IsUserInFollowerList(sUserName))
 				oClient.RemoveFromFollowerList(sUserName);
@@ -179,7 +179,7 @@ CKGSInGamePlayersList.prototype.Handle_RightClick = function(Record, e)
 				oClient.AddToFollowerList(sUserName);
 		});
 		oContextMenu.AddHorizontalLine();
-		oContextMenu.AddCheckBoxItem(false, g_oLocalization.GetMainRoomPlayersListContextMenuCopyLink(), function()
+		oContextMenu.AddCheckBoxItem(false, g_oLocalization.mainRoom.playersList.contextMenuCopyLink, function()
 		{
 			var sMessage   = "\\user=" + sUserName + ";";
 

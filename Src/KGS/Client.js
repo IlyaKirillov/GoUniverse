@@ -1380,7 +1380,7 @@ CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
 		sTime        = oProposal.GetTimeSettingsString();
 
 		if (oCreator && oCreator.IsRobot())
-			sWhite += "(" + g_oLocalization.GetMainRoomGamesListAdditionalRobot() + ")";
+			sWhite += "(" + g_oLocalization.mainRoom.gamesList.listAdditionalRobot + ")";
 	}
 
 	if (EKGSGameType.Demonstration === nGameType)

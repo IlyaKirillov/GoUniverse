@@ -28,8 +28,7 @@ CommonExtend(CKGSAutomatchSetupWindow, CKGSWindowConfirmBase);
 
 CKGSAutomatchSetupWindow.prototype.Init = function(sDivId, oPr)
 {
-	this.m_nDefH = 372;
-	this.m_nDefW = 206;
+	this.private_CalculateWindowSize();
 
 	oPr.Resizeable = false;
 	var oClient = oPr.Client;
@@ -42,7 +41,7 @@ CKGSAutomatchSetupWindow.prototype.Init = function(sDivId, oPr)
 
 	CKGSAutomatchSetupWindow.superclass.Init.call(this, sDivId, oPr);
 
-	this.Set_Caption("Automatch setup");
+	this.Set_Caption(g_oLocalization.KGS.window.automatchSetup.caption);
 
 	var oMainDiv                   = this.HtmlElement.ConfirmInnerDiv;
 	oMainDiv.style.paddingTop      = "5px";
@@ -56,7 +55,7 @@ CKGSAutomatchSetupWindow.prototype.Init = function(sDivId, oPr)
 	}
 
 	var oThis = this;
-	this.m_oHumanCheckBox = this.private_AddCheckBox("Human", oPreferences.CanPlayWithHuman(), true, function()
+	this.m_oHumanCheckBox = this.private_AddCheckBox(g_oLocalization.KGS.window.automatchSetup.human, oPreferences.CanPlayWithHuman(), true, function()
 	{
 		var oHuman = oThis.m_oHumanCheckBox;
 		var oRobot = oThis.m_oRobotCheckBox;
@@ -66,7 +65,7 @@ CKGSAutomatchSetupWindow.prototype.Init = function(sDivId, oPr)
 		if (false === oHuman.checked && false === oRobot.checked)
 			oRobot.checked = true;
 	});
-	this.m_oRobotCheckBox = this.private_AddCheckBox("Robot", oPreferences.CanPlayWithRobot(), true, function()
+	this.m_oRobotCheckBox = this.private_AddCheckBox(g_oLocalization.KGS.window.automatchSetup.robot, oPreferences.CanPlayWithRobot(), true, function()
 	{
 		var oHuman = oThis.m_oHumanCheckBox;
 		var oRobot = oThis.m_oRobotCheckBox;
@@ -76,14 +75,14 @@ CKGSAutomatchSetupWindow.prototype.Init = function(sDivId, oPr)
 		if (false === oRobot.checked && false === oHuman.checked)
 			oHuman.checked = true;
 	});
-	this.m_oUnrankedCheckBox = this.private_AddCheckBox("Unranked opponent", oPreferences.CanPlayWithUnranked());
+	this.m_oUnrankedCheckBox = this.private_AddCheckBox(g_oLocalization.KGS.window.automatchSetup.unranked, oPreferences.CanPlayWithUnranked());
 	this.private_AddSeparator();
-	this.m_oMaxHandicapInput = this.private_AddTextBox("Max handicap", oPreferences.GetMaxHandicap());
+	this.m_oMaxHandicapInput = this.private_AddTextBox(g_oLocalization.KGS.window.automatchSetup.maxHandicap, oPreferences.GetMaxHandicap());
 	this.private_AddSeparator();
 
 	if (oUser.CanPlayRanked())
 	{
-		this.m_oRankedCheckBox = this.private_AddCheckBox("Ranked game", oPreferences.CanPlayRankedGames(), true, function()
+		this.m_oRankedCheckBox = this.private_AddCheckBox(g_oLocalization.KGS.window.automatchSetup.ranked, oPreferences.CanPlayRankedGames(), true, function()
 		{
 			var oRanked = oThis.m_oRankedCheckBox;
 			var oFree   = oThis.m_oFreeCheckBox;
@@ -93,7 +92,7 @@ CKGSAutomatchSetupWindow.prototype.Init = function(sDivId, oPr)
 			if (false === oFree.checked && false === oRanked.checked)
 				oFree.checked = true;
 		});
-		this.m_oFreeCheckBox = this.private_AddCheckBox("Free game", oPreferences.CanPlayFreeGames(), true, function()
+		this.m_oFreeCheckBox = this.private_AddCheckBox(g_oLocalization.KGS.window.automatchSetup.free, oPreferences.CanPlayFreeGames(), true, function()
 		{
 			var oRanked = oThis.m_oRankedCheckBox;
 			var oFree   = oThis.m_oFreeCheckBox;
@@ -106,13 +105,13 @@ CKGSAutomatchSetupWindow.prototype.Init = function(sDivId, oPr)
 	}
 	else
 	{
-		this.m_oRankedCheckBox = this.private_AddCheckBox("Ranked game", false, false, null);
-		this.m_oFreeCheckBox = this.private_AddCheckBox("Free game", true, false, null);
+		this.m_oRankedCheckBox = this.private_AddCheckBox(g_oLocalization.KGS.window.automatchSetup.ranked, false, false, null);
+		this.m_oFreeCheckBox = this.private_AddCheckBox(g_oLocalization.KGS.window.automatchSetup.free, true, false, null);
 	}
 
 	this.private_AddSeparator();
 
-	this.m_oMediumCheckBox = this.private_AddCheckBox("Medium", oPreferences.CanPlayMedium(), true, function()
+	this.m_oMediumCheckBox = this.private_AddCheckBox(g_oLocalization.KGS.window.automatchSetup.medium, oPreferences.CanPlayMedium(), true, function()
 	{
 		var oMedium = oThis.m_oMediumCheckBox;
 		var oFast   = oThis.m_oFastCheckBox;
@@ -124,7 +123,7 @@ CKGSAutomatchSetupWindow.prototype.Init = function(sDivId, oPr)
 		if (false === oMedium.checked && false === oFast.checked && false === oBlitz.checked)
 			oFast.checked = true;
 	});
-	this.m_oFastCheckBox = this.private_AddCheckBox("Fast", oPreferences.CanPlayFast(), true, function()
+	this.m_oFastCheckBox = this.private_AddCheckBox(g_oLocalization.KGS.window.automatchSetup.fast, oPreferences.CanPlayFast(), true, function()
 	{
 		var oMedium = oThis.m_oMediumCheckBox;
 		var oFast   = oThis.m_oFastCheckBox;
@@ -136,7 +135,7 @@ CKGSAutomatchSetupWindow.prototype.Init = function(sDivId, oPr)
 		if (false === oMedium.checked && false === oFast.checked && false === oBlitz.checked)
 			oMedium.checked = true;
 	});
-	this.m_oBlitzCheckBox = this.private_AddCheckBox("Blitz", oPreferences.CanPlayBlitz(), true, function()
+	this.m_oBlitzCheckBox = this.private_AddCheckBox(g_oLocalization.KGS.window.automatchSetup.blitz, oPreferences.CanPlayBlitz(), true, function()
 	{
 		var oMedium = oThis.m_oMediumCheckBox;
 		var oFast   = oThis.m_oFastCheckBox;
@@ -407,4 +406,35 @@ CKGSAutomatchSetupWindow.prototype.Handle_OK = function()
 	this.m_oClient.UpdateAutomatchPreferences();
 
 	this.Close();
+};
+CKGSAutomatchSetupWindow.prototype.private_CalculateWindowSize = function()
+{
+	this.m_nDefH = 372;
+	this.m_nDefW = 206;
+
+	this.m_nDefW = 14 + 25 + 13 + 7 + 10 + 2;
+	// 14px левая и правая границы
+	// 25px отступ слева
+	// 13px размер чекбокса
+	// 7px отступ от чекбокса
+	// 10px отступ справа
+	// 2px для погршности
+
+	g_oTextMeasurer.SetFont("14px 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif");
+	this.m_nDefW += Math.max(
+		g_oTextMeasurer.Measure(g_oLocalization.KGS.window.automatchSetup.human),
+		g_oTextMeasurer.Measure(g_oLocalization.KGS.window.automatchSetup.robot),
+		g_oTextMeasurer.Measure(g_oLocalization.KGS.window.automatchSetup.unranked),
+		g_oTextMeasurer.Measure(g_oLocalization.KGS.window.automatchSetup.maxHandicap),
+		g_oTextMeasurer.Measure(g_oLocalization.KGS.window.automatchSetup.ranked),
+		g_oTextMeasurer.Measure(g_oLocalization.KGS.window.automatchSetup.free),
+		g_oTextMeasurer.Measure(g_oLocalization.KGS.window.automatchSetup.medium),
+		g_oTextMeasurer.Measure(g_oLocalization.KGS.window.automatchSetup.fast),
+		g_oTextMeasurer.Measure(g_oLocalization.KGS.window.automatchSetup.blitz)
+	);
+
+	g_oTextMeasurer.SetFont("13pt Tahoma, 'Sans serif'");
+	var nCaptionW = 74 + g_oTextMeasurer.Measure(g_oLocalization.KGS.window.automatchSetup.caption);
+
+	this.m_nDefW = Math.max(this.m_nDefW, nCaptionW);
 };

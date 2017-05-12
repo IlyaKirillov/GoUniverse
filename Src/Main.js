@@ -12,7 +12,7 @@ window.onresize       = OnDocumentResize;
 var oApp = null;
 function OnDocumentReady()
 {
-	g_oLocalization = new CLocalizationsManager();
+	g_oLocalization = g_oLocalization_ruRU;
 
 	oApp = new CGoUniverseApplication();
 	oApp.Init();

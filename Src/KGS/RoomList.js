@@ -22,8 +22,8 @@ function CKGSRoomList(oApp)
 	this.m_oHeaders = {
 		Sizes : [0, 245, 365],
 		Count : 3,
-		1     : "Name",
-		2     : "Category",
+		1     : g_oLocalization.KGS.window.roomsList.listHeaderName,
+		2     : g_oLocalization.KGS.window.roomsList.listHeaderCategory,
 		3     : ""
 	};
 
@@ -125,7 +125,7 @@ CKGSRoomListRecord.prototype.Update = function(aLine)
 {
 	this.m_nRoomId   = aLine[1] | 0;
 	this.m_sName     = aLine[2];
-	this.m_sCategory = aLine[3];
+	this.m_sCategory = this.private_GetCategory(aLine[3]);
 	this.m_bPrivate  = aLine[4];
 };
 CKGSRoomListRecord.prototype.Compare = function(nRoomId)
@@ -134,4 +134,20 @@ CKGSRoomListRecord.prototype.Compare = function(nRoomId)
 		return true;
 
 	return false;
+};
+CKGSRoomListRecord.prototype.private_GetCategory = function(sCategory)
+{
+	switch(sCategory)
+	{
+		case "CLUBS" : return g_oLocalization.KGS.window.roomsList.categoryClubs;
+		case "FRIENDLY" : return g_oLocalization.KGS.window.roomsList.categorySocial;
+		case "MAIN" : return g_oLocalization.KGS.window.roomsList.categoryMain;
+		case "NATIONAL" : return g_oLocalization.KGS.window.roomsList.categoryNational;
+		case "TEMPORARY" : return g_oLocalization.KGS.window.roomsList.categoryNewRooms;
+		case "LESSONS" : return g_oLocalization.KGS.window.roomsList.categoryLessons;
+		case "TOURNAMENT" : return g_oLocalization.KGS.window.roomsList.categoryTournaments;
+	}
+
+	console.log("Unknown room category: " + this.m_sCategory);
+	return "";
 };
