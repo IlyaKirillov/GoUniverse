@@ -70,6 +70,8 @@ function CGoUniverseApplication()
 }
 CGoUniverseApplication.prototype.Init = function()
 {
+	this.private_ParseLocale();
+
 	this.m_oAnimatedLogo = new CGoUniverseAnimatedLogo(document.getElementById("animatedLogoId"));
 
 	this.private_InitMainDiv();
@@ -246,11 +248,11 @@ CGoUniverseApplication.prototype.OnResize = function(bSkipChatHandler)
 {
 	var ConnectionDiv        = document.getElementById("divIdConnection");
 	ConnectionDiv.style.left = (document.body.clientWidth - 250) / 2 + "px";
-	ConnectionDiv.style.top  = (document.body.clientHeight - 170) / 2 + "px";
+	ConnectionDiv.style.top  = (document.body.clientHeight - 200) / 2 + "px";
 
 	var ErrorDiv        = document.getElementById("divIdConnectionError");
 	ErrorDiv.style.left = (document.body.clientWidth - 250) / 2 + "px";
-	ErrorDiv.style.top  = (document.body.clientHeight - 170) / 2 + 180 + "px";
+	ErrorDiv.style.top  = (document.body.clientHeight - 200) / 2 + 180 + "px";
 
 	var AboutDiv        = document.getElementById("divIdAbout");
 	AboutDiv.style.left = (document.body.clientWidth - 250) / 2 + "px";
@@ -738,6 +740,19 @@ CGoUniverseApplication.prototype.private_InitLoginPage = function()
 		oThis.m_oGlobalSettings.SetKGSSavePassword(bChecked);
 	}, false);
 
+	document.getElementById("localizationSelectId").addEventListener("change", function()
+	{
+		var sLocale = "enEN";
+		switch (this.selectedIndex)
+		{
+			case 0 : sLocale = "enEN"; break;
+			case 1 : sLocale = "ruRU"; break;
+		}
+
+		oThis.m_oGlobalSettings.SetLocale(sLocale);
+
+		location.reload();
+	}, false);
 };
 CGoUniverseApplication.prototype.private_InitClientPage = function()
 {
@@ -1650,6 +1665,30 @@ CGoUniverseApplication.prototype.UpdateTranslation = function()
 
 
 };
+CGoUniverseApplication.prototype.private_ParseLocale = function()
+{
+	var sLocale = this.GetGlobalSettings().GetLocale();
+
+	var oSelection = document.getElementById("localizationSelectId");
+	switch (sLocale)
+	{
+		case "ruRU" :
+		{
+			oSelection.selectedIndex = 1;
+			g_oLocalization = g_oLocalization_ruRU;
+			break;
+		}
+
+		case "enEN":
+		default:
+		{
+			oSelection.selectedIndex = 0;
+			g_oLocalization = g_oLocalization_enEN;
+			break;
+		}
+	}
+};
+
 
 /**
  * Спецаильный класс для работы с табами чата
