@@ -113,16 +113,17 @@ var g_oLocalization_ruRU = {
 			},
 
 			automatchSetup : {
-				caption     : "Настройки автоподбора",
-				human       : "Человек",
-				robot       : "Робот",
-				unranked    : "Соперник без рейтинга",
-				maxHandicap : "Максимальная фора",
-				ranked      : "Рейтинговая игра",
-				free        : "Свободная игра",
-				medium      : "Медленная",
-				fast        : "Быстрая",
-				blitz       : "Блиц"
+				caption       : "Настройки автоподбора",
+				estimatedRank : "Предполагаемый рейтинг",
+				human         : "Человек",
+				robot         : "Робот",
+				unranked      : "Соперник без рейтинга",
+				maxHandicap   : "Максимальная фора",
+				ranked        : "Рейтинговая игра",
+				free          : "Свободная игра",
+				medium        : "Медленная",
+				fast          : "Быстрая",
+				blitz         : "Блиц"
 			}
 		}
 	}

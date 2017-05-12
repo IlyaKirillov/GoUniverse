@@ -117,16 +117,17 @@ var g_oLocalization_enEN = {
 			},
 
 			automatchSetup : {
-				caption     : "Automatch setup",
-				human       : "Human",
-				robot       : "Robot",
-				unranked    : "Unranked opponent",
-				maxHandicap : "Max handicap",
-				ranked      : "Ranked game",
-				free        : "Free game",
-				medium      : "Medium",
-				fast        : "Fast",
-				blitz       : "Blitz"
+				caption       : "Automatch setup",
+				estimatedRank : "Rank",
+				human         : "Human",
+				robot         : "Robot",
+				unranked      : "Unranked opponent",
+				maxHandicap   : "Max handicap",
+				ranked        : "Ranked game",
+				free          : "Free game",
+				medium        : "Medium",
+				fast          : "Fast",
+				blitz         : "Blitz"
 			}
 		}
 	}

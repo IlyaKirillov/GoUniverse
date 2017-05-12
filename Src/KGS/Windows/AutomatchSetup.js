@@ -337,7 +337,7 @@ CKGSAutomatchSetupWindow.prototype.private_AddRankSelect = function(sRank)
 	oLabelDiv.style.paddingLeft = "5px";
 	oLabelDiv.style["float"]    = "left";
 	var oSpan                   = document.createElement("span");
-	oSpan.innerText             = "Rank";
+	oSpan.innerText             = g_oLocalization.KGS.window.automatchSetup.estimatedRank;
 	oSpan.style.cursor          = "default";
 
 	oLabelDiv.appendChild(oSpan);
@@ -433,8 +433,10 @@ CKGSAutomatchSetupWindow.prototype.private_CalculateWindowSize = function()
 		g_oTextMeasurer.Measure(g_oLocalization.KGS.window.automatchSetup.blitz)
 	);
 
+	var nEstimatedRank = 14 + 10 + 50 + 5 + g_oTextMeasurer.Measure(g_oLocalization.KGS.window.automatchSetup.estimatedRank) + 10 + 2;
+
 	g_oTextMeasurer.SetFont("13pt Tahoma, 'Sans serif'");
 	var nCaptionW = 74 + g_oTextMeasurer.Measure(g_oLocalization.KGS.window.automatchSetup.caption);
 
-	this.m_nDefW = Math.max(this.m_nDefW, nCaptionW);
+	this.m_nDefW = Math.max(this.m_nDefW, nCaptionW, nEstimatedRank);
 };
