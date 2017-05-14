@@ -1222,7 +1222,7 @@ CKGSChallengeWindow.prototype.private_CreateButtons = function()
 			g_oTextMeasurer.Measure(g_oLocalization.common.button.ok),
 			g_oTextMeasurer.Measure(g_oLocalization.common.button.buttonRetry)
 		) + 10;
-	
+
 	// Всевозможные кнопки добавляем сразу, а вот их реальное присутствие в окне будет зависеть уже от типа окна
 
 	// Close - общая кнопка

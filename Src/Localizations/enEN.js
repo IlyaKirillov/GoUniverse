@@ -97,6 +97,17 @@ var g_oLocalization_enEN = {
 
 	common : {
 
+		gameResult : {
+			resign  : "Resign",
+			time    : "Time",
+			forfeit : "Forfeit"
+		},
+
+		black      : "Black",
+		white      : "White",
+		shortBlack : "B",
+		shortWhite : "W",
+
 		button : {
 			ok     : "OK",
 			canel  : "Cancel",

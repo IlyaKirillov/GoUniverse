@@ -98,6 +98,17 @@ var g_oLocalization_ruRU = {
 
 	common : {
 
+		gameResult : {
+			resign  : "Сдача",
+			time    : "Время",
+			forfeit : "Штраф"
+		},
+
+		black      : "Черные",
+		white      : "Белые",
+		shortBlack : "Ч",
+		shortWhite : "Б",
+
 		button : {
 			ok     : "OK",
 			canel  : "Отмена",

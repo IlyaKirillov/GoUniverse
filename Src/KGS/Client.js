@@ -2378,24 +2378,24 @@ CKGSClient.prototype.private_ParseScore = function(sScore)
 	if ("UNKNOWN" === sScore || "UNFINISHED" === sScore || "NO_RESULT" === sScore)
 		sResult = "-";
 	else if ("B+RESIGN" === sScore)
-		sResult = "B+Resign";
+		sResult = g_oLocalization.common.shortBlack + "+" + g_oLocalization.common.gameResult.resign;
 	else if ("W+RESIGN" === sScore)
-		sResult = "W+Resign";
+		sResult = g_oLocalization.common.shortWhite + "+" + g_oLocalization.common.gameResult.resign;
 	else if ("B+FORFEIT" === sScore)
-		sResult = "B+Forfeit";
+		sResult = g_oLocalization.common.shortBlack + "+" + g_oLocalization.common.gameResult.forfeit;
 	else if ("W+FORFEIT" === sScore)
-		sResult = "W+Forfeit";
+		sResult = g_oLocalization.common.shortWhite + "+" + g_oLocalization.common.gameResult.forfeit;
 	else if ("B+TIME" === sScore)
-		sResult = "B+Time";
+		sResult = g_oLocalization.common.shortBlack + "+" + g_oLocalization.common.gameResult.time;
 	else if ("W+TIME" === sScore)
-		sResult = "W+Time";
+		sResult = g_oLocalization.common.shortWhite + "+" + g_oLocalization.common.gameResult.time;
 	else
 	{
 		var dScore = parseFloat(sScore);
 		if (dScore < 0)
-			sResult = "W+" + Math.abs(dScore);
+			sResult = g_oLocalization.common.shortWhite + "+" + Math.abs(dScore);
 		else
-			sResult = "B+" + Math.abs(dScore);
+			sResult = g_oLocalization.common.shortBlack + "+" + Math.abs(dScore);
 	}
 
 	return sResult;
