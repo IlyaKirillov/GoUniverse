@@ -56,6 +56,10 @@ function CKGSChallengeWindow()
 	this.m_nPlayersHeight = 30;
 	this.m_nFieldHeight   = 32;
 
+	this.m_nFieldLabelWidth    = 100;
+	this.m_nFieldValueMinWidth = 221;
+	this.m_nSelectionW         = 110;
+
 	this.m_oPlayersColorsCanvas = null;
 	this.m_oAnimatedWaiting     = null;
 
@@ -73,6 +77,9 @@ function CKGSChallengeWindow()
 		Width  : 0,
 		Hided  : false
 	};
+
+	this.m_nDefW = 360;
+	this.m_nDefH = 512;
 
 	this.m_oCurrentChallenger = null;
 	this.m_arrChallengers     = [];
@@ -445,6 +452,8 @@ CKGSChallengeWindow.prototype.Init = function(sDivId, oPr)
 
 	}
 
+	this.private_CalculateWindowSize();
+
 	this.private_CreateName();
 	this.private_CreatePlayers();
 	this.private_CreateRules();
@@ -485,10 +494,7 @@ CKGSChallengeWindow.prototype.Update_Size = function(bForce)
 };
 CKGSChallengeWindow.prototype.Get_DefaultWindowSize = function()
 {
-	if (this.m_nType === EKGSChallengeWindowType.Demonstration)
-		return {W : 360, H : 512 - this.m_nHeaderHeight - 60};
-	else
-		return {W : 360, H : 512};
+	return {W : this.m_nDefW, H : this.m_nDefH};
 };
 CKGSChallengeWindow.prototype.Close = function()
 {
@@ -710,7 +716,7 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 		oInputControl.SetAnchor(true, true, true, true);
 		oWrapperControl.AddControl(oInputControl);
 		oInput.maxLength         = "80";
-		oInput.placeholder       = "No comment";
+		oInput.placeholder       = g_oLocalization.KGS.window.challenge.commentPlaceHolder;
 		oInput.style.paddingLeft = "3px";
 
 		var sComment = this.m_oGameRecord.GetComment();
@@ -723,7 +729,7 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 
 	var oWrapperTypeDiv     = this.protected_CreateDivElement(oMainDiv);
 	var oWrapperTypeControl = CreateControlContainerByElement(oWrapperTypeDiv);
-	oWrapperTypeControl.SetParams(0, 0, -1, -1, true, true, false, false, nLeftWidth, this.m_nHeaderHeight);
+	oWrapperTypeControl.SetParams(0, 0, -1, -1, true, true, false, false, 10 + this.m_nSelectionW, this.m_nHeaderHeight);
 	oWrapperTypeControl.SetAnchor(true, true, false, false);
 	oMainControl.AddControl(oWrapperTypeControl);
 
@@ -735,30 +741,30 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 	{
 		case EKGSChallengeWindowType.Regular:
 		{
-			this.private_AddOptionToSelect(oTypeList, "Ranked");
-			this.private_AddOptionToSelect(oTypeList, "Free");
-			this.private_AddOptionToSelect(oTypeList, "Teaching");
+			this.private_AddOptionToSelect(oTypeList, g_oLocalization.KGS.gameType.ranked);
+			this.private_AddOptionToSelect(oTypeList, g_oLocalization.KGS.gameType.free);
+			this.private_AddOptionToSelect(oTypeList, g_oLocalization.KGS.gameType.teaching);
 			break;
 		}
 		case EKGSChallengeWindowType.Unranked:
 		{
-			this.private_AddOptionToSelect(oTypeList, "Free");
-			this.private_AddOptionToSelect(oTypeList, "Teaching");
+			this.private_AddOptionToSelect(oTypeList, g_oLocalization.KGS.gameType.free);
+			this.private_AddOptionToSelect(oTypeList, g_oLocalization.KGS.gameType.teaching);
 			break;
 		}
 		case EKGSChallengeWindowType.Rengo:
 		{
-			this.private_AddOptionToSelect(oTypeList, "Rengo");
+			this.private_AddOptionToSelect(oTypeList, g_oLocalization.KGS.gameType.rengo);
 			break;
 		}
 		case EKGSChallengeWindowType.Simulation:
 		{
-			this.private_AddOptionToSelect(oTypeList, "Simulation");
+			this.private_AddOptionToSelect(oTypeList, g_oLocalization.KGS.gameType.simulation);
 			break;
 		}
 		case EKGSChallengeWindowType.Demonstration:
 		{
-			this.private_AddOptionToSelect(oTypeList, "Demo");
+			this.private_AddOptionToSelect(oTypeList, g_oLocalization.KGS.gameType.demonstration);
 			break;
 		}
 	}
@@ -771,7 +777,7 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 	var nPrivateHeight = this.m_nHeaderHeight - 5;
 	var oWrapperPrivateDiv = this.protected_CreateDivElement(oMainDiv);
 	var oWrapperPrivateControl = CreateControlContainerByElement(oWrapperPrivateDiv);
-	oWrapperPrivateControl.SetParams(nLeftWidth, 5, 0, -1, true, true, true, false, -1, nPrivateHeight);
+	oWrapperPrivateControl.SetParams(10 + this.m_nSelectionW, 5, 0, -1, true, true, true, false, -1, nPrivateHeight);
 	oWrapperPrivateControl.SetAnchor(true, true, true, false);
 	oMainControl.AddControl(oWrapperPrivateControl);
 
@@ -793,7 +799,7 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 	oPrivateLabel.style.fontSize   = "16px";
 	oPrivateLabel.style.height     = nPrivateHeight + "px";
 	oPrivateLabel.style.lineHeight = nPrivateHeight + "px";
-	oPrivateLabel.textContent      = "Private";
+	oPrivateLabel.textContent      = g_oLocalization.KGS.window.challenge.privateFlag;
 	oWrapperPrivateDiv.appendChild(oPrivateLabel);
 
 	if (this.m_nState === EKGSChallengeWindowState.Creation)
@@ -854,7 +860,7 @@ CKGSChallengeWindow.prototype.private_CreatePlayers = function()
 	this.m_oPlayersColorsCanvas = oPlayersColor;
 
 	oPlayersColor.style.cursor = "pointer";
-	oPlayersColor.title = "Switch colors";
+	oPlayersColor.title = g_oLocalization.KGS.window.challenge.switchColorsHint;
 	var oThis = this;
 	oPlayersColor.addEventListener("click", this.private_OnChangeColors, false);
 
@@ -1034,11 +1040,11 @@ CKGSChallengeWindow.prototype.private_CreateRules = function()
 	var oGameRecord = this.m_oGameRecord;
 	var oProposal   = oGameRecord.GetProposal();
 
-	var nLeftWidth = 100;
+	var nLeftWidth = this.m_nFieldLabelWidth;
 	var nTop = this.m_nTop + 10;
 
 	// Room
-	var oRoomSelectElement = this.private_AddRulesField(nLeftWidth, nTop, "select", "Room:");
+	var oRoomSelectElement = this.private_AddRulesField(nLeftWidth, nTop, "select", g_oLocalization.KGS.window.challenge.fieldRoom + ":");
 	if (EKGSChallengeWindowState.Creation === this.m_nState)
 	{
 		var oClient  = this.m_oClient;
@@ -1067,57 +1073,57 @@ CKGSChallengeWindow.prototype.private_CreateRules = function()
 	nTop += this.m_nFieldHeight;
 
 	// Rules
-	var oRulesSelectElement = this.private_AddRulesField(nLeftWidth, nTop, "select", "Rules:");
-	this.private_AddOptionToSelect(oRulesSelectElement, "Japanese");
-	this.private_AddOptionToSelect(oRulesSelectElement, "Chinese");
-	this.private_AddOptionToSelect(oRulesSelectElement, "AGA");
-	this.private_AddOptionToSelect(oRulesSelectElement, "New Zealand");
+	var oRulesSelectElement = this.private_AddRulesField(nLeftWidth, nTop, "select", g_oLocalization.KGS.window.challenge.fieldRules + ":");
+	this.private_AddOptionToSelect(oRulesSelectElement, g_oLocalization.common.rules.japanese);
+	this.private_AddOptionToSelect(oRulesSelectElement, g_oLocalization.common.rules.chinese);
+	this.private_AddOptionToSelect(oRulesSelectElement, g_oLocalization.common.rules.aga);
+	this.private_AddOptionToSelect(oRulesSelectElement, g_oLocalization.common.rules.newZeland);
 	this.m_oRulesSelect = oRulesSelectElement;
 
 	nTop += this.m_nFieldHeight;
 
 	// BoardSize
-	var oBoardElement = this.private_AddRulesField(nLeftWidth, nTop, "input", "Board size:");
+	var oBoardElement = this.private_AddRulesField(nLeftWidth, nTop, "input", g_oLocalization.KGS.window.challenge.fieldBorderSize + ":");
 	oBoardElement.value = "19";
 	this.m_oSizeInput = oBoardElement;
 	nTop += this.m_nFieldHeight;
 
 	// Handicap
-	var oHandicapElement = this.private_AddRulesField(nLeftWidth, nTop, "input", "Handicap:");
+	var oHandicapElement = this.private_AddRulesField(nLeftWidth, nTop, "input", g_oLocalization.KGS.window.challenge.fieldHandicap + ":");
 	oHandicapElement.value = "0";
 	this.m_oHandicapInput = oHandicapElement;
 
 	nTop += this.m_nFieldHeight;
 
 	// Komi
-	var oKomiElement = this.private_AddRulesField(nLeftWidth, nTop, "input", "Komi:");
+	var oKomiElement = this.private_AddRulesField(nLeftWidth, nTop, "input", g_oLocalization.KGS.window.challenge.fieldKomi + ":");
 	oKomiElement.value = "6.5";
 	this.m_oKomiInput = oKomiElement;
 	nTop += this.m_nFieldHeight;
 
 	// TimeSystem
-	var oTimeSystemElement = this.private_AddRulesField(nLeftWidth, nTop, "select", "Time system:");
-	this.private_AddOptionToSelect(oTimeSystemElement, "Absolute");
-	this.private_AddOptionToSelect(oTimeSystemElement, "Byo-Yomi");
-	this.private_AddOptionToSelect(oTimeSystemElement, "Canadian");
-	this.private_AddOptionToSelect(oTimeSystemElement, "No time limit");
+	var oTimeSystemElement = this.private_AddRulesField(nLeftWidth, nTop, "select", g_oLocalization.KGS.window.challenge.fieldTimeSystem + ":");
+	this.private_AddOptionToSelect(oTimeSystemElement, g_oLocalization.common.timeSystem.absolute);
+	this.private_AddOptionToSelect(oTimeSystemElement, g_oLocalization.common.timeSystem.byoYomi);
+	this.private_AddOptionToSelect(oTimeSystemElement, g_oLocalization.common.timeSystem.canadian);
+	this.private_AddOptionToSelect(oTimeSystemElement, g_oLocalization.common.timeSystem.none);
 	this.m_oTimeSystemSelect = oTimeSystemElement;
 	nTop += this.m_nFieldHeight;
 
 	// MainTime
-	var oMainTimeElement = this.private_AddRulesField(nLeftWidth, nTop, "input", "Main time:");
+	var oMainTimeElement = this.private_AddRulesField(nLeftWidth, nTop, "input", g_oLocalization.KGS.window.challenge.fieldMainTime + ":");
 	oMainTimeElement.value = "10:00";
 	this.m_oMainTimeInput = oMainTimeElement;
 	nTop += this.m_nFieldHeight;
 
 	// ByoYomi time
-	var oByoTimeElement = this.private_AddRulesField(nLeftWidth, nTop, "input", "Byo-yomi:");
+	var oByoTimeElement = this.private_AddRulesField(nLeftWidth, nTop, "input", g_oLocalization.KGS.window.challenge.fieldByoYomiTime + ":");
 	oByoTimeElement.value = "00:30";
 	this.m_oByoYomiTimeInput = oByoTimeElement;
 	nTop += this.m_nFieldHeight;
 
 	// ByoYomi count
-	var oTemp = this.private_AddRulesField(nLeftWidth, nTop, "input", "Count:", true);
+	var oTemp = this.private_AddRulesField(nLeftWidth, nTop, "input", g_oLocalization.KGS.window.challenge.fieldPeriods + ":", true);
 	var oByoCountElement = oTemp.Field;
 	oByoCountElement.value = "5";
 	this.m_oByoYomiCountInput = oByoCountElement;
@@ -1207,9 +1213,16 @@ CKGSChallengeWindow.prototype.private_CreateButtons = function()
 	var oThis        = this;
 	var sMainId      = oMainDiv.id;
 
-	var nButtonW = 70;
 	var nButtonH = 25;
 
+	g_oTextMeasurer.SetFont("16px 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif");
+	var nButtonW = Math.max(60,
+			g_oTextMeasurer.Measure(g_oLocalization.common.button.close),
+			g_oTextMeasurer.Measure(g_oLocalization.common.button.create),
+			g_oTextMeasurer.Measure(g_oLocalization.common.button.ok),
+			g_oTextMeasurer.Measure(g_oLocalization.common.button.buttonRetry)
+		) + 10;
+	
 	// Всевозможные кнопки добавляем сразу, а вот их реальное присутствие в окне будет зависеть уже от типа окна
 
 	// Close - общая кнопка
@@ -1219,10 +1232,10 @@ CKGSChallengeWindow.prototype.private_CreateButtons = function()
 	oCloseButtonControl.SetParams(0, 0, 5, 5, false, false, true, true, nButtonW, nButtonH);
 	oCloseButtonControl.SetAnchor(false, false, true, true);
 	oMainControl.AddControl(oCloseButtonControl);
-	var oCloseButton = new CDrawingButtonSimpleText("Close", function()
+	var oCloseButton = new CDrawingButtonSimpleText(g_oLocalization.common.button.close, function()
 	{
 		oThis.Close();
-	}, "Close challenge");
+	}, "");
 	oCloseButton.Init(sCloseButtonId);
 	this.m_oButtons.Close = oCloseButton;
 
@@ -1233,10 +1246,10 @@ CKGSChallengeWindow.prototype.private_CreateButtons = function()
 	oCreateButtonControl.SetParams(0, 0, 5 + nButtonW + 5, 5, false, false, true, true, nButtonW, nButtonH);
 	oCreateButtonControl.SetAnchor(false, false, true, true);
 	oMainControl.AddControl(oCreateButtonControl);
-	var oCreateButton = new CDrawingButtonSimpleText("Create", function()
+	var oCreateButton = new CDrawingButtonSimpleText(g_oLocalization.common.button.create, function()
 	{
 		oThis.private_CreateChallenge();
-	}, "Create a new challenge");
+	}, "");
 	oCreateButton.Init(sCreateButtonId);
 	this.m_oButtons.Create = oCreateButton;
 
@@ -1247,10 +1260,10 @@ CKGSChallengeWindow.prototype.private_CreateButtons = function()
 	oOkButtonControl.SetParams(0, 0, 5 + nButtonW + 5, 5, false, false, true, true, nButtonW, nButtonH);
 	oOkButtonControl.SetAnchor(false, false, true, true);
 	oMainControl.AddControl(oOkButtonControl);
-	var oOkButton = new CDrawingButtonSimpleText("OK", function()
+	var oOkButton = new CDrawingButtonSimpleText(g_oLocalization.common.button.ok, function()
 	{
 		oThis.private_OkChallenge();
-	}, "OK");
+	}, "");
 	oOkButton.Init(sOkButtonId);
 	this.m_oButtons.Ok = oOkButton;
 
@@ -1261,10 +1274,10 @@ CKGSChallengeWindow.prototype.private_CreateButtons = function()
 	oRetryButtonControl.SetParams(0, 0, 5 + nButtonW + 5, 5, false, false, true, true, nButtonW, nButtonH);
 	oRetryButtonControl.SetAnchor(false, false, true, true);
 	oMainControl.AddControl(oRetryButtonControl);
-	var oRetryButton = new CDrawingButtonSimpleText("Retry", function()
+	var oRetryButton = new CDrawingButtonSimpleText(g_oLocalization.KGS.window.challenge.buttonRetry, function()
 	{
 		oThis.private_RetryChallenge();
-	}, "Cancel current proposal");
+	}, g_oLocalization.KGS.window.challenge.buttonRetryHint);
 	oRetryButton.Init(sRetryButtonId);
 	this.m_oButtons.Retry = oRetryButton;
 };
@@ -1674,9 +1687,9 @@ CKGSChallengeWindow.prototype.private_UpdateTimeSystemFields = function()
 		}
 
 		if (oTimeSettings.IsByoYomi())
-			this.m_oOverCountLabel.innerHTML = "Periods:";
+			this.m_oOverCountLabel.innerHTML = g_oLocalization.KGS.window.challenge.fieldPeriods + ":";
 		else
-			this.m_oOverCountLabel.innerHTML = "Stones:";
+			this.m_oOverCountLabel.innerHTML = g_oLocalization.KGS.window.challenge.fieldStones + ":";
 	}
 	else if (oTimeSettings.IsNone())
 	{
@@ -1825,21 +1838,21 @@ CKGSChallengeWindow.prototype.private_UpdateCaption = function()
 	if (EKGSChallengeWindowState.Creation === this.m_nState)
 	{
 		if (this.m_nType === EKGSChallengeWindowType.Demonstration)
-			this.Set_Caption("Create a new demonstration");
+			this.Set_Caption(g_oLocalization.KGS.window.challenge.captionNewDemo);
 		else
-			this.Set_Caption("Create a new challenge");
+			this.Set_Caption(g_oLocalization.KGS.window.challenge.captionNewChallenge);
 	}
 	else if (EKGSChallengeWindowState.CreatorProposal === this.m_nState)
 	{
-		this.Set_Caption("Your challenge");
+		this.Set_Caption(g_oLocalization.KGS.window.challenge.captionYourChallenge);
 	}
 	else if (EKGSChallengeWindowState.ChallengerSubmit === this.m_nState)
 	{
-		this.Set_Caption(this.m_oOwner ? "New game vs. " + this.m_oOwner.GetName() : "New game");
+		this.Set_Caption(this.m_oOwner ? g_oLocalization.KGS.window.challenge.captionNewGameVs + " " + this.m_oOwner.GetName() : g_oLocalization.KGS.window.challenge.captionNewGame);
 	}
 	else if (EKGSChallengeWindowState.ChallengerAccept === this.m_nState)
 	{
-		this.Set_Caption("Press OK to start the game");
+		this.Set_Caption(g_oLocalization.KGS.window.challenge.captionPressOkToStart);
 	}
 	else if (EKGSChallengeWindowState.Waiting === this.m_nState)
 	{
@@ -1847,16 +1860,16 @@ CKGSChallengeWindow.prototype.private_UpdateCaption = function()
 	else if (EKGSChallengeWindowState.ChallengerWaiting === this.m_nState)
 	{
 		bAnimatedWaiting = true;
-		this.Set_Caption("waiting...");
+		this.Set_Caption(g_oLocalization.KGS.window.challenge.captionWaiting);
 	}
 	else if (EKGSChallengeWindowState.CreatorWaiting === this.m_nState)
 	{
 		bAnimatedWaiting = true;
-		this.Set_Caption("waiting...");
+		this.Set_Caption(g_oLocalization.KGS.window.challenge.captionWaiting);
 	}
 	else// if (EKGSChallengeWindowState.Unknown === this.m_nState)
 	{
-		this.Set_Caption("New game");
+		this.Set_Caption(g_oLocalization.KGS.window.challenge.captionNewGame);
 	}
 
 	if (!bAnimatedWaiting)
@@ -1968,7 +1981,7 @@ CKGSChallengeWindow.prototype.private_UpdateOnStateChange = function()
 
 		this.m_oCurrentChallenger        = this.m_oClient.GetCurrentUser();
 		this.m_oChallengerSpan.innerHTML = this.m_oCurrentChallenger.GetName() + "[" + this.m_oCurrentChallenger.GetStringRank() + "]";
-		this.m_oChallengerSpan.title     = "View user info";
+		this.m_oChallengerSpan.title     = g_oLocalization.KGS.window.challenge.challengerHint;
 	}
 
 	this.private_UpdateCaption();
@@ -2061,6 +2074,84 @@ CKGSChallengeWindow.prototype.private_FillDefaultChallengerValues = function()
 CKGSChallengeWindow.prototype.private_GetGlobalSettings = function()
 {
 	return this.m_oClient.m_oApp.GetGlobalSettings();
+};
+CKGSChallengeWindow.prototype.private_CalculateWindowSize = function()
+{
+	g_oTextMeasurer.SetFont("16px 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif");
+	this.m_nFieldLabelWidth = Math.max(
+		g_oTextMeasurer.Measure(g_oLocalization.KGS.window.challenge.fieldRoom),
+		g_oTextMeasurer.Measure(g_oLocalization.KGS.window.challenge.fieldRules),
+		g_oTextMeasurer.Measure(g_oLocalization.KGS.window.challenge.fieldBorderSize),
+		g_oTextMeasurer.Measure(g_oLocalization.KGS.window.challenge.fieldHandicap),
+		g_oTextMeasurer.Measure(g_oLocalization.KGS.window.challenge.fieldKomi),
+		g_oTextMeasurer.Measure(g_oLocalization.KGS.window.challenge.fieldTimeSystem),
+		g_oTextMeasurer.Measure(g_oLocalization.KGS.window.challenge.fieldMainTime),
+		g_oTextMeasurer.Measure(g_oLocalization.KGS.window.challenge.fieldByoYomiTime),
+		g_oTextMeasurer.Measure(g_oLocalization.KGS.window.challenge.fieldPeriods),
+		g_oTextMeasurer.Measure(g_oLocalization.KGS.window.challenge.fieldStones),
+		100
+	) + g_oTextMeasurer.Measure(":") + 1;
+
+	var nFieldLineW = 7 + 10 + this.m_nFieldLabelWidth + 10 + this.m_nFieldValueMinWidth + 5 + 7;
+
+	g_oTextMeasurer.SetFont("13pt Tahoma, 'Sans serif'");
+	var nCaptionW = Math.max(
+		220,
+		g_oTextMeasurer.Measure(g_oLocalization.KGS.window.challenge.captionNewChallenge),
+		g_oTextMeasurer.Measure(g_oLocalization.KGS.window.challenge.captionNewDemo),
+		g_oTextMeasurer.Measure(g_oLocalization.KGS.window.challenge.captionYourChallenge),
+		g_oTextMeasurer.Measure(g_oLocalization.KGS.window.challenge.captionNewGameVs),
+		g_oTextMeasurer.Measure(g_oLocalization.KGS.window.challenge.captionNewGame),
+		g_oTextMeasurer.Measure(g_oLocalization.KGS.window.challenge.captionPressOkToStart),
+		g_oTextMeasurer.Measure(g_oLocalization.KGS.window.challenge.captionWaiting)
+	);
+	var nCaptionW = 122 + nCaptionW;
+
+	this.m_nDefW = Math.max(nCaptionW, nFieldLineW);
+
+	g_oTextMeasurer.SetFont("16px bold 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif");
+
+	this.m_nSelectionW = 25;
+	switch (this.m_nType)
+	{
+		case EKGSChallengeWindowType.Regular:
+		{
+			this.m_nSelectionW += Math.max(
+				g_oTextMeasurer.Measure(g_oLocalization.KGS.gameType.free),
+				g_oTextMeasurer.Measure(g_oLocalization.KGS.gameType.ranked),
+				g_oTextMeasurer.Measure(g_oLocalization.KGS.gameType.teaching)
+			);
+			break;
+		}
+		case EKGSChallengeWindowType.Unranked:
+		{
+			this.m_nSelectionW += Math.max(
+				g_oTextMeasurer.Measure(g_oLocalization.KGS.gameType.free),
+				g_oTextMeasurer.Measure(g_oLocalization.KGS.gameType.teaching)
+			);
+			break;
+		}
+		case EKGSChallengeWindowType.Rengo:
+		{
+			this.m_nSelectionW += g_oTextMeasurer.Measure(g_oLocalization.KGS.gameType.rengo);
+			break;
+		}
+		case EKGSChallengeWindowType.Simulation:
+		{
+			this.m_nSelectionW += g_oTextMeasurer.Measure(g_oLocalization.KGS.gameType.simulation);
+			break;
+		}
+		case EKGSChallengeWindowType.Demonstration:
+		{
+			this.m_nSelectionW += g_oTextMeasurer.Measure(g_oLocalization.KGS.gameType.demonstration);
+			break;
+		}
+	}
+
+	if (this.m_nType === EKGSChallengeWindowType.Demonstration)
+		this.m_nDefH = 512 - this.m_nHeaderHeight - 60;
+	else
+		this.m_nDefH = 512;
 };
 
 function CGoUniverseButtonMinimize(fOnClickHandler)

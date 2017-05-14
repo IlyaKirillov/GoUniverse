@@ -95,12 +95,44 @@ var g_oLocalization_enEN = {
 
 	},
 
-	Common : {
-		ok    : "OK",
-		canel : "Cancel"
+	common : {
+
+		button : {
+			ok     : "OK",
+			canel  : "Cancel",
+			create : "Create",
+			close  : "Close",
+			submit : "Submit"
+		},
+
+		timeSystem : {
+			absolute : "Absolute",
+			byoYomi  : "Byo-Yomi",
+			canadian : "Canadian",
+			none     : "No time limit"
+		},
+
+		rules : {
+			japanese  : "Japanese",
+			chinese   : "Chinese",
+			aga       : "AGA",
+			newZeland : "New Zeland"
+		},
+
+		privateFlag : "Private"
 	},
 
 	KGS : {
+
+		gameType : {
+			free          : "Free",
+			ranked        : "Ranked",
+			teaching      : "Teaching",
+			simulation    : "Simulation",
+			demonstration : "Demonstration",
+			rengo         : "Rengo"
+		},
+
 		window : {
 			roomsList : {
 				caption             : "Room list",
@@ -128,7 +160,38 @@ var g_oLocalization_enEN = {
 				medium        : "Medium",
 				fast          : "Fast",
 				blitz         : "Blitz"
+			},
+
+			challenge : {
+
+				captionNewChallenge   : "Create new challenge",
+				captionNewDemo        : "Create new demonstration",
+				captionYourChallenge  : "Your challenge",
+				captionNewGameVs      : "New game vs.",
+				captionNewGame        : "New game",
+				captionPressOkToStart : "Press OK to start the game",
+				captionWaiting        : "Waiting...",
+
+				privateFlag        : "Private",
+				commentPlaceHolder : "No comment",
+				switchColorsHint   : "Switch colors",
+				fieldRoom          : "Room",
+				fieldRules         : "Rules",
+				fieldBorderSize    : "Board size",
+				fieldHandicap      : "Handicap",
+				fieldKomi          : "Komi",
+				fieldTimeSystem    : "Time system",
+				fieldMainTime      : "Main time",
+				fieldByoYomiTime   : "Byo-tomi",
+				fieldPeriods       : "Periods",
+				fieldStones        : "Stones",
+
+				buttonRetry     : "Retry",
+				buttonRetryHint : "Cancel current proposal",
+
+				challengerHint  : "View info"
 			}
+
 		}
 	}
 };

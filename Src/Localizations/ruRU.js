@@ -96,7 +96,44 @@ var g_oLocalization_ruRU = {
 
 	},
 
+	common : {
+
+		button : {
+			ok     : "OK",
+			canel  : "Отмена",
+			create : "Создать",
+			close  : "Закрыть",
+			submit : "Отправить"
+		},
+
+		timeSystem : {
+			absolute : "Абсолют",
+			byoYomi  : "Беёми",
+			canadian : "Канадский",
+			none     : "Без лимита"
+		},
+
+		rules : {
+			japanese  : "Японские",
+			chinese   : "Китайские",
+			aga       : "АГА",
+			newZeland : "Новозеландские"
+		},
+
+		privateFlag : "Приватная"
+	},
+
 	KGS : {
+
+		gameType : {
+			free          : "Свободная",
+			ranked        : "Рейтинговая",
+			teaching      : "Обучающая",
+			simulation    : "Сеанс",
+			demonstration : "Демонстрация",
+			rengo         : "Ренго"
+		},
+
 		window : {
 			roomsList : {
 				caption             : "Список комнат",
@@ -124,6 +161,36 @@ var g_oLocalization_ruRU = {
 				medium        : "Медленная",
 				fast          : "Быстрая",
 				blitz         : "Блиц"
+			},
+
+			challenge : {
+
+				captionNewChallenge   : "Новая партия",
+				captionNewDemo        : "Новая демонстрация",
+				captionYourChallenge  : "Ваш вызов",
+				captionNewGameVs      : "Новая партия против",
+				captionNewGame        : "Новая партия",
+				captionPressOkToStart : "Нажмите OK для начала игры",
+				captionWaiting        : "Ожидание...",
+
+				privateFlag        : "Приватная",
+				commentPlaceHolder : "Без комментария",
+				switchColorsHint   : "Поменяться цветами",
+				fieldRoom          : "Комната",
+				fieldRules         : "Правила",
+				fieldBorderSize    : "Размер доски",
+				fieldHandicap      : "Фора",
+				fieldKomi          : "Коми",
+				fieldTimeSystem    : "Регламент времени",
+				fieldMainTime      : "Основное время",
+				fieldByoYomiTime   : "Время беёми",
+				fieldPeriods       : "Периоды беёми",
+				fieldStones        : "Ходов за беёми",
+
+				buttonRetry     : "Повтор",
+				buttonRetryHint : "Отменить текущее предложение",
+
+				challengerHint  : "Посмотреть информацию"
 			}
 		}
 	}
