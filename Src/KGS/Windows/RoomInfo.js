@@ -31,7 +31,7 @@ CKGSRoomInfoWindow.prototype.Init = function(sDivId, oPr)
 	CKGSRoomListWindow.superclass.Init.apply(this, arguments);
 
 	this.m_nRoomId = oPr.RoomId;
-	this.Set_Caption("Room info: " + this.m_oClient.GetRoomName(oPr.RoomId));
+	this.Set_Caption(g_oLocalization.KGS.window.roomInfo.caption + ": " + this.m_oClient.GetRoomName(oPr.RoomId));
 
 	var oMainDiv     = this.HtmlElement.InnerDiv;
 	var oMainControl = this.HtmlElement.InnerControl;

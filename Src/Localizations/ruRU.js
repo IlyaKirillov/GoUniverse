@@ -202,6 +202,10 @@ var g_oLocalization_ruRU = {
 				buttonRetryHint : "Отменить текущее предложение",
 
 				challengerHint  : "Посмотреть информацию"
+			},
+
+			roomInfo : {
+				caption : "Информация о комнате"
 			}
 		}
 	}

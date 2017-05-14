@@ -201,6 +201,10 @@ var g_oLocalization_enEN = {
 				buttonRetryHint : "Cancel current proposal",
 
 				challengerHint  : "View info"
+			},
+
+			roomInfo : {
+				caption : "Room info"
 			}
 
 		}
