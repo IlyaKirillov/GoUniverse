@@ -2202,7 +2202,7 @@ CKGSClient.prototype.private_HandleGameUndoRequest = function(oMessage)
 		CreateKGSWindow(EKGSWindowType.UndoRequest, {
 			App        : this.m_oApp,
 			Client     : this,
-			Text       : "The opponent has requested an undo for their last move. Do you want to perform an undo?",
+			Text       : g_oLocalization.KGS.window.undoRequest.message,
 			WindowId   : nChannelId,
 			GameRoom   : oGame,
 			W          : 320,

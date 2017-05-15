@@ -19,6 +19,10 @@ CommonExtend(CKGSUndoRequestWindow, CKGSWindowConfirmBase);
 
 CKGSUndoRequestWindow.prototype.Init = function(sDivId, oPr)
 {
+	var oSize = this.private_CalculateWindowSize();
+	oPr.H = oSize.H;
+	oPr.W = oSize.W;
+
 	CKGSUndoRequestWindow.superclass.Init.call(this, sDivId, oPr);
 
 	var oMainDiv     = this.HtmlElement.InnerDiv;
@@ -26,7 +30,7 @@ CKGSUndoRequestWindow.prototype.Init = function(sDivId, oPr)
 	var oButtonsDiv  = this.HtmlElement.OkCancelDiv;
 	var _sDivId      = oMainDiv.id;
 
-	var sCaption = "Never undo";
+	var sCaption = g_oLocalization.KGS.window.undoRequest.buttonNeverUndo;
 	g_oTextMeasurer.SetFont("16px 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif");
 	var nCaptionWidth = g_oTextMeasurer.Measure(sCaption);
 	var sButtonNerverUndo = _sDivId + "NerverUndo";
@@ -54,4 +58,14 @@ CKGSUndoRequestWindow.prototype.Update_Size = function(bForce)
 
 	if (this.m_oButtonNeverUndo)
 		this.m_oButtonNeverUndo.Update_Size(bForce);
+};
+CKGSUndoRequestWindow.prototype.private_CalculateWindowSize = function()
+{
+	g_oTextMeasurer.SetFont("16px 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif");
+	var nCaptionWidth = g_oTextMeasurer.Measure(g_oLocalization.KGS.window.undoRequest.buttonNeverUndo);
+
+	return {
+		W : Math.max(320, 7 + 10 + nCaptionWidth + 10 + 159 + 7),
+		H : 140
+	}
 };

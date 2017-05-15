@@ -111,7 +111,7 @@ var g_oLocalization_ruRU = {
 
 		button : {
 			ok     : "OK",
-			canel  : "Отмена",
+			cancel : "Отмена",
 			create : "Создать",
 			close  : "Закрыть",
 			submit : "Отправить"
@@ -125,10 +125,10 @@ var g_oLocalization_ruRU = {
 		},
 
 		rules : {
-			japanese  : "Японские",
-			chinese   : "Китайские",
-			aga       : "АГА",
-			newZeland : "Новозеландские"
+			japanese   : "Японские",
+			chinese    : "Китайские",
+			aga        : "АГА",
+			newZealand : "Новозеландские"
 		},
 
 		privateFlag : "Приватная"
@@ -146,6 +146,11 @@ var g_oLocalization_ruRU = {
 		},
 
 		window : {
+
+			common : {
+				captionGameWarning : "Предупреждение"
+			},
+
 			roomsList : {
 				caption             : "Список комнат",
 				searchPlaceholder   : "Введите название комнаты",
@@ -206,6 +211,11 @@ var g_oLocalization_ruRU = {
 
 			roomInfo : {
 				caption : "Информация о комнате"
+			},
+
+			undoRequest : {
+				buttonNeverUndo : "Запретить возврат хода",
+				message         : "Соперник попросил взять свой последний ход назад. Разрешить взятие хода назад?"
 			}
 		}
 	}

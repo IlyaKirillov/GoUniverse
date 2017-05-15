@@ -467,7 +467,7 @@ CKGSUserInfoWindow.prototype.EditUserInfo = function()
 		"personalName"  : this.m_oRawInfo.PersonalName,
 		"personalInfo"  : this.m_oRawInfo.PersonalInfo,
 		"personalEmail" : this.m_oRawInfo.Email,
-		"emailPrivate"  : this.m_oRawInfo.PrivateEmail,
+		"privateEmail"  : this.m_oRawInfo.PrivateEmail,
 		"emailWanted"   : this.m_oRawInfo.EmailWanted,
 		"authLevel"     : this.m_oRawInfo.AuthLevel,
 		"rankWanted"    : this.m_oRawInfo.RankWanted,
@@ -2010,8 +2010,11 @@ CKGSUserInfoGamesListRecord.prototype.Draw = function(oContext, dX, dY, eType)
 		bResetFont    = true;
 	}
 
-	if ((EKGSUserInfoGameListRecord.WName === eType && -1 !== this.m_sScore.indexOf("W+"))
-		|| (EKGSUserInfoGameListRecord.BName === eType && -1 !== this.m_sScore.indexOf("B+")))
+	var sWplus = g_oLocalization.common.shortWhite + "+";
+	var sBplus = g_oLocalization.common.shortBlack + "+";
+
+	if ((EKGSUserInfoGameListRecord.WName === eType && -1 !== this.m_sScore.indexOf(sWplus))
+		|| (EKGSUserInfoGameListRecord.BName === eType && -1 !== this.m_sScore.indexOf(sBplus)))
 	{
 		oContext.fillStyle = "#008272";
 		bResetFont         = true;

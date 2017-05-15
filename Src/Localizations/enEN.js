@@ -110,7 +110,7 @@ var g_oLocalization_enEN = {
 
 		button : {
 			ok     : "OK",
-			canel  : "Cancel",
+			cancel : "Cancel",
 			create : "Create",
 			close  : "Close",
 			submit : "Submit"
@@ -124,10 +124,10 @@ var g_oLocalization_enEN = {
 		},
 
 		rules : {
-			japanese  : "Japanese",
-			chinese   : "Chinese",
-			aga       : "AGA",
-			newZeland : "New Zeland"
+			japanese   : "Japanese",
+			chinese    : "Chinese",
+			aga        : "AGA",
+			newZealand : "New Zealand"
 		},
 
 		privateFlag : "Private"
@@ -145,6 +145,11 @@ var g_oLocalization_enEN = {
 		},
 
 		window : {
+
+			common : {
+				captionGameWarning : "Game warning"
+			},
+
 			roomsList : {
 				caption             : "Room list",
 				searchPlaceholder   : "Enter room name here",
@@ -205,6 +210,11 @@ var g_oLocalization_enEN = {
 
 			roomInfo : {
 				caption : "Room info"
+			},
+
+			undoRequest : {
+				buttonNeverUndo : "Never undo",
+				message         : "The opponent has requested an undo for their last move. Do you want to perform an undo?"
 			}
 
 		}

@@ -347,7 +347,7 @@ CKGSWindowConfirmBase.prototype.Init = function(sDivId, oPr)
 	this.private_UpdatePosition();
 	this.HtmlElement.Control.HtmlElement.style.zIndex = g_nKGSWindowsCount;
 
-	this.Set_Caption("Game warning");
+	this.Set_Caption(g_oLocalization.KGS.window.common.captionGameWarning);
 
 	if (oPr.Text)
 	{

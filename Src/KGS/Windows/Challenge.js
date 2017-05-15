@@ -533,7 +533,7 @@ CKGSChallengeWindow.prototype.OnDecline = function()
 };
 CKGSChallengeWindow.prototype.OnProposal = function(oProposal)
 {
-	if (EKGSChallengeWindowState.ChallengerWaiting === this.m_nState || EKGSChallengeWindowState.ChallengerAccept === this.m_nState)
+	if (EKGSChallengeWindowState.ChallengerWaiting === this.m_nState || EKGSChallengeWindowState.ChallengerAccept === this.m_nState || EKGSChallengeWindowState.Waiting === this.m_nState)
 	{
 		var nGameType  = oProposal.GetGameType();
 		var bNigiri    = oProposal.IsNigiri();
@@ -1077,7 +1077,7 @@ CKGSChallengeWindow.prototype.private_CreateRules = function()
 	this.private_AddOptionToSelect(oRulesSelectElement, g_oLocalization.common.rules.japanese);
 	this.private_AddOptionToSelect(oRulesSelectElement, g_oLocalization.common.rules.chinese);
 	this.private_AddOptionToSelect(oRulesSelectElement, g_oLocalization.common.rules.aga);
-	this.private_AddOptionToSelect(oRulesSelectElement, g_oLocalization.common.rules.newZeland);
+	this.private_AddOptionToSelect(oRulesSelectElement, g_oLocalization.common.rules.newZealand);
 	this.m_oRulesSelect = oRulesSelectElement;
 
 	nTop += this.m_nFieldHeight;
