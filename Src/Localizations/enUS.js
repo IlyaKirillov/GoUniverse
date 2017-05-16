@@ -9,7 +9,9 @@
  * Time     16:35
  */
 
-var g_oLocalization_enEN = {
+var g_oLocalization_enUS = {
+
+	locale : "en-US",
 
 	loginScreen : {
 
@@ -75,7 +77,9 @@ var g_oLocalization_enEN = {
 			listHeaderRank      : "Rank",
 			listHeaderName      : "Name",
 			listHeaderTime      : "Time",
-
+			listHeaderKomi      : "Komi",
+			listHeaderResult    : "Result",
+			listHeaderDate      : "Date",
 
 			listAdditionalRobot : "robot"
 		},
@@ -114,7 +118,12 @@ var g_oLocalization_enEN = {
 			cancel : "Cancel",
 			create : "Create",
 			close  : "Close",
-			submit : "Submit"
+			submit : "Submit",
+			edit   : "Edit",
+			save   : "Save",
+			add    : "Add",
+			remove : "Remove",
+			change : "Change"
 		},
 
 		timeSystem : {
@@ -129,6 +138,29 @@ var g_oLocalization_enEN = {
 			chinese    : "Chinese",
 			aga        : "AGA",
 			newZealand : "New Zealand"
+		},
+
+		connectionStatus : {
+			online     : "online",
+			secondsAgo : "seconds ago",
+			minutesAgo : "minutes ago",
+			hoursAgo   : "hours ago",
+			daysAgo    : "days ago"
+		},
+
+		months : {
+			Jan : "Jan",
+			Feb : "Feb",
+			Mar : "Mar",
+			Apr : "Apr",
+			May : "May",
+			Jun : "Jun",
+			Jul : "Jul",
+			Aug : "Aug",
+			Sep : "Sep",
+			Oct : "Oct",
+			Nov : "Nov",
+			Dec : "Dec"
 		},
 
 		privateFlag : "Private"
@@ -216,6 +248,46 @@ var g_oLocalization_enEN = {
 			undoRequest : {
 				buttonNeverUndo : "Never undo",
 				message         : "The opponent has requested an undo for their last move. Do you want to perform an undo?"
+			},
+
+			userInfo : {
+				tabInfo     : "Info",
+				tabGames    : "Games",
+				tabRank     : "Rank",
+				tabFriends  : "Friends",
+				tabCensored : "Censored",
+				tabFuns     : "Funs",
+
+				rankGraphReplacementText : "No rank data avaliable",
+
+				fieldUserName     : "User name",
+				fieldRealName     : "Real name",
+				fieldRank         : "Rank",
+				fieldLastOn       : "Last on",
+				fieldRegisteredOn : "Registered on",
+				fieldLocale       : "Locale",
+				fieldEmail        : "Email",
+				fieldGames        : "Games",
+				fieldRecentGames  : "Recent games",
+
+				flagPrivateEmail         : "Hide address from other users?",
+				flagReceiveAnnouncements : "Receive KGS announcements?",
+				flagOnlyRanked           : "Only ranked games",
+
+				emailPrivate : "private",
+
+				userslistNamePlaceholder  : "User name",
+				userslistNotesPlaceholder : "Notes",
+
+				gamesArchive : {
+					contextMenu : {
+						observe  : "Observe",
+						view     : "View",
+						download : "Download to disk",
+						loadIn   : "Load in...",
+						loadPIn  : "Load (P) in..."
+					}
+				}
 			}
 
 		}

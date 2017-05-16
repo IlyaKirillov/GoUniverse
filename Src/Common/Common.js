@@ -98,8 +98,7 @@ function SplitTextToLines(sText)
 				// Ничего не делаем
 			}
 			var oDate = new Date(sTimeString);
-			// TODO: Когда сделаем выбор языка тут надо будет сделать меняющуюся локаль
-			sTimeString = oDate.toLocaleString();
+			sTimeString = oDate.toLocaleString(g_oLocalization.locale);
 
 			aLines[nIndex] = aLines[nIndex].splice(nPos, nEndPos + 6 - nPos, sTimeString);
 
@@ -312,11 +311,11 @@ CTimeStamp.prototype.Parse = function(sTimeStamp)
 };
 CTimeStamp.prototype.ToLocaleString = function()
 {
-	return this.m_oDate.toLocaleString();
+	return this.m_oDate.toLocaleString(g_oLocalization.locale);
 };
 CTimeStamp.prototype.ToLocaleDate = function()
 {
-	return this.m_oDate.toLocaleDateString();
+	return this.m_oDate.toLocaleDateString(g_oLocalization.locale);
 };
 CTimeStamp.prototype.GetDifferenceString = function()
 {
@@ -329,25 +328,25 @@ CTimeStamp.prototype.GetDifferenceString = function()
 
 	if (nSeconds <= 60 * 2)
 	{
-		return "" + nSeconds + " seconds ago";
+		return "" + nSeconds + " " + g_oLocalization.common.connectionStatus.secondsAgo;
 	}
 	else if (nSeconds <= 3600 * 2)
 	{
 		var nMinutes = Math.floor(nSeconds / 60);
-		return nMinutes + " minutes ago";
+		return nMinutes + " " + g_oLocalization.common.connectionStatus.minutesAgo;
 	}
 	else if (nSeconds <= 3600 * 24 * 2)
 	{
 		var nMinutes = Math.floor(nSeconds / 60);
 		var nHours   = Math.floor(nMinutes / 60);
-		return nHours + " hours ago";
+		return nHours + " " + g_oLocalization.common.connectionStatus.hoursAgo;
 	}
 	else
 	{
 		var nMinutes = Math.floor(nSeconds / 60);
 		var nHours   = Math.floor(nMinutes / 60);
 		var nDays    = Math.floor(nHours / 24);
-		return nDays + " days ago";
+		return nDays + " " + g_oLocalization.common.connectionStatus.daysAgo;
 	}
 };
 

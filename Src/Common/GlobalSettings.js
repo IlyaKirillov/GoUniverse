@@ -16,7 +16,7 @@ function CGoUniverseGlobalSettings(oApp)
 	// Common
 	this.m_dChatSplitterPosition = 500;
 	this.m_bChatTabsFullHeight   = false;
-	this.m_sLocale               = "enEN";
+	this.m_sLocale               = "en-US";
 
 
 	// KGS specific
@@ -118,7 +118,7 @@ CGoUniverseGlobalSettings.prototype.private_ParseLocale = function()
 	this.m_sLocale = this.private_GetValue("Locale");
 	if (null === this.m_sLocale
 		|| undefined === this.m_sLocale)
-		this.m_sLocale = "enEN";
+		this.m_sLocale = "en-EN";
 };
 CGoUniverseGlobalSettings.prototype.SetKGSGamesListType = function(nValue)
 {

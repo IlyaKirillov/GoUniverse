@@ -9,8 +9,8 @@
  * Time     16:36
  */
 
-var g_oDefaultLocalization = g_oLocalization_enEN;
-var g_oLocalization        = g_oLocalization_enEN;
+var g_oDefaultLocalization = g_oLocalization_enUS;
+var g_oLocalization        = g_oLocalization_enUS;
 
 var ExtendLocalization = function(original, base, key)
 {

@@ -11,6 +11,8 @@
 
 var g_oLocalization_ruRU = {
 
+	locale : "ru-RU",
+
 	loginScreen : {
 
 		login    : "Логин",
@@ -76,7 +78,9 @@ var g_oLocalization_ruRU = {
 			listHeaderRank      : "Ранк",
 			listHeaderName      : "Имя",
 			listHeaderTime      : "Время",
-
+			listHeaderKomi      : "Коми",
+			listHeaderResult    : "Результат",
+			listHeaderDate      : "Дата",
 
 			listAdditionalRobot : "робот"
 		},
@@ -115,7 +119,12 @@ var g_oLocalization_ruRU = {
 			cancel : "Отмена",
 			create : "Создать",
 			close  : "Закрыть",
-			submit : "Отправить"
+			submit : "Отправить",
+			edit   : "Редактировать",
+			save   : "Сохранить",
+			add    : "Добавить",
+			remove : "Удалить",
+			change : "Изменить"
 		},
 
 		timeSystem : {
@@ -130,6 +139,29 @@ var g_oLocalization_ruRU = {
 			chinese    : "Китайские",
 			aga        : "АГА",
 			newZealand : "Новозеландские"
+		},
+
+		connectionStatus : {
+			online     : "в сети",
+			secondsAgo : "секунд назад",
+			minutesAgo : "минут назад",
+			hoursAgo   : "часов назад",
+			daysAgo    : "дней назад"
+		},
+
+		months : {
+			Jan : "Янв",
+			Feb : "Фев",
+			Mar : "Мрт",
+			Apr : "Апр",
+			May : "Май",
+			Jun : "Июн",
+			Jul : "Июл",
+			Aug : "Авг",
+			Sep : "Сен",
+			Oct : "Окт",
+			Nov : "Нбр",
+			Dec : "Дек"
 		},
 
 		privateFlag : "Приватная"
@@ -217,6 +249,46 @@ var g_oLocalization_ruRU = {
 			undoRequest : {
 				buttonNeverUndo : "Запретить возврат хода",
 				message         : "Соперник попросил взять свой последний ход назад. Разрешить взятие хода назад?"
+			},
+
+			userInfo : {
+				tabInfo     : "Информация",
+				tabGames    : "Архив",
+				tabRank     : "Рейтинг",
+				tabFriends  : "Друзья",
+				tabCensored : "Заглушенные",
+				tabFuns     : "Наблюдаемые",
+
+				rankGraphReplacementText : "Нет данных",
+
+				fieldUserName     : "Имя пользователя",
+				fieldRealName     : "Настоящее имя",
+				fieldRank         : "Рейтинг",
+				fieldLastOn       : "Последнее посещение",
+				fieldRegisteredOn : "Зарегестрирован",
+				fieldLocale       : "Язык",
+				fieldEmail        : "Эл. адрес",
+				fieldGames        : "Статистика",
+				fieldRecentGames  : "Последние игры",
+
+				flagPrivateEmail         : "Скрывать адрес от других пользователей?",
+				flagReceiveAnnouncements : "Получать рассылку KGS?",
+				flagOnlyRanked           : "Только рейтинговые игры",
+
+				emailPrivate : "скрыт",
+
+				userslistNamePlaceholder  : "Имя пользователя",
+				userslistNotesPlaceholder : "Заметки",
+
+				gamesArchive : {
+					contextMenu : {
+						observe  : "Наблюдать",
+						view     : "Посмотреть",
+						download : "Скачать на диск",
+						loadIn   : "Загрузить в...",
+						loadPIn  : "Загрузить приватно в..."
+					}
+				}
 			}
 		}
 	}

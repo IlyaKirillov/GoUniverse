@@ -187,16 +187,16 @@ CKGSUserInfoWindow.prototype.Init = function(sDivId, oPr)
 
 	var oTab;
 	oTab = new CVisualUserInfoTab(this);
-	oTab.Init(0, oInfoDivWrapper, "Info");
+	oTab.Init(0, oInfoDivWrapper, g_oLocalization.KGS.window.userInfo.tabInfo);
 	this.m_oTabs.AddTab(oTab);
 	oTab.OnClick();
 
 	oTab = new CVisualUserInfoTab(this);
-	oTab.Init(1, oGamesDivWrapper, "Games");
+	oTab.Init(1, oGamesDivWrapper, g_oLocalization.KGS.window.userInfo.tabGames);
 	this.m_oTabs.AddTab(oTab);
 
 	oTab = new CVisualUserInfoTab(this);
-	oTab.Init(2, oRankDivWrapper, "Rank");
+	oTab.Init(2, oRankDivWrapper, g_oLocalization.KGS.window.userInfo.tabRank);
 	this.m_oTabs.AddTab(oTab);
 
 	if (this.m_bOwnInfo)
@@ -227,15 +227,15 @@ CKGSUserInfoWindow.prototype.Init = function(sDivId, oPr)
 		this.private_CreateFollowerPage(oFollowerDivWrapper, oFollowerDivWrapperControl);
 
 		oTab = new CVisualUserInfoTab(this);
-		oTab.Init(3, oFriendsDivWrapper, "Friends");
+		oTab.Init(3, oFriendsDivWrapper, g_oLocalization.KGS.window.userInfo.tabFriends);
 		this.m_oTabs.AddTab(oTab);
 
 		oTab = new CVisualUserInfoTab(this);
-		oTab.Init(4, oCensoredDivWrapper, "Censored");
+		oTab.Init(4, oCensoredDivWrapper, g_oLocalization.KGS.window.userInfo.tabCensored);
 		this.m_oTabs.AddTab(oTab);
 
 		oTab = new CVisualUserInfoTab(this);
-		oTab.Init(5, oFollowerDivWrapper, "Funs");
+		oTab.Init(5, oFollowerDivWrapper, g_oLocalization.KGS.window.userInfo.tabFuns);
 		this.m_oTabs.AddTab(oTab);
 
 		this.UpdateFriendsLists();
@@ -318,7 +318,7 @@ CKGSUserInfoWindow.prototype.OnUserDetails = function(oDetails)
 
 		if (oUser.IsOnline())
 		{
-			Common.Set_InnerTextToElement(this.m_oInfoTable.LastOn, "online");
+			Common.Set_InnerTextToElement(this.m_oInfoTable.LastOn, g_oLocalization.common.connectionStatus.online);
 		}
 		else
 		{
@@ -430,7 +430,7 @@ CKGSUserInfoWindow.prototype.OnUserArchiveGameRemove = function(oMessage)
 };
 CKGSUserInfoWindow.prototype.OnDetailsUpdate = function(oMessage)
 {
-	Common.Set_InnerTextToElement(this.m_oInfoTable.Locale, oMessage.locale);
+	Common.Set_InnerTextToElement(this.m_oInfoTable.Locale, GetLanguage(oMessage.locale));
 	Common.Set_InnerTextToElement(this.m_oInfoTable.Name, oMessage.personalName);
 
 	var oRegisterTimeStamp = new CTimeStamp(oMessage.regStartDate);
@@ -718,18 +718,18 @@ CKGSUserInfoWindow.prototype.private_DrawRank = function()
 			var sText = "";
 			switch (nCurMonth)
 			{
-				case 1: sText = "Jan"; break;
-				case 2: sText = "Feb"; break;
-				case 3: sText = "Mar"; break;
-				case 4: sText = "Apr"; break;
-				case 5: sText = "May"; break;
-				case 6: sText = "Jun"; break;
-				case 7: sText = "Jul"; break;
-				case 8: sText = "Aug"; break;
-				case 9: sText = "Sep"; break;
-				case 10: sText = "Oct"; break;
-				case 11: sText = "Nov"; break;
-				case 12: sText = "Dec"; break;
+				case 1: sText = g_oLocalization.common.months.Jan; break;
+				case 2: sText = g_oLocalization.common.months.Feb; break;
+				case 3: sText = g_oLocalization.common.months.Mar; break;
+				case 4: sText = g_oLocalization.common.months.Apr; break;
+				case 5: sText = g_oLocalization.common.months.May; break;
+				case 6: sText = g_oLocalization.common.months.Jun; break;
+				case 7: sText = g_oLocalization.common.months.Jul; break;
+				case 8: sText = g_oLocalization.common.months.Aug; break;
+				case 9: sText = g_oLocalization.common.months.Sep; break;
+				case 10: sText = g_oLocalization.common.months.Oct; break;
+				case 11: sText = g_oLocalization.common.months.Nov; break;
+				case 12: sText = g_oLocalization.common.months.Dec; break;
 			}
 
 			oContext.fillText(sText, dX + 5, nH - 5);
@@ -746,7 +746,7 @@ CKGSUserInfoWindow.prototype.private_DrawNoRank = function()
 	if (!this.m_oRankCanvas)
 		return;
 
-	var sText = "No rank data avaliable";
+	var sText = g_oLocalization.KGS.window.userInfo.rankGraphReplacementText;
 	var sFont = "20px 'Times New Roman', Helvetica";
 
 	var oContext = this.m_oRankCanvas.getContext("2d");
@@ -797,19 +797,19 @@ CKGSUserInfoWindow.prototype.private_AddMainInfo = function()
 	var nLeftWidth = 50;
 
 	var arrLabels = [];
-	var sUserName = arrLabels[0] = "User name";
-	var sName     = arrLabels[1] = "Real name";
-	var sRank     = arrLabels[2] = "Rank";
-	var sLastOn   = arrLabels[3] = "Last on";
-	var sRegister = arrLabels[4] = "Registered on";
-	var sLocale   = arrLabels[5] = "Locale";
-	var sEmail    = arrLabels[6] = "Email";
-	var sGames    = arrLabels[7] = "Games";
-	var sRecent   = arrLabels[8] = "Recent games";
+	var sUserName = arrLabels[0] = g_oLocalization.KGS.window.userInfo.fieldUserName;
+	var sName     = arrLabels[1] = g_oLocalization.KGS.window.userInfo.fieldRealName;
+	var sRank     = arrLabels[2] = g_oLocalization.KGS.window.userInfo.fieldRank;
+	var sLastOn   = arrLabels[3] = g_oLocalization.KGS.window.userInfo.fieldLastOn;
+	var sRegister = arrLabels[4] = g_oLocalization.KGS.window.userInfo.fieldRegisteredOn;
+	var sLocale   = arrLabels[5] = g_oLocalization.KGS.window.userInfo.fieldLocale;
+	var sEmail    = arrLabels[6] = g_oLocalization.KGS.window.userInfo.fieldEmail;
+	var sGames    = arrLabels[7] = g_oLocalization.KGS.window.userInfo.fieldGames;
+	var sRecent   = arrLabels[8] = g_oLocalization.KGS.window.userInfo.fieldRecentGames;
 
-	var sPrivateEmail         = "Hide address from other users?";
-	var sReceiveAnnouncements = "Receive KGS announcements?";
-	var sOnlyRanked           = "Only ranked games";
+	var sPrivateEmail         = g_oLocalization.KGS.window.userInfo.flagPrivateEmail;
+	var sReceiveAnnouncements = g_oLocalization.KGS.window.userInfo.flagReceiveAnnouncements;
+	var sOnlyRanked           = g_oLocalization.KGS.window.userInfo.flagOnlyRanked;
 
 	g_oTextMeasurer.SetFont("italic bold 16px 'Segoe UI', Tahoma, sans-serif");
 	for (var nIndex = 0, nCount = arrLabels.length; nIndex < nCount; ++nIndex)
@@ -1001,7 +1001,7 @@ CKGSUserInfoWindow.prototype.private_AddEmail = function(sEmail)
 
 	if (!sEmail)
 	{
-		oSpan.textContent = "Private";
+		oSpan.textContent = g_oLocalization.KGS.window.userInfo.emailPrivate;
 	}
 	else
 	{
@@ -1116,9 +1116,9 @@ CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
 
 	if (this.m_bOwnInfo)
 	{
-		var sSaveButton   = "Save";
-		var sEditButton   = "Edit";
-		var sCancelButton = "Cancel";
+		var sSaveButton   = g_oLocalization.common.button.save;
+		var sEditButton   = g_oLocalization.common.button.edit;
+		var sCancelButton = g_oLocalization.common.button.cancel;
 
 		g_oTextMeasurer.SetFont("14px 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif");
 		var nPadding = 20;
@@ -1287,21 +1287,21 @@ CKGSUserInfoWindow.prototype.private_CreateUserListPage = function(oDiv, oContro
 	oNameInput.style.padding  = "0px 5px 0px 5px";
 	oNameInput.type           = "text";
 	oNameInput.maxLength      = "20";
-	oNameInput["aria-label"]  = "User name";
-	oNameInput["placeholder"] = "User name";
+	oNameInput["aria-label"]  = g_oLocalization.KGS.window.userInfo.userslistNamePlaceholder;
+	oNameInput["placeholder"] = g_oLocalization.KGS.window.userInfo.userslistNamePlaceholder;
 	var oThis = this;
 	oNameInput.addEventListener("input", function()
 	{
 		if (null === oListView.SelectByKey(oNameInput.value.toLowerCase()))
 		{
 			oNotesInput.value = "";
-			Common.Set_InnerTextToElement(oAddButton, "Add");
+			Common.Set_InnerTextToElement(oAddButton, g_oLocalization.common.button.add);
 
 			oRemoveButton.className = "ButtonCommonDisabled";
 		}
 		else
 		{
-			Common.Set_InnerTextToElement(oAddButton, "Change");
+			Common.Set_InnerTextToElement(oAddButton, g_oLocalization.common.button.change);
 			oRemoveButton.className = "ButtonCommon";
 		}
 	}, false);
@@ -1315,8 +1315,8 @@ CKGSUserInfoWindow.prototype.private_CreateUserListPage = function(oDiv, oContro
 	oNotesInput.style.padding  = "0px 5px 0px 5px";
 	oNotesInput.type           = "text";
 	oNotesInput.maxLength      = "256";
-	oNotesInput["aria-label"]  = "Notes";
-	oNotesInput["placeholder"] = "Notes";
+	oNotesInput["aria-label"]  = g_oLocalization.KGS.window.userInfo.userslistNotesPlaceholder;
+	oNotesInput["placeholder"] = g_oLocalization.KGS.window.userInfo.userslistNotesPlaceholder;
 
 	var nButtonW = (nRightPanelW - 4 - 2) / 2 - 2;
 	var oAddButton              = this.protected_CreateDivElement(oDiv, null, "div");
@@ -1327,7 +1327,7 @@ CKGSUserInfoWindow.prototype.private_CreateUserListPage = function(oDiv, oContro
 	oAddButton.style.lineHeight = "23px";
 	oAddButton.style.fontSize   = "14px";
 	oAddButton.style.fontFamily = "'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif";
-	Common.Set_InnerTextToElement(oAddButton, "Add");
+	Common.Set_InnerTextToElement(oAddButton, g_oLocalization.common.button.add);
 	var oAddControl = CreateControlContainerByElement(oAddButton);
 	oAddControl.SetParams(2, 70, nRightPanelW - 4 - nButtonW, 1000, true, true, true, false, nButtonW, 25);
 	oAddControl.SetAnchor(false, true, true, false);
@@ -1350,7 +1350,7 @@ CKGSUserInfoWindow.prototype.private_CreateUserListPage = function(oDiv, oContro
 	oRemoveButton.style.lineHeight = "23px";
 	oRemoveButton.style.fontSize   = "14px";
 	oRemoveButton.style.fontFamily = "'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif";
-	Common.Set_InnerTextToElement(oRemoveButton, "Remove");
+	Common.Set_InnerTextToElement(oRemoveButton, g_oLocalization.common.button.remove);
 	var oRemoveControl = CreateControlContainerByElement(oRemoveButton);
 	oRemoveControl.SetParams(2, 70, 2, 1000, true, true, true, false, nButtonW, 25);
 	oRemoveControl.SetAnchor(false, true, true, false);
@@ -1369,14 +1369,14 @@ CKGSUserInfoWindow.prototype.private_CreateUserListPage = function(oDiv, oContro
 	{
 		oNameInput.value  = sName;
 		oNotesInput.value = sNotes;
-		Common.Set_InnerTextToElement(oAddButton, "Change");
+		Common.Set_InnerTextToElement(oAddButton, g_oLocalization.common.button.change);
 		oRemoveButton.className = "ButtonCommon";
 	});
 	oListView.GetListObject().SetUnselectCallback(function()
 	{
 		oNameInput.value  = "";
 		oNotesInput.value = "";
-		Common.Set_InnerTextToElement(oAddButton, "Add");
+		Common.Set_InnerTextToElement(oAddButton, g_oLocalization.common.button.add);
 		oRemoveButton.className = "ButtonCommonDisabled";
 	});
 
@@ -1413,7 +1413,7 @@ CKGSUserInfoWindow.prototype.private_OnMouseMoveRankGraph = function(X, Y)
 
 			var oDate = new Date(oPoint.time);
 
-			this.private_ShowRankHint(oPoint.x + oPos.X, oPoint.y + oPos.Y, sRank + " " + oDate.toLocaleDateString());
+			this.private_ShowRankHint(oPoint.x + oPos.X, oPoint.y + oPos.Y, sRank + " " + oDate.toLocaleDateString(g_oLocalization.locale));
 
 			if (nPointIndex > 0)
 			{
@@ -1587,13 +1587,13 @@ CKGSUserInfoWindow.prototype.UpdateFriendsLists = function()
 		if (null === oListView.SelectByKey(oNameInput.value.toLowerCase()))
 		{
 			oNotesInput.value = "";
-			Common.Set_InnerTextToElement(oAddButton, "Add");
+			Common.Set_InnerTextToElement(oAddButton, g_oLocalization.common.button.add);
 
 			oRemoveButton.className = "ButtonCommonDisabled";
 		}
 		else
 		{
-			Common.Set_InnerTextToElement(oAddButton, "Change");
+			Common.Set_InnerTextToElement(oAddButton, g_oLocalization.common.button.change);
 			oRemoveButton.className = "ButtonCommon";
 		}
 	}
@@ -1728,16 +1728,16 @@ function CKGSUserInfoGamesList(oApp)
 	this.m_oHeaders = {
 		Sizes : [0, 16, 56, 196, 221, 261, 381, 450, 515, 609],
 		Count : 10,
-		1     : "Kind",
-		2     : "wr",
-		3     : "White",
+		1     : g_oLocalization.mainRoom.gamesList.listHeaderType,
+		2     : g_oLocalization.mainRoom.gamesList.listHeaderWhiteRank,
+		3     : g_oLocalization.mainRoom.gamesList.listHeaderWhiteName,
 		4     : "",
-		5     : "br",
-		6     : "Black",
+		5     : g_oLocalization.mainRoom.gamesList.listHeaderBlackRank,
+		6     : g_oLocalization.mainRoom.gamesList.listHeaderBlackName,
 		7     : "",
-		8     : "Komi",
-		9     : "Result",
-		10    : "Date"
+		8     : g_oLocalization.mainRoom.gamesList.listHeaderKomi,
+		9     : g_oLocalization.mainRoom.gamesList.listHeaderResult,
+		10    : g_oLocalization.mainRoom.gamesList.listHeaderDate
 	};
 
 	this.m_nSortType = -EKGSUserInfoGameListRecord.TimeStamp;
@@ -1944,18 +1944,18 @@ CKGSUserInfoGamesList.prototype.Handle_RightClick = function(oRecord, e)
 
 	if (true === oRecord.IsInPlay())
 	{
-		oContextMenu.AddListItem("Observe", function()
+		oContextMenu.AddListItem(g_oLocalization.KGS.window.userInfo.gamesArchive.contextMenu.observe, function()
 		{
 			oClient.EnterGameRoomByTimeStamp(oRecord.GetTimeStamp());
 		}, isPrivate);
 	}
 	else
 	{
-		oContextMenu.AddListItem("View", function(e)
+		oContextMenu.AddListItem(g_oLocalization.KGS.window.userInfo.gamesArchive.contextMenu.view, function(e)
 		{
 			privateLoadSgfByUrl(sUrl, privateViewGame, oClient, oThis.m_oApp);
 		}, isPrivate || isDemo, false);
-		oContextMenu.AddListItem("Download to disk", function(e)
+		oContextMenu.AddListItem(g_oLocalization.KGS.window.userInfo.gamesArchive.contextMenu.download, function(e)
 		{
 			function privateDownload(sUrl, sSgf)
 			{
@@ -1966,8 +1966,8 @@ CKGSUserInfoGamesList.prototype.Handle_RightClick = function(oRecord, e)
 
 			privateLoadSgfByUrl(sUrl, privateDownload);
 		}, isPrivate || "" === sUrl);
-		oContextMenu.AddListItem("Load in...", privateLoadIn, isPrivate, false);
-		oContextMenu.AddListItem("Load (P) in...", privateLoadIn, isPrivate, true);
+		oContextMenu.AddListItem(g_oLocalization.KGS.window.userInfo.gamesArchive.contextMenu.loadIn, privateLoadIn, isPrivate, false);
+		oContextMenu.AddListItem(g_oLocalization.KGS.window.userInfo.gamesArchive.contextMenu.loadPIn, privateLoadIn, isPrivate, true);
 	}
 
 	oContextMenu.Show();
@@ -2231,7 +2231,7 @@ CKGSUserInfoGamesListRecord.prototype.private_GetKomi = function()
 };
 CKGSUserInfoGamesListRecord.prototype.private_GetTimeStamp = function()
 {
-	return this.m_oDate.toLocaleString();
+	return this.m_oDate.toLocaleString(g_oLocalization.locale);
 };
 
 function CVisualUserInfoTabs()

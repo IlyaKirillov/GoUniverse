@@ -1376,7 +1376,7 @@ CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
 		sBlack       = "";
 		nBlackR      = -3;
 		sGameName    = oGameRecord.GetComment();
-		sSizeHandi   = nBoardSize + "x" + nBoardSize + ",   "  + oProposal.GetKomi() + ",   " + KGSCommon.GameRulesToRedableString(oProposal.GetRules());
+		sSizeHandi   = nBoardSize + "x" + nBoardSize + ",   "  + oProposal.GetKomi() + ",   " + KGSCommon.GameRulesToReadableString(oProposal.GetRules());
 		sTime        = oProposal.GetTimeSettingsString();
 
 		if (oCreator && oCreator.IsRobot())

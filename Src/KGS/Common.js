@@ -129,22 +129,22 @@ var KGSCommon = {
 	},
 
 	/**
-	 * Convert a rules type to a redable string.
+	 * Convert a rules type to a readable string.
 	 * @param {EKGSGameRules} nRules
 	 * @returns {string}
 	 */
-	GameRulesToRedableString : function(nRules)
+	GameRulesToReadableString : function(nRules)
 	{
 		if (EKGSGameRules.Japanese === nRules)
-			return "Japanese";
+			return g_oLocalization.common.rules.japanese;
 		else if (EKGSGameRules.Chinese === nRules)
-			return "Chinese";
+			return g_oLocalization.common.rules.chinese;
 		else if (EKGSGameRules.Aga === nRules)
-			return "AGA";
+			return g_oLocalization.common.rules.aga;
 		else if (EKGSGameRules.NewZealand === nRules)
-			return "New Zealand";
+			return g_oLocalization.common.rules.newZealand;
 
-		return "Japanese";
+		return g_oLocalization.common.rules.japanese;
 	},
 
 	/**

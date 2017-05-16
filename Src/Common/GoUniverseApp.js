@@ -226,7 +226,7 @@ CGoUniverseApplication.prototype.ConnectToKGS = function()
 		this.m_oGlobalSettings.SetKGSPassword(sPassword);
 
 	document.getElementById("inputPasswordId").value = "";
-	this.m_oClient.Connect(sLogin, sPassword, "en_US");
+	this.m_oClient.Connect(sLogin, sPassword, g_oLocalization.locale.replace("-", "_"));
 
 	g_oFadeEffect.Out(document.getElementById("divIdConnection"), 200);
 	g_oFadeEffect.Out(document.getElementById("divIdConnectionError"), 200);
@@ -742,11 +742,11 @@ CGoUniverseApplication.prototype.private_InitLoginPage = function()
 
 	document.getElementById("localizationSelectId").addEventListener("change", function()
 	{
-		var sLocale = "enEN";
+		var sLocale = "en-EN";
 		switch (this.selectedIndex)
 		{
-			case 0 : sLocale = "enEN"; break;
-			case 1 : sLocale = "ruRU"; break;
+			case 0 : sLocale = "en-EN"; break;
+			case 1 : sLocale = "ru-RU"; break;
 		}
 
 		oThis.m_oGlobalSettings.SetLocale(sLocale);
@@ -1672,18 +1672,18 @@ CGoUniverseApplication.prototype.private_ParseLocale = function()
 	var oSelection = document.getElementById("localizationSelectId");
 	switch (sLocale)
 	{
-		case "ruRU" :
+		case "ru-RU" :
 		{
 			oSelection.selectedIndex = 1;
 			g_oLocalization = g_oLocalization_ruRU;
 			break;
 		}
 
-		case "enEN":
+		case "en-EN":
 		default:
 		{
 			oSelection.selectedIndex = 0;
-			g_oLocalization = g_oLocalization_enEN;
+			g_oLocalization = g_oLocalization_enUS;
 			break;
 		}
 	}

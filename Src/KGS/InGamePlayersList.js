@@ -25,8 +25,8 @@ function CKGSInGamePlayersList(oApp, nGameId)
 		Sizes : [0, 20, 125],
 		Count : 3,
 		1     : "",
-		2     : "Name",
-		3     : "Rank"
+		2     : g_oLocalization.mainRoom.playersList.listHeaderName,
+		3     : g_oLocalization.mainRoom.playersList.listHeaderRank
 	};
 
 	this.m_nSortType = -EKGSInGamePlayersListRecord.Rank;
