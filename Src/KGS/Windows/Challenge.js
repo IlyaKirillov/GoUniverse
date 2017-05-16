@@ -268,7 +268,7 @@ function CKGSChallengeWindow()
 			oThis.m_oButtons.Ok.Show();
 
 			oChallengerSpan.innerHTML = oChallenger.GetName() + "[" + oChallenger.GetStringRank() + "]";
-			oChallengerSpan.title     = "View user info";
+			oChallengerSpan.title     = g_oLocalization.KGS.window.challenge.challengerHint;
 
 			oThis.m_oHandicapInput.value = oProposal.GetHandicap();
 			oThis.m_oKomiInput.value     = oProposal.GetKomi();
@@ -883,7 +883,7 @@ CKGSChallengeWindow.prototype.private_CreatePlayers = function()
 		{
 			oThis.m_oClient.LoadUserInfo(oChallengeCreator.GetName());
 		}, false);
-		oSpan.title = "View user info";
+		oSpan.title = g_oLocalization.KGS.window.challenge.challengerHint;
 		oCreatorPlayer.appendChild(oSpan);
 	}
 

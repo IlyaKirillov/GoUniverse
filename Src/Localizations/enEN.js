@@ -100,7 +100,8 @@ var g_oLocalization_enEN = {
 		gameResult : {
 			resign  : "Resign",
 			time    : "Time",
-			forfeit : "Forfeit"
+			forfeit : "Forfeit",
+			even    : "Even"
 		},
 
 		black      : "Black",
