@@ -226,7 +226,7 @@ CGoUniverseApplication.prototype.ConnectToKGS = function()
 		this.m_oGlobalSettings.SetKGSPassword(sPassword);
 
 	document.getElementById("inputPasswordId").value = "";
-	this.m_oClient.Connect(sLogin, sPassword, g_oLocalization.locale.replace("-", "_"));
+	this.m_oClient.Connect(sLogin, sPassword, KGSCommon.GetLanguageCode(g_oLocalization.locale));
 
 	g_oFadeEffect.Out(document.getElementById("divIdConnection"), 200);
 	g_oFadeEffect.Out(document.getElementById("divIdConnectionError"), 200);

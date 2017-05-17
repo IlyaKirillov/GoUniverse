@@ -100,6 +100,11 @@ var g_oLocalization_ruRU = {
 
 	},
 
+	gameRoom : {
+
+
+	},
+
 	common : {
 
 		gameResult : {
@@ -253,7 +258,7 @@ var g_oLocalization_ruRU = {
 
 			userInfo : {
 				tabInfo     : "Информация",
-				tabGames    : "Архив",
+				tabGames    : "Партии",
 				tabRank     : "Рейтинг",
 				tabFriends  : "Друзья",
 				tabCensored : "Заглушенные",

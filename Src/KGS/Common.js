@@ -164,6 +164,158 @@ var KGSCommon = {
 			return "none";
 
 		return "none";
+	},
+
+	/**
+	 * Convert iso language code to a KGS-allowable code
+	 * @param sCode
+	 * @constructor
+	 */
+	GetLanguageCode : function(sCode)
+	{
+		var sLanguage = "en_US";
+		switch (sCode)
+		{
+			case "bg" :
+			case "bg-BG" :
+				sLanguage = "bg_BG";
+				break;
+			case "ca" :
+			case "ca-ES" :
+				sLanguage = "ca_ES";
+				break;
+			case "cs" :
+			case "cs-CZ" :
+				sLanguage = "cs_CZ";
+				break;
+			case "da" :
+			case "da-DK" :
+				sLanguage = "da_DK";
+				break;
+			case "de" :
+			case "de-AT" :
+			case "de-CH" :
+			case "de-DE" :
+			case "de-LI" :
+			case "de-LU" :
+				sLanguage = "de_DE";
+				break;
+			case "en" :
+			case "en-AU" :
+			case "en-BZ" :
+			case "en-CA" :
+			case "en-CB" :
+			case "en-GB" :
+			case "en-IE" :
+			case "en-JM" :
+			case "en-NZ" :
+			case "en-PH" :
+			case "en-TT" :
+			case "en-US" :
+			case "en-ZA" :
+			case "en-ZW" :
+				sLanguage = "en_US";
+				break;
+			case "es" :
+			case "es-AR" :
+			case "es-BO" :
+			case "es-CL" :
+			case "es-CO" :
+			case "es-CR" :
+			case "es-DO" :
+			case "es-EC" :
+			case "es-ES" :
+			case "es-GT" :
+			case "es-HN" :
+			case "es-MX" :
+			case "es-NI" :
+			case "es-PA" :
+			case "es-PE" :
+			case "es-PR" :
+			case "es-PY" :
+			case "es-SV" :
+			case "es-UY" :
+			case "es-VE" :
+				sLanguage = "es_ES";
+				break;
+			case "eu" :
+			case "eu-ES" :
+				sLanguage = "eu_ES";
+				break;
+			case "fi" :
+			case "fi-FI" :
+				sLanguage = "fi_FI";
+				break;
+			case "fr" :
+			case "fr-BE" :
+			case "fr-CA" :
+			case "fr-CH" :
+			case "fr-FR" :
+			case "fr-LU" :
+			case "fr-MC" :
+				sLanguage = "fr_FR";
+				break;
+			case "hu" :
+			case "hu-HU" :
+				sLanguage = "hu_HU";
+				break;
+			case "it" :
+			case "it-CH" :
+			case "it-IT" :
+				sLanguage = "it_IT";
+				break;
+			case "ja" :
+			case "ja-JP" :
+				sLanguage = "ja_JP";
+				break;
+			case "ko" :
+			case "ko-KR" :
+				sLanguage = "ko_KR";
+				break;
+			case "lv" :
+			case "lv-LV" :
+				sLanguage = "lv_LV";
+				break;
+			case "pl" :
+			case "pl-PL" :
+				sLanguage = "pl_PL";
+				break;
+			case "pt" :
+			case "pt-BR" :
+			case "pt-PT" :
+				sLanguage = "pt_BR";
+				break;
+			case "ro" :
+			case "ro-RO" :
+				sLanguage = "ro_RO";
+				break;
+			case "ru" :
+			case "ru-RU" :
+				sLanguage = "ru_RU";
+				break;
+			case "sk" :
+			case "sk-SK" :
+				sLanguage = "sk_SK";
+				break;
+			case "tr" :
+			case "tr-TR" :
+				sLanguage = "tr_TR";
+				break;
+			case "vi" :
+			case "vi-VN" :
+				sLanguage = "vi_VN";
+				break;
+			case "zh" :
+			case "zh-CN" :
+			case "zh-HK" :
+			case "zh-MO" :
+			case "zh-SG" :
+			case "zh-TW" :
+				sLanguage = "zh_CN";
+				break;
+		}
+
+		return sLanguage;
 	}
 
 };

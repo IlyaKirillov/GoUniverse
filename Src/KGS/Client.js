@@ -102,7 +102,7 @@ CKGSClient.prototype.Connect = function(sLogin, sPassword, sLocale)
 		"type"     : "LOGIN",
 		"name"     : sLogin,
 		"password" : sPassword,
-		"locale"   : sLocale ? sLocale : "en-US"
+		"locale"   : sLocale ? sLocale : "en_US"
 	});
 };
 CKGSClient.prototype.ConnectAsGuest = function()
