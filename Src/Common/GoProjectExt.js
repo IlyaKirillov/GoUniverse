@@ -430,10 +430,20 @@ CDrawing.prototype.private_GoUniverseCreateMatchToolbar = function(oParentContro
 	oToolBarControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right | g_anchor_bottom);
 	oToolBarControlWrapper.AddControl(oToolBarControl);
 
+	var oButtonUndo = new CGoUniverseButtonUndo(this, this.m_oGameRoom);
+	var oButtonPass = new CGoUniverseButtonPass(this, this.m_oGameRoom);
+	var oButtonResign = new CGoUniverseButtonResign(this, this.m_oGameRoom);
+
+	var nButtonW = Math.max(72,
+		oButtonUndo.GetMinWidth(),
+		oButtonPass.GetMinWidth(),
+		oButtonResign.GetMinWidth()
+	);
+
 	var oDrawingToolbar = new CDrawingToolbar(this);
-	oDrawingToolbar.Add_Control(new CGoUniverseButtonUndo(this, this.m_oGameRoom), 72, 1, EToolbarFloat.Left);
-	oDrawingToolbar.Add_Control(new CGoUniverseButtonPass(this, this.m_oGameRoom), 72, 1, EToolbarFloat.Left);
-	oDrawingToolbar.Add_Control(new CGoUniverseButtonResign(this, this.m_oGameRoom), 72, 1, EToolbarFloat.Left);
+	oDrawingToolbar.Add_Control(oButtonUndo, nButtonW, 1, EToolbarFloat.Left);
+	oDrawingToolbar.Add_Control(oButtonPass, nButtonW, 1, EToolbarFloat.Left);
+	oDrawingToolbar.Add_Control(oButtonResign, nButtonW, 1, EToolbarFloat.Left);
 	oDrawingToolbar.Add_Control(new CDrawingButtonAbout(this), 36, 1, EToolbarFloat.Right);
 	oDrawingToolbar.Add_Control(new CDrawingButtonGameInfo(this), 36, 1, EToolbarFloat.Right);
 	oDrawingToolbar.Init(sToolbarInnerDivId, this.m_oGameTree);
@@ -519,6 +529,7 @@ CDrawing.prototype.GoUniverseOnView = function()
 	oPr.ManagerControl.HtmlElement.style.display      = "block";
 	oPr.MatchToolbarControl.HtmlElement.style.display = "none";
 	oPr.EditButtonControl.HtmlElement.style.display   = "block";
+	oPr.MenuButtonControl.HtmlElement.style.display   = "block";
 
 	var oGameRoom = this.m_oGameRoom;
 	if (!oGameRoom.IsDemonstration() && oGameRoom.IsPlayer())
@@ -643,9 +654,9 @@ CGoUniverseDrawingComments.prototype.private_AddMoveReference = function(oNode, 
 	if (undefined !== sGameOverResult && "" !== sGameOverResult)
 		sText = sGameOverResult;
 	else if (0 === nMoveNumber)
-		sText += "Game Start\n";
+		sText += g_oLocalization.gameRoom.gameStart + "\n";
 	else
-		sText += "Move " + nMoveNumber + "\n";
+		sText += g_oLocalization.gameRoom.move + " " + nMoveNumber + "\n";
 
 	var oDiv = this.m_oTextArea;
 
@@ -671,7 +682,7 @@ CGoUniverseDrawingComments.prototype.private_AddMoveReference = function(oNode, 
 };
 CGoUniverseDrawingComments.prototype.AddGameOver = function(oNode, sResult)
 {
-	this.private_AddMoveReference(oNode, "Game Over: " + sResult);
+	this.private_AddMoveReference(oNode, g_oLocalization.gameRoom.gameOver + ": " + sResult);
 	this.m_oLastNode = oNode;
 	this.private_CheckScrollTop();
 };
@@ -1128,11 +1139,11 @@ CGoUniverseDrawingPlayerInfo.prototype.private_Update = function()
 	}
 	else
 	{
-		var sNameText = ("" === this.m_sName ? (BOARD_BLACK === this.m_nPlayer ? "Black " : "White ") : this.m_sName) + ("" === this.m_sRank ? "" : "[" + this.m_sRank +  "]");
+		var sNameText = ("" === this.m_sName ? (BOARD_BLACK === this.m_nPlayer ? g_oLocalization.common.black + " " : g_oLocalization.common.white + " ") : this.m_sName) + ("" === this.m_sRank ? "" : "[" + this.m_sRank +  "]");
 		Common.Set_InnerTextToElement(oNameDiv, sNameText);
 	}
 
-	var sScoresText = this.m_dScores + (true === this.m_bScores ? " points" : " captures");
+	var sScoresText = (true === this.m_bScores ? g_oLocalization.gameRoom.points : g_oLocalization.gameRoom.captures) + ": " + this.m_dScores;
 	Common.Set_InnerTextToElement(oScoresDiv, sScoresText);
 };
 CGoUniverseDrawingPlayerInfo.prototype.StopCountDown = function()
@@ -1188,7 +1199,7 @@ CGoUniverseDrawingGameState.prototype.Update = function()
 
 	if (null !== sResult && true !== bDemo)
 	{
-		sText += "Game Over: " + sResult;
+		sText += g_oLocalization.gameRoom.gameOver + ": " + sResult;
 	}
 	else
 	{
@@ -1205,7 +1216,7 @@ CGoUniverseDrawingGameState.prototype.Update = function()
 
 		if (oNode === oGameTree.Get_StartNode())
 		{
-			sText += "Game Start: ";
+			sText += g_oLocalization.gameRoom.gameStart + ": ";
 			nNext = BOARD_BLACK;
 		}
 		else
@@ -1215,13 +1226,13 @@ CGoUniverseDrawingGameState.prototype.Update = function()
 			var oSize       = oGameTree.Get_Board().Get_Size();
 			var nMoveValue  = oMove.Get_Value();
 
-			var sMove = 0 === nMoveValue ? "Pass" : Common_PosValueToString(nMoveValue, oSize.X, oSize.Y).toLowerCase();
+			var sMove = 0 === nMoveValue ? g_oLocalization.gameRoom.pass : Common_PosValueToString(nMoveValue, oSize.X, oSize.Y).toLowerCase();
 
-			sText += "Move " + nMoveNumber + " (" + (BOARD_BLACK ===  oMove.Get_Type() ? "B " : "W ") + sMove + "): ";
+			sText += g_oLocalization.gameRoom.move + " " + nMoveNumber + " (" + (BOARD_BLACK ===  oMove.Get_Type() ? g_oLocalization.common.shortBlack + " " : g_oLocalization.common.shortWhite + " ") + sMove + "): ";
 			nNext = BOARD_BLACK ===  oMove.Get_Type() ? BOARD_WHITE : BOARD_BLACK;
 		}
 
-		sText += (BOARD_BLACK ===  nNext ? "Black to play" : "White to play");
+		sText += (BOARD_BLACK ===  nNext ? g_oLocalization.gameRoom.blackToPlay : g_oLocalization.gameRoom.whiteToPlay);
 	}
 
 	Common.Set_InnerTextToElement(this.m_oDiv, sText);
@@ -1243,7 +1254,7 @@ CGoUniverseDrawingGameState.prototype.private_UpdateCaptionStyle = function()
 		oDiv.style.color          = "#2a75f3";
 		oDiv.style.textDecoration = "underline";
 		oDiv.style.cursor         = "pointer";
-		oDiv.title                = "Back to Game";
+		oDiv.title                = g_oLocalization.gameRoom.backToGame;
 	}
 	else
 	{
@@ -1287,7 +1298,7 @@ function CGoUniverseButtonEditorControl(oDrawing)
 	oMainDiv.appendChild(oMenuElementWrapper);
 
 	var oThis = this;
-	this.private_CreateMenuItem(oMenuElementWrapper, "Back to game", function()
+	this.private_CreateMenuItem(oMenuElementWrapper, g_oLocalization.gameRoom.backToGame, function()
 	{
 		var oGameRoom = oDrawing.m_oGameRoom;
 		if (!oGameRoom)
@@ -1295,7 +1306,7 @@ function CGoUniverseButtonEditorControl(oDrawing)
 
 		oGameRoom.BackToGame();
 	});
-	this.private_CreateMenuItem(oMenuElementWrapper, "Remove own changes", function()
+	this.private_CreateMenuItem(oMenuElementWrapper, g_oLocalization.gameRoom.removeOwnChanges, function()
 	{
 		var oGameRoom = oDrawing.m_oGameRoom;
 		if (!oGameRoom)
@@ -1303,7 +1314,7 @@ function CGoUniverseButtonEditorControl(oDrawing)
 		
 		oGameRoom.RemoveOwnChanges();
 	});
-	this.private_CreateMenuItem(oMenuElementWrapper, "Return control", function()
+	this.private_CreateMenuItem(oMenuElementWrapper, g_oLocalization.gameRoom.returnControl, function()
 	{
 		var oGameRoom = oDrawing.m_oGameRoom;
 		if (!oGameRoom)
@@ -1542,7 +1553,7 @@ CommonExtend(CGoUniverseButtonUndo, CDrawingButtonBase);
 
 CGoUniverseButtonUndo.prototype.private_DrawOnCanvas = function(Canvas, Size, X_off, Y_off, bDisabled, W, H, BackColor, FillColor)
 {
-	var Text       = "Undo";
+	var Text       = g_oLocalization.gameRoom.button.undo;
 	var FontSize   = 20;
 	var FontFamily = "Times New Roman, Sans serif";
 	var sFont      = FontSize + "px " + FontFamily;
@@ -1560,7 +1571,12 @@ CGoUniverseButtonUndo.prototype.private_HandleMouseDown = function()
 };
 CGoUniverseButtonUndo.prototype.private_GetHint = function()
 {
-	return "Request an undo";
+	return "";
+};
+CGoUniverseButtonUndo.prototype.GetMinWidth = function()
+{
+	g_oTextMeasurer.SetFont("20px Times New Roman, Sans serif");
+	return g_oTextMeasurer.Measure(g_oLocalization.gameRoom.button.undo) + 12;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Кнопка Pass
@@ -1575,7 +1591,7 @@ CommonExtend(CGoUniverseButtonPass, CDrawingButtonBase);
 
 CGoUniverseButtonPass.prototype.private_DrawOnCanvas = function(Canvas, Size, X_off, Y_off, bDisabled, W, H, BackColor, FillColor)
 {
-	var Text       = "Pass";
+	var Text       = g_oLocalization.gameRoom.button.pass;
 	var FontSize   = 20;
 	var FontFamily = "Times New Roman, Sans serif";
 	var sFont      = FontSize + "px " + FontFamily;
@@ -1593,7 +1609,12 @@ CGoUniverseButtonPass.prototype.private_HandleMouseDown = function()
 };
 CGoUniverseButtonPass.prototype.private_GetHint = function()
 {
-	return "Pass";
+	return "";
+};
+CGoUniverseButtonPass.prototype.GetMinWidth = function()
+{
+	g_oTextMeasurer.SetFont("20px Times New Roman, Sans serif");
+	return g_oTextMeasurer.Measure(g_oLocalization.gameRoom.button.pass) + 12;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Кнопка Resign
@@ -1608,7 +1629,7 @@ CommonExtend(CGoUniverseButtonResign, CDrawingButtonBase);
 
 CGoUniverseButtonResign.prototype.private_DrawOnCanvas = function(Canvas, Size, X_off, Y_off, bDisabled, W, H, BackColor, FillColor)
 {
-	var Text       = "Resign";
+	var Text       = g_oLocalization.gameRoom.button.resign;
 	var FontSize   = 20;
 	var FontFamily = "Times New Roman, Sans serif";
 	var sFont      = FontSize + "px " + FontFamily;
@@ -1640,7 +1661,12 @@ CGoUniverseButtonResign.prototype.private_HandleMouseDown = function()
 };
 CGoUniverseButtonResign.prototype.private_GetHint = function()
 {
-	return "Resignation";
+	return "";
+};
+CGoUniverseButtonResign.prototype.GetMinWidth = function()
+{
+	g_oTextMeasurer.SetFont("20px Times New Roman, Sans serif");
+	return g_oTextMeasurer.Measure(g_oLocalization.gameRoom.button.resign) + 12;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Кнопка Analyze
@@ -1655,7 +1681,7 @@ CommonExtend(CGoUniverseButtonAnalyze, CDrawingButtonBase);
 
 CGoUniverseButtonAnalyze.prototype.private_DrawOnCanvas = function(Canvas, Size, X_off, Y_off, bDisabled, W, H, BackColor, FillColor)
 {
-	var Text       = "Analyze";
+	var Text       = g_oLocalization.gameRoom.button.analyze;
 	var FontSize   = 20;
 	var FontFamily = "Times New Roman, Sans serif";
 	var sFont      = FontSize + "px " + FontFamily;
@@ -1674,6 +1700,11 @@ CGoUniverseButtonAnalyze.prototype.private_HandleMouseDown = function()
 CGoUniverseButtonAnalyze.prototype.private_GetHint = function()
 {
 	return "Analyze the game";
+};
+CGoUniverseButtonAnalyze.prototype.GetMinWidth = function()
+{
+	g_oTextMeasurer.SetFont("20px Times New Roman, Sans serif");
+	return g_oTextMeasurer.Measure(g_oLocalization.gameRoom.button.analyze) + 12;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Панелька с подсчетом очков
@@ -1774,7 +1805,7 @@ CGoUniverseDrawingCountingScores.prototype.private_CreateHeader = function(nTop,
 	oHeaderControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right);
 	this.m_oMainControl.AddControl(oHeaderControl);
 	oHeaderControl.HtmlElement.style.borderBottom  = "1px solid rgb(172, 172, 172)";
-	oDiv.innerHTML        = "Score counting phase";
+	oDiv.innerHTML        = g_oLocalization.gameRoom.countingScores.header;
 	oDiv.style.textAlign  = "center";
 	oDiv.style.fontSize   = "25px";
 	oDiv.style.fontFamily = "'Segoe UI', Tahoma, sans-serif";
@@ -1786,7 +1817,7 @@ CGoUniverseDrawingCountingScores.prototype.private_CreateInfo = function(nTop, n
 	oInfoControl.Anchor = (g_anchor_top | g_anchor_left | g_anchor_right);
 	this.m_oMainControl.AddControl(oInfoControl);
 	var oInfoInnerDiv = document.createElement("div");
-	oInfoInnerDiv.innerHTML         = "Both players now select and agree upon which groups should be considered 'dead' for the purpose of scoring.";
+	oInfoInnerDiv.innerHTML         = g_oLocalization.gameRoom.countingScores.message;
 	oInfoInnerDiv.style.width       = "300px";
 	oInfoInnerDiv.style.display     = "block";
 	oInfoInnerDiv.style.marginLeft  = "auto";
@@ -1805,7 +1836,7 @@ CGoUniverseDrawingCountingScores.prototype.private_CreateAcceptButton = function
 
 	var oButton = document.createElement("div");
 	oButtonDiv.appendChild(oButton);
-	oButton.innerHTML = "Accept";
+	oButton.innerHTML = g_oLocalization.gameRoom.countingScores.buttonAccept;
 	oButton.className = "ButtonGreen";
 	oButton.style.textAlign   = "center";
 	oButton.style.width       = "200px";
@@ -1832,7 +1863,7 @@ CGoUniverseDrawingCountingScores.prototype.private_CreateResumeButton = function
 
 	var oButton = document.createElement("div");
 	oButtonDiv.appendChild(oButton);
-	oButton.innerHTML = "Cancel and resume game";
+	oButton.innerHTML = g_oLocalization.gameRoom.countingScores.buttonResume;
 	oButton.className = "ButtonCommon";
 	oButton.style.textAlign   = "center";
 	oButton.style.width       = "200px";
@@ -1918,11 +1949,11 @@ CDrawingButtonFileMenu.prototype.GoUniverseInitMenuForMatch = function(oGameRoom
 	Common.ClearNode(oMenuElementWrapper);
 
 	var oThis = this;
-	this.private_CreateMenuItem(oMenuElementWrapper, "Add 1 minute", function()
+	this.private_CreateMenuItem(oMenuElementWrapper, g_oLocalization.gameRoom.addMinute1, function()
 	{
 		oGameRoom.AddTimeToOpponent(60);
 	});
-	this.private_CreateMenuItem(oMenuElementWrapper, "Add 5 minutes", function()
+	this.private_CreateMenuItem(oMenuElementWrapper, g_oLocalization.gameRoom.addMinute5, function()
 	{
 		oGameRoom.AddTimeToOpponent(300);
 	});
@@ -1974,7 +2005,7 @@ CGoUniverseDrawingReviewPanel.prototype.private_CreateReviewButton = function(nT
 
 	var oButton = document.createElement("div");
 	oButtonDiv.appendChild(oButton);
-	oButton.innerHTML = "Start review";
+	oButton.innerHTML = g_oLocalization.gameRoom.startReview;
 	oButton.className = "ButtonGreen";
 	oButton.style.textAlign   = "center";
 	oButton.style.width       = "200px";

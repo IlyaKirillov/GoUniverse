@@ -102,7 +102,38 @@ var g_oLocalization_ruRU = {
 
 	gameRoom : {
 
+		gameStart : "Начало партии",
+		gameOver  : "Партия закончена",
+		move      : "Ход",
+		pass      : "Пас",
+		points    : "Очки",
+		captures  : "Пленники",
+		blackToPlay : "Ход черных",
+		whiteToPlay : "Ход белых",
 
+		backToGame       : "Вернуться к партии",
+		removeOwnChanges : "Удалить свои изменения",
+		returnControl    : "Вернуть контроль",
+
+		addMinute1 : "Добавить 1 минуту",
+		addMinute5 : "Добавить 5 минут",
+
+		startReview : "Начать разбор",
+
+		button : {
+			undo   : "Ход назад",
+			resign : "Сдаться",
+			pass   : "Пас",
+			analyze : "Анализировать"
+		},
+
+		countingScores : {
+			header  : "Стадия подсчета очков",
+			message : "Оба игрока сейчас выбирают и соглашаются какие группы считаются пленными, с целью подсчета очков.",
+
+			buttonAccept : "Согласиться",
+			buttonResume : "Отменить и продолжить партию"
+		}
 	},
 
 	common : {

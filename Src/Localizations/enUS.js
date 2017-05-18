@@ -99,6 +99,44 @@ var g_oLocalization_enUS = {
 
 	},
 
+	gameRoom : {
+
+		gameStart : "Game start",
+		gameOver  : "Game over",
+		move      : "Move",
+		pass      : "Pass",
+
+		points   : "Points",
+		captures : "Captures",
+
+		blackToPlay : "Black to play",
+		whiteToPlay : "White to play",
+
+		backToGame       : "Back to game",
+		removeOwnChanges : "Remove own changes",
+		returnControl    : "Return control",
+
+		addMinute1 : "Add 1 minute",
+		addMinute5 : "Add 5 minutes",
+
+		startReview : "Start review",
+
+		button : {
+			undo   : "Undo",
+			resign : "Resign",
+			pass   : "Pass",
+			analyze : "Analyze"
+		},
+
+		countingScores : {
+			header : "Score counting phase",
+			message : "Both players now select and agree upon which groups should be considered 'dead' for the purpose of scoring.",
+
+			buttonAccept : "Accept",
+			buttonResume : "Cancel and resume the game"
+		}
+	},
+
 	common : {
 
 		gameResult : {
@@ -112,6 +150,7 @@ var g_oLocalization_enUS = {
 		white      : "White",
 		shortBlack : "B",
 		shortWhite : "W",
+
 
 		button : {
 			ok     : "OK",
