@@ -301,7 +301,7 @@ var g_oLocalization_ruRU = {
 				fieldRealName     : "Настоящее имя",
 				fieldRank         : "Рейтинг",
 				fieldLastOn       : "Последнее посещение",
-				fieldRegisteredOn : "Зарегестрирован",
+				fieldRegisteredOn : "Зарегистрирован",
 				fieldLocale       : "Язык",
 				fieldEmail        : "Эл. адрес",
 				fieldGames        : "Статистика",
