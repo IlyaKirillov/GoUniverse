@@ -157,15 +157,6 @@ var g_oLocalization_ruRU = {
 				showKifu       : "Показвать кифу партии",
 				toggleKifuMode : "Переключить режим кифу"
 
-			},
-
-			toolbarCustomization : {
-				mainNavigation : "Основная навигация",
-				treeNavigation : "Навигация по вариантам",
-				generalToolbar : "Общая панель инструментов",
-				autoplay       : "Автопроигрывание",
-				timelinePanel  : "Слайдер по ходам",
-				kifuMode       : "Режим кифу"
 			}
 		},
 
@@ -175,6 +166,15 @@ var g_oLocalization_ruRU = {
 
 			buttonAccept : "Согласиться",
 			buttonResume : "Отменить и продолжить партию"
+		},
+
+		toolbarCustomization : {
+			mainNavigation : "Основная навигация",
+			treeNavigation : "Навигация по вариантам",
+			generalToolbar : "Общая панель инструментов",
+			autoplay       : "Автопроигрывание",
+			timelinePanel  : "Слайдер по ходам",
+			kifuMode       : "Режим кифу"
 		},
 
 		menu : {
@@ -189,7 +189,8 @@ var g_oLocalization_ruRU = {
 			toggleCoordinates     : "Переключатель координат",
 			createNew             : "Создать",
 			loadFile              : "Загрузить с диска",
-			loadFileFromClipboard : "Загрузить из буфера"
+			loadFileFromClipboard : "Загрузить из буфера",
+			gameInfo              : "Информация о партии"
 		}
 	},
 

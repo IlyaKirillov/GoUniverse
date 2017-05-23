@@ -157,17 +157,7 @@ var g_oLocalization_enUS = {
 
 				showKifu       : "Show kifu",
 				toggleKifuMode : "Toggle kifu mode"
-			},
-
-			toolbarCustomization : {
-				mainNavigation : "Main navigation",
-				treeNavigation : "Tree navigation",
-				generalToolbar : "General toolbar",
-				autoplay       : "Autoplay",
-				timelinePanel  : "Timeline panel",
-				kifuMode       : "Kifu mode"
 			}
-
 		},
 
 		countingScores : {
@@ -176,6 +166,15 @@ var g_oLocalization_enUS = {
 
 			buttonAccept : "Accept",
 			buttonResume : "Cancel and resume the game"
+		},
+
+		toolbarCustomization : {
+			mainNavigation : "Main navigation",
+			treeNavigation : "Tree navigation",
+			generalToolbar : "General toolbar",
+			autoplay       : "Autoplay",
+			timelinePanel  : "Timeline panel",
+			kifuMode       : "Kifu mode"
 		},
 
 		menu : {
@@ -190,7 +189,8 @@ var g_oLocalization_enUS = {
 			toggleCoordinates     : "Toggle coordinates",
 			createNew             : "Create new",
 			loadFile              : "Load from disk",
-			loadFileFromClipboard : "Load from clipboard"
+			loadFileFromClipboard : "Load from clipboard",
+			gameInfo              : "Game info"
 		}
 	},
 
