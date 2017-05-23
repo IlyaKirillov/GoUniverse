@@ -154,7 +154,7 @@ var g_oLocalization_ruRU = {
 
 				gameInfo : "Информация о партии",
 
-				showKifu       : "Показвать кифу партии",
+				showKifu       : "Показать кифу партии",
 				toggleKifuMode : "Переключить режим кифу"
 
 			}
