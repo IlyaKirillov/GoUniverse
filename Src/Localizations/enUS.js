@@ -115,6 +115,7 @@ var g_oLocalization_enUS = {
 		backToGame       : "Back to game",
 		removeOwnChanges : "Remove own changes",
 		returnControl    : "Return control",
+		editorControl    : "Editor control",
 
 		addMinute1 : "Add 1 minute",
 		addMinute5 : "Add 5 minutes",
@@ -122,10 +123,51 @@ var g_oLocalization_enUS = {
 		startReview : "Start review",
 
 		button : {
-			undo   : "Undo",
-			resign : "Resign",
-			pass   : "Pass",
-			analyze : "Analyze"
+			undo    : "Undo",
+			resign  : "Resign",
+			pass    : "Pass",
+			analyze : "Analyze",
+
+			hint : {
+				forward1      : "Forward",
+				forward5      : "Forward 5 moves",
+				forwardEnd    : "Go to the end",
+				backward1     : "Back",
+				backward5     : "Back 5 moves",
+				backwardStart : "Back to the start",
+				nextVariant   : "Next variant",
+				prevVariant   : "Previous variant",
+
+				editMode          : "Select edit mode",
+				editModeMoves     : "Moves",
+				editModeScores    : "Counting scores",
+				editModeEditor    : "Editor",
+				editModeTriangles : "Triangles",
+				editModeSquares   : "Squares",
+				editModeCircles   : "Circles",
+				editModeXMarks    : "X marks",
+				editModeText      : "Text labels",
+				editModeNumbers   : "Numeric labels",
+				editModeColors    : "Color marks",
+
+				startAutoplay : "Start autoplay",
+				stopAutoplay  : "Stop autoplay",
+
+				gameInfo : "Game info",
+
+				showKifu       : "Show kifu",
+				toggleKifuMode : "Toggle kifu mode"
+			},
+
+			toolbarCustomization : {
+				mainNavigation : "Main navigation",
+				treeNavigation : "Tree navigation",
+				generalToolbar : "General toolbar",
+				autoplay       : "Autoplay",
+				timelinePanel  : "Timeline panel",
+				kifuMode       : "Kifu mode"
+			}
+
 		},
 
 		countingScores : {
@@ -134,6 +176,21 @@ var g_oLocalization_enUS = {
 
 			buttonAccept : "Accept",
 			buttonResume : "Cancel and resume the game"
+		},
+
+		menu : {
+
+			hint : "Menu",
+
+			downloadSGF           : "Download as SGF",
+			createSnapshot        : "Create snapshot",
+			exportToGif           : "Export to GIF",
+			convertToASCIIDiagram : "Convert to ASCII diagram",
+			scoreEstimator        : "Score estimator",
+			toggleCoordinates     : "Toggle coordinates",
+			createNew             : "Create new",
+			loadFile              : "Load from disk",
+			loadFileFromClipboard : "Load from clipboard"
 		}
 	},
 

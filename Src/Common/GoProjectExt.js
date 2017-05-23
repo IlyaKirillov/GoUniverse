@@ -1439,7 +1439,7 @@ CGoUniverseButtonEditorControl.prototype.private_HandleMouseDown = function()
 };
 CGoUniverseButtonEditorControl.prototype.private_GetHint = function()
 {
-	return "Editor control";
+	return g_oLocalization.gameRoom.editorControl;
 };
 CGoUniverseButtonEditorControl.prototype.Show_Menu = function()
 {

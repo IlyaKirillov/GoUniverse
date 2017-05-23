@@ -114,6 +114,7 @@ var g_oLocalization_ruRU = {
 		backToGame       : "Вернуться к партии",
 		removeOwnChanges : "Удалить свои изменения",
 		returnControl    : "Вернуть контроль",
+		editorControl    : "Управление редактором",
 
 		addMinute1 : "Добавить 1 минуту",
 		addMinute5 : "Добавить 5 минут",
@@ -121,10 +122,51 @@ var g_oLocalization_ruRU = {
 		startReview : "Начать разбор",
 
 		button : {
-			undo   : "Ход назад",
-			resign : "Сдаться",
-			pass   : "Пас",
-			analyze : "Анализировать"
+			undo    : "Ход назад",
+			resign  : "Сдаться",
+			pass    : "Пас",
+			analyze : "Анализировать",
+
+			hint : {
+				forward1      : "Вперед",
+				forward5      : "Вперед на 5 ходов",
+				forwardEnd    : "В конец",
+				backward1     : "Назад",
+				backward5     : "Назад на 5 ходов",
+				backwardStart : "В начало",
+				nextVariant   : "Следующий вариант",
+				prevVariant   : "Предыдущий вариант",
+
+				editMode          : "Выберите режим редактирования",
+				editModeMoves     : "Ходы",
+				editModeScores    : "Подсчет очков",
+				editModeEditor    : "Добавление/удаление камней",
+				editModeTriangles : "Треугольники",
+				editModeSquares   : "Квадраты",
+				editModeCircles   : "Окружности",
+				editModeXMarks    : "Крестики",
+				editModeText      : "Текстовые метки",
+				editModeNumbers   : "Числовые метки",
+				editModeColors    : "Цветные метки",
+
+				startAutoplay : "Начать автопроигрывание",
+				stopAutoplay  : "Остановить автопроигрывание",
+
+				gameInfo : "Информация о партии",
+
+				showKifu       : "Показвать кифу партии",
+				toggleKifuMode : "Переключить режим кифу"
+
+			},
+
+			toolbarCustomization : {
+				mainNavigation : "Основная навигация",
+				treeNavigation : "Навигация по вариантам",
+				generalToolbar : "Общая панель инструментов",
+				autoplay       : "Автопроигрывание",
+				timelinePanel  : "Слайдер по ходам",
+				kifuMode       : "Режим кифу"
+			}
 		},
 
 		countingScores : {
@@ -133,6 +175,21 @@ var g_oLocalization_ruRU = {
 
 			buttonAccept : "Согласиться",
 			buttonResume : "Отменить и продолжить партию"
+		},
+
+		menu : {
+
+			hint : "Меню",
+
+			downloadSGF           : "Скачать SGF",
+			createSnapshot        : "Сделать снимок доски",
+			exportToGif           : "Экспортировать в GIF",
+			convertToASCIIDiagram : "Сконвертировать в ASCII-диаграмму",
+			scoreEstimator        : "Оценка счета",
+			toggleCoordinates     : "Переключатель координат",
+			createNew             : "Создать",
+			loadFile              : "Загрузить с диска",
+			loadFileFromClipboard : "Загрузить из буфера"
 		}
 	},
 
