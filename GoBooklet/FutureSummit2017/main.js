@@ -7,27 +7,99 @@
 
 window.onload = OnDocumentReady;
 
+var oGame1 = null;
+var oGame2 = null;
+var oGame3 = null;
+var oGame4 = null;
+var oGame5 = null;
+
 function OnDocumentReady()
 {
-	$('#flipbook').turn({gradients: true});
+	$('#booklet').turn({gradients: true, height : 582, width : 920});
+	$('#booklet').turn("resize");
 
-
-	var oGame1 = GoBoardApi.Embed("bookGame1", {
-		boardMode  : "viewer",
-		width      : 500,
-		boardTheme : "BookStyle",
-		sgfData    : "(;GM[1]FF[4]CA[UTF-8]AP[WebGoBoard:0.10.6]RU[Chinese]SZ[19]KM[7.5]HA[0]TM[7200]OT[3x60 byo-yomi]RE[W+R]GN[AlphaGo vs. Ke Jie Game 1]DT[2016-03-09]PB[Lee Sedol]BR[9p]PW[AlphaGo]WR[9p]EV[Deepmind Challenge Match]RO[1]PC[Four Season Hotel, Seoul  , Korea]SO[gokifu.com]US[The fabulous Toe];B[qd];W[dd];B[pq];W[dp];B[fc];W[cf];B[ql];W[od];B[ld];W[qc];B[rc];W[pc];B[re];W[of];B[pg];W[og];B[ph];W[id];B[lf];W[oh];B[pi];W[lh];B[kh];W[ke];B[le];W[lg];B[kg];W[kf];B[ne];W[oe];B[jc];W[ic];B[jd];W[ie];B[je];W[jf];B[if];W[jg];B[li];W[mi];B[hf];W[ih];B[mb];W[gd];B[ki];W[mj];B[kk];W[ib];B[ob];W[ml];B[lm];W[nc];B[nb];W[kb];B[lc];W[mm];B[ln];W[kl];B[ll];W[lk];B[jj];W[jl];B[hj];W[hi];B[gj];W[gf];B[ii];W[jh];B[ij];W[mn];B[lo];W[mo];B[lp];W[mp];B[lq];W[mq];B[im];W[qo];B[fq];W[gg];B[cn];W[dn];B[dm];W[fp];B[gp];W[gq];B[fr];W[co];B[en];W[do];B[ep];W[cm];B[dl];W[lr];B[kr];W[rb];B[jb];W[ja];B[mf];W[mh];B[nd];W[qj];B[pj];W[qk];B[pl];W[pk];B[ok];W[rh];B[rl];W[qf];B[ri];W[rf];B[pf];W[qe];B[qh];W[cc];B[bn];W[bm];B[bl];W[bo];B[rg];W[mr];B[po];W[jr];B[kq];W[pn];B[oo];W[qp];B[on];W[pp];B[op];W[qq];B[or];W[pr];B[oq];W[pd];B[qr];W[rr];B[ps];W[rs];B[rn];W[ro];B[qn];W[so];B[cl];W[an];B[ks];W[om];B[ol];W[ci];B[dr];W[dj];B[hh];W[hg];B[bq];W[cq];B[cr];W[bp];B[dq];W[br];B[cp];W[ap];B[ek];W[fi];B[bj];W[bi];B[pb];W[qb];B[sf];W[rd];B[ai];W[ah];B[aj];W[bh];B[gi];W[fj];B[fk];W[oc];B[mc];W[nm];B[pm];W[cj];B[al];W[aq];B[gh];W[fh])"
+	$("#booklet").bind("turned", function(event, page, view)
+	{
+		if (!oGame1 && (6 === page || 7 === page))
+		{
+			oGame1 = GoBoardApi.Embed("bookGame1", {
+				boardMode  : "viewer",
+				width      : 440,
+				boardTheme : "BookStyle",
+				sgfData    : "(;GM[1]FF[4]CA[UTF-8]AP[WebGoBoard:0.10.6]RU[Japanese]SZ[19]KM[6.5]HA[0]TM[2h]RE[W+0.5]DT[2017-05-23]PB[Ke Jie]BR[9p]PW[AlphaGo]EV[Future of Go Summit, Ke Jie9p VS AlphaGo, 1st game]PC[China];B[qd];W[pp];B[cc];W[cp];B[nc];W[fp];B[qq];W[pq];B[qp];W[qn];B[qo];W[po];B[rn];W[qr];B[rr];W[rm];B[pr];W[or];B[pn];W[qm];B[qs];W[on];B[dj];W[nk];B[ph];W[ch];B[cf];W[eh];B[ci];W[de];B[df];W[dc];B[cd];W[dd];B[ef];W[di];B[ei];W[dh];B[cj];W[ce];B[be];W[bf];B[bg];W[bd];B[af];W[bc];B[fi];W[cm];B[hq];W[ek];B[fh];W[gq];B[hp];W[ej];B[eq];W[gr];B[cq];W[dp];B[dq];W[ep];B[bp];W[bh];B[ah];W[bo];B[bq];W[fg];B[gg];W[kp];B[ko];W[jo];B[jn];W[in];B[jp];W[io];B[lp];W[kq];B[lq];W[kr];B[lr];W[ir];B[kn];W[il];B[oq];W[pf];B[nh];W[rf];B[od];W[qi];B[qg];W[rd];B[qf];W[qe];B[pe];W[re];B[qc];W[rg];B[kh];W[ic];B[gc];W[kc];B[jd];W[id];B[ge];W[hb];B[gb];W[jf];B[je];W[ie];B[ld];W[hg];B[eg];W[lc];B[le];W[hf];B[qh];W[rh];B[pi];W[qj];B[gk];W[fd];B[gd];W[lf];B[mf];W[lg];B[gm];W[gn];B[fn];W[go];B[dl];W[mo];B[oo];W[pm];B[op];W[mg];B[nf];W[lo];B[nn];W[lm];B[pn];W[dk];B[ck];W[cl];B[el];W[bk];B[bi];W[li];B[ii];W[ds];B[dr];W[hi];B[ik];W[jk];B[ij];W[md];B[mc];W[ke];B[me];W[kd];B[om];W[ls];B[ms];W[ks];B[nr];W[ng];B[og];W[es];B[cs];W[fr];B[er];W[fs];B[bs];W[hl];B[pl];W[ql];B[rc];W[ro];B[rp];W[sn];B[hm];W[im];B[kk];W[kj];B[lk];W[jl];B[mj];W[mi];B[nj];W[pk];B[fm];W[cn];B[ol];W[ok];B[ni];W[ih];B[ji];W[mb];B[nb];W[lb];B[fe];W[cb];B[mp];W[mm];B[eb];W[na];B[oa];W[ma];B[qb];W[bj];B[ai];W[aj];B[ag];W[gl];B[fk];W[bl];B[kg];W[kf];B[ib];W[jb];B[ga];W[ha];B[ed];W[ec];B[fc];W[gf];B[ff];W[gj];B[hk];W[hh];B[fj];W[no];B[fq];W[hr];B[kl];W[km];B[mn];W[ln];B[nl];W[db];B[da];W[ca];B[ea];W[np];B[nq];W[oj];B[oi];W[en];B[em];W[eo];B[dm];W[dn];B[sp];W[so];B[hn];W[ho];B[hc];W[ia];B[ao];W[an];B[ap];W[sc];B[sb];W[sd];B[jg];W[ad];B[gh];W[ae];B[ee];W[ml];B[mk];W[pj];B[bf];W[nm];B[on];W[he];B[ig];W[ki];B[jh];W[fl];B[jj];W[fo];B[hj];W[gi];B[ll];W[jm];B[lh];W[mh];B[lj];W[if];B[hd])",
+				booklet    : true
+			});
+			GoBoardApi.Set_ShowTarget(oGame1, false);
+			GoBoardApi.Update_Size(oGame1);
+		}
 	});
-	GoBoardApi.Set_ShowTarget(oGame1, false);
 
-
-	$("#flipbook").turn("resize");
-
-	GoBoardApi.Update_Size(oGame1);
-
-	// $("#flipbook").bind("turning", function(event, page, view)
-	// {
-	// 	GoBoardApi.Update_Size(oGame1);
-	// });
-
+	document.getElementById("contentsAboutId").addEventListener("click", function()
+	{
+		$("#booklet").turn("page", 4);
+	}, false);
+	document.getElementById("contentsMatchesId").addEventListener("click", function()
+	{
+		$("#booklet").turn("page", 4);
+	}, false);
+	document.getElementById("contentsGame1Id").addEventListener("click", function()
+	{
+		$("#booklet").turn("page", 6);
+	}, false);
+	document.getElementById("contentsGame2Id").addEventListener("click", function()
+	{
+		$("#booklet").turn("page", 8);
+	}, false);
+	document.getElementById("contentsGame3Id").addEventListener("click", function()
+	{
+		$("#booklet").turn("page", 10);
+	}, false);
+	document.getElementById("contentsGame4Id").addEventListener("click", function()
+	{
+		$("#booklet").turn("page", 12);
+	}, false);
+	document.getElementById("contentsGame5Id").addEventListener("click", function()
+	{
+		$("#booklet").turn("page", 14);
+	}, false);
+	document.getElementById("contentsParticipantsId").addEventListener("click", function()
+	{
+		$("#booklet").turn("page", 16);
+	}, false);
+	document.getElementById("contentsAlphaGoId").addEventListener("click", function()
+	{
+		$("#booklet").turn("page", 18);
+	}, false);
+	document.getElementById("contentsKeJieId").addEventListener("click", function()
+	{
+		$("#booklet").turn("page", 18);
+	}, false);
+	document.getElementById("contentsGuLiId").addEventListener("click", function()
+	{
+		$("#booklet").turn("page", 20);
+	}, false);
+	document.getElementById("contentsLianXiaoId").addEventListener("click", function()
+	{
+		$("#booklet").turn("page", 20);
+	}, false);
+	document.getElementById("contentsChenYaoyeId").addEventListener("click", function()
+	{
+		$("#booklet").turn("page", 22);
+	}, false);
+	document.getElementById("contentsZhouRuiyangId").addEventListener("click", function()
+	{
+		$("#booklet").turn("page", 22);
+	}, false);
+	document.getElementById("contentsMiYutingId").addEventListener("click", function()
+	{
+		$("#booklet").turn("page", 24);
+	}, false);
+	document.getElementById("contentsShiYueId").addEventListener("click", function()
+	{
+		$("#booklet").turn("page", 24);
+	}, false);
+	document.getElementById("contentsTangWeixingId").addEventListener("click", function()
+	{
+		$("#booklet").turn("page", 26);
+	}, false);
 }

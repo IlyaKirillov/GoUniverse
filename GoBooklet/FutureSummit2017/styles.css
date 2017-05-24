@@ -1,38 +1,51 @@
 .bookPage {
-	background : white;
-	width      : 500px;
-	height     : 400px;
+	width      : 460px;
+	height     : 582px;
+}
 
-	border : 1px solid silver;
+.oddPage {
+	background : url(files/pages.png);
+}
+
+.evenPage {
+	background : url(files/pages.png);
+	background-position-x: -460px;
 }
 
 .bookCover {
 	background : rgb(32, 77, 123);
-	width      : 500px;
-	height     : 400px;
-}
-
-.bookPageOdd {
-	box-shadow: rgba(0, 0, 0, 0) 0px 0px 20px;
+	width      : 460px;
+	height     : 582px;
 }
 
 .contentsHeading1 {
-	font-weight: bold;
-	font-size: 24px;
-	width:100%;
-	text-align: center;
+	font-weight : bold;
+	font-size   : 24px;
+	width       : 100%;
+	text-align  : center;
 }
 
 .contentsHeading2 {
-	padding-left: 20px;
-	font-weight: bold;
-	font-size: 20px;
+	padding-left : 20px;
+	font-weight  : bold;
+	font-size    : 20px;
+	cursor       : pointer;
+}
+
+.contentsHeading2:hover {
+	text-decoration : underline;
 }
 
 .contentsNormal {
-	padding-left: 30px;
-	font-size: 16px;
+	padding-left : 30px;
+	font-size    : 16px;
+	cursor       : pointer;
 }
+
+.contentsNormal:hover {
+	text-decoration : underline;
+}
+
 
 .contentsPageNumber {
 	padding-right:10px;
@@ -43,7 +56,7 @@
 .oddPageNumber {
 	position    : absolute;
 	left        : 10px;
-	top         : 570px;
+	top         : 552px;
 	width       : 20px;
 	height      : 20px;
 	line-height : 20px;
@@ -55,11 +68,71 @@
 .evenPageNumber {
 	position    : absolute;
 	right       : 10px;
-	top         : 570px;
+	top         : 552px;
 	width       : 20px;
 	height      : 20px;
 	line-height : 20px;
 	text-align  : center;
 	font-size   : 12px;
 	color       : silver;
+}
+
+.gameHeader1 {
+	font-size   : 20px;
+	margin-top  : 100px;
+	font-weight : bold;
+	width       : 100%;
+	text-align  : center;
+}
+
+.gameHeader2 {
+	font-size  : 14px;
+	margin-top : 5px;
+	width      : 100%;
+	text-align : center;
+}
+
+table.gameDescription {
+	padding-right : 35px;
+	padding-left  : 35px;
+	margin-top    : 50px;
+}
+
+.gameDescriptionFieldName {
+	font-size   : 16px;
+	font-weight : bold;
+	text-align  : left;
+}
+.gameDescriptionFieldValue {
+	font-size   : 16px;
+	text-align  : left;
+}
+
+.waitingGame {
+	line-height : 582px;
+	height      : 582px;
+	font-size   : 25px;
+	width       : 100%;
+	text-align  : center;
+}
+
+.participantImg {
+	padding-left   : 35px;
+	padding-top    : 35px;
+	padding-right  : 10px;
+	padding-bottom : 10px;
+	float          : left;
+}
+
+.participantHeading {
+	font-weight : bold;
+	font-size   : 40px;
+	width       : 100%;
+	margin-top  : 100px;
+}
+
+.participantText {
+	font-size     : 16px;
+	padding-left  : 35px;
+	padding-right : 35px;
 }

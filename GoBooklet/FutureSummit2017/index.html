@@ -49,10 +49,13 @@
 	<link rel="stylesheet" type="text/css" href="styles.css">
 
 </head>
-<body style="margin: 0px; padding: 0px;width: 1000px; height: 600px;">
+<body style="margin: 0px; padding: 0px;">
 <div id="bookWrapper"
-	 style="position:absolute; top: 0px; left : 0px;width: 1000px; height: 600px; overflow: hidden; font-family: 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif;">
-	<div id="flipbook">
+	 style="position:absolute; top: 0px; left : 0px;width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif;
+display: flex;
+  justify-content: center;
+  align-items: center; ">
+	<div id="booklet">
 		<div class="bookCover hard">
 			<div style="color:white;font-size: 35px; width:100%; text-align: center;margin-top: 250px;">
 				The Future of Go Summit
@@ -63,14 +66,14 @@
 		</div>
 		<div class="bookCover hard"></div>
 
-		<div class="bookPage">
+		<div class="bookPage evenPage">
 			<div class="contentsHeading1" style="margin-top: 70px;">
 				Contents
 			</div>
 			<table style="width:100%">
 				<tr>
 					<td>
-						<div class="contentsHeading2">
+						<div id="contentsAboutId" class="contentsHeading2">
 							About summit
 						</div>
 					</td>
@@ -82,7 +85,7 @@
 				</tr>
 				<tr>
 					<td>
-						<div class="contentsHeading2">
+						<div id="contentsMatchesId" class="contentsHeading2">
 							Matches
 						</div>
 					</td>
@@ -92,10 +95,9 @@
 						</div>
 					</td>
 				</tr>
-
 				<tr>
 					<td>
-						<div class="contentsNormal">
+						<div id="contentsGame1Id" class="contentsNormal">
 							AlphaGo vs. Ke Jie Game 1
 						</div>
 					</td>
@@ -105,24 +107,10 @@
 						</div>
 					</td>
 				</tr>
-
 				<tr>
 					<td>
-						<div class="contentsNormal">
+						<div id="contentsGame2Id" class="contentsNormal">
 							AlphaGo vs. Ke Jie Game 2
-						</div>
-					</td>
-					<td>
-						<div class="contentsPageNumber">
-							6
-						</div>
-					</td>
-				</tr>
-
-				<tr>
-					<td>
-						<div class="contentsNormal">
-							Gu Li,AlphaGo vs. Lian Xiao,AlphaGo
 						</div>
 					</td>
 					<td>
@@ -131,24 +119,10 @@
 						</div>
 					</td>
 				</tr>
-
 				<tr>
 					<td>
-						<div class="contentsNormal">
-							Team tournament game
-						</div>
-					</td>
-					<td>
-						<div class="contentsPageNumber">
-							8
-						</div>
-					</td>
-				</tr>
-
-				<tr>
-					<td>
-						<div class="contentsNormal">
-							AlphaGo vs. Ke Jie Game 3
+						<div id="contentsGame3Id" class="contentsNormal">
+							Gu Li,AlphaGo vs. Lian Xiao,AlphaGo
 						</div>
 					</td>
 					<td>
@@ -157,24 +131,10 @@
 						</div>
 					</td>
 				</tr>
-
 				<tr>
 					<td>
-						<div class="contentsHeading2">
-							Players
-						</div>
-					</td>
-					<td>
-						<div class="contentsPageNumber">
-							10
-						</div>
-					</td>
-				</tr>
-
-				<tr>
-					<td>
-						<div class="contentsNormal">
-							AlphaGo
+						<div id="contentsGame4Id" class="contentsNormal">
+							Team tournament game
 						</div>
 					</td>
 					<td>
@@ -183,24 +143,10 @@
 						</div>
 					</td>
 				</tr>
-
 				<tr>
 					<td>
-						<div class="contentsNormal">
-							Ke Jie
-						</div>
-					</td>
-					<td>
-						<div class="contentsPageNumber">
-							12
-						</div>
-					</td>
-				</tr>
-
-				<tr>
-					<td>
-						<div class="contentsNormal">
-							Gu Li
+						<div id="contentsGame5Id" class="contentsNormal">
+							AlphaGo vs. Ke Jie Game 3
 						</div>
 					</td>
 					<td>
@@ -211,33 +157,8 @@
 				</tr>
 				<tr>
 					<td>
-						<div class="contentsNormal">
-							Lian Xiao
-						</div>
-					</td>
-					<td>
-						<div class="contentsPageNumber">
-							14
-						</div>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<div class="contentsNormal">
-							Chen Yaoye
-						</div>
-					</td>
-					<td>
-						<div class="contentsPageNumber">
-							15
-						</div>
-					</td>
-				</tr>
-
-				<tr>
-					<td>
-						<div class="contentsNormal">
-							Zhou Ruiyang
+						<div id="contentsParticipantsId" class="contentsHeading2">
+                            Participants
 						</div>
 					</td>
 					<td>
@@ -246,11 +167,10 @@
 						</div>
 					</td>
 				</tr>
-
 				<tr>
 					<td>
-						<div class="contentsNormal">
-							Mi Yuting
+						<div id="contentsAlphaGoId" class="contentsNormal">
+							AlphaGo
 						</div>
 					</td>
 					<td>
@@ -259,12 +179,10 @@
 						</div>
 					</td>
 				</tr>
-
-
 				<tr>
 					<td>
-						<div class="contentsNormal">
-							Shi Yue
+						<div id="contentsKeJieId" class="contentsNormal">
+							Ke Jie
 						</div>
 					</td>
 					<td>
@@ -273,20 +191,90 @@
 						</div>
 					</td>
 				</tr>
-
 				<tr>
 					<td>
-						<div class="contentsNormal">
+						<div id="contentsGuLiId" class="contentsNormal">
+							Gu Li
+						</div>
+					</td>
+					<td>
+						<div class="contentsPageNumber">
+							19
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<div id="contentsLianXiaoId" class="contentsNormal">
+							Lian Xiao
+						</div>
+					</td>
+					<td>
+						<div class="contentsPageNumber">
+							20
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<div id="contentsChenYaoyeId" class="contentsNormal">
+							Chen Yaoye
+						</div>
+					</td>
+					<td>
+						<div class="contentsPageNumber">
+							21
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<div id="contentsZhouRuiyangId" class="contentsNormal">
+							Zhou Ruiyang
+						</div>
+					</td>
+					<td>
+						<div class="contentsPageNumber">
+							22
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<div id="contentsMiYutingId" class="contentsNormal">
+							Mi Yuting
+						</div>
+					</td>
+					<td>
+						<div class="contentsPageNumber">
+							23
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<div id="contentsShiYueId" class="contentsNormal">
+							Shi Yue
+						</div>
+					</td>
+					<td>
+						<div class="contentsPageNumber">
+							24
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<div id="contentsTangWeixingId" class="contentsNormal">
 							Tang Weixing
 						</div>
 					</td>
 					<td>
 						<div class="contentsPageNumber" align="right">
-							19
+							25
 						</div>
 					</td>
 				</tr>
-
 			</table>
 
 
@@ -295,11 +283,11 @@
 			</div>
 
 		</div>
-		<div class="bookPage" style="font-size:14px;">
-			<div style="font-size:20px;margin-top: 70px; font-weight: bold; width:100%; text-align: center;">
+		<div class="bookPage oddPage" style="font-size:14px;">
+			<div style="font-size:20px;margin-top: 100px; font-weight: bold; width:100%; text-align: center;">
 				About summit
 			</div>
-			<div style="font-size:16px; margin-left: 20px; margin-right: 20px;">
+			<div style="font-size:16px; margin-left: 35px; margin-right: 35px;">
 				The Future of Go Summit will be held by Chinese Go Association, Sport Bureau of
 				Zhejiang Province and Google in Wuzhen, Zhejiang, which is the permanent host place of the World
 				Internet Conference, in May 2017, featuring five Go games involving AlphaGo and top Chinese Go players,
@@ -310,8 +298,8 @@
 				3
 			</div>
 		</div>
-		<div class="bookPage sheet">
-			<div class="heading1" style="line-height: 600px; height:600px; font-weight: bold; font-size:40px; width:100%; text-align: center;">
+		<div class="bookPage evenPage">
+			<div class="waitingGame" style="font-weight: bold;">
 				Matches
 			</div>
 
@@ -319,68 +307,365 @@
 				4
 			</div>
 		</div>
-		<div class="bookPage sheet">
-			<div id="bookGame1" style="position: relative; top:10px; left:0px; width:500px; height:561px;">
+
+		<div class="bookPage oddPage">
+			<div class="gameHeader1">
+				Match AlphaGo vs. Ke Jie
 			</div>
+			<div class="gameHeader2">
+				Game 1
+			</div>
+			<div class="gameHeader2">
+				23 may 2017
+			</div>
+
+			<table class="gameDescription">
+				<tr>
+					<td>
+						<div class="gameDescriptionFieldName">
+							White
+						</div>
+					</td>
+					<td>
+						<div class="gameDescriptionFieldValue">
+							AlphaGo
+						</div>
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+						<div class="gameDescriptionFieldName">
+							Black
+						</div>
+					</td>
+					<td>
+						<div class="gameDescriptionFieldValue">
+							Ke Jie
+						</div>
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+						<div class="gameDescriptionFieldName">
+							Result
+						</div>
+					</td>
+					<td>
+						<div class="gameDescriptionFieldValue">
+							AlphaGo won by half a point after 289 moves
+						</div>
+					</td>
+				</tr>
+
+
+			</table>
+
 			<div class="oddPageNumber">
 				5
 			</div>
 		</div>
-
-		<div class="bookPage sheet">
-			<div class="heading1" style="line-height: 600px; height:600px; font-size:25px; width:100%; text-align: center;">
-				The game will be played on May 25
-			</div>
-
+		<div class="bookPage evenPage">
+			<div id="bookGame1" style="position: relative; top:20px; left:20px;"></div>
 			<div class="evenPageNumber">
 				6
 			</div>
 		</div>
-		<div class="bookPage sheet">
-			<div class="heading1" style="line-height: 600px; height:600px; font-size:25px; width:100%; text-align: center;">
-				The game will be played on May 26
-			</div>
 
-			<div class="oddPageNumber">
-				7
-			</div>
-		</div>
-		<div class="bookPage sheet">
-			<div class="heading1" style="line-height: 600px; height:600px; font-size:25px; width:100%; text-align: center;">
-				The game will be played on May 26
-			</div>
+        <div class="bookPage oddPage">
+            <div class="gameHeader1">
+                Match AlphaGo vs. Ke Jie
+            </div>
+            <div class="gameHeader2">
+                Game 2
+            </div>
+            <div class="gameHeader2">
+                25 may 2017
+            </div>
 
-			<div class="evenPageNumber">
-				8
-			</div>
-		</div>
+            <table class="gameDescription">
+                <tr>
+                    <td>
+                        <div class="gameDescriptionFieldName">
+                            White
+                        </div>
+                    </td>
+                    <td>
+                        <div class="gameDescriptionFieldValue">
+                            Ke Jie
+                        </div>
+                    </td>
+                </tr>
 
-		<div class="bookPage sheet">
-			<div class="heading1" style="line-height: 600px; height:600px; font-size:25px; width:100%; text-align: center;">
-				The game will be played on May 27
-			</div>
+                <tr>
+                    <td>
+                        <div class="gameDescriptionFieldName">
+                            Black
+                        </div>
+                    </td>
+                    <td>
+                        <div class="gameDescriptionFieldValue">
+                            AlphaGo
+                        </div>
+                    </td>
+                </tr>
 
-			<div class="oddPageNumber">
-				9
-			</div>
-		</div>
+                <!--<tr>-->
+                    <!--<td>-->
+                        <!--<div class="gameDescriptionFieldName">-->
+                            <!--Result-->
+                        <!--</div>-->
+                    <!--</td>-->
+                    <!--<td>-->
+                        <!--<div class="gameDescriptionFieldValue">-->
 
-		<div class="bookPage sheet">
-			<div class="heading1" style="line-height: 600px; height:600px; font-weight: bold; font-size:40px; width:100%; text-align: center;">
-				Players
-			</div>
+                        <!--</div>-->
+                    <!--</td>-->
+                <!--</tr>-->
 
-			<div class="evenPageNumber">
-				10
-			</div>
-		</div>
 
-		<div class="bookPage sheet">
-			<img src="files/AlphaGo.png" width=200 height=200 style="padding:10px; float:left;"/>
-			<div class="heading1" style="font-weight: bold; font-size:40px; width:100%; text-align: center;margin-top:100px;">
+            </table>
+
+            <div class="oddPageNumber">
+                7
+            </div>
+        </div>
+        <div class="bookPage evenPage">
+            <div class="waitingGame">
+                The game will be played on May 25
+            </div>
+
+            <div class="evenPageNumber">
+                8
+            </div>
+        </div>
+
+        <div class="bookPage oddPage">
+            <div class="gameHeader1">
+                Pair Go
+            </div>
+            <div class="gameHeader2">
+                Players team up with AlphaGo and do battle as a united force.
+            </div>
+            <div class="gameHeader2">
+                26 may 2017
+            </div>
+
+            <table class="gameDescription">
+                <tr>
+                    <td>
+                        <div class="gameDescriptionFieldName">
+                            Team1
+                        </div>
+                    </td>
+                    <td>
+                        <div class="gameDescriptionFieldValue">
+                            Gu Li, AlphaGo
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <div class="gameDescriptionFieldName">
+                            Team2
+                        </div>
+                    </td>
+                    <td>
+                        <div class="gameDescriptionFieldValue">
+                            Lian Xiao, AlphaGo
+                        </div>
+                    </td>
+                </tr>
+
+                <!--<tr>-->
+                    <!--<td>-->
+                        <!--<div class="gameDescriptionFieldName">-->
+                            <!--Result-->
+                        <!--</div>-->
+                    <!--</td>-->
+                    <!--<td>-->
+                        <!--<div class="gameDescriptionFieldValue">-->
+
+                        <!--</div>-->
+                    <!--</td>-->
+                <!--</tr>-->
+
+
+            </table>
+
+            <div class="oddPageNumber">
+                9
+            </div>
+        </div>
+        <div class="bookPage evenPage">
+            <div class="waitingGame">
+                The game will be played on May 26
+            </div>
+
+            <div class="evenPageNumber">
+                10
+            </div>
+        </div>
+
+        <div class="bookPage oddPage">
+            <div class="gameHeader1">
+                Team Tournament
+            </div>
+            <div class="gameHeader2">
+                5 players combine tactics and take on AlphaGo together.
+            </div>
+            <div class="gameHeader2">
+                26 may 2017
+            </div>
+
+            <table class="gameDescription">
+                <tr>
+                    <td>
+                        <div class="gameDescriptionFieldName">
+                            Team1
+                        </div>
+                    </td>
+                    <td>
+                        <div class="gameDescriptionFieldValue">
+                            AlphaGo
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <div class="gameDescriptionFieldName">
+                            Team2
+                        </div>
+                    </td>
+                    <td>
+                        <div class="gameDescriptionFieldValue">
+                            Chen Yaoye, Zhou Ruiyang, Mi Yuting, Shi Yue, Tang Weixing
+                        </div>
+                    </td>
+                </tr>
+
+                <!--<tr>-->
+                    <!--<td>-->
+                        <!--<div class="gameDescriptionFieldName">-->
+                            <!--Result-->
+                        <!--</div>-->
+                    <!--</td>-->
+                    <!--<td>-->
+                        <!--<div class="gameDescriptionFieldValue">-->
+
+                        <!--</div>-->
+                    <!--</td>-->
+                <!--</tr>-->
+
+
+            </table>
+
+            <div class="oddPageNumber">
+                11
+            </div>
+        </div>
+        <div class="bookPage evenPage">
+            <div class="waitingGame">
+                The game will be played on May 26
+            </div>
+
+            <div class="evenPageNumber">
+                12
+            </div>
+        </div>
+
+        <div class="bookPage oddPage">
+            <div class="gameHeader1">
+                Match AlphaGo vs. Ke Jie
+            </div>
+            <div class="gameHeader2">
+                Game 3
+            </div>
+            <div class="gameHeader2">
+                27 may 2017
+            </div>
+
+            <table class="gameDescription">
+                <tr>
+                    <td>
+                        <div class="gameDescriptionFieldName">
+                            White
+                        </div>
+                    </td>
+                    <td>
+                        <div class="gameDescriptionFieldValue">
+                            AlphaGo
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <div class="gameDescriptionFieldName">
+                            Black
+                        </div>
+                    </td>
+                    <td>
+                        <div class="gameDescriptionFieldValue">
+                            Ke Jie
+                        </div>
+                    </td>
+                </tr>
+
+                <!--<tr>-->
+                    <!--<td>-->
+                        <!--<div class="gameDescriptionFieldName">-->
+                            <!--Result-->
+                        <!--</div>-->
+                    <!--</td>-->
+                    <!--<td>-->
+                        <!--<div class="gameDescriptionFieldValue">-->
+
+                        <!--</div>-->
+                    <!--</td>-->
+                <!--</tr>-->
+
+
+            </table>
+
+            <div class="oddPageNumber">
+                13
+            </div>
+        </div>
+        <div class="bookPage evenPage">
+            <div class="waitingGame">
+                The game will be played on May 27
+            </div>
+
+            <div class="evenPageNumber">
+                14
+            </div>
+        </div>
+
+        <div class="bookPage oddPage">
+            <div class="oddPageNumber">
+                15
+            </div>
+        </div>
+        <div class="bookPage evenPage">
+            <div class="waitingGame" style="font-weight: bold;">
+                Participants
+            </div>
+
+            <div class="evenPageNumber">
+                16
+            </div>
+        </div>
+
+		<div class="bookPage oddPage">
+			<img src="files/AlphaGo.png" width=200 height=200 class="participantImg"/>
+			<div class="participantHeading">
 				AlphaGo
 			</div>
-			<div style="font-size:16px;padding-left: 10px; padding-right: 10px;">
+			<div class="participantText">
 				AlphaGo is a narrow AI, computer program developed by Alphabet Inc.'s Google DeepMind in London to play
 				the board game Go. In October 2015, it became the first Computer Go program to beat a human professional
 				Go player without handicaps on a full-sized 19×19 board. In March 2016, it beat Lee Sedol in a five-game
@@ -392,16 +677,15 @@
 			</div>
 
 			<div class="oddPageNumber">
-				11
+				17
 			</div>
 		</div>
-
-		<div class="bookPage sheet">
-			<img src="files/KeJie.png" width=280 height=200 style="padding:10px; float:left;"/>
-			<div class="heading1" style="font-weight: bold; font-size:40px; width:100%; text-align: center;margin-top:100px;">
+		<div class="bookPage evenPage">
+			<img src="files/KeJie.png" width=280 height=200 class="participantImg"/>
+			<div class="participantHeading">
 				Ke Jie
 			</div>
-			<div style="font-size:16px;padding-left: 10px; padding-right: 10px;">
+			<div class="participantText">
 				Ke Jie is a Chinese professional go player of 9 dan rank. He is currently ranked number one in the world
 				under Rémi Coulom's unofficial ranking system.
 				Ke Jie started to learn how to play go in 2003 when he was 5 years old and won his first national
@@ -411,57 +695,16 @@
 			</div>
 
 			<div class="evenPageNumber">
-				12
+				18
 			</div>
 		</div>
 
-		<div class="bookPage sheet">
-			<img src="files/GuLi.png" width=200 height=200 style="padding:10px; float:left;"/>
-			<div class="heading1" style="font-weight: bold; font-size:40px; width:100%; text-align: center;margin-top:100px;">
+		<div class="bookPage oddPage">
+			<img src="files/GuLi.png" width=200 height=200 class="participantImg"/>
+            <div class="participantHeading">
 				Gu Li
 			</div>
-			<div style="font-size:16px;padding-left: 10px; padding-right: 10px;">
-				Gu Li is a Chinese go player. He became a pro in 1994 when he was only 12. In 2006, he won the 10th LG
-				Cup and became the youngest Chinese player to ever win a major international title; as a result, he
-				was also promoted to 9 dan.
-			<br/>
-				His given name Li, literally meaning strength, is also a Go term roughly meaning the ability of reading.
-				Li also encompasses the meaning of the ability to discover strong moves and the ability to fight. Gu has
-				a nickname "Gu Da Li". Da literally means large, big or huge. This refers to Gu's incredible ability at
-				playing really strong moves that require sharp instinct as well as immaculate reading. One of his main
-				weaknesses is his inaccurate endgame.
-			</div>
-
-			<div class="oddPageNumber">
-				13
-			</div>
-		</div>
-
-		<div class="bookPage sheet">
-			<img src="files/KeJie.png" width=280 height=200 style="padding:10px; float:left;"/>
-			<div class="heading1" style="font-weight: bold; font-size:40px; width:100%; text-align: center;margin-top:100px;">
-				Ke Jie
-			</div>
-			<div style="font-size:16px;padding-left: 10px; padding-right: 10px;">
-				Ke Jie is a Chinese professional go player of 9 dan rank. He is currently ranked number one in the world
-				under Rémi Coulom's unofficial ranking system.
-				Ke Jie started to learn how to play go in 2003 when he was 5 years old and won his first national
-				championship in 2007. He became a professional go player in 2008 when he was 10 years old and was
-				promoted to 9 dan rank in 2015. In January 2015, Ke won his first world title when he won the 2nd
-				Bailing Cup, defeating Qiu Jun in the finals.
-			</div>
-
-			<div class="evenPageNumber">
-				14
-			</div>
-		</div>
-
-		<div class="bookPage sheet">
-			<img src="files/GuLi.png" width=200 height=200 style="padding:10px; float:left;"/>
-			<div class="heading1" style="font-weight: bold; font-size:40px; width:100%; text-align: center;margin-top:100px;">
-				Gu Li
-			</div>
-			<div style="font-size:16px;padding-left: 10px; padding-right: 10px;">
+            <div class="participantText">
 				Gu Li is a Chinese go player. He became a pro in 1994 when he was only 12. In 2006, he won the 10th LG
 				Cup and became the youngest Chinese player to ever win a major international title; as a result, he
 				was also promoted to 9 dan.
@@ -474,9 +717,110 @@
 			</div>
 
 			<div class="oddPageNumber">
-				15
+				19
 			</div>
 		</div>
+        <div class="bookPage evenPage">
+            <img src="files/LianXiao.png" width=200 height=200 class="participantImg"/>
+            <div class="participantHeading">
+                Lian Xiao
+            </div>
+            <div class="participantText">
+                Lian Xiao is a Chinese professional go player. As of 2017, he is ranking 6th in Go ratings with and Elo rating of 3529. Lian was promoted to 8 dan on 16 January 2017.
+            </div>
+
+            <div class="evenPageNumber">
+                20
+            </div>
+        </div>
+
+        <div class="bookPage oddPage">
+            <img src="files/ChenYaoye.png" width=200 height=200 class="participantImg"/>
+            <div class="participantHeading">
+                Chen Yaoye
+            </div>
+            <div class="participantText">
+                Chen Yaoye is a Chinese, professional 9-dan. In 2012-2013 Chen
+                was #1 in the Chinese Ranking and in the World Ranking; in November 2013 he became the fourth Cinese
+                Tianyuan and Mingren at the same time, after Liu Xiaoguang (in 1988), Ma Xiaochun (1994) and Gu Li
+                (2004).
+            </div>
+
+            <div class="oddPageNumber">
+                21
+            </div>
+        </div>
+        <div class="bookPage evenPage">
+            <img src="files/ZhouRuiyang.png" width=200 height=200 class="participantImg"/>
+            <div class="participantHeading">
+                Zhou Ruiyang
+            </div>
+            <div class="participantText">
+                Zhou Ruiyang is a Chinese, professional 9-dan of the Zhongguo
+                Weiqi Xiehui. He has been regularly ranked between #1 and #4 under the Zhongguo Weiqi Xiehui’s Elo
+                ranking system since December 31 2010; and is ranked #2 as of August 2014.
+                <br/>
+                Zhou began playing go at the age of seven. He is popularly known for not having attended a professional
+                go school or having a professional teacher, but reached professional 1d in 2002. In 2004, he won his
+                first title, the 17th Wanbao Cup.
+            </div>
+
+            <div class="evenPageNumber">
+                22
+            </div>
+        </div>
+
+        <div class="bookPage oddPage">
+            <img src="files/MiYuting.png" width=200 height=200 class="participantImg"/>
+            <div class="participantHeading">
+                Mi Yuting
+            </div>
+            <div class="participantText">
+                Mi Yuting, born 1996-01-08 is a Chinese 9 dan pro. Achieved 1 dan pro on 2007-07-24. Promoted to 2 dan
+                on
+                2009-07-29, 3 dan on 2010-07-30, 4 dan in 2012 and 9 dan on 2013-12-06. He ranked #9 in the Chinese
+                Rating at the end of September 2013, #6 at the end of November 2013, and 4th in December 2016.
+                Winner of the 3rd Xinxiu (2009-01-16): aged 13 is the youngest winner of a title in China. In the 2011
+                China Weiqi League, Mi obtained the best individual score, winning 16 games and losing 6 only.
+                Winner in 2012 of the National Go Individual.
+            </div>
+
+            <div class="oddPageNumber">
+                23
+            </div>
+        </div>
+        <div class="bookPage evenPage">
+            <img src="files/ShiYue.png" width=200 height=200 class="participantImg"/>
+            <div class="participantHeading">
+                Shi Yue
+            </div>
+            <div class="participantText">
+                Shi Yue is a Chinese professional 9-dan. Learned Weiqi at age 6, ranked #11 in Chinese Ranking in
+                December 2008; as of December 2012 he is ranked #2; he was new Chinese #1 at the end of May 2013. As of
+                2012-07-01 he is ranked #5 in the World Ranking and new #1 at the end of September 2014.
+                Promoted 9 dan in 2013-02-20, by winning the 17th LG Cup.
+            </div>
+
+            <div class="evenPageNumber">
+                24
+            </div>
+        </div>
+
+        <div class="bookPage oddPage">
+            <img src="files/TangWeixing.png" width=200 height=200 class="participantImg"/>
+            <div class="participantHeading">
+                Tang Weixing
+            </div>
+            <div class="participantText">
+                Tang Weixing is a Chinese professional player, born 1993-01-15. Became a pro from 2006-07-24. Promoted 2
+                dan on 2007-07-17 and 3 dan on 2010-07-20, he was promoted to 9 dan on 2013-12-11, by winning the 18th
+                Samsung Cup. Member of the Team Liaoning winner of the 2011 China Weiqi League. In 2012 reached the Semi-finals of the 1st Bailing Cup.
+            </div>
+
+            <div class="oddPageNumber">
+                25
+            </div>
+        </div>
 
 		<div class="bookCover hard"></div>
 		<div class="bookCover hard"></div>

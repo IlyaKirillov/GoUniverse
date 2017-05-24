@@ -252,7 +252,7 @@ CGoUniverseApplication.prototype.OnResize = function(bSkipChatHandler)
 
 	var ErrorDiv        = document.getElementById("divIdConnectionError");
 	ErrorDiv.style.left = (document.body.clientWidth - 250) / 2 + "px";
-	ErrorDiv.style.top  = (document.body.clientHeight - 200) / 2 + 180 + "px";
+	ErrorDiv.style.top  = (document.body.clientHeight - 200) / 2 + 210 + "px";
 
 	var AboutDiv        = document.getElementById("divIdAbout");
 	AboutDiv.style.left = (document.body.clientWidth - 250) / 2 + "px";
@@ -766,6 +766,7 @@ CGoUniverseApplication.prototype.private_InitClientPage = function()
 	this.private_InitGameTabs();
 	this.private_InitMainRoom();
 	this.private_InitUserNameLink();
+	this.private_InitBookletButton();
 };
 CGoUniverseApplication.prototype.private_InitGameTabs = function()
 {
@@ -877,14 +878,14 @@ CGoUniverseApplication.prototype.private_InitTabPanel = function(oTabsControl)
 			oThis.m_oClient.CreateDemonstration();
 		}, false);
 
-		oContextMenu.AddListItem(g_oLocalization.mainRoom.playMenu.loadFile, function()
-		{
-			var oGameTree = new CGameTree(null);
-			Common.OpenFileDialog(oGameTree, function()
-			{
-				oThis.m_oClient.LoadFile(oGameTree);
-			});
-		}, false);
+		// oContextMenu.AddListItem(g_oLocalization.mainRoom.playMenu.loadFile, function()
+		// {
+		// 	var oGameTree = new CGameTree(null);
+		// 	Common.OpenFileDialog(oGameTree, function()
+		// 	{
+		// 		oThis.m_oClient.LoadFile(oGameTree);
+		// 	});
+		// }, false);
 
 		oContextMenu.AddHorizontalLine();
 
@@ -918,7 +919,7 @@ CGoUniverseApplication.prototype.private_InitTabPanel = function(oTabsControl)
 
 	g_oTextMeasurer.SetFont("14px 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif");
 	var nExitW = g_oTextMeasurer.Measure(g_oLocalization.mainRoom.exitButton);
-	var nRightPanelW = 120 + 100 + 35 + nExitW;
+	var nRightPanelW = 60 + 120 + 100 + 35 + nExitW;
 
 	// Правая панелька с поиском, ником и кнопкой выхода
 	var oRightPanel = CreateControlContainer("divIdPanelRight");
@@ -1174,6 +1175,22 @@ CGoUniverseApplication.prototype.private_InitGamesListTabs = function(oParentCon
 	oTab = new CVisualGamesListTab(this);
 	oTab.Init(EKGSGamesListType.Followed, g_oLocalization.mainRoom.gamesTabs.followed);
 	this.m_oGamesListTabs.AddTab(oTab);
+};
+CGoUniverseApplication.prototype.private_InitBookletButton = function()
+{
+	document.getElementById("bookletDivId").style.display = "none";
+	document.getElementById("bookletDivId").style.top     = "0px";
+	var oButton = document.getElementById("divIdBookletButton");
+	oButton.addEventListener("click", function()
+	{
+		document.getElementById("bookletDivId").style.display = "block";
+	});
+
+	var oClose = document.getElementById("closeBookletId");
+	oClose.addEventListener("click", function()
+	{
+		document.getElementById("bookletDivId").style.display = "none";
+	});
 };
 CGoUniverseApplication.prototype.private_ClearClient = function()
 {

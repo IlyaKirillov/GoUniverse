@@ -195,6 +195,10 @@
 			</button>
 			<div id="divIdPanelRight" style="position: absolute; top: 0px; left: 0px; height: 50px;">
 
+				<button id="divIdBookletButton" class="ButtonExit" style="font-family: NotoEmoji;font-size:24px;float:left;margin-right: 2px;width:58px;">
+					<div id="divIdBookletButtonLabel">&#x1f4d6;</div>
+				</button>
+
 				<input id="OmniboxInput" placeholder="find a player" type="text" class="SearchInput" style="float:left;margin-top: 11px;"/>
 
 				<button id="divIdExitButton" class="ButtonExit">
@@ -210,9 +214,13 @@
 		</div>
 	</div>
 
-	<div style="display:none;position: absolute; top:50px; left:50px; width:1050px; height:650px;">
-		<iframe src="../GoBooklet/FutureSummit2017/index.html" width="1050" height="650" frameborder="false">
+	<div id="bookletDivId" style="display:block;position: absolute; top:10000px; left:0px; width:100%; height:100%; background: rgba(0,0,0, 0.6);">
+		<iframe src="../GoBooklet/FutureSummit2017/index.html" style="position: absolute; width:100%;height: 100%; border: none">
 		</iframe>
+
+		<div style="position: absolute; bottom:10px; left:0px;width:100%;">
+			<button id="closeBookletId" style="width:100px;height:30px;margin:auto;display: block;">Close</button>
+		</div>
 	</div>
 
 </div>
