@@ -190,7 +190,8 @@ var g_oLocalization_enUS = {
 			createNew             : "Create new",
 			loadFile              : "Load from disk",
 			loadFileFromClipboard : "Load from clipboard",
-			gameInfo              : "Game info"
+			gameInfo              : "Game info",
+			cropBoard             : "Crop the board"
 		},
 
 		window : {
@@ -225,6 +226,23 @@ var g_oLocalization_enUS = {
 				blue    : "Blue",
 				green   : "Green",
 				gray    : "Gray"
+			},
+
+			creatingGIF : {
+				caption : "Creating Gif file..."
+			},
+
+			asciiDiagram : {
+				caption : "ASCII diagram"
+			},
+
+			boardCropping : {
+				caption      : "Crop the board...",
+				errorMessage : "Sorry, the cropped part can't be so small."
+			},
+
+			error : {
+				caption : "Error"
 			}
 
 		}

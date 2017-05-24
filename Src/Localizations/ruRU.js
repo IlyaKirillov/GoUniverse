@@ -190,7 +190,8 @@ var g_oLocalization_ruRU = {
 			createNew             : "Создать",
 			loadFile              : "Загрузить с диска",
 			loadFileFromClipboard : "Загрузить из буфера",
-			gameInfo              : "Информация о партии"
+			gameInfo              : "Информация о партии",
+			cropBoard             : "Обрезать доску"
 		},
 
 		window : {
@@ -225,7 +226,25 @@ var g_oLocalization_ruRU = {
 				blue    : "Синие",
 				green   : "Зеленые",
 				gray    : "Серые"
+			},
+
+			creatingGIF : {
+				caption : "Создаем Gif файл..."
+			},
+
+			asciiDiagram : {
+				caption : "ASCII диаграмма"
+			},
+
+			boardCropping : {
+				caption      : "Обрезка доски...",
+				errorMessage : "Обрезанная часть не может быть настолько маленькой."
+			},
+
+			error : {
+				caption : "Ошибка"
 			}
+
 		}
 	},
 
