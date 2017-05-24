@@ -219,10 +219,13 @@ var g_oLocalization_ruRU = {
 				gameInfo     : "Информация"
 			},
 
-			settings : {
-				caption : "Settings"
+			colorsCounter : {
+				caption : "Счетчик цветов",
+				red     : "Красные",
+				blue    : "Синие",
+				green   : "Зеленые",
+				gray    : "Серые"
 			}
-
 		}
 	},
 

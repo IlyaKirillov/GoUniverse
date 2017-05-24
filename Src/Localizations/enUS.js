@@ -219,6 +219,13 @@ var g_oLocalization_enUS = {
 				gameInfo     : "Game info"
 			},
 
+			colorsCounter : {
+				caption : "Colors counter",
+				red     : "Red",
+				blue    : "Blue",
+				green   : "Green",
+				gray    : "Gray"
+			}
 
 		}
 	},
