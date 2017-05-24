@@ -191,6 +191,38 @@ var g_oLocalization_ruRU = {
 			loadFile              : "Загрузить с диска",
 			loadFileFromClipboard : "Загрузить из буфера",
 			gameInfo              : "Информация о партии"
+		},
+
+		window : {
+			gameInfo : {
+				caption : "Информация о партии",
+
+				gameName     : "Название партии",
+				result       : "Результат",
+				rules        : "Правила",
+				komi         : "Коми",
+				handicap     : "Фора",
+				timeSettings : "Регламент времени",
+				black        : "Черные",
+				blackRank    : "Рейтинг черных",
+				white        : "Белые",
+				whiteRank    : "Рейтинг белых",
+				copyright    : "Авторские права",
+				date         : "Дата",
+				event        : "Событие",
+				round        : "Раунд",
+				place        : "Место",
+				annotator    : "Комментатор",
+				fuseki       : "Фусэки",
+				source       : "Источник",
+				transcriber  : "Транслятор",
+				gameInfo     : "Информация"
+			},
+
+			settings : {
+				caption : "Settings"
+			}
+
 		}
 	},
 

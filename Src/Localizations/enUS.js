@@ -191,6 +191,35 @@ var g_oLocalization_enUS = {
 			loadFile              : "Load from disk",
 			loadFileFromClipboard : "Load from clipboard",
 			gameInfo              : "Game info"
+		},
+
+		window : {
+			gameInfo : {
+				caption : "Game info",
+
+				gameName     : "Game name",
+				result       : "Result",
+				rules        : "Rules",
+				komi         : "Komi",
+				handicap     : "Handicap",
+				timeSettings : "Time settings",
+				black        : "Black",
+				blackRank    : "Black rank",
+				white        : "White",
+				whiteRank    : "White rank",
+				copyright    : "Copyright",
+				date         : "Date",
+				event        : "Event",
+				round        : "Round",
+				place        : "Place",
+				annotator    : "Annotator",
+				fuseki       : "Fuseki",
+				source       : "Source",
+				transcriber  : "Transcriber",
+				gameInfo     : "Game info"
+			},
+
+
 		}
 	},
 
