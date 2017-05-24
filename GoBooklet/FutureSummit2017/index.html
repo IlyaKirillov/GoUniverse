@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+
+	<script type="text/javascript" language="JavaScript" src="../../Src/External/GoProject/WebSDK/Common.js"></script>
+	<script type="text/javascript" language="JavaScript" src="../../Src/External/GoProject/WebSDK/Drawing/Controls.js"></script>
+	<script type="text/javascript" language="JavaScript" src="../../Src/External/GoProject/WebSDK/Drawing/Board.js"></script>
+	<script type="text/javascript" language="JavaScript"
+			src="../../Src/External/GoProject/WebSDK/Drawing/BoardTarget.js"></script>
+	<script type="text/javascript" language="JavaScript" src="../../Src/External/GoProject/WebSDK/Drawing/HtmlEvents.js"></script>
+	<script type="text/javascript" language="JavaScript" src="../../Src/External/GoProject/WebSDK/Drawing/Mark.js"></script>
+	<script type="text/javascript" language="JavaScript" src="../../Src/External/GoProject/WebSDK/Drawing/Button.js"></script>
+	<script type="text/javascript" language="JavaScript" src="../../Src/External/GoProject/WebSDK/Drawing/Toolbar.js"></script>
+	<script type="text/javascript" language="JavaScript" src="../../Src/External/GoProject/WebSDK/Drawing/Drawing.js"></script>
+	<script type="text/javascript" language="JavaScript"
+			src="../../Src/External/GoProject/WebSDK/Drawing/InterfaceState.js"></script>
+	<script type="text/javascript" language="JavaScript" src="../../Src/External/GoProject/WebSDK/Drawing/Comments.js"></script>
+	<script type="text/javascript" language="JavaScript" src="../../Src/External/GoProject/WebSDK/Drawing/Navigator.js"></script>
+	<script type="text/javascript" language="JavaScript"
+			src="../../Src/External/GoProject/WebSDK/Drawing/NavigatorMap.js"></script>
+	<script type="text/javascript" language="JavaScript" src="../../Src/External/GoProject/WebSDK/Drawing/Slider.js"></script>
+	<script type="text/javascript" language="JavaScript" src="../../Src/External/GoProject/WebSDK/Drawing/Sound.js"></script>
+	<script type="text/javascript" language="JavaScript"
+			src="../../Src/External/GoProject/WebSDK/Drawing/Presentation.js"></script>
+	<script type="text/javascript" language="JavaScript"
+			src="../../Src/External/GoProject/WebSDK/Drawing/VerticalTabs.js"></script>
+	<script type="text/javascript" language="JavaScript" src="../../Src/External/GoProject/WebSDK/Drawing/Window.js"></script>
+	<script type="text/javascript" language="JavaScript" src="../../Src/External/GoProject/WebSDK/Command.js"></script>
+	<script type="text/javascript" language="JavaScript" src="../../Src/External/GoProject/WebSDK/Consts.js"></script>
+	<script type="text/javascript" language="JavaScript" src="../../Src/External/GoProject/WebSDK/GameTree.js"></script>
+	<script type="text/javascript" language="JavaScript" src="../../Src/External/GoProject/WebSDK/GifWriter.js"></script>
+	<script type="text/javascript" language="JavaScript" src="../../Src/External/GoProject/WebSDK/LogicBoard.js"></script>
+	<script type="text/javascript" language="JavaScript" src="../../Src/External/GoProject/WebSDK/Memory.js"></script>
+	<script type="text/javascript" language="JavaScript" src="../../Src/External/GoProject/WebSDK/Move.js"></script>
+	<script type="text/javascript" language="JavaScript" src="../../Src/External/GoProject/WebSDK/Node.js"></script>
+	<script type="text/javascript" language="JavaScript" src="../../Src/External/GoProject/WebSDK/Territory.js"></script>
+	<script type="text/javascript" language="JavaScript" src="../../Src/External/GoProject/WebSDK/SgfReader.js"></script>
+	<script type="text/javascript" language="JavaScript" src="../../Src/External/GoProject/WebSDK/SgfWriter.js"></script>
+	<script type="text/javascript" language="JavaScript" src="../../Src/External/GoProject/WebSDK/Api.js"></script>
+	<script type="text/javascript" language="JavaScript" src="../../Src/External/GoProject/WebSDK/Version.js"></script>
+
+
+	<script type="text/javascript" language="JavaScript" src="../../Src/External/jquery-3.2.1.min.js"></script>
+	<script type="text/javascript" language="JavaScript" src="../../Src/External/turn.min.js"></script>
+
+	<script type="text/javascript" language="JavaScript" src="main.js"></script>
+
+	<link rel="stylesheet" type="text/css" href="styles.css">
+
+</head>
+<body style="margin: 0px; padding: 0px;width: 1000px; height: 600px;">
+<div id="bookWrapper"
+	 style="position:absolute; top: 0px; left : 0px;width: 1000px; height: 600px; overflow: hidden; font-family: 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif;">
+	<div id="flipbook">
+		<div class="bookCover hard">
+			<div style="color:white;font-size: 35px; width:100%; text-align: center;margin-top: 250px;">
+				The Future of Go Summit
+			</div>
+			<div style="color:white;font-size: 12px; width:100%; text-align: center;margin-top: 50px;">
+				23 May - 27 May 2017, Wuzhen, China
+			</div>
+		</div>
+		<div class="bookCover hard"></div>
+
+		<div class="bookPage">
+			<div class="contentsHeading1" style="margin-top: 70px;">
+				Contents
+			</div>
+			<table style="width:100%">
+				<tr>
+					<td>
+						<div class="contentsHeading2">
+							About summit
+						</div>
+					</td>
+					<td>
+						<div class="contentsPageNumber">
+							3
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<div class="contentsHeading2">
+							Matches
+						</div>
+					</td>
+					<td>
+						<div class="contentsPageNumber">
+							4
+						</div>
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+						<div class="contentsNormal">
+							AlphaGo vs. Ke Jie Game 1
+						</div>
+					</td>
+					<td>
+						<div class="contentsPageNumber">
+							5
+						</div>
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+						<div class="contentsNormal">
+							AlphaGo vs. Ke Jie Game 2
+						</div>
+					</td>
+					<td>
+						<div class="contentsPageNumber">
+							6
+						</div>
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+						<div class="contentsNormal">
+							Gu Li,AlphaGo vs. Lian Xiao,AlphaGo
+						</div>
+					</td>
+					<td>
+						<div class="contentsPageNumber">
+							7
+						</div>
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+						<div class="contentsNormal">
+							Team tournament game
+						</div>
+					</td>
+					<td>
+						<div class="contentsPageNumber">
+							8
+						</div>
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+						<div class="contentsNormal">
+							AlphaGo vs. Ke Jie Game 3
+						</div>
+					</td>
+					<td>
+						<div class="contentsPageNumber">
+							9
+						</div>
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+						<div class="contentsHeading2">
+							Players
+						</div>
+					</td>
+					<td>
+						<div class="contentsPageNumber">
+							10
+						</div>
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+						<div class="contentsNormal">
+							AlphaGo
+						</div>
+					</td>
+					<td>
+						<div class="contentsPageNumber">
+							11
+						</div>
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+						<div class="contentsNormal">
+							Ke Jie
+						</div>
+					</td>
+					<td>
+						<div class="contentsPageNumber">
+							12
+						</div>
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+						<div class="contentsNormal">
+							Gu Li
+						</div>
+					</td>
+					<td>
+						<div class="contentsPageNumber">
+							13
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<div class="contentsNormal">
+							Lian Xiao
+						</div>
+					</td>
+					<td>
+						<div class="contentsPageNumber">
+							14
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<div class="contentsNormal">
+							Chen Yaoye
+						</div>
+					</td>
+					<td>
+						<div class="contentsPageNumber">
+							15
+						</div>
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+						<div class="contentsNormal">
+							Zhou Ruiyang
+						</div>
+					</td>
+					<td>
+						<div class="contentsPageNumber">
+							16
+						</div>
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+						<div class="contentsNormal">
+							Mi Yuting
+						</div>
+					</td>
+					<td>
+						<div class="contentsPageNumber">
+							17
+						</div>
+					</td>
+				</tr>
+
+
+				<tr>
+					<td>
+						<div class="contentsNormal">
+							Shi Yue
+						</div>
+					</td>
+					<td>
+						<div class="contentsPageNumber">
+							18
+						</div>
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+						<div class="contentsNormal">
+							Tang Weixing
+						</div>
+					</td>
+					<td>
+						<div class="contentsPageNumber" align="right">
+							19
+						</div>
+					</td>
+				</tr>
+
+			</table>
+
+
+			<div class="evenPageNumber">
+				2
+			</div>
+
+		</div>
+		<div class="bookPage" style="font-size:14px;">
+			<div style="font-size:20px;margin-top: 70px; font-weight: bold; width:100%; text-align: center;">
+				About summit
+			</div>
+			<div style="font-size:16px; margin-left: 20px; margin-right: 20px;">
+				The Future of Go Summit will be held by Chinese Go Association, Sport Bureau of
+				Zhejiang Province and Google in Wuzhen, Zhejiang, which is the permanent host place of the World
+				Internet Conference, in May 2017, featuring five Go games involving AlphaGo and top Chinese Go players,
+				as well as panels on the future of AI.
+			</div>
+
+			<div class="oddPageNumber">
+				3
+			</div>
+		</div>
+		<div class="bookPage sheet">
+			<div class="heading1" style="line-height: 600px; height:600px; font-weight: bold; font-size:40px; width:100%; text-align: center;">
+				Matches
+			</div>
+
+			<div class="evenPageNumber">
+				4
+			</div>
+		</div>
+		<div class="bookPage sheet">
+			<div id="bookGame1" style="position: relative; top:10px; left:0px; width:500px; height:561px;">
+			</div>
+			<div class="oddPageNumber">
+				5
+			</div>
+		</div>
+
+		<div class="bookPage sheet">
+			<div class="heading1" style="line-height: 600px; height:600px; font-size:25px; width:100%; text-align: center;">
+				The game will be played on May 25
+			</div>
+
+			<div class="evenPageNumber">
+				6
+			</div>
+		</div>
+		<div class="bookPage sheet">
+			<div class="heading1" style="line-height: 600px; height:600px; font-size:25px; width:100%; text-align: center;">
+				The game will be played on May 26
+			</div>
+
+			<div class="oddPageNumber">
+				7
+			</div>
+		</div>
+		<div class="bookPage sheet">
+			<div class="heading1" style="line-height: 600px; height:600px; font-size:25px; width:100%; text-align: center;">
+				The game will be played on May 26
+			</div>
+
+			<div class="evenPageNumber">
+				8
+			</div>
+		</div>
+
+		<div class="bookPage sheet">
+			<div class="heading1" style="line-height: 600px; height:600px; font-size:25px; width:100%; text-align: center;">
+				The game will be played on May 27
+			</div>
+
+			<div class="oddPageNumber">
+				9
+			</div>
+		</div>
+
+		<div class="bookPage sheet">
+			<div class="heading1" style="line-height: 600px; height:600px; font-weight: bold; font-size:40px; width:100%; text-align: center;">
+				Players
+			</div>
+
+			<div class="evenPageNumber">
+				10
+			</div>
+		</div>
+
+		<div class="bookPage sheet">
+			<img src="files/AlphaGo.png" width=200 height=200 style="padding:10px; float:left;"/>
+			<div class="heading1" style="font-weight: bold; font-size:40px; width:100%; text-align: center;margin-top:100px;">
+				AlphaGo
+			</div>
+			<div style="font-size:16px;padding-left: 10px; padding-right: 10px;">
+				AlphaGo is a narrow AI, computer program developed by Alphabet Inc.'s Google DeepMind in London to play
+				the board game Go. In October 2015, it became the first Computer Go program to beat a human professional
+				Go player without handicaps on a full-sized 19×19 board. In March 2016, it beat Lee Sedol in a five-game
+				match, the first time a computer Go program has beaten a 9-dan professional without handicaps. Although
+				it lost to Lee Sedol in the fourth game, Lee resigned the final game, giving a final score of 4 games to
+				1 in favour of AlphaGo. In recognition of beating Lee Sedol, AlphaGo was awarded an honorary 9-dan by
+				the Korea Baduk Association. It was chosen by Science as one of the Breakthrough of the Year runners-up
+				on 22 December 2016.
+			</div>
+
+			<div class="oddPageNumber">
+				11
+			</div>
+		</div>
+
+		<div class="bookPage sheet">
+			<img src="files/KeJie.png" width=280 height=200 style="padding:10px; float:left;"/>
+			<div class="heading1" style="font-weight: bold; font-size:40px; width:100%; text-align: center;margin-top:100px;">
+				Ke Jie
+			</div>
+			<div style="font-size:16px;padding-left: 10px; padding-right: 10px;">
+				Ke Jie is a Chinese professional go player of 9 dan rank. He is currently ranked number one in the world
+				under Rémi Coulom's unofficial ranking system.
+				Ke Jie started to learn how to play go in 2003 when he was 5 years old and won his first national
+				championship in 2007. He became a professional go player in 2008 when he was 10 years old and was
+				promoted to 9 dan rank in 2015. In January 2015, Ke won his first world title when he won the 2nd
+				Bailing Cup, defeating Qiu Jun in the finals.
+			</div>
+
+			<div class="evenPageNumber">
+				12
+			</div>
+		</div>
+
+		<div class="bookPage sheet">
+			<img src="files/GuLi.png" width=200 height=200 style="padding:10px; float:left;"/>
+			<div class="heading1" style="font-weight: bold; font-size:40px; width:100%; text-align: center;margin-top:100px;">
+				Gu Li
+			</div>
+			<div style="font-size:16px;padding-left: 10px; padding-right: 10px;">
+				Gu Li is a Chinese go player. He became a pro in 1994 when he was only 12. In 2006, he won the 10th LG
+				Cup and became the youngest Chinese player to ever win a major international title; as a result, he
+				was also promoted to 9 dan.
+			<br/>
+				His given name Li, literally meaning strength, is also a Go term roughly meaning the ability of reading.
+				Li also encompasses the meaning of the ability to discover strong moves and the ability to fight. Gu has
+				a nickname "Gu Da Li". Da literally means large, big or huge. This refers to Gu's incredible ability at
+				playing really strong moves that require sharp instinct as well as immaculate reading. One of his main
+				weaknesses is his inaccurate endgame.
+			</div>
+
+			<div class="oddPageNumber">
+				13
+			</div>
+		</div>
+
+		<div class="bookPage sheet">
+			<img src="files/KeJie.png" width=280 height=200 style="padding:10px; float:left;"/>
+			<div class="heading1" style="font-weight: bold; font-size:40px; width:100%; text-align: center;margin-top:100px;">
+				Ke Jie
+			</div>
+			<div style="font-size:16px;padding-left: 10px; padding-right: 10px;">
+				Ke Jie is a Chinese professional go player of 9 dan rank. He is currently ranked number one in the world
+				under Rémi Coulom's unofficial ranking system.
+				Ke Jie started to learn how to play go in 2003 when he was 5 years old and won his first national
+				championship in 2007. He became a professional go player in 2008 when he was 10 years old and was
+				promoted to 9 dan rank in 2015. In January 2015, Ke won his first world title when he won the 2nd
+				Bailing Cup, defeating Qiu Jun in the finals.
+			</div>
+
+			<div class="evenPageNumber">
+				14
+			</div>
+		</div>
+
+		<div class="bookPage sheet">
+			<img src="files/GuLi.png" width=200 height=200 style="padding:10px; float:left;"/>
+			<div class="heading1" style="font-weight: bold; font-size:40px; width:100%; text-align: center;margin-top:100px;">
+				Gu Li
+			</div>
+			<div style="font-size:16px;padding-left: 10px; padding-right: 10px;">
+				Gu Li is a Chinese go player. He became a pro in 1994 when he was only 12. In 2006, he won the 10th LG
+				Cup and became the youngest Chinese player to ever win a major international title; as a result, he
+				was also promoted to 9 dan.
+				<br/>
+				His given name Li, literally meaning strength, is also a Go term roughly meaning the ability of reading.
+				Li also encompasses the meaning of the ability to discover strong moves and the ability to fight. Gu has
+				a nickname "Gu Da Li". Da literally means large, big or huge. This refers to Gu's incredible ability at
+				playing really strong moves that require sharp instinct as well as immaculate reading. One of his main
+				weaknesses is his inaccurate endgame.
+			</div>
+
+			<div class="oddPageNumber">
+				15
+			</div>
+		</div>
+
+		<div class="bookCover hard"></div>
+		<div class="bookCover hard"></div>
+	</div>
+</div>
+</body>
+</html>
