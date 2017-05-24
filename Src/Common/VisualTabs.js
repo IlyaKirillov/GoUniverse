@@ -362,8 +362,8 @@ CVisualGameRoomTab.prototype.InitGameRoom = function(sDivIdContainer, oGame)
 	// Кнопка для закрытия таба
 	var oCloseButton           = document.createElement("button");
 	oCloseButton.tabIndex      = "0";
-	oCloseButton["aria-label"] = "Close game room";
-	oCloseButton.title         = "Close game room";
+	oCloseButton["aria-label"] = g_oLocalization.mainRoom.closeGameRoomHint;
+	oCloseButton.title         = g_oLocalization.mainRoom.closeGameRoomHint;
 	oCloseButton.className += " " + "ButtonCloseGameRoom";
 	oCloseButton.addEventListener("click", function()
 	{
@@ -865,20 +865,20 @@ CVisualChatRoomTab.prototype.private_InitMenu = function()
 	this.private_AddMenuButton(oHtmlElement, "right", "ChatMenuSpanClose",  function()
 	{
 		oThis.OnClickClose();
-	}, "Close Room");
+	}, g_oLocalization.mainRoom.roomsTabs.hint.close);
 	this.private_AddMenuButton(oHtmlElement, "left", "ChatMenuSpanLeftArrow",  function()
 	{
 		oThis.MoveTabToStart();
-	}, "Move this tab to the start of the list");
+	}, g_oLocalization.mainRoom.roomsTabs.hint.moveTabToStart);
 	this.private_AddMenuButton(oHtmlElement, "left", "ChatMenuSpanInfo",  function()
 	{
 		oThis.ShowRoomInfo();
-	}, oThis.IsPrivate() ? "User Info" : "Room Info");
+	}, oThis.IsPrivate() ? g_oLocalization.mainRoom.roomsTabs.hint.userInfo : g_oLocalization.mainRoom.roomsTabs.hint.roomInfo);
 
 	this.m_oMenuSoundButton = this.private_AddMenuButton(oHtmlElement, "left", this.IsSoundOn() ? "ChatMenuSpanSoundOn" : "ChatMenuSpanSoundOff" ,  function()
 	{
 		oThis.OnToggleSound();
-	}, this.IsSoundOn() ? "Sound is on" : "Sound is off");
+	}, this.IsSoundOn() ? g_oLocalization.mainRoom.roomsTabs.hint.soundOn : g_oLocalization.mainRoom.roomsTabs.hint.soundOff);
 };
 CVisualChatRoomTab.prototype.private_AddMenuButton = function(oParentElement, sFloat, sSpanClass, fOnClickHandler, sHint)
 {

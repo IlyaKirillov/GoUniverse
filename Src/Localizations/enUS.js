@@ -39,9 +39,12 @@ var g_oLocalization_enUS = {
 		},
 
 		findPlayer   : "find a player",
-		search       : "Search",
-		searchRoom   : "Find room",
-		searchPlayer : "Find player",
+
+		search             : "Search",
+		searchRoom         : "Find room",
+		searchRoomHint     : "Search in the list of all rooms",
+		chatWithPlayer     : "Chat with player",
+		chatWithPlayerHint : "Start private chat with the specified user",
 
 		gamesTabs : {
 			games            : "Games",
@@ -95,8 +98,20 @@ var g_oLocalization_enUS = {
 
 			listHeaderName : "Name",
 			listHeaderRank : "Rank"
-		}
+		},
 
+		roomsTabs : {
+			hint : {
+				close          : "Close room",
+				moveTabToStart : "Move this tab to the start of the list",
+				userInfo       : "User info",
+				roomInfo       : "Room info",
+				soundOn        : "Sound notification is on",
+				soundOff       : "Sound notification is off"
+			}
+		},
+
+		closeGameRoomHint : "Close game room"
 	},
 
 	gameRoom : {
@@ -121,6 +136,8 @@ var g_oLocalization_enUS = {
 		addMinute5 : "Add 5 minutes",
 
 		startReview : "Start review",
+
+		labelPlaceholder : "Label...",
 
 		button : {
 			undo    : "Undo",
@@ -243,6 +260,12 @@ var g_oLocalization_enUS = {
 
 			error : {
 				caption : "Error"
+			},
+
+			kifu : {
+				caption : "Kifu",
+				end     : "End",
+				next    : "Next"
 			}
 
 		}
@@ -261,7 +284,6 @@ var g_oLocalization_enUS = {
 		white      : "White",
 		shortBlack : "B",
 		shortWhite : "W",
-
 
 		button : {
 			ok     : "OK",
@@ -313,7 +335,17 @@ var g_oLocalization_enUS = {
 			Dec : "Dec"
 		},
 
-		privateFlag : "Private"
+		privateFlag : "Private",
+
+		about : {
+			caption          : "About",
+			version          : "Version",
+			visitMessage     : "Visit our github project for feedback and issue reports:",
+			allRightReserved : "All rights reserved."
+		},
+
+		minimizeButtonHint : "Minimize"
+
 	},
 
 	KGS : {

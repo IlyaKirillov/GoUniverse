@@ -1755,8 +1755,8 @@ CVisualChatTabsPanel.prototype.Init = function(oChatTabs, oParentControl, bFullH
 
 	var oAddRoomElement           = document.createElement("div");
 	oAddRoomElement.innerHTML     = g_oLocalization.mainRoom.searchRoom;
-	oAddRoomElement["aria-label"] = "Search in the list of all rooms";
-	oAddRoomElement.title         = "Search in the list of all rooms";
+	oAddRoomElement["aria-label"] = g_oLocalization.mainRoom.searchRoomHint;
+	oAddRoomElement.title         = g_oLocalization.mainRoom.searchRoomHint;
 	oAddRoomElement.className     = "ButtonGreen chatTabsAdditionalSearchButtons";
 	this.m_oAddRoomElement        = oAddRoomElementWrapper;
 	oAddRoomElementWrapper.appendChild(oAddRoomElement);
@@ -1766,9 +1766,9 @@ CVisualChatTabsPanel.prototype.Init = function(oChatTabs, oParentControl, bFullH
 	oAddPrivateChatElementWrappper.className = "chatTabsAdditionalSearchButtonsWrapper";
 
 	var oAddPrivateChatElement           = document.createElement("div");
-	oAddPrivateChatElement.innerHTML     = g_oLocalization.mainRoom.searchPlayer;
-	oAddPrivateChatElement["aria-label"] = "Start private chat with that user";
-	oAddPrivateChatElement.title         = "Start private chat with that user";
+	oAddPrivateChatElement.innerHTML     = g_oLocalization.mainRoom.chatWithPlayer;
+	oAddPrivateChatElement["aria-label"] = g_oLocalization.mainRoom.chatWithPlayerHint;
+	oAddPrivateChatElement.title         = g_oLocalization.mainRoom.chatWithPlayerHint;
 	oAddPrivateChatElement.className     = "ButtonGreen chatTabsAdditionalSearchButtons";
 	this.m_oAddPrivateChatElement        = oAddPrivateChatElementWrappper;
 	oAddPrivateChatElementWrappper.appendChild(oAddPrivateChatElement);

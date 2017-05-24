@@ -21,7 +21,7 @@ CGoUniverseAboutWindow.prototype.Init = function(sDivId, oPr)
 {
 	CGoUniverseAboutWindow.superclass.Init.call(this, sDivId, false);
 
-	this.Set_Caption("About");
+	this.Set_Caption(g_oLocalization.common.about.caption);
 
 	this.m_oApp = oPr.App;
 
@@ -79,13 +79,13 @@ CGoUniverseAboutWindow.prototype.private_InitAboutPage = function(oDiv)
 	var oVersion = document.createElement("div");
 	oVersion.style.marginLeft = "110px";
 	oDivMainPart.appendChild(oVersion);
-	Common.Set_InnerTextToElement(oVersion, "Version " + this.m_oApp.GetVersion());
+	Common.Set_InnerTextToElement(oVersion, g_oLocalization.common.about.version + " " + this.m_oApp.GetVersion());
 
 	var oString              = document.createElement("div");
 	oString.style.marginLeft = "110px";
 	oString.style.paddingTop = "20px";
 	oDivMainPart.appendChild(oString);
-	Common.Set_InnerTextToElement(oString, "Visit our Github project for feedback and issue reports:");
+	Common.Set_InnerTextToElement(oString, g_oLocalization.common.about.visitMessage);
 	oString                  = document.createElement("a");
 	oString.style.marginLeft = "110px";
 	oString.target           = "_blank";
@@ -96,7 +96,7 @@ CGoUniverseAboutWindow.prototype.private_InitAboutPage = function(oDiv)
 	oString                  = document.createElement("div");
 	oString.style.paddingTop = "30px";
 	oDivMainPart.appendChild(oString);
-	Common.Set_InnerTextToElement(oString, "© Ilya Kirillov, 2016-2017. All rights reserved.");
+	Common.Set_InnerTextToElement(oString, "© Ilya Kirillov, 2016-2017. " + g_oLocalization.common.about.allRightReserved);
 
 	var oDiv = document.createElement("div");
 	oDiv.innerHTML = '<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">\

@@ -2209,7 +2209,7 @@ CGoUniverseButtonMinimize.prototype.private_HandleMouseDown = function()
 };
 CGoUniverseButtonMinimize.prototype.private_GetHint = function()
 {
-	return "Minimize";
+	return g_oLocalization.common.minimizeButtonHint;
 };
 CGoUniverseButtonMinimize.prototype.private_ClickTransformIn = function()
 {

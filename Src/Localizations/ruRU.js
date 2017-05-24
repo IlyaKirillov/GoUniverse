@@ -39,10 +39,12 @@ var g_oLocalization_ruRU = {
 		},
 
 		findPlayer   : "найти игрока",
-		search       : "Поиск",
-		searchRoom   : "Найти комнату",
-		searchPlayer : "Найти игрока",
 
+		search             : "Поиск",
+		searchRoom         : "Найти комнату",
+		searchRoomHint     : "Искать в списке всех комнат",
+		chatWithPlayer     : "Общаться с игроком",
+		chatWithPlayerHint : "Начать приватный разговор с заданным пользователем",
 
 		gamesTabs : {
 			games            : "Партии",
@@ -96,8 +98,20 @@ var g_oLocalization_ruRU = {
 
 			listHeaderName : "Имя",
 			listHeaderRank : "Рейтинг"
-		}
+		},
 
+		roomsTabs : {
+			hint : {
+				close          : "Закрыть комнату",
+				moveTabToStart : "Переместить данный таб в начало списка",
+				userInfo       : "Информация о пользователе",
+				roomInfo       : "Информация о комнате",
+				soundOn        : "Звуковое оповещение включено",
+				soundOff       : "Звуковое оповещение выключено"
+			}
+		},
+
+		closeGameRoomHint : "Закрыть"
 	},
 
 	gameRoom : {
@@ -120,6 +134,8 @@ var g_oLocalization_ruRU = {
 		addMinute5 : "Добавить 5 минут",
 
 		startReview : "Начать разбор",
+
+		labelPlaceholder : "Отметка...",
 
 		button : {
 			undo    : "Ход назад",
@@ -243,8 +259,13 @@ var g_oLocalization_ruRU = {
 
 			error : {
 				caption : "Ошибка"
-			}
+			},
 
+			kifu : {
+				caption : "Кифу",
+				end     : "Конец",
+				next    : "Следующий"
+			}
 		}
 	},
 
@@ -312,7 +333,16 @@ var g_oLocalization_ruRU = {
 			Dec : "Дек"
 		},
 
-		privateFlag : "Приватная"
+		privateFlag : "Приватная",
+
+		about : {
+			caption          : "О программе",
+			version          : "Версия",
+			visitMessage     : "Посетите наш проект на гитхабе для отзывов и сообщений об ошибках:",
+			allRightReserved : "Все права защищены."
+		},
+
+		minimizeButtonHint : "Свернуть"
 	},
 
 	KGS : {
