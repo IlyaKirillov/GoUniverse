@@ -158,7 +158,7 @@ CKGSClient.prototype.LoadGameInRoom = function(sTimeStamp, nRoomId, isPrivate)
 	{
 		this.private_SendMessage({
 			"type"      : "ROOM_LOAD_GAME",
-			"timestamp" : "",
+			"timestamp" : sTimeStamp,
 			"channelId" : nRoomId
 		});
 	}
