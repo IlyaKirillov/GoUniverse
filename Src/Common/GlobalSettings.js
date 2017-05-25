@@ -371,7 +371,13 @@ CGoUniverseGlobalSettings.prototype.GetKGSLogin = function()
 };
 CGoUniverseGlobalSettings.prototype.private_ParseKGSLogin = function()
 {
-	this.m_sKGSLogin = this.private_GetValue("KGSLogin");
+	var sValue = this.private_GetValue("KGSLogin");
+
+	if (null === sValue
+		|| undefined === sValue)
+		sValue = "";
+
+	this.m_sKGSLogin = sValue;
 };
 CGoUniverseGlobalSettings.prototype.SetKGSPassword = function(sPassword)
 {
@@ -399,9 +405,19 @@ CGoUniverseGlobalSettings.prototype.GetKGSPassword = function()
 CGoUniverseGlobalSettings.prototype.private_ParseKGSPassword = function()
 {
 	if (true === this.GetKGSSavePassword())
-		this.m_sKGSPassword = this.private_GetValue("KGSPassword");
+	{
+		var sValue = this.private_GetValue("KGSPassword");
+
+		if (null === sValue
+			|| undefined === sValue)
+			sValue = "";
+
+		this.m_sKGSPassword = sValue;
+	}
 	else
+	{
 		this.m_sKGSPassword = "";
+	}
 };
 CGoUniverseGlobalSettings.prototype.SetKGSUserInfoRecentOnlyRanked = function(bOnlyRanked)
 {
