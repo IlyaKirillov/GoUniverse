@@ -919,7 +919,7 @@ CGoUniverseApplication.prototype.private_InitTabPanel = function(oTabsControl)
 
 	g_oTextMeasurer.SetFont("14px 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif");
 	var nExitW = g_oTextMeasurer.Measure(g_oLocalization.mainRoom.exitButton);
-	var nRightPanelW = 60 + 120 + 100 + 35 + nExitW;
+	var nRightPanelW = 70 + 120 + 100 + 35 + nExitW;
 
 	// Правая панелька с поиском, ником и кнопкой выхода
 	var oRightPanel = CreateControlContainer("divIdPanelRight");
