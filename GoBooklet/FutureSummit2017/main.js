@@ -45,6 +45,32 @@ function OnDocumentReady()
 			GoBoardApi.Set_ShowTarget(oGame2, false);
 			GoBoardApi.Update_Size(oGame2);
 		}
+
+		if (!oGame3 && (10 === page || 11 === page))
+		{
+			oGame3 = GoBoardApi.Embed("bookGame3", {
+				boardMode  : "viewer",
+				width      : 440,
+				boardTheme : "BookStyle",
+				sgfData    : "(;EV[The Future of Go Summit, Pair Go]RD[2017-05-26];PB[Gu Li + AlphaGo]PW[Lian Xiao + AlphaGo]SZ[19]KM[7.5];B[pd];W[cc];B[qp];W[dq];B[co];W[oq];B[pq];W[op];B[pn];W[kp];B[ep];W[fq];B[eq];W[er];B[dp];W[cq];B[dr];W[cr];B[fr];W[ds];B[gq];W[pf];B[hn];W[nc];B[nd];W[md];B[ne];W[oc];B[pe];W[qj];B[mr];W[mq];B[lq];W[pr];B[mp];W[mo];B[lp];W[pp];B[qq];W[qo];B[po];W[qn];B[qm];W[rm];B[pm];W[rp];B[rq];W[ro];B[qr];W[or];B[rl];W[qs];B[sr];W[rs];B[sm];W[rr];B[rn];W[sq];B[lo];W[qb];B[qh];W[di];B[dd];W[dc];B[fd];W[de];B[qf];W[lj];B[kd];W[jj];B[lb];W[lc];B[kc];W[mb];B[mj];W[li];B[mi];W[mk];B[mh];W[jm];B[kl];W[jl];B[ml];W[ed];B[fe];W[hc];B[gc];W[hd];B[hf];W[gf];B[ee];W[cd];B[gg];W[ge];B[fg];W[hg];B[eg];W[hh];B[if];W[je];B[jf];W[ke];B[hi];W[gh];B[ei];W[gi];B[gj];W[fj];B[ej];W[fk];B[cf];W[hb];B[jh];W[le];B[lh];W[ii];B[ek];W[fl];B[hl];W[go];B[gn];W[el];B[dl];W[dm];B[cm];W[df];B[dg];W[fo];B[fn];W[ll];B[lm];W[en];B[dn];W[em];B[eo];W[ho];B[io];W[hp];B[ip];W[hq];B[fp];W[in];B[hr];W[cl];B[dk];W[iq];B[jn];W[im];B[jq];W[jo];B[jp];W[hm];B[ir];W[bi];B[bh];W[ch];B[cg];W[bm];B[cn];W[ck];B[bj];W[cj];B[ai];W[bk];B[ci];W[rf];B[dh];W[qg];B[qe];W[pg];B[rh];W[rg];B[ng];W[rd];B[ph];W[bp];B[re];W[se];B[eb];W[lk];B[nk];W[bn];B[bo];W[ao];B[cp];W[bq];B[db];W[ec];B[gb];W[cb];B[ce];W[be];B[bf];W[fc];B[gd];W[fb];B[fa];W[ha];B[ga];W[ae];B[id];W[ie];B[he];W[ic];B[km];W[kn];B[kk];W[kj];B[mn];W[gm];B[gp];W[sf];B[jd];W[jb];B[hj];W[hk];B[ld];W[mc];B[ik];W[jk])",
+				booklet    : true
+			});
+			GoBoardApi.Set_ShowTarget(oGame3, false);
+			GoBoardApi.Update_Size(oGame3);
+		}
+
+		if (!oGame4 && (12 === page || 13 === page))
+		{
+			oGame4 = GoBoardApi.Embed("bookGame4", {
+				boardMode  : "viewer",
+				width      : 440,
+				boardTheme : "BookStyle",
+				sgfData    : "(;EV[The Future of Go Summit, Team Go]RD[2017-05-26];PB[Chen Yaoye, Zhou Ruiyang, Mi Yuting, Shi Yue, Tang Weixing]PW[AlphaGo]SZ[19]KM[7.5];B[pd];W[dd];B[qp];W[dp];B[fq];W[oq];B[cn];W[dn];B[dm];W[en];B[cp];W[cq];B[co];W[dq];B[gp];W[po];B[qo];W[pn];B[qm];W[iq];B[ip];W[jp];B[jq];W[kq];B[jr];W[hq];B[io];W[kr];B[gn];W[do];B[dl];W[fm];B[ci];W[ej];B[di];W[hl];B[il];W[hk];B[im];W[kp];B[jj];W[qc];B[pc];W[qd];B[qf];W[qe];B[pe];W[rf];B[fc];W[hc];B[fe];W[db];B[jc];W[hh];B[eb];W[ce];B[hf];W[if];B[ie];W[id];B[ig];W[jd];B[jf];W[lc];B[rg];W[qg];B[pf];W[rh];B[cb];W[da];B[dc];W[cc];B[ec];W[bb];B[ea];W[ca];B[jb];W[nc];B[ia];W[mf];B[pg];W[sg];B[mh];W[ng];B[qh];W[nh];B[rg];W[qi];B[pi];W[qg];B[ph];W[mi];B[rg];W[ke];B[re];W[qg];B[ba];W[aa];B[rg];W[qn];B[rn];W[qg];B[ne];W[me];B[rg];W[rm];B[rl];W[qg];B[pq];W[pr];B[rg];W[pm];B[sm];W[qg];B[op];W[pp];B[qq];W[nq];B[rg];W[pb];B[ob];W[qg];B[or];W[nr];B[rg];W[qb];B[oc];W[qg];B[fl];W[gm];B[rg];W[cm];B[sf];W[cl];B[ck];W[bn];B[bk];W[bm];B[pl];W[kh];B[om];W[ji];B[li];W[lh];B[mj];W[ni];B[df];W[cf];B[dg];W[oo];B[nj];W[rd];B[pa];W[nb];B[oa];W[gb];B[lb];W[kc];B[ek];W[qr];B[rr];W[lm];B[kl];W[oj];B[oi];W[nl];B[ml];W[nm];B[no];W[np];B[on];W[op];B[ol];W[nk];B[lj];W[nn];B[ok];W[ha];B[mb];W[kb];B[mc];W[md];B[nd];W[la];B[na];W[rs];B[rq];W[bh];B[gj];W[gi];B[fi];W[fh];B[ei];W[hj];B[ln];W[kn];B[mm];W[mn];B[lo];W[mo];B[km];W[er];B[fr];W[lp];B[ll];W[jn];B[hm];W[bi];B[fg];W[gk];B[fj];W[bj];B[ka];W[ja];B[eh];W[cj];B[dj];W[al];B[ka];W[ib];B[ma];W[ic];B[gh];W[hi];B[ak];W[aj];B[ki];W[jh];B[kf];W[lf];B[fo];W[in];B[hn];W[hg];B[gg];W[ir];B[dk];W[bl];B[fs];W[mk];B[lk];W[hp];B[ho];W[gd];B[de];W[ed];B[fd];W[ge];B[gf];W[ee];B[ef];W[cd];B[br];W[bp];)",
+				booklet    : true
+			});
+			GoBoardApi.Set_ShowTarget(oGame4, false);
+			GoBoardApi.Update_Size(oGame4);
+		}
 	});
 
 	document.getElementById("contentsAboutId").addEventListener("click", function()
