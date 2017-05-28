@@ -255,7 +255,8 @@ var g_oLocalization_enUS = {
 
 			boardCropping : {
 				caption      : "Crop the board...",
-				errorMessage : "Sorry, the cropped part can't be so small."
+				errorMessage : "Sorry, the cropped part can't be so small.",
+				buttonReset  : "Reset"
 			},
 
 			error : {

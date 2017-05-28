@@ -254,7 +254,8 @@ var g_oLocalization_ruRU = {
 
 			boardCropping : {
 				caption      : "Обрезка доски...",
-				errorMessage : "Обрезанная часть не может быть настолько маленькой."
+				errorMessage : "Обрезанная часть не может быть настолько маленькой.",
+				buttonReset  : "Сбросить"
 			},
 
 			error : {

@@ -675,7 +675,11 @@ CVisualChatRoomTab.prototype.OnClickClose = function()
 CVisualChatRoomTab.prototype.IncreaseMessagesCount = function()
 {
 	this.m_nNewMessagesCount++;
-	this.m_oMessagesDiv.innerHTML = "" +  Math.min(99, this.m_nNewMessagesCount);
+
+	if (this.m_nNewMessagesCount < 100)
+		this.m_oMessagesDiv.innerHTML = "" +  Math.min(99, this.m_nNewMessagesCount);
+	else
+		this.m_oMessagesDiv.innerHTML = "99+";
 };
 CVisualChatRoomTab.prototype.OnCloseTab = function()
 {

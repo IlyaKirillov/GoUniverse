@@ -80,7 +80,7 @@ CGoUniverseApplication.prototype.Init = function()
 	this.UpdateTranslation();
 	this.private_GotoLoginPage(false);
 	this.OnResize();
-
+	//
 	// //------------------------------------------------------------------------------------------------------------------
 	//
 	// //TEST
@@ -162,10 +162,20 @@ CGoUniverseApplication.prototype.Init = function()
 	//  	oThis.OnAddChatMessage(0, "Test", "Test message " + nIndex);
 	//  }
 	//
-	//  for (var nIndex = 0; nIndex < 100; nIndex++)
+	//  for (var nIndex = 0; nIndex < 110; nIndex++)
 	//  {
 	//  	TEST_AddChatMessage(nIndex);
 	//  }
+	//
+	// function TEST_AddChatMessage2(nIndex)
+	// {
+	// 	oThis.OnAddChatMessage(1, "Test", "Test message " + nIndex);
+	// }
+	//
+	// for (var nIndex = 0; nIndex < 80; nIndex++)
+	// {
+	// 	TEST_AddChatMessage2(nIndex);
+	// }
 	//
 	//  function TEST_AddGameRecord(nGameId)
 	//  {
