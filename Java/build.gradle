@@ -1,0 +1,113 @@
+apply plugin: 'java'
+
+version = '1.3.3'
+
+repositories {
+  mavenCentral()
+}
+
+sourceSets {
+}
+
+processResources{
+	from('src/main/java'){
+		into 'go/universe/jar'
+		include '*.fxml' 
+		include '*.css'
+	}
+}
+
+task jsonClient(type: Jar){
+
+  destinationDir = file('build')
+  baseName = 'jsonClient'
+  includeEmptyDirs = false
+
+  def wars = fileTree('jsonClient'){
+    include 'jsonClient-*.war'
+  }.sort().reverse()
+
+  if(!wars) throw new GradleException('The war file for the KGS JSON client is not found')
+
+  def input = wars[0]
+  inputs.file input
+
+  version = ( input.name =~ '^jsonClient-(.+)\\.war$' )[0][1]
+
+  manifest {
+      attributes 'Implementation-Title': 'KGS JSON Client',
+                 'Implementation-Version': version
+  }
+
+  from {
+    zipTree input
+   } {
+      eachFile{
+      def match = ( path =~ '^WEB-INF/classes/(.+)$' )
+      if(match){
+        path = match[0][1]
+      }else{
+        exclude()
+      }
+     }
+  }
+}
+
+dependencies {
+  compile group: 'ch.qos.logback',    name:'logback-classic', version:'1.2.1'
+  compile group: 'ch.qos.logback',    name:'logback-core', version:'1.2.1'
+  compile group: 'org.slf4j', name:'slf4j-api', version:'1.7.24'
+  compile group: 'org.slf4j', name:'jul-to-slf4j', version:'1.7.24'
+  compile group: 'org.json', name: 'json', version: '20160810'
+  compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '8.5.2'
+  compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-logging-juli', version: '8.5.2'
+  compile jsonClient.outputs.files
+}
+
+
+jar {
+  dependsOn classes
+
+  duplicatesStrategy = 'warn'
+
+	baseName = 'GoUniverse'
+  extension = 'jar'
+
+  manifest {
+    attributes 'Implementation-Title': 'GoUniverse',
+               'Implementation-Version': version,
+               'Main-Class': 'go.universe.jar.Main'
+  }
+
+  into('/'){ 
+
+  	configurations.runtime.files.each {
+      from files(it).collect { 
+        it.isDirectory() ? it : zipTree(it) 
+      }
+
+      exclude 'META-INF/*.SF'
+      exclude 'META-INF/*.DSA'
+      exclude 'META-INF/*.RSA'
+      exclude 'META-INF/DEPENDENCIES'
+      exclude 'META-INF/LICENSE'
+      exclude 'META-INF/LICENSE.txt'
+      exclude 'META-INF/NOTICE'
+      exclude 'META-INF/NOTICE.txt'
+      exclude 'about.html'
+      exclude 'logging.properties'
+    }
+  }
+
+  into('/'){
+    from 'etc/'
+  }
+
+  into('/'){
+    from '../Src'
+		exclude '.git'
+		exclude 'KGS/Client.js'
+  }
+}
+
+
