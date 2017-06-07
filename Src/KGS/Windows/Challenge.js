@@ -356,6 +356,8 @@ function CKGSChallengeWindow()
 				oThis.m_oPrivateCheckBox.checked  = false;
 			}
 		}
+
+		//oThis.Update
 	};
 	this.private_OnChangeComment = function()
 	{
@@ -2152,6 +2154,10 @@ CKGSChallengeWindow.prototype.private_CalculateWindowSize = function()
 		this.m_nDefH = 512 - this.m_nHeaderHeight - 60;
 	else
 		this.m_nDefH = 512;
+};
+CKGSChallengeWindow.prototype.private_UpdatePlayers = function()
+{
+
 };
 
 function CGoUniverseButtonMinimize(fOnClickHandler)

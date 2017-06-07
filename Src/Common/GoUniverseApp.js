@@ -757,6 +757,7 @@ CGoUniverseApplication.prototype.private_InitLoginPage = function()
 		{
 			case 0 : sLocale = "en-EN"; break;
 			case 1 : sLocale = "ru-RU"; break;
+			case 2 : sLocale = "fr-FR"; break;
 		}
 
 		oThis.m_oGlobalSettings.SetLocale(sLocale);
@@ -1703,6 +1704,12 @@ CGoUniverseApplication.prototype.private_ParseLocale = function()
 		{
 			oSelection.selectedIndex = 1;
 			g_oLocalization = g_oLocalization_ruRU;
+			break;
+		}
+		case "fr-FR":
+		{
+			oSelection.selectedIndex = 2;
+			g_oLocalization = g_oLocalization_frFR;
 			break;
 		}
 

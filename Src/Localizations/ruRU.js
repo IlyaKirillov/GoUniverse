@@ -275,7 +275,7 @@ var g_oLocalization_ruRU = {
 		gameResult : {
 			resign  : "Сдача",
 			time    : "Время",
-			forfeit : "Штраф",
+			forfeit : "Неявка",
 			even    : "Ничья"
 		},
 
