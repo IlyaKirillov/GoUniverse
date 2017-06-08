@@ -315,10 +315,22 @@ var g_oLocalization_enUS = {
 
 		connectionStatus : {
 			online     : "online",
-			secondsAgo : "seconds ago",
-			minutesAgo : "minutes ago",
-			hoursAgo   : "hours ago",
-			daysAgo    : "days ago"
+			secondsAgo : function(nSeconds)
+			{
+				return nSeconds + " seconds ago";
+			},
+			minutesAgo : function(nMinutes)
+			{
+				return nMinutes + " minutes ago";
+			},
+			hoursAgo   : function(nHours)
+			{
+				return nHours + " hours ago";
+			},
+			daysAgo    : function(nDays)
+			{
+				return nDays + " days ago";
+			}
 		},
 
 		months : {

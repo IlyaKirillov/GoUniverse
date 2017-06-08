@@ -315,10 +315,22 @@ var g_oLocalization_frFR = {
 
 		connectionStatus : {
 			online     : "En ligne",
-			secondsAgo : "Il y a quelques secondes",
-			minutesAgo : "Il y a quelques minutes",
-			hoursAgo   : "Il y a quelques heures",
-			daysAgo    : "Il y a quelques jours"
+			secondsAgo : function (nSeconds)
+			{
+				return "Il y a quelques secondes";
+			},
+			minutesAgo : function (nMinutes)
+			{
+				return "Il y a quelques minutes";
+			},
+			hoursAgo   : function (nHours)
+			{
+				return "Il y a quelques heures";
+			},
+			daysAgo    : function (nDays)
+			{
+				return "Il y a quelques jours";
+			}
 		},
 
 		months : {

@@ -328,25 +328,25 @@ CTimeStamp.prototype.GetDifferenceString = function()
 
 	if (nSeconds <= 60 * 2)
 	{
-		return "" + nSeconds + " " + g_oLocalization.common.connectionStatus.secondsAgo;
+		return g_oLocalization.common.connectionStatus.secondsAgo(nSeconds);
 	}
 	else if (nSeconds <= 3600 * 2)
 	{
 		var nMinutes = Math.floor(nSeconds / 60);
-		return nMinutes + " " + g_oLocalization.common.connectionStatus.minutesAgo;
+		return g_oLocalization.common.connectionStatus.minutesAgo(nMinutes);
 	}
 	else if (nSeconds <= 3600 * 24 * 2)
 	{
 		var nMinutes = Math.floor(nSeconds / 60);
 		var nHours   = Math.floor(nMinutes / 60);
-		return nHours + " " + g_oLocalization.common.connectionStatus.hoursAgo;
+		return g_oLocalization.common.connectionStatus.hoursAgo(nHours);
 	}
 	else
 	{
 		var nMinutes = Math.floor(nSeconds / 60);
 		var nHours   = Math.floor(nMinutes / 60);
 		var nDays    = Math.floor(nHours / 24);
-		return nDays + " " + g_oLocalization.common.connectionStatus.daysAgo;
+		return g_oLocalization.common.connectionStatus.daysAgo(nDays);
 	}
 };
 

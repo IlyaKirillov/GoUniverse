@@ -313,10 +313,46 @@ var g_oLocalization_ruRU = {
 
 		connectionStatus : {
 			online     : "в сети",
-			secondsAgo : "секунд назад",
-			minutesAgo : "минут назад",
-			hoursAgo   : "часов назад",
-			daysAgo    : "дней назад"
+			secondsAgo : function(nSeconds)
+			{
+				var nType = private_ruRuLocaliztionTimeAgo(nSeconds);
+				if (0 === nType)
+					return nSeconds + " секунд назад";
+				else if (2 === nType)
+					return nSeconds + " секунды назад";
+				else
+					return nSeconds + " секунду назад";
+			},
+			minutesAgo : function(nMinutes)
+			{
+				var nType = private_ruRuLocaliztionTimeAgo(nMinutes);
+				if (0 === nType)
+					return nMinutes + " минут назад";
+				else if (2 === nType)
+					return nMinutes + " минуты назад";
+				else
+					return nMinutes + " минуту назад";
+			},
+			hoursAgo   : function(nHours)
+			{
+				var nType = private_ruRuLocaliztionTimeAgo(nHours);
+				if (0 === nType)
+					return nHours + " часов назад";
+				else if (2 === nType)
+					return nHours + " часа назад";
+				else
+					return nHours + " час назад";
+			},
+			daysAgo    : function(nDays)
+			{
+				var nType = private_ruRuLocaliztionTimeAgo(nDays);
+				if (0 === nType)
+					return nDays + " дней назад";
+				else if (2 === nType)
+					return nDays + " дня назад";
+				else
+					return nDays + " день назад";
+			}
 		},
 
 		months : {
@@ -474,3 +510,17 @@ var g_oLocalization_ruRU = {
 };
 
 ExtendLocalization(g_oLocalization_ruRU, g_oDefaultLocalization);
+
+function private_ruRuLocaliztionTimeAgo(nCount)
+{
+	var nOst10 = nCount % 10;
+	var nOst100 = nCount % 100;
+
+	if ((nOst100 >= 10 && nOst100 <= 20)
+		|| nOst10 >= 5)
+		return 0;
+	else if (1 === nOst10)
+		return 1;
+	else
+		return 2;
+}
