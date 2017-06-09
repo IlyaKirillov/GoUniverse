@@ -379,7 +379,24 @@ var g_oLocalization_ruRU = {
 			allRightReserved : "Все права защищены."
 		},
 
-		minimizeButtonHint : "Свернуть"
+		minimizeButtonHint : "Свернуть",
+
+		window : {
+			captionError   : "Ошибка",
+			captionWarning : "Предупреждение",
+
+			messageNoUserWithName    : function(sUserName)
+			{
+				return "Пользователь с именем \"" + sUserName + "\" не найден.";
+			},
+			messageNoUser            : "Пользователь не найден.",
+			messageRoomIsPrivate     : function(sRoomName)
+			{
+				return "Извините, комната " + sRoomName + " является приватной. Вы не можете войти.";
+			},
+			messageAlreadyPlaying    : "Извините, вы уже играете, нельзя начинать еще одну игру.",
+			messageChallengeDeclined : "Ваш вызов был отклонен."
+		}
 	},
 
 	KGS : {
@@ -454,7 +471,10 @@ var g_oLocalization_ruRU = {
 				buttonRetry     : "Повтор",
 				buttonRetryHint : "Отменить текущее предложение",
 
-				challengerHint  : "Посмотреть информацию"
+				challengerHint  : "Посмотреть информацию",
+
+				buttonDecline     : "отклонить",
+				buttonDeclineHint : "Отклонить вызов данного игрока"
 			},
 
 			roomInfo : {

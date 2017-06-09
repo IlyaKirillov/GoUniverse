@@ -1940,7 +1940,7 @@ CKGSClient.prototype.private_HandleDetailsNonExistant = function(oMessage)
 			oUser.Window.Close();
 	}
 	
-	CreateKGSWindow(EKGSWindowType.Information, {Client : this, App : this.m_oApp, Caption : "Error", Text : "There is no user account named \"" + oMessage.name + "\" on this system.", Image : "WarningSpanWarning", W : 347, H : 144});
+	CreateKGSWindow(EKGSWindowType.Information, {Client : this, App : this.m_oApp, Caption : g_oLocalization.common.window.captionError, Text : g_oLocalization.common.window.messageNoUserWithName(oMessage.name), Image : "WarningSpanWarning", W : 347, H : 144});
 };
 CKGSClient.prototype.private_HandleArchiveNonExistant = function(oMessage)
 {
@@ -1992,7 +1992,7 @@ CKGSClient.prototype.private_HandlePrivateKeepOut = function(oMessage)
 		delete this.m_oGameNotify[nChannelId];
 	}
 
-	CreateKGSWindow(EKGSWindowType.Information, {Client : this, App : this.m_oApp, Caption : "Error", Text : "Sorry, " + sRoomName + " is private. You cannot enter.", Image : "WarningSpanNoEntry", W : 485, H : 144});
+	CreateKGSWindow(EKGSWindowType.Information, {Client : this, App : this.m_oApp, Caption : g_oLocalization.common.window.captionError, Text : g_oLocalization.common.window.messageRoomIsPrivate(sRoomName), Image : "WarningSpanNoEntry", W : 485, H : 144});
 };
 CKGSClient.prototype.private_HandleIdleWarning = function(oMessage)
 {
@@ -2265,8 +2265,8 @@ CKGSClient.prototype.private_HandleConvoNoSuchUser = function(oMessage)
 	CreateKGSWindow(EKGSWindowType.Information, {
 		Client : this,
 		App    : this.m_oApp,
-		Caption: "Warning",
-		Text   : "There is no such user.",
+		Caption: g_oLocalization.common.window.captionWarning,
+		Text   : g_oLocalization.common.window.messageNoUser,
 		Image  : "WarningSpanWarning",
 		W      : 370,
 		H      : 144
@@ -2617,8 +2617,8 @@ CKGSClient.prototype.private_ShowAlreadyPlayingWindow = function()
 	CreateKGSWindow(EKGSWindowType.Information, {
 		Client : this,
 		App    : this.m_oApp,
-		Caption: "Warning",
-		Text   : "Sorry, you are already playing in one game, so you can't start playing in another.",
+		Caption: g_oLocalization.common.window.captionWarning,
+		Text   : g_oLocalization.common.window.messageAlreadyPlaying,
 		Image  : "WarningSpanWarning",
 		W      : 370,
 		H      : 144

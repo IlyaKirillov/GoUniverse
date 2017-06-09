@@ -531,7 +531,7 @@ CKGSChallengeWindow.prototype.OnDecline = function()
 	var oChallengeCreator = this.m_oOwner;
 	this.private_SetState(EKGSChallengeWindowState.ChallengerSubmit);
 
-	CreateKGSWindow(EKGSWindowType.Information, {Client : this.m_oClient, App : this.m_oClient.m_oApp, Caption : "Warning", Text : "Your challenge has been declined.", Image : "WarningSpanWarning", W : 315, H : 145});
+	CreateKGSWindow(EKGSWindowType.Information, {Client : this.m_oClient, App : this.m_oClient.m_oApp, Caption : g_oLocalization.common.window.captionWarning, Text : g_oLocalization.common.window.messageChallengeDeclined, Image : "WarningSpanWarning", W : 315, H : 145});
 };
 CKGSChallengeWindow.prototype.OnProposal = function(oProposal)
 {
@@ -921,8 +921,8 @@ CKGSChallengeWindow.prototype.private_CreatePlayers = function()
 	oChallengerRejectSpan.className      = "challengePlayerSpan challengePlayerRejectSpan";
 	oChallengerRejectSpan.style["float"] = "right";
 	oChallengerRejectSpan.style.display  = "none";
-	oChallengerRejectSpan.innerHTML      = "decline";
-	oChallengerRejectSpan.title          = "Decline this player";
+	oChallengerRejectSpan.innerHTML      = g_oLocalization.KGS.window.challenge.buttonDecline;
+	oChallengerRejectSpan.title          = g_oLocalization.KGS.window.challenge.buttonDeclineHint;
 	oChallengerRejectSpan.onclick = function ()
 	{
 		oThis.private_RejectChallenge();
@@ -1352,7 +1352,7 @@ CKGSChallengeWindow.prototype.private_OkChallenge = function()
 		if (nGameType === EKGSGameType.Rengo || nGameType === EKGSGameType.Simul)
 		{
 			this.Close();
-			CreateKGSWindow(EKGSWindowType.Information, {Client : this, App : this.m_oApp, Caption : "Warning", Text : "Sorry, simulations and rengo challenges are not supported in the current version.", Image : "WarningSpanWarning", W : 347, H : 144});
+			CreateKGSWindow(EKGSWindowType.Information, {Client : this, App : this.m_oApp, Caption : g_oLocalization.common.window.captionWarning, Text : "Sorry, simulations and rengo challenges are not supported in the current version.", Image : "WarningSpanWarning", W : 347, H : 144});
 			return;
 		}
 

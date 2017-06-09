@@ -357,7 +357,24 @@ var g_oLocalization_enUS = {
 			allRightReserved : "All rights reserved."
 		},
 
-		minimizeButtonHint : "Minimize"
+		minimizeButtonHint : "Minimize",
+
+		window : {
+			captionError   : "Error",
+			captionWarning : "Warning",
+
+			messageNoUserWithName    : function(sUserName)
+			{
+				return "There is no user account named \"" + sUserName + "\" on this system.";
+			},
+			messageNoUser            : "There is no such user.",
+			messageRoomIsPrivate     : function(sRoomName)
+			{
+				return "Sorry, " + sRoomName + " is private. You cannot enter.";
+			},
+			messageAlreadyPlaying    : "Sorry, you are already playing in one game, so you can't start playing in another.",
+			messageChallengeDeclined : "Your challenge has been declined."
+		}
 
 	},
 
@@ -433,7 +450,10 @@ var g_oLocalization_enUS = {
 				buttonRetry     : "Retry",
 				buttonRetryHint : "Cancel current proposal",
 
-				challengerHint  : "View info"
+				challengerHint  : "View info",
+
+				buttonDecline     : "decline",
+				buttonDeclineHint : "Decline this player"
 			},
 
 			roomInfo : {
