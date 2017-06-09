@@ -517,7 +517,8 @@ function private_ruRuLocaliztionTimeAgo(nCount)
 	var nOst100 = nCount % 100;
 
 	if ((nOst100 >= 10 && nOst100 <= 20)
-		|| nOst10 >= 5)
+		|| nOst10 >= 5 
+		|| 0 === nOst10)
 		return 0;
 	else if (1 === nOst10)
 		return 1;
