@@ -416,11 +416,11 @@ CTimeSettings.prototype.GetTimeSystemString = function()
 	{
 		case ETimeSettings.None:
 		{
-			return "no time limit";
+			return g_oLocalization.common.timeSystem.none.toLowerCase();
 		}
 		case ETimeSettings.Absolute:
 		{
-			return this.private_SecondsToString2(this.m_nMainTime) + " absolute";
+			return this.private_SecondsToString2(this.m_nMainTime) + " " + g_oLocalization.common.timeSystem.absolute.toLowerCase();
 		}
 		case ETimeSettings.ByoYomi:
 		{
@@ -432,7 +432,7 @@ CTimeSettings.prototype.GetTimeSystemString = function()
 		}
 	}
 
-	return "No time limit";
+	return g_oLocalization.common.timeSystem.none.toLowerCase();
 };
 CTimeSettings.prototype.GetMainTimeString = function()
 {
