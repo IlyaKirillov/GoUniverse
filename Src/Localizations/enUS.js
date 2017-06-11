@@ -471,9 +471,9 @@ var g_oLocalization_enUS = {
 				tabRank     : "Rank",
 				tabFriends  : "Friends",
 				tabCensored : "Censored",
-				tabFuns     : "Funs",
+				tabFuns     : "Fans",
 
-				rankGraphReplacementText : "No rank data avaliable",
+				rankGraphReplacementText : "No rank data available",
 
 				fieldUserName     : "User name",
 				fieldRealName     : "Real name",
