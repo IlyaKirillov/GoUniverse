@@ -35,6 +35,9 @@ CGoUniverseAboutWindow.prototype.Init = function(sDivId, oPr)
 };
 CGoUniverseAboutWindow.prototype.Get_DefaultWindowSize = function()
 {
+	if (undefined !== g_oLocalization.common.about.translatedBy)
+		return {W : 392, H : 264 + 40};
+
 	return {W : 392, H : 264};
 };
 CGoUniverseAboutWindow.prototype.Close = function()
@@ -92,6 +95,15 @@ CGoUniverseAboutWindow.prototype.private_InitAboutPage = function(oDiv)
 	oString.href             = "https://github.com/IlyaKirillov/GoUniverse";
 	oDivMainPart.appendChild(oString);
 	Common.Set_InnerTextToElement(oString, "https://github.com/IlyaKirillov/GoUniverse");
+
+	if (undefined !== g_oLocalization.common.about.translatedBy)
+	{
+		oString                  = document.createElement("div");
+		oString.style.marginLeft = "110px";
+		oString.style.paddingTop = "20px";
+		oDivMainPart.appendChild(oString);
+		Common.Set_InnerTextToElement(oString, g_oLocalization.common.about.translatedBy);
+	}
 
 	oString                  = document.createElement("div");
 	oString.style.paddingTop = "30px";

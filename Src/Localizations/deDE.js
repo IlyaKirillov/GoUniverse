@@ -9,6 +9,8 @@
  * Time     14:56
  */
 
+// The translation was made by Yvonne Limbach
+
 var g_oLocalization_deDE = {
 
 	locale : "de-DE",
@@ -170,19 +172,19 @@ var g_oLocalization_deDE = {
 				startAutoplay : "Autoplay atarten",
 				stopAutoplay  : "Autoplay stoppen",
 
-				gameInfo : "Spielinfo",
+				gameInfo : "Partieinfo",
 
 				showKifu       : "Kifu anzeigen",
-				toggleKifuMode : "Kifu-Modus wechseln"
+				toggleKifuMode : "Den nächsten Zug raten"
 			}
 		},
 
 		countingScores : {
 			header  : "Gefangene markieren",
-			message : "Bevor das Ergebnis feststeht markieren die Spieler die aus ihrer Sicht toten Steine. Nachdem beide Seiten der Markierung zugestimmt haben steht der Gewinner fest.",
+			message : "Die Spieler markieren die aus ihrer Sicht toten Steine. Nachdem beide Seiten der Markierung zugestimmt haben steht der Gewinner fest.",
 
 			buttonAccept : "OK",
-			buttonResume : "Abbrechen und zurück zum Spiel"
+			buttonResume : "Zurück zum Spiel"
 		},
 
 		toolbarCustomization : {
@@ -201,19 +203,19 @@ var g_oLocalization_deDE = {
 			downloadSGF           : "Partie als SGF herunterladen",
 			createSnapshot        : "Screenshot vom Brett aufnehmen",
 			exportToGif           : "Als GIF exportieren",
-			convertToASCIIDiagram : "In ein ASCII-Diagramm konvertieren",
+			convertToASCIIDiagram : "In ASCII-Diagramm konvertieren",
 			scoreEstimator        : "Ergebnis schätzen",
 			toggleCoordinates     : "Brettkoordinaten",
 			createNew             : "Neu",
 			loadFile              : "Von der Festplatte laden",
 			loadFileFromClipboard : "Aus der Zwischenablage laden",
-			gameInfo              : "Spielinfo",
+			gameInfo              : "Partieinfo",
 			cropBoard             : "Brettausschnitt wählen"
 		},
 
 		window : {
 			gameInfo : {
-				caption : "Spielinfo",
+				caption : "Partieinfo",
 
 				gameName     : "Name der Partie",
 				result       : "Ergebnis",
@@ -234,7 +236,7 @@ var g_oLocalization_deDE = {
 				fuseki       : "Fuseki",
 				source       : "Quelle",
 				transcriber  : "Mitschreiber",
-				gameInfo     : "Spielinfo"
+				gameInfo     : "Partieinfo"
 			},
 
 			colorsCounter : {
@@ -354,7 +356,8 @@ var g_oLocalization_deDE = {
 			caption          : "About",
 			version          : "Version",
 			visitMessage     : "Hinterlasse Feedback oder Fehlermeldungen beim Github-Projekt:",
-			allRightReserved : "Alle Rechte vorbehalten."
+			allRightReserved : "Alle Rechte vorbehalten.",
+			translatedBy     : "Übersetzt von Yvonne Limbach."
 		},
 
 		minimizeButtonHint : "Minimieren",
@@ -445,7 +448,7 @@ var g_oLocalization_deDE = {
 				fieldMainTime      : "Grundbedenkzeit",
 				fieldByoYomiTime   : "Byoyomi",
 				fieldPeriods       : "Perioden",
-				fieldStones        : "Steine",
+				fieldStones        : "Züge",
 
 				buttonRetry     : "Abbrechen",
 				buttonRetryHint : "Aktuelle Anfrage abbrechen",
