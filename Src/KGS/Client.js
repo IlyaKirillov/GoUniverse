@@ -235,14 +235,14 @@ CKGSClient.prototype.SendChatMessageInGameRoom = function(nGameRoomId, sText)
 		"text"      : sText
 	});
 };
-CKGSClient.prototype.LoadUserInfo = function(sUserName)
+CKGSClient.prototype.LoadUserInfo = function(_sUserName)
 {
-	var sUserName = sUserName.toLowerCase();
+	var sUserName = _sUserName.toLowerCase();
 
 	if (this.m_oUserInfo[sUserName])
 		return;
 
-	var oWindow = CreateKGSWindow(EKGSWindowType.UserInfo, {UserName : sUserName, Client : this, App: this.m_oApp});
+	var oWindow = CreateKGSWindow(EKGSWindowType.UserInfo, {UserName : _sUserName, Client : this, App: this.m_oApp});
 	oWindow.Hide();
 
 	this.m_oUserInfo[sUserName] = {

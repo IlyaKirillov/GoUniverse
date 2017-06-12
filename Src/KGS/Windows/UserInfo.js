@@ -967,7 +967,7 @@ CKGSUserInfoWindow.prototype.private_AddInfoCheckboxFields = function(oParent, o
 
 	var oCheckBox     = document.createElement("input");
 	oCheckBox.style.position = "relative";
-	oCheckBox.style.top      = (nHeight - 12) / 2 + "px";
+	oCheckBox.style.top      = Math.ceil((nHeight - 12) / 2) + "px";
 	oCheckBox.style.width    = "12px";
 	oCheckBox.style.height   = "12px";
 	oCheckBox.type           = "checkbox";
@@ -1058,7 +1058,7 @@ CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
 	var sDivId = oDiv.id;
 
 	var nEditH = 25;
-	var nBot   = this.m_bOwnInfo ?  nEditH + 10 : 7;
+	var nBot   = nEditH + 10;//this.m_bOwnInfo ?  nEditH + 10 : 7;
 
 	var sMainInfo  = sDivId + "M";
 	var sAvatar    = sDivId + "A";
@@ -1114,6 +1114,13 @@ CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
 		return oButton;
 	}
 
+	var sEditId = sDivId + "D";
+	var oEditAreaElement = this.protected_CreateDivElement(oDiv, sEditId);
+	var oEditAreaControl = CreateControlContainer(sEditId);
+	oEditAreaControl.SetParams(5, 0, 5, 5, true, false, true, true, -1, nEditH);
+	oEditAreaControl.SetAnchor(true, false, true, true);
+	oControl.AddControl(oEditAreaControl);
+
 	if (this.m_bOwnInfo)
 	{
 		var sSaveButton   = g_oLocalization.common.button.save;
@@ -1127,13 +1134,6 @@ CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
 		var nCancelButtonW = g_oTextMeasurer.Measure(sCancelButton);
 
 		nEditButtonW = nSaveButtonW = nCancelButtonW = nPadding + Math.max(nEditButtonW, nSaveButtonW, nCancelButtonW, 40);
-
-		var sEditId = sDivId + "D";
-		var oEditAreaElement = this.protected_CreateDivElement(oDiv, sEditId);
-		var oEditAreaControl = CreateControlContainer(sEditId);
-		oEditAreaControl.SetParams(5, 0, 5, 5, true, false, true, true, -1, nEditH);
-		oEditAreaControl.SetAnchor(true, false, true, true);
-		oControl.AddControl(oEditAreaControl);
 
 		this.m_oEditButton   = private_AddButton(oEditAreaElement, sEditButton, nEditButtonW, 0, function(){return oThis.private_OnClickEdit()});
 		this.m_oSaveButton   = private_AddButton(oEditAreaElement, sSaveButton, nSaveButtonW, 0 + nCancelButtonW + 3, function(){return oThis.private_OnClickSave()});
@@ -1159,6 +1159,55 @@ CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
 		this.m_oInfoEditScroll.SetPaddings(0, 0, -1);
 
 		this.m_oExtensionEditDiv.maxLength = "1500";
+	}
+	else
+	{
+		var oClient = this.m_oClient;
+		this.private_AddUserListCheckbox(oEditAreaElement,
+			g_oLocalization.mainRoom.playersList.contextMenuFriend,
+			function(s)
+			{
+				return oClient.IsUserInFriendList(s);
+			},
+			function(s)
+			{
+				return oClient.AddToFriendList(s);
+			},
+			function(s)
+			{
+				return oClient.RemoveFromFriendList(s);
+			}
+		);
+		this.private_AddUserListCheckbox(oEditAreaElement,
+			g_oLocalization.mainRoom.playersList.contextMenuCensored,
+			function(s)
+			{
+				return oClient.IsUserInBlackList(s);
+			},
+			function(s)
+			{
+				return oClient.AddToBlackList(s);
+			},
+			function(s)
+			{
+				return oClient.RemoveFromBlackList(s);
+			}
+		);
+		this.private_AddUserListCheckbox(oEditAreaElement,
+			g_oLocalization.mainRoom.playersList.contextMenuFollow,
+			function(s)
+			{
+				return oClient.IsUserInFollowerList(s);
+			},
+			function(s)
+			{
+				return oClient.AddToFollowerList(s);
+			},
+			function(s)
+			{
+				return oClient.RemoveFromFollowerList(s);
+			}
+		);
 	}
 
 	this.private_AddMainInfo();
@@ -1706,6 +1755,58 @@ CKGSUserInfoWindow.prototype.private_OnClickCancel = function()
 
 	// Вызываем, чтобы обновить рейтинг, если он был скрыт
 	this.OnUserUpdate();
+};
+CKGSUserInfoWindow.prototype.private_AddUserListCheckbox = function(oParent, sLabel, fIsInList, fAdd, fRemove)
+{
+	var nHeight = 25;
+
+	var oWrapper                = document.createElement("div");
+	oWrapper.style["user-select"] = "none";
+	oWrapper.style.paddingLeft  = "5px";
+	oWrapper.style.paddingRight = "15px";
+	oWrapper.style.height       = nHeight + "px";
+	oWrapper.style["float"]     = "left";
+	oWrapper.style.cursor       = "default";
+	oParent.appendChild(oWrapper);
+
+	oWrapper.addEventListener("selectstart", function(){return false}, false);
+
+	var oCheckBox     = document.createElement("input");
+	oCheckBox.style.position = "relative";
+	oCheckBox.style.top      = Math.ceil((nHeight - 12 + 2) / 2) + "px";
+	oCheckBox.style.width    = "12px";
+	oCheckBox.style.height   = "12px";
+	oCheckBox.style["float"] = "left";
+	oCheckBox.type           = "checkbox";
+	oCheckBox.checked        = fIsInList(this.m_sUserName);
+	oWrapper.appendChild(oCheckBox);
+
+	var oLabel               = document.createElement("div");
+	oLabel.style["float"]    = "left";
+	oLabel.style.paddingLeft = "3px";
+	oLabel.style.fontFamily  = "'Segoe UI', Tahoma, sans-serif";
+	oLabel.style.fontSize    = "16px";
+	oLabel.style.height      = nHeight + "px";
+	oLabel.style.lineHeight  = nHeight + "px";
+	oLabel.textContent       = sLabel;
+	oWrapper.appendChild(oLabel);
+
+	var oThis = this;
+	function privateOnClick()
+	{
+		if (fIsInList(oThis.m_sUserName))
+		{
+			fRemove(oThis.m_sUserName);
+			oCheckBox.checked = false;
+		}
+		else
+		{
+			fAdd(oThis.m_sUserName);
+			oCheckBox.checked = true;
+		}
+	}
+	oCheckBox.onclick = privateOnClick;
+	oLabel.onclick    = privateOnClick;
 };
 
 var EKGSUserInfoGameListRecord = {
