@@ -354,7 +354,8 @@ var g_oLocalization_frFR = {
 			caption          : "A propos",
 			version          : "Version",
 			visitMessage     : "Visiter la page github de notre projet pour donner vos retours:",
-			allRightReserved : "Tous droits réservés."
+			allRightReserved : "Tous droits réservés.",
+			translatedBy     : "Traduit par Christopher Long."
 		},
 
 		minimizeButtonHint : "Minimiser"
