@@ -451,7 +451,7 @@ var g_oLocalization_frFR = {
 				buttonRetry     : "Réessayer",
 				buttonRetryHint : "Annuler proposition actuelle",
 
-				challengerHint : "Voir les informations"
+				challengerHint : "Voir les informations",
 
 				buttonDecline     : "Refuser",
 				buttonDeclineHint : "Refuser ce joueur"
