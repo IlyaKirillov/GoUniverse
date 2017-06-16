@@ -317,19 +317,19 @@ var g_oLocalization_frFR = {
 			online     : "En ligne",
 			secondsAgo : function (nSeconds)
 			{
-				return "Il y a quelques secondes";
+				return "Il y a " + nSeconds + " secondes";
 			},
 			minutesAgo : function (nMinutes)
 			{
-				return "Il y a quelques minutes";
+				return "Il y a " + nMinutes + " minutes";
 			},
 			hoursAgo   : function (nHours)
 			{
-				return "Il y a quelques heures";
+				return "Il y a " + nHours + " heures";
 			},
 			daysAgo    : function (nDays)
 			{
-				return "Il y a quelques jours";
+				return "Il y a " + nDays + " jours";
 			}
 		},
 
@@ -358,7 +358,24 @@ var g_oLocalization_frFR = {
 			translatedBy     : "Traduit par Christopher Long."
 		},
 
-		minimizeButtonHint : "Minimiser"
+		minimizeButtonHint : "Minimiser",
+
+		window : {
+			captionError   : "Erreur",
+			captionWarning : "Attention",
+
+			messageNoUserWithName    : function(sUserName)
+			{
+				return "Il n'y a pas d'utilisateur \"" + sUserName + "\" dans ce système.";
+			},
+			messageNoUser            : "Il n'y a pas de tel utilisateur.",
+			messageRoomIsPrivate     : function(sRoomName)
+			{
+				return "Désolé, " + sRoomName + " est privé. Vous ne pouvez pas entrer.";
+			},
+			messageAlreadyPlaying    : "Désolé, vous êtes déjà en train de jouer une partie, vous ne pouvez pas en commencer une autre.",
+			messageChallengeDeclined : "Votre offre de partie a été décliné."
+		}
 
 	},
 
@@ -435,6 +452,9 @@ var g_oLocalization_frFR = {
 				buttonRetryHint : "Annuler proposition actuelle",
 
 				challengerHint : "Voir les informations"
+
+				buttonDecline     : "Refuser",
+				buttonDeclineHint : "Refuser ce joueur"
 			},
 
 			roomInfo : {
