@@ -399,6 +399,12 @@ CKGSChallengeWindow.prototype.Init = function(sDivId, oPr)
 	this.HtmlElement.MinimizeButton = oMinimizeButton;
 	this.HtmlElement.CaptionTextControl.SetParams(15, 0, 55 + 45 + 6, 1000, true, false, true, false, -1, 30);
 	//--------------------------------------------------------------------------------------------
+	
+	this.HtmlElement.NameWrapperControl    = null;
+	this.HtmlElement.PlayersWrapperControl = null;
+	this.HtmlElement.RulesWrapperControl   = null;
+	this.HtmlElement.RulesWrapperElement   = null;
+	this.HtmlElement.ButtonsWrapperControl = null;
 
 	this.m_nChannelId  = oPr.ChannelId;
 	this.m_oGameRecord = oPr.GameRecord;
@@ -703,12 +709,22 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 	var nLeftWidth = 120;
 	var oMainDiv     = this.HtmlElement.InnerDiv;
 	var oMainControl = this.HtmlElement.InnerControl;
+	
+	var oNameWrapperDiv = this.protected_CreateDivElement(oMainDiv);
+	var oNameWrapperControl = CreateControlContainerByElement(oNameWrapperDiv);
 
-	var oWrapperDiv     = this.protected_CreateDivElement(oMainDiv);
+	oNameWrapperControl.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, 2 * this.m_nHeaderHeight);
+	oNameWrapperControl.SetAnchor(true, true, true, false);
+	oMainControl.AddControl(oNameWrapperControl);
+	
+	this.HtmlElement.NameWrapperControl = oNameWrapperControl;
+	
+
+	var oWrapperDiv     = this.protected_CreateDivElement(oNameWrapperDiv);
 	var oWrapperControl = CreateControlContainerByElement(oWrapperDiv);
 	oWrapperControl.SetParams(0, this.m_nHeaderHeight, 1000, 1000, true, true, false, false, -1, this.m_nHeaderHeight);
 	oWrapperControl.SetAnchor(false, true, true, false);
-	oMainControl.AddControl(oWrapperControl);
+	oNameWrapperControl.AddControl(oWrapperControl);
 
 	if (this.m_nType !== EKGSChallengeWindowType.Demonstration)
 	{
@@ -729,11 +745,11 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 		this.private_AddEventsForInput(this.private_OnChangeComment, oInput);
 	}
 
-	var oWrapperTypeDiv     = this.protected_CreateDivElement(oMainDiv);
+	var oWrapperTypeDiv     = this.protected_CreateDivElement(oNameWrapperDiv);
 	var oWrapperTypeControl = CreateControlContainerByElement(oWrapperTypeDiv);
 	oWrapperTypeControl.SetParams(0, 0, -1, -1, true, true, false, false, 10 + this.m_nSelectionW, this.m_nHeaderHeight);
 	oWrapperTypeControl.SetAnchor(true, true, false, false);
-	oMainControl.AddControl(oWrapperTypeControl);
+	oNameWrapperControl.AddControl(oWrapperTypeControl);
 
 	var oTypeList       = this.protected_CreateDivElement(oWrapperTypeDiv, null, "select");
 	oTypeList.style.fontWeight = "bold";
@@ -777,11 +793,11 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 	oWrapperTypeControl.AddControl(oTypeListControl);
 
 	var nPrivateHeight = this.m_nHeaderHeight - 5;
-	var oWrapperPrivateDiv = this.protected_CreateDivElement(oMainDiv);
+	var oWrapperPrivateDiv = this.protected_CreateDivElement(oNameWrapperDiv);
 	var oWrapperPrivateControl = CreateControlContainerByElement(oWrapperPrivateDiv);
 	oWrapperPrivateControl.SetParams(10 + this.m_nSelectionW, 5, 0, -1, true, true, true, false, -1, nPrivateHeight);
 	oWrapperPrivateControl.SetAnchor(true, true, true, false);
-	oMainControl.AddControl(oWrapperPrivateControl);
+	oNameWrapperControl.AddControl(oWrapperPrivateControl);
 
 	var oPrivateCheckBox            = document.createElement("input");
 	oPrivateCheckBox.style.position = "relative";
@@ -847,18 +863,21 @@ CKGSChallengeWindow.prototype.private_CreatePlayers = function()
 	if (this.m_nType === EKGSChallengeWindowType.Demonstration)
 		return;
 
-	var nTop = this.m_nHeaderHeight * 2;
-
-	nTop += 10;
-
 	var oMainDiv     = this.HtmlElement.InnerDiv;
 	var oMainControl = this.HtmlElement.InnerControl;
+	
+	var oPlayersWrapperElement = this.protected_CreateDivElement(oMainDiv);
+	var oPlayersWrapperControl = CreateControlContainerByElement(oPlayersWrapperElement);	
+	oPlayersWrapperControl.SetParams(0, this.m_nHeaderHeight * 2 + 10, 1000, 1000, false, true, false, false, -1, 2 * this.m_nPlayersHeight);
+	oPlayersWrapperControl.SetAnchor(true, true, true, false);
+	oMainControl.AddControl(oPlayersWrapperControl);	
+	this.HtmlElement.PlayersWrapperControl = oPlayersWrapperControl;
 
-	var oPlayersColor        = this.protected_CreateDivElement(oMainDiv, null, "canvas");
+	var oPlayersColor        = this.protected_CreateDivElement(oPlayersWrapperElement, null, "canvas");
 	var oPlayersColorControl = CreateControlContainerByElement(oPlayersColor);
-	oPlayersColorControl.SetParams(10, nTop, 0, 0, true, true, false, false, 50, 2 * this.m_nPlayersHeight);
+	oPlayersColorControl.SetParams(10, 0, 0, 0, true, true, false, false, 50, 2 * this.m_nPlayersHeight);
 	oPlayersColorControl.SetAnchor(true, true, false, false);
-	oMainControl.AddControl(oPlayersColorControl);
+	oPlayersWrapperControl.AddControl(oPlayersColorControl);
 	this.m_oPlayersColorsCanvas = oPlayersColor;
 
 	oPlayersColor.style.cursor = "pointer";
@@ -866,11 +885,11 @@ CKGSChallengeWindow.prototype.private_CreatePlayers = function()
 	var oThis = this;
 	oPlayersColor.addEventListener("click", this.private_OnChangeColors, false);
 
-	var oCreatorPlayer = this.protected_CreateDivElement(oMainDiv);
+	var oCreatorPlayer  = this.protected_CreateDivElement(oPlayersWrapperElement);
 	var oCreatorControl = CreateControlContainerByElement(oCreatorPlayer);
-	oCreatorControl.SetParams(70, nTop, 10, 0, true, true, true, false, -1, this.m_nPlayersHeight);
+	oCreatorControl.SetParams(70, 0, 10, 0, true, true, true, false, -1, this.m_nPlayersHeight);
 	oCreatorControl.SetAnchor(true, true, true, false);
-	oMainControl.AddControl(oCreatorControl);
+	oPlayersWrapperControl.AddControl(oCreatorControl);
 	oCreatorPlayer.style.paddingLeft = "3px";
 	oCreatorPlayer.className += "challengePlayer";
 
@@ -889,18 +908,18 @@ CKGSChallengeWindow.prototype.private_CreatePlayers = function()
 		oCreatorPlayer.appendChild(oSpan);
 	}
 
-	var oChallengerListElement = this.protected_CreateDivElement(oMainDiv, "", "select");
+	var oChallengerListElement = this.protected_CreateDivElement(oPlayersWrapperElement, "", "select");
 	var oChallengerListControl = CreateControlContainerByElement(oChallengerListElement);
-	oChallengerListControl.SetParams(70, nTop + this.m_nPlayersHeight, 10, 0, true, true, true, false, -1, this.m_nPlayersHeight);
+	oChallengerListControl.SetParams(70, this.m_nPlayersHeight, 10, 0, true, true, true, false, -1, this.m_nPlayersHeight);
 	oChallengerListControl.SetAnchor(true, true, true, false);
-	oMainControl.AddControl(oChallengerListControl);
+	oPlayersWrapperControl.AddControl(oChallengerListControl);
 	this.private_AddOptionToSelect(oChallengerListElement, "");
 
-	var oChallengerPlayer = this.protected_CreateDivElement(oMainDiv);
+	var oChallengerPlayer = this.protected_CreateDivElement(oPlayersWrapperElement);
 	var oChallengerControl = CreateControlContainerByElement(oChallengerPlayer);
-	oChallengerControl.SetParams(70 + 1, nTop + this.m_nPlayersHeight + 1, 50, 0, true, true, true, false, -1, this.m_nPlayersHeight - 2);
+	oChallengerControl.SetParams(70 + 1, this.m_nPlayersHeight + 1, 50, 0, true, true, true, false, -1, this.m_nPlayersHeight - 2);
 	oChallengerControl.SetAnchor(true, true, true, false);
-	oMainControl.AddControl(oChallengerControl);
+	oPlayersWrapperControl.AddControl(oChallengerControl);
 	oChallengerPlayer.style.paddingLeft = "3px";
 	oChallengerPlayer.className += "challengePlayer";
 
@@ -930,7 +949,7 @@ CKGSChallengeWindow.prototype.private_CreatePlayers = function()
 	oChallengerPlayer.appendChild(oChallengerRejectSpan);
 
 
-	this.m_nTop = nTop + 2 * this.m_nPlayersHeight;
+	this.m_nTop = 2 * this.m_nPlayersHeight;
 
 	this.m_oChallengerDiv    = oChallengerPlayer;
 	this.m_oChallengerSelect = oChallengerListElement;
@@ -1042,8 +1061,19 @@ CKGSChallengeWindow.prototype.private_CreateRules = function()
 	var oGameRecord = this.m_oGameRecord;
 	var oProposal   = oGameRecord.GetProposal();
 
+	var oMainDiv     = this.HtmlElement.InnerDiv;
+	var oMainControl = this.HtmlElement.InnerControl;
+	
+	var oRulesWrapperElement = this.protected_CreateDivElement(oMainDiv);
+	var oRulesWrapperControl = CreateControlContainerByElement(oRulesWrapperElement);	
+	oRulesWrapperControl.SetParams(0, this.m_nHeaderHeight * 2 + 10 + this.m_nPlayersHeight * 2 + 10, 1000, 1000, false, true, false, false, -1, 9 * this.m_nFieldHeight);
+	oRulesWrapperControl.SetAnchor(true, true, true, false);
+	oMainControl.AddControl(oRulesWrapperControl);	
+	this.HtmlElement.RulesWrapperControl = oRulesWrapperControl;
+	this.HtmlElement.RulesWrapperElement = oRulesWrapperElement;
+
 	var nLeftWidth = this.m_nFieldLabelWidth;
-	var nTop = this.m_nTop + 10;
+	var nTop       = 0;
 
 	// Room
 	var oRoomSelectElement = this.private_AddRulesField(nLeftWidth, nTop, "select", g_oLocalization.KGS.window.challenge.fieldRoom + ":");
@@ -1181,8 +1211,8 @@ CKGSChallengeWindow.prototype.private_AddOptionToSelect = function(oSelect, sNam
 };
 CKGSChallengeWindow.prototype.private_AddRulesField = function(nLeftWidth, nTop, sTag, sFieldName, isReturnLabel)
 {
-	var oMainDiv     = this.HtmlElement.InnerDiv;
-	var oMainControl = this.HtmlElement.InnerControl;
+	var oMainDiv     = this.HtmlElement.RulesWrapperElement;
+	var oMainControl = this.HtmlElement.RulesWrapperControl;
 
 	var oTitleElement = this.protected_CreateDivElement(oMainDiv);
 	var oTitleControl = CreateControlContainerByElement(oTitleElement);
@@ -1214,8 +1244,14 @@ CKGSChallengeWindow.prototype.private_CreateButtons = function()
 	var oMainControl = this.HtmlElement.InnerControl;
 	var oThis        = this;
 	var sMainId      = oMainDiv.id;
-
+	
 	var nButtonH = 25;
+
+	var oButtonsWrapperElement = this.protected_CreateDivElement(oMainDiv);
+	var oButtonsWrapperControl = CreateControlContainerByElement(oButtonsWrapperElement);
+	oButtonsWrapperControl.SetParams(0, 0, 1000, 5, false, false, false, true, -1, nButtonH);
+	oButtonsWrapperControl.SetAnchor(true, false, true, true);
+	oMainControl.AddControl(oButtonsWrapperControl);
 
 	g_oTextMeasurer.SetFont("16px 'Segoe UI', Helvetica, Tahoma, Geneva, Verdana, sans-serif");
 	var nButtonW = Math.max(60,
@@ -1229,11 +1265,11 @@ CKGSChallengeWindow.prototype.private_CreateButtons = function()
 
 	// Close - общая кнопка
 	var sCloseButtonId      = sMainId + "Z";
-	var oCloseButtonElement = this.protected_CreateDivElement(oMainDiv, sCloseButtonId);
+	var oCloseButtonElement = this.protected_CreateDivElement(oButtonsWrapperElement, sCloseButtonId);
 	var oCloseButtonControl = CreateControlContainerByElement(oCloseButtonElement);
-	oCloseButtonControl.SetParams(0, 0, 5, 5, false, false, true, true, nButtonW, nButtonH);
+	oCloseButtonControl.SetParams(0, 0, 5, 0, false, false, true, true, nButtonW, nButtonH);
 	oCloseButtonControl.SetAnchor(false, false, true, true);
-	oMainControl.AddControl(oCloseButtonControl);
+	oButtonsWrapperControl.AddControl(oCloseButtonControl);
 	var oCloseButton = new CDrawingButtonSimpleText(g_oLocalization.common.button.close, function()
 	{
 		oThis.Close();
@@ -1243,11 +1279,11 @@ CKGSChallengeWindow.prototype.private_CreateButtons = function()
 
 	// Create - кнопка для создания вызова
 	var sCreateButtonId      = sMainId + "C";
-	var oCreateButtonElement = this.protected_CreateDivElement(oMainDiv, sCreateButtonId);
+	var oCreateButtonElement = this.protected_CreateDivElement(oButtonsWrapperElement, sCreateButtonId);
 	var oCreateButtonControl = CreateControlContainerByElement(oCreateButtonElement);
-	oCreateButtonControl.SetParams(0, 0, 5 + nButtonW + 5, 5, false, false, true, true, nButtonW, nButtonH);
+	oCreateButtonControl.SetParams(0, 0, 5 + nButtonW + 5, 0, false, false, true, true, nButtonW, nButtonH);
 	oCreateButtonControl.SetAnchor(false, false, true, true);
-	oMainControl.AddControl(oCreateButtonControl);
+	oButtonsWrapperControl.AddControl(oCreateButtonControl);
 	var oCreateButton = new CDrawingButtonSimpleText(g_oLocalization.common.button.create, function()
 	{
 		oThis.private_CreateChallenge();
@@ -1257,11 +1293,11 @@ CKGSChallengeWindow.prototype.private_CreateButtons = function()
 
 	// Ok - кнопка для подтверждения
 	var sOkButtonId      = sMainId + "O";
-	var oOkButtonElement = this.protected_CreateDivElement(oMainDiv, sOkButtonId);
+	var oOkButtonElement = this.protected_CreateDivElement(oButtonsWrapperElement, sOkButtonId);
 	var oOkButtonControl = CreateControlContainerByElement(oOkButtonElement);
-	oOkButtonControl.SetParams(0, 0, 5 + nButtonW + 5, 5, false, false, true, true, nButtonW, nButtonH);
+	oOkButtonControl.SetParams(0, 0, 5 + nButtonW + 5, 0, false, false, true, true, nButtonW, nButtonH);
 	oOkButtonControl.SetAnchor(false, false, true, true);
-	oMainControl.AddControl(oOkButtonControl);
+	oButtonsWrapperControl.AddControl(oOkButtonControl);
 	var oOkButton = new CDrawingButtonSimpleText(g_oLocalization.common.button.ok, function()
 	{
 		oThis.private_OkChallenge();
@@ -1271,11 +1307,11 @@ CKGSChallengeWindow.prototype.private_CreateButtons = function()
 
 	// Retry - кнопка для отмены предложения
 	var sRetryButtonId      = sMainId + "R";
-	var oRetryButtonElement = this.protected_CreateDivElement(oMainDiv, sRetryButtonId);
+	var oRetryButtonElement = this.protected_CreateDivElement(oButtonsWrapperElement, sRetryButtonId);
 	var oRetryButtonControl = CreateControlContainerByElement(oRetryButtonElement);
-	oRetryButtonControl.SetParams(0, 0, 5 + nButtonW + 5, 5, false, false, true, true, nButtonW, nButtonH);
+	oRetryButtonControl.SetParams(0, 0, 5 + nButtonW + 5, 0, false, false, true, true, nButtonW, nButtonH);
 	oRetryButtonControl.SetAnchor(false, false, true, true);
-	oMainControl.AddControl(oRetryButtonControl);
+	oButtonsWrapperControl.AddControl(oRetryButtonControl);
 	var oRetryButton = new CDrawingButtonSimpleText(g_oLocalization.KGS.window.challenge.buttonRetry, function()
 	{
 		oThis.private_RetryChallenge();
