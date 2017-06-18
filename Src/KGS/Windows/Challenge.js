@@ -39,7 +39,9 @@ function CKGSChallengeWindow()
 	CKGSChallengeWindow.superclass.constructor.call(this);
 
 	this.m_nState      = EKGSChallengeWindowState.Unknown;
-	this.m_nType       = EKGSChallengeWindowState.Unranked;
+	this.m_nType       = EKGSChallengeWindowType.Regular;
+	
+	this.m_bEnableRanked = false;
 
 	this.m_nChannelId  = -1;
 	this.m_oGameRecord = null;
@@ -51,7 +53,6 @@ function CKGSChallengeWindow()
 	this.m_bCreatorBlack = false;
 	this.m_nGameType     = EKGSGameType.Free;
 
-	this.m_nTop           = 0;
 	this.m_nHeaderHeight  = 30;
 	this.m_nPlayersHeight = 30;
 	this.m_nFieldHeight   = 32;
@@ -60,8 +61,9 @@ function CKGSChallengeWindow()
 	this.m_nFieldValueMinWidth = 221;
 	this.m_nSelectionW         = 110;
 
-	this.m_oPlayersColorsCanvas = null;
-	this.m_oAnimatedWaiting     = null;
+	this.m_oPlayersColorsCanvas  = null;
+	this.m_oPlayersColorsControl = null;
+	this.m_oAnimatedWaiting      = null;
 
 	this.m_oButtons = {
 		Close  : null,
@@ -357,7 +359,7 @@ function CKGSChallengeWindow()
 			}
 		}
 
-		//oThis.Update
+		oThis.private_UpdateGameType();
 	};
 	this.private_OnChangeComment = function()
 	{
@@ -366,7 +368,7 @@ function CKGSChallengeWindow()
 	};
 	this.private_OnChangePrivate = function()
 	{
-		if (oThis.m_nType === EKGSChallengeWindowType.Regular && true === oThis.m_oPrivateCheckBox.checked && EKGSGameType.Ranked === oThis.private_GetSelectedGameType())
+		if (oThis.m_nType === EKGSChallengeWindowType.Regular && true === oThis.m_bEnableRanked && true === oThis.m_oPrivateCheckBox.checked && EKGSGameType.Ranked === oThis.private_GetSelectedGameType())
 		{
 			oThis.private_SetSelectedGameType(EKGSGameType.Free);
 			oThis.private_OnChangeGameType();
@@ -424,11 +426,9 @@ CKGSChallengeWindow.prototype.Init = function(sDivId, oPr)
 	}
 	else if (true === oPr.Create)
 	{
-		this.m_nState = EKGSChallengeWindowState.Creation;
-		this.m_nType  = EKGSChallengeWindowType.Unranked;
-
-		if (this.m_oClient.GetCurrentUser().CanPlayRanked())
-			this.m_nType = EKGSChallengeWindowType.Regular;
+		this.m_nState        = EKGSChallengeWindowState.Creation;
+		this.m_nType         = EKGSChallengeWindowType.Regular;
+		this.m_bEnableRanked = this.m_oClient.GetCurrentUser().CanPlayRanked();
 	}
 	else
 	{
@@ -441,23 +441,9 @@ CKGSChallengeWindow.prototype.Init = function(sDivId, oPr)
 			this.m_nState             = EKGSChallengeWindowState.ChallengerSubmit;
 			this.m_oCurrentChallenger = this.m_oClient.GetCurrentUser();
 		}
-		this.m_nGameType = this.m_oGameRecord.GetProposal().GetGameType();
-
-		if (EKGSGameType.Free === this.m_nGameType)
-			this.m_nType = EKGSChallengeWindowType.Unranked;
-		else if (EKGSGameType.Rengo === this.m_nGameType)
-			this.m_nType = EKGSChallengeWindowType.Rengo;
-		else if (EKGSGameType.Simul === this.m_nGameType)
-			this.m_nType = EKGSChallengeWindowType.Simulation;
-		else if (EKGSGameType.Teaching === this.m_nGameType)
-			this.m_nType = EKGSChallengeWindowType.Unranked;
-		else if (EKGSGameType.Ranked === this.m_nGameType)
-		{
-			this.m_nType = EKGSChallengeWindowType.Unranked;
-			if (this.m_oOwner && this.m_oOwner.CanPlayRanked() && (!this.m_oCurrentChallenger || this.m_oCurrentChallenger.CanPlayRanked()))
-				this.m_nType = EKGSChallengeWindowType.Regular;
-		}
-
+		this.m_nGameType     = this.m_oGameRecord.GetProposal().GetGameType();
+		this.m_nType         = EKGSChallengeWindowType.Regular;
+		this.m_bEnableRanked = this.m_oOwner && this.m_oOwner.CanPlayRanked() && (!this.m_oCurrentChallenger || this.m_oCurrentChallenger.CanPlayRanked()) ? true : false;
 	}
 
 	this.private_CalculateWindowSize();
@@ -759,25 +745,15 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 	{
 		case EKGSChallengeWindowType.Regular:
 		{
-			this.private_AddOptionToSelect(oTypeList, g_oLocalization.KGS.gameType.ranked);
+			if (this.m_bEnableRanked)
+				this.private_AddOptionToSelect(oTypeList, g_oLocalization.KGS.gameType.ranked);
+			
 			this.private_AddOptionToSelect(oTypeList, g_oLocalization.KGS.gameType.free);
 			this.private_AddOptionToSelect(oTypeList, g_oLocalization.KGS.gameType.teaching);
-			break;
-		}
-		case EKGSChallengeWindowType.Unranked:
-		{
-			this.private_AddOptionToSelect(oTypeList, g_oLocalization.KGS.gameType.free);
-			this.private_AddOptionToSelect(oTypeList, g_oLocalization.KGS.gameType.teaching);
-			break;
-		}
-		case EKGSChallengeWindowType.Rengo:
-		{
 			this.private_AddOptionToSelect(oTypeList, g_oLocalization.KGS.gameType.rengo);
-			break;
-		}
-		case EKGSChallengeWindowType.Simulation:
-		{
-			this.private_AddOptionToSelect(oTypeList, g_oLocalization.KGS.gameType.simulation);
+			
+			// TODO: Simulations are currently disabled
+			//this.private_AddOptionToSelect(oTypeList, g_oLocalization.KGS.gameType.simulation);
 			break;
 		}
 		case EKGSChallengeWindowType.Demonstration:
@@ -825,15 +801,6 @@ CKGSChallengeWindow.prototype.private_CreateName = function()
 	else
 		oPrivateCheckBox.disabled = "disabled";
 
-	if (this.m_nType !== EKGSChallengeWindowType.Demonstration)
-	{
-		this.m_nTop = this.m_nHeaderHeight * 2;
-	}
-	else
-	{
-		this.m_nTop = this.m_nHeaderHeight;
-	}
-
 	this.m_oGameTypeSelect  = oTypeList;
 	this.m_oPrivateCheckBox = oPrivateCheckBox;
 
@@ -860,9 +827,6 @@ CKGSChallengeWindow.prototype.private_CreateAnimatedWaiting = function()
 };
 CKGSChallengeWindow.prototype.private_CreatePlayers = function()
 {
-	if (this.m_nType === EKGSChallengeWindowType.Demonstration)
-		return;
-
 	var oMainDiv     = this.HtmlElement.InnerDiv;
 	var oMainControl = this.HtmlElement.InnerControl;
 	
@@ -878,7 +842,8 @@ CKGSChallengeWindow.prototype.private_CreatePlayers = function()
 	oPlayersColorControl.SetParams(10, 0, 0, 0, true, true, false, false, 50, 2 * this.m_nPlayersHeight);
 	oPlayersColorControl.SetAnchor(true, true, false, false);
 	oPlayersWrapperControl.AddControl(oPlayersColorControl);
-	this.m_oPlayersColorsCanvas = oPlayersColor;
+	this.m_oPlayersColorsCanvas  = oPlayersColor;
+	this.m_oPlayersColorsControl = oPlayersColorControl;
 
 	oPlayersColor.style.cursor = "pointer";
 	oPlayersColor.title = g_oLocalization.KGS.window.challenge.switchColorsHint;
@@ -948,15 +913,15 @@ CKGSChallengeWindow.prototype.private_CreatePlayers = function()
 	};
 	oChallengerPlayer.appendChild(oChallengerRejectSpan);
 
-
-	this.m_nTop = 2 * this.m_nPlayersHeight;
-
 	this.m_oChallengerDiv    = oChallengerPlayer;
 	this.m_oChallengerSelect = oChallengerListElement;
 	this.m_oChallengerSpan   = oChallengerSpan;
 	this.m_oChallengerReject = oChallengerRejectSpan;
 
 	this.private_AddEventsForSelect(this.private_OnChangeChallenger, oChallengerListElement);
+	
+	if (this.m_nType === EKGSChallengeWindowType.Demonstration)
+		oPlayersWrapperElement.style.display = "none";
 };
 CKGSChallengeWindow.prototype.private_DrawPlayerColor = function(bChanged)
 {
@@ -989,70 +954,92 @@ CKGSChallengeWindow.prototype.private_DrawPlayerColor = function(bChanged)
 
 	oContext.lineWidth   = 2;
 	oContext.strokeStyle = "rgb(0, 0, 0)";
-
-	if (true === this.m_bNigiri)
+	
+	function privateDrawNigiri(nX, nY)
 	{
 		oContext.fillStyle = "rgb(255, 255, 255)";
 		oContext.beginPath();
-		oContext.arc(nX, nY1, nRad, 0, 2 * Math.PI, false);
+		oContext.arc(nX, nY, nRad, 0, 2 * Math.PI, false);
 		oContext.closePath();
 		oContext.stroke();
 		oContext.fill();
 
 		oContext.fillStyle = "rgb(0, 0, 0)";
 		oContext.beginPath();
-		oContext.arc(nX, nY1, nRad, 1.75 * Math.PI, 0.75 * Math.PI, false);
-		oContext.closePath();
-		oContext.stroke();
-		oContext.fill();
-
-		oContext.fillStyle = "rgb(255, 255, 255)";
-		oContext.beginPath();
-		oContext.arc(nX, nY2, nRad, 0, 2 * Math.PI, false);
-		oContext.closePath();
-		oContext.stroke();
-		oContext.fill();
-
-		oContext.fillStyle = "rgb(0, 0, 0)";
-		oContext.beginPath();
-		oContext.arc(nX, nY2, nRad, 1.75 * Math.PI, 0.75 * Math.PI, false);
+		oContext.arc(nX, nY, nRad, 1.75 * Math.PI, 0.75 * Math.PI, false);
 		oContext.closePath();
 		oContext.stroke();
 		oContext.fill();
 	}
-	else if (true === this.m_bCreatorBlack)
+	function privateDrawBlack(nX, nY)
 	{
 		oContext.fillStyle = "rgb(0, 0, 0)";
 
 		oContext.beginPath();
-		oContext.arc(nX, nY1, nRad, 0, 2 * Math.PI, false);
+		oContext.arc(nX, nY, nRad, 0, 2 * Math.PI, false);
 		oContext.stroke();
 		oContext.fill();
-
+	}
+	function privateDrawWhite(nX, nY)
+	{
 		oContext.fillStyle = "rgb(255, 255, 255)";
 
 		oContext.beginPath();
-		oContext.arc(nX, nY2, nRad, 0, 2 * Math.PI, false);
+		oContext.arc(nX, nY, nRad, 0, 2 * Math.PI, false);
 		oContext.stroke();
 		oContext.fill();
+	}
+	
+	var nGameType = this.private_GetSelectedGameType();
+	if (EKGSGameType.Rengo === nGameType)
+	{
+		var nY3 = nSize * 2.5;
+		var nY4 = nSize * 3.5;
+		
+		if (true === this.m_bNigiri)
+		{
+			privateDrawNigiri(nX, nY1);
+			privateDrawNigiri(nX, nY2);
+			privateDrawNigiri(nX, nY3);
+			privateDrawNigiri(nX, nY4);
+		}
+		else if (true === this.m_bCreatorBlack)
+		{
+			privateDrawBlack(nX, nY1);
+			privateDrawBlack(nX, nY2);
+			privateDrawWhite(nX, nY3);
+			privateDrawWhite(nX, nY4);
+		}
+		else
+		{
+			privateDrawWhite(nX, nY1);
+			privateDrawWhite(nX, nY2);
+			privateDrawBlack(nX, nY3);
+			privateDrawBlack(nX, nY4);
+		}
+	}
+	else if (EKGSGameType.Simul === nGameType)
+	{
+		// TODO: Implement
 	}
 	else
 	{
-		oContext.fillStyle = "rgb(255, 255, 255)";
-
-		oContext.beginPath();
-		oContext.arc(nX, nY1, nRad, 0, 2 * Math.PI, false);
-		oContext.stroke();
-		oContext.fill();
-
-		oContext.fillStyle = "rgb(0, 0, 0)";
-
-		oContext.beginPath();
-		oContext.arc(nX, nY2, nRad, 0, 2 * Math.PI, false);
-		oContext.stroke();
-		oContext.fill();
+		if (true === this.m_bNigiri)
+		{
+			privateDrawNigiri(nX, nY1);
+			privateDrawNigiri(nX, nY2);
+		}
+		else if (true === this.m_bCreatorBlack)
+		{
+			privateDrawBlack(nX, nY1);
+			privateDrawWhite(nX, nY2);
+		}
+		else
+		{
+			privateDrawWhite(nX, nY1);
+			privateDrawBlack(nX, nY2);
+		}
 	}
-
 };
 CKGSChallengeWindow.prototype.private_CreateRules = function()
 {
@@ -1065,8 +1052,13 @@ CKGSChallengeWindow.prototype.private_CreateRules = function()
 	var oMainControl = this.HtmlElement.InnerControl;
 	
 	var oRulesWrapperElement = this.protected_CreateDivElement(oMainDiv);
-	var oRulesWrapperControl = CreateControlContainerByElement(oRulesWrapperElement);	
-	oRulesWrapperControl.SetParams(0, this.m_nHeaderHeight * 2 + 10 + this.m_nPlayersHeight * 2 + 10, 1000, 1000, false, true, false, false, -1, 9 * this.m_nFieldHeight);
+	var oRulesWrapperControl = CreateControlContainerByElement(oRulesWrapperElement);
+
+	if (EKGSChallengeWindowType.Demonstration === this.m_nType)	
+		oRulesWrapperControl.SetParams(0, this.m_nHeaderHeight + 10, 1000, 1000, false, true, false, false, -1, 9 * this.m_nFieldHeight);
+	else
+		oRulesWrapperControl.SetParams(0, this.m_nHeaderHeight * 2 + 10 + this.m_nPlayersHeight * 2 + 10, 1000, 1000, false, true, false, false, -1, 9 * this.m_nFieldHeight);
+	
 	oRulesWrapperControl.SetAnchor(true, true, true, false);
 	oMainControl.AddControl(oRulesWrapperControl);	
 	this.HtmlElement.RulesWrapperControl = oRulesWrapperControl;
@@ -1189,8 +1181,6 @@ CKGSChallengeWindow.prototype.private_CreateRules = function()
 
 		this.private_UpdateTimeSystemFields();
 	}
-
-	this.m_nTop = nTop;
 
 	this.private_AddEventsForSelect(this.private_OnChangeRoom, oRoomSelectElement);
 	this.private_AddEventsForSelect(this.private_OnChangeRules, oRulesSelectElement);
@@ -1408,36 +1398,43 @@ CKGSChallengeWindow.prototype.private_RetryChallenge = function()
 };
 CKGSChallengeWindow.prototype.private_GetSelectedGameType = function()
 {
+	if (!this.m_oGameTypeSelect)
+		return EKGSGameType.Free;
+	
 	var nSelectedIndex = this.m_oGameTypeSelect.selectedIndex;
 	switch (this.m_nType)
 	{
 		case EKGSChallengeWindowType.Regular:
 		{
-			if (0 === nSelectedIndex)
-				return EKGSGameType.Ranked;
-			else if (1 === nSelectedIndex)
-				return EKGSGameType.Free;
-			else if (2 === nSelectedIndex)
-				return EKGSGameType.Teaching;
-
+			if (this.m_bEnableRanked)
+			{
+				if (0 === nSelectedIndex)
+					return EKGSGameType.Ranked;
+				else if (1 === nSelectedIndex)
+					return EKGSGameType.Free;
+				else if (2 === nSelectedIndex)
+					return EKGSGameType.Teaching;
+				else if (3 === nSelectedIndex)
+					return EKGSGameType.Rengo;
+				else if (4 === nSelectedIndex)
+					return EKGSGameType.Simul;
+			}
+			else
+			{
+				if (0 === nSelectedIndex)
+					return EKGSGameType.Free;
+				else if (1 === nSelectedIndex)
+					return EKGSGameType.Teaching;
+				else if (2 === nSelectedIndex)
+					return EKGSGameType.Rengo;
+				else if (3 === nSelectedIndex)
+					return EKGSGameType.Simul;
+			}
 			break;
-		}
-		case EKGSChallengeWindowType.Unranked:
+		}		
+		case EKGSChallengeWindowType.Demonstration:
 		{
-			if (0 === nSelectedIndex)
-				return EKGSGameType.Free;
-			else if (1 === nSelectedIndex)
-				return EKGSGameType.Teaching;
-
-			break;
-		}
-		case EKGSChallengeWindowType.Rengo:
-		{
-			return EKGSGameType.Rengo;
-		}
-		case EKGSChallengeWindowType.Simulation:
-		{
-			return EKGSGameType.Simul;
+			return EKGSGameType.Demonstration;
 		}
 	}
 
@@ -1450,26 +1447,34 @@ CKGSChallengeWindow.prototype.private_SetSelectedGameType = function(nGameType)
 	{
 		case EKGSChallengeWindowType.Regular:
 		{
-			if (EKGSGameType.Ranked === nGameType)
-				nSelectedIndex = 0;
-			else if (EKGSGameType.Free === nGameType)
-				nSelectedIndex = 1;
-			else if (EKGSGameType.Teaching === nGameType)
-				nSelectedIndex = 2;
+			if (this.m_bEnableRanked)
+			{
+				if (EKGSGameType.Ranked === nGameType)
+					nSelectedIndex = 0;
+				else if (EKGSGameType.Free === nGameType)
+					nSelectedIndex = 1;
+				else if (EKGSGameType.Teaching === nGameType)
+					nSelectedIndex = 2;
+				else if (EKGSGameType.Rengo === nGameType)
+					nSelectedIndex = 3;
+				else if (EKGSGameType.Simul === nGameType)
+					nSelectedIndex = 4;
+			}
+			else
+			{
+				if (EKGSGameType.Free === nGameType)
+					nSelectedIndex = 0;
+				else if (EKGSGameType.Teaching === nGameType)
+					nSelectedIndex = 1;
+				else if (EKGSGameType.Rengo === nGameType)
+					nSelectedIndex = 2;
+				else if (EKGSGameType.Simul === nGameType)
+					nSelectedIndex = 3;
+			}
 
 			break;
 		}
-		case EKGSChallengeWindowType.Unranked:
-		{
-			if (EKGSGameType.Free === nGameType)
-				nSelectedIndex = 0;
-			else if (EKGSGameType.Teaching === nGameType)
-				nSelectedIndex = 1;
-
-			break;
-		}
-		case EKGSChallengeWindowType.Rengo:
-		case EKGSChallengeWindowType.Simulation:
+		case EKGSChallengeWindowType.Demonstration:
 		{
 			nSelectedIndex = 0;
 			break;
@@ -2154,29 +2159,26 @@ CKGSChallengeWindow.prototype.private_CalculateWindowSize = function()
 	{
 		case EKGSChallengeWindowType.Regular:
 		{
-			this.m_nSelectionW += Math.max(
-				g_oTextMeasurer.Measure(g_oLocalization.KGS.gameType.free),
-				g_oTextMeasurer.Measure(g_oLocalization.KGS.gameType.ranked),
-				g_oTextMeasurer.Measure(g_oLocalization.KGS.gameType.teaching)
-			);
-			break;
-		}
-		case EKGSChallengeWindowType.Unranked:
-		{
-			this.m_nSelectionW += Math.max(
-				g_oTextMeasurer.Measure(g_oLocalization.KGS.gameType.free),
-				g_oTextMeasurer.Measure(g_oLocalization.KGS.gameType.teaching)
-			);
-			break;
-		}
-		case EKGSChallengeWindowType.Rengo:
-		{
-			this.m_nSelectionW += g_oTextMeasurer.Measure(g_oLocalization.KGS.gameType.rengo);
-			break;
-		}
-		case EKGSChallengeWindowType.Simulation:
-		{
-			this.m_nSelectionW += g_oTextMeasurer.Measure(g_oLocalization.KGS.gameType.simulation);
+			if (this.m_bEnableRanked)
+			{
+				this.m_nSelectionW += Math.max(
+					g_oTextMeasurer.Measure(g_oLocalization.KGS.gameType.free),
+					g_oTextMeasurer.Measure(g_oLocalization.KGS.gameType.ranked),
+					g_oTextMeasurer.Measure(g_oLocalization.KGS.gameType.teaching),
+					g_oTextMeasurer.Measure(g_oLocalization.KGS.gameType.rengo),
+					g_oTextMeasurer.Measure(g_oLocalization.KGS.gameType.simulation)
+				);
+			}
+			else
+			{
+				this.m_nSelectionW += Math.max(
+					g_oTextMeasurer.Measure(g_oLocalization.KGS.gameType.free),
+					g_oTextMeasurer.Measure(g_oLocalization.KGS.gameType.teaching),
+					g_oTextMeasurer.Measure(g_oLocalization.KGS.gameType.rengo),
+					g_oTextMeasurer.Measure(g_oLocalization.KGS.gameType.simulation)
+				);
+			}
+			
 			break;
 		}
 		case EKGSChallengeWindowType.Demonstration:
@@ -2186,14 +2188,56 @@ CKGSChallengeWindow.prototype.private_CalculateWindowSize = function()
 		}
 	}
 
-	if (this.m_nType === EKGSChallengeWindowType.Demonstration)
-		this.m_nDefH = 512 - this.m_nHeaderHeight - 60;
-	else
-		this.m_nDefH = 512;
+	this.private_UpdateWindowSize();
 };
 CKGSChallengeWindow.prototype.private_UpdatePlayers = function()
 {
 
+};
+CKGSChallengeWindow.prototype.private_UpdateWindowSize = function()
+{
+	var nBounds = 35;
+	
+	var nRulesHeight   = 9 * this.m_nFieldHeight;
+	var nButtonsHeight = 25;
+	var nGameType      = this.private_GetSelectedGameType();
+	
+	if (this.m_nType === EKGSChallengeWindowType.Demonstration)
+		this.m_nDefH = nBounds + this.m_nHeaderHeight + 10 + nRulesHeight + 5 + nButtonsHeight + 5;
+	else if (EKGSGameType.Rengo === nGameType)
+		this.m_nDefH = nBounds + this.m_nHeaderHeight * 2 + 10 + this.m_nPlayersHeight * 4 + 10 + nRulesHeight + 5 + nButtonsHeight + 5;
+	else
+		this.m_nDefH = nBounds + this.m_nHeaderHeight * 2 + 10 + this.m_nPlayersHeight * 2 + 10 + nRulesHeight + 5 + nButtonsHeight + 5;
+};
+CKGSChallengeWindow.prototype.private_UpdateGameType = function()
+{
+	var nGameType = this.private_GetSelectedGameType();
+	
+	if (EKGSChallengeWindowType.Demonstration === this.m_nType)
+	{
+		this.HtmlElement.RulesWrapperControl.SetParams(0, this.m_nHeaderHeight + 10, 1000, 1000, false, true, false, false, -1, 9 * this.m_nFieldHeight);	
+	}
+	else if (EKGSGameType.Rengo === nGameType)
+	{
+		this.HtmlElement.PlayersWrapperControl.SetParams(0, this.m_nHeaderHeight * 2 + 10, 1000, 1000, false, true, false, false, -1, 4 * this.m_nPlayersHeight);		
+		this.HtmlElement.RulesWrapperControl.SetParams(0, this.m_nHeaderHeight * 2 + 10 + 4 * this.m_nPlayersHeight + 10, 1000, 1000, false, true, false, false, -1, 9 * this.m_nFieldHeight);	
+		this.m_oPlayersColorsControl.SetParams(10, 0, 0, 0, true, true, false, false, 50, 4 * this.m_nPlayersHeight);
+	}
+	else if (EKGSGameType.Simul === nGameType)
+	{
+		// TODO: Implement this case
+	}
+	else
+	{
+		this.HtmlElement.PlayersWrapperControl.SetParams(0, this.m_nHeaderHeight * 2 + 10, 1000, 1000, false, true, false, false, -1, 2 * this.m_nPlayersHeight);		
+		this.HtmlElement.RulesWrapperControl.SetParams(0, this.m_nHeaderHeight * 2 + 10 + 2 * this.m_nPlayersHeight + 10, 1000, 1000, false, true, false, false, -1, 9 * this.m_nFieldHeight);		
+		this.m_oPlayersColorsControl.SetParams(10, 0, 0, 0, true, true, false, false, 50, 4 * this.m_nPlayersHeight);
+	}
+	
+	
+	this.private_CalculateWindowSize();
+	this.private_UpdateSize();
+	this.Update_Size(true);
 };
 
 function CGoUniverseButtonMinimize(fOnClickHandler)

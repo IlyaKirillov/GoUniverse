@@ -648,6 +648,13 @@ CKGSClient.prototype.SendCreateChallenge = function(nChannelId, nCallBackKey, nG
 		oRules["byoYomiTime"]   = oTimeSettings.GetOverTime();
 		oRules["byoYomiStones"] = oTimeSettings.GetOverCount();
 	}
+	
+	var arrPlayers = [{"role" : "white", "name" : this.m_oCurrentUser.GetName()}, {"role" : "black"}];
+	
+	if (EKGSGameType.Rengo === nGameType)
+	{
+		arrPlayers.push({"role" : "black_2"}, {"role" : "white_2"});
+	}
 
 	this.private_SendMessage({
 		"channelId"   : nChannelId,
@@ -665,12 +672,7 @@ CKGSClient.prototype.SendCreateChallenge = function(nChannelId, nCallBackKey, nG
 
 			"private" : bPrivate,
 
-			"players" : [{
-				"role" : "white",
-				"name" : this.m_oCurrentUser.GetName()
-			}, {
-				"role" : "black"
-			}]
+			"players" : arrPlayers
 		}
 	});
 };
