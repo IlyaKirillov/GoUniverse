@@ -650,11 +650,8 @@ CKGSClient.prototype.SendCreateChallenge = function(nChannelId, nCallBackKey, nG
 	}
 	
 	var arrPlayers = [{"role" : "white", "name" : this.m_oCurrentUser.GetName()}, {"role" : "black"}];
-	
 	if (EKGSGameType.Rengo === nGameType)
-	{
 		arrPlayers.push({"role" : "black_2"}, {"role" : "white_2"});
-	}
 
 	this.private_SendMessage({
 		"channelId"   : nChannelId,
@@ -722,6 +719,30 @@ CKGSClient.prototype.SendCreateDemonstration = function(nChannelId, nCallBackKey
 };
 CKGSClient.prototype.SendSubmitChallenge = function(nChannelId, nGameType, oRules, bNigiri, bCreatorBlack, sCreator, bPrivate)
 {
+	var arrPlayers = [{
+			"role" : bCreatorBlack ? "black" : "white",
+			"name" : sCreator
+		}, {
+			"role" : bCreatorBlack ? "white" : "black",
+			"name" : this.GetUserName()
+		}];
+		
+	if (EKGSGameType.Rengo === nGameType)
+	{
+		arrPlayers = [{
+			"role" : "white", 
+			"name" : sCreator
+			}, {
+				"role" : "black",
+				"name" : this.GetUserName()
+			}, {
+				"role" : "black_2"
+			}, {
+				"role" : "white_2"
+			}];
+	}
+
+	
 	this.private_SendMessage({
 		"channelId" : nChannelId,
 		"type"      : "CHALLENGE_SUBMIT",
@@ -729,13 +750,7 @@ CKGSClient.prototype.SendSubmitChallenge = function(nChannelId, nGameType, oRule
 		"nigiri"    : bNigiri,
 		"rules"     : oRules,
 		"private"   : bPrivate,
-		"players"   : [{
-			"role" : bCreatorBlack ? "black" : "white",
-			"name" : sCreator
-		}, {
-			"role" : bCreatorBlack ? "white" : "black",
-			"name" : this.GetUserName()
-		}]
+		"players"   : arrPlayers
 	});
 };
 CKGSClient.prototype.SendChallengeProposal = function(nChannelId, nGameType, oRules, bNigiri, bCreatorBlack, sCreator, sChallenger, bPrivate)

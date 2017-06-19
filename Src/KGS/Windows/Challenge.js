@@ -446,13 +446,14 @@ CKGSChallengeWindow.prototype.Init = function(sDivId, oPr)
 		this.m_bEnableRanked = this.m_oOwner && this.m_oOwner.CanPlayRanked() && (!this.m_oCurrentChallenger || this.m_oCurrentChallenger.CanPlayRanked()) ? true : false;
 	}
 
-	this.private_CalculateWindowSize();
-
 	this.private_CreateName();
 	this.private_CreatePlayers();
 	this.private_CreateRules();
 	this.private_CreateButtons();
 	this.private_CreateAnimatedWaiting();
+
+	this.private_CalculateWindowSize();
+	this.private_UpdateGameType();
 
 	if (true === oPr.Create)
 		this.private_FillDefaultCreatorValues();
@@ -1375,10 +1376,10 @@ CKGSChallengeWindow.prototype.private_OkChallenge = function()
 	}
 	else if (EKGSChallengeWindowState.ChallengerSubmit === this.m_nState)
 	{
-		if (nGameType === EKGSGameType.Rengo || nGameType === EKGSGameType.Simul)
+		if (nGameType === EKGSGameType.Simul)
 		{
 			this.Close();
-			CreateKGSWindow(EKGSWindowType.Information, {Client : this, App : this.m_oApp, Caption : g_oLocalization.common.window.captionWarning, Text : "Sorry, simulations and rengo challenges are not supported in the current version.", Image : "WarningSpanWarning", W : 347, H : 144});
+			CreateKGSWindow(EKGSWindowType.Information, {Client : this, App : this.m_oApp, Caption : g_oLocalization.common.window.captionWarning, Text : "Sorry, simulations are not supported in the current version.", Image : "WarningSpanWarning", W : 347, H : 144});
 			return;
 		}
 
