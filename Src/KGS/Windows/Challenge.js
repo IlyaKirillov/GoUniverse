@@ -87,6 +87,10 @@ function CKGSChallengeWindow()
 	this.m_arrChallengers     = [];
 	this.m_arrRooms           = [];
 
+	this.m_oRengoChallenger1  = null;
+	this.m_oRengoChallenger2  = null;
+	this.m_oRengoChallenger3  = null;
+
 	this.m_oCommentInput      = null;
 	this.m_oGameTypeSelect    = null;
 	this.m_oRoomSelect        = null;
@@ -316,9 +320,16 @@ function CKGSChallengeWindow()
 		oThis.private_DrawPlayerColor(bChangedColors);
 		oThis.Update_Size(); // Нужно вызывать из-за кнопки OK
 	};
+	this.private_OnChangeRengoChallenger = function()
+	{
+		// TODO: Реализовать
+	};
 	this.private_OnChangeColors = function()
 	{
-		if (EKGSChallengeWindowState.ChallengerSubmit === oThis.m_nState || (EKGSChallengeWindowState.CreatorProposal === oThis.m_nState && null !== oThis.m_oCurrentChallenger))
+		if (EKGSChallengeWindowState.ChallengerSubmit === oThis.m_nState && EKGSGameType.Rengo === oThis.private_GetSelectedGameType())
+			return;
+
+		if (EKGSChallengeWindowState.ChallengerSubmit === oThis.m_nState || (EKGSChallengeWindowState.CreatorProposal === oThis.m_nState && oThis.private_IsChallengersReady()))
 		{
 			if (true === oThis.m_bNigiri)
 			{
@@ -1773,7 +1784,7 @@ CKGSChallengeWindow.prototype.private_GetDefaultKomi = function(bNigiri)
 	var nRules = this.private_GetSelectedRules();
 
 	var bDefaultNigiri = this.private_GetDefaultNigiri();
-	if (true === bDefaultNigiri || true === bNigiri)
+	if (true === bDefaultNigiri || true === bNigiri || EKGSGameType.Rengo === this.private_GetSelectedGameType())
 	{
 		if (EKGSGameRules.Japanese === nRules)
 			return 6.5;
@@ -1789,6 +1800,9 @@ CKGSChallengeWindow.prototype.private_GetDefaultKomi = function(bNigiri)
 };
 CKGSChallengeWindow.prototype.private_GetDefaultNigiri = function()
 {
+	if (EKGSGameType.Rengo === this.private_GetSelectedGameType())
+		return true;
+
 	var oCreator    = this.m_oOwner;
 	var oChallenger = this.m_oCurrentChallenger;
 
@@ -2011,10 +2025,21 @@ CKGSChallengeWindow.prototype.private_UpdateOnStateChange = function()
 		this.m_oRulesSelect.disabled       = "disabled";
 		this.m_oSizeInput.className        = "challengeInput";
 		this.m_oSizeInput.disabled         = "disabled";
-		this.m_oKomiInput.className        = "challengeInput challengeInputEditable";
-		this.m_oKomiInput.disabled         = "";
-		this.m_oHandicapInput.className    = "challengeInput challengeInputEditable";
-		this.m_oHandicapInput.disabled     = "";
+
+		if (this.private_GetSelectedGameType() === EKGSGameType.Rengo)
+		{
+			this.m_oKomiInput.className     = "challengeInput";
+			this.m_oKomiInput.disabled      = "disabled";
+			this.m_oHandicapInput.className = "challengeInput";
+			this.m_oHandicapInput.disabled  = "disabled";
+		}
+		else
+		{
+			this.m_oKomiInput.className     = "challengeInput challengeInputEditable";
+			this.m_oKomiInput.disabled      = "";
+			this.m_oHandicapInput.className = "challengeInput challengeInputEditable";
+			this.m_oHandicapInput.disabled  = "";
+		}
 		this.m_oTimeSystemSelect.className = "challengeSelect challengeSelectDisabled";
 		this.m_oTimeSystemSelect.disabled  = "disabled";
 		this.m_oChallengerSelect.className = "challengeSelect challengeSelectDisabled";
@@ -2044,7 +2069,11 @@ CKGSChallengeWindow.prototype.private_UpdateKomiAndHandicapFields = function()
 	if (EKGSChallengeWindowState.Waiting === this.m_nState || EKGSChallengeWindowState.CreatorWaiting === this.m_nState || EKGSChallengeWindowState.ChallengerAccept === this.m_nState || EKGSChallengeWindowState.ChallengerWaiting === this.m_nState)
 		return;
 
-	if (true !== this.m_bNigiri && (EKGSChallengeWindowState.ChallengerSubmit === this.m_nState || (EKGSChallengeWindowState.CreatorProposal === this.m_nState && null !== this.m_oCurrentChallenger)))
+	if (true !== this.m_bNigiri
+		&& (EKGSChallengeWindowState.ChallengerSubmit === this.m_nState
+		|| (EKGSChallengeWindowState.CreatorProposal === this.m_nState
+		&& null !== this.m_oCurrentChallenger))
+		&& EKGSGameType.Rengo !== this.private_GetSelectedGameType())
 	{
 		this.m_oKomiInput.className     = "challengeInput challengeInputEditable";
 		this.m_oKomiInput.disabled      = "";
@@ -2191,10 +2220,6 @@ CKGSChallengeWindow.prototype.private_CalculateWindowSize = function()
 
 	this.private_UpdateWindowSize();
 };
-CKGSChallengeWindow.prototype.private_UpdatePlayers = function()
-{
-
-};
 CKGSChallengeWindow.prototype.private_UpdateWindowSize = function()
 {
 	var nBounds = 35;
@@ -2239,6 +2264,18 @@ CKGSChallengeWindow.prototype.private_UpdateGameType = function()
 	this.private_CalculateWindowSize();
 	this.private_UpdateSize();
 	this.Update_Size(true);
+};
+CKGSChallengeWindow.prototype.private_IsChallengersReady = function()
+{
+	if ((EKGSGameType.Rengo === this.private_GetSelectedGameType()
+		&& null !== this.m_oRengoChallenger1
+		&& null !== this.m_oRengoChallenger2
+		&& null !== this.m_oRengoChallenger3)
+		|| (EKGSGameType.Rengo !== this.private_GetSelectedGameType()
+		&& null !== this.m_oCurrentChallenger))
+		return true;
+
+	return false;
 };
 
 function CGoUniverseButtonMinimize(fOnClickHandler)
