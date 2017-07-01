@@ -83,6 +83,8 @@ function CKGSChallengeWindow()
 	this.m_nDefW = 360;
 	this.m_nDefH = 512;
 
+	this.m_oChallengers = new CKGSChallengeWindowChallengers(this);
+
 	this.m_oCurrentChallenger = null;
 	this.m_arrChallengers     = [];
 	this.m_arrRooms           = [];
@@ -90,6 +92,12 @@ function CKGSChallengeWindow()
 	this.m_oRengoChallenger1  = null;
 	this.m_oRengoChallenger2  = null;
 	this.m_oRengoChallenger3  = null;
+	this.m_oRengoChallengerElement = {
+
+	};
+
+	this.m_oChallengerElement      = null;
+	this.m_oRengoChallengerElement = null;
 
 	this.m_oCommentInput      = null;
 	this.m_oGameTypeSelect    = null;
@@ -885,52 +893,21 @@ CKGSChallengeWindow.prototype.private_CreatePlayers = function()
 		oCreatorPlayer.appendChild(oSpan);
 	}
 
-	var oChallengerListElement = this.protected_CreateDivElement(oPlayersWrapperElement, "", "select");
-	var oChallengerListControl = CreateControlContainerByElement(oChallengerListElement);
-	oChallengerListControl.SetParams(70, this.m_nPlayersHeight, 10, 0, true, true, true, false, -1, this.m_nPlayersHeight);
-	oChallengerListControl.SetAnchor(true, true, true, false);
-	oPlayersWrapperControl.AddControl(oChallengerListControl);
-	this.private_AddOptionToSelect(oChallengerListElement, "");
-
-	var oChallengerPlayer = this.protected_CreateDivElement(oPlayersWrapperElement);
-	var oChallengerControl = CreateControlContainerByElement(oChallengerPlayer);
-	oChallengerControl.SetParams(70 + 1, this.m_nPlayersHeight + 1, 50, 0, true, true, true, false, -1, this.m_nPlayersHeight - 2);
+	var oChallengerElement = this.protected_CreateDivElement(oPlayersWrapperElement);
+	var oChallengerControl = CreateControlContainerByElement(oChallengerElement);
+	oChallengerControl.SetParams(70, this.m_nPlayersHeight, 10, 0, true, true, true, false, -1, 3 * this.m_nPlayersHeight);
 	oChallengerControl.SetAnchor(true, true, true, false);
 	oPlayersWrapperControl.AddControl(oChallengerControl);
-	oChallengerPlayer.style.paddingLeft = "3px";
-	oChallengerPlayer.className += "challengePlayer";
+	this.private_CreateChallengerElement(oChallengerElement, oChallengerControl);
+	this.m_oChallengerElement = oChallengerElement;
 
-	var oChallengerSpan            = document.createElement("span");
-	oChallengerSpan.style["float"] = "left";
-	oChallengerSpan.style.display  = "block";
-	oChallengerSpan.className      = "challengePlayerSpan";
-	oChallengerSpan.innerHTML      = "";
-	oChallengerSpan.title          = "";
-	oChallengerSpan.onclick        = function ()
-	{
-		if (oThis.m_oCurrentChallenger)
-			oThis.m_oClient.LoadUserInfo(oThis.m_oCurrentChallenger.GetName());
-	};
-	oChallengerPlayer.appendChild(oChallengerSpan);
-
-	var oChallengerRejectSpan            = document.createElement("span");
-	oChallengerRejectSpan.className      = "challengePlayerSpan challengePlayerRejectSpan";
-	oChallengerRejectSpan.style["float"] = "right";
-	oChallengerRejectSpan.style.display  = "none";
-	oChallengerRejectSpan.innerHTML      = g_oLocalization.KGS.window.challenge.buttonDecline;
-	oChallengerRejectSpan.title          = g_oLocalization.KGS.window.challenge.buttonDeclineHint;
-	oChallengerRejectSpan.onclick = function ()
-	{
-		oThis.private_RejectChallenge();
-	};
-	oChallengerPlayer.appendChild(oChallengerRejectSpan);
-
-	this.m_oChallengerDiv    = oChallengerPlayer;
-	this.m_oChallengerSelect = oChallengerListElement;
-	this.m_oChallengerSpan   = oChallengerSpan;
-	this.m_oChallengerReject = oChallengerRejectSpan;
-
-	this.private_AddEventsForSelect(this.private_OnChangeChallenger, oChallengerListElement);
+	var oRengoChallengerElement = this.protected_CreateDivElement(oPlayersWrapperElement);
+	var oRengoChallengerControl = CreateControlContainerByElement(oRengoChallengerElement);
+	oRengoChallengerControl.SetParams(70, this.m_nPlayersHeight, 10, 0, true, true, true, false, -1, 3 * this.m_nPlayersHeight);
+	oRengoChallengerControl.SetAnchor(true, true, true, false);
+	oPlayersWrapperControl.AddControl(oRengoChallengerControl);
+	this.private_CreateRengoChallengerElement(oRengoChallengerElement, oRengoChallengerControl);
+	this.m_oRengoChallengerElement = oRengoChallengerElement;
 	
 	if (this.m_nType === EKGSChallengeWindowType.Demonstration)
 		oPlayersWrapperElement.style.display = "none";
@@ -1955,10 +1932,9 @@ CKGSChallengeWindow.prototype.private_UpdateOnStateChange = function()
 		this.m_oHandicapInput.disabled     = "disabled";
 		this.m_oTimeSystemSelect.className = "challengeSelect challengeSelectDisabled";
 		this.m_oTimeSystemSelect.disabled  = "disabled";
-		this.m_oChallengerSelect.className = "challengeSelect challengeSelectDisabled";
-		this.m_oChallengerSelect.disabled  = "disabled";
-		this.m_oChallengerDiv.className    = "challengePlayer";
 		this.m_oPrivateCheckBox.disabled   = "disabled";
+
+		this.m_oChallengers.Disable();
 	}
 	else if (EKGSChallengeWindowState.Creation === this.m_nState)
 	{
@@ -1966,11 +1942,10 @@ CKGSChallengeWindow.prototype.private_UpdateOnStateChange = function()
 		{
 			this.m_oCommentInput.className     = "challengeInput challengeInputEditable";
 			this.m_oCommentInput.disabled      = "";
-			this.m_oChallengerSelect.className = "challengeSelect challengeSelectDisabled";
-			this.m_oChallengerSelect.disabled  = "disabled";
-			this.m_oChallengerDiv.className    = "challengePlayer";
 			this.m_oGameTypeSelect.className   = "challengeSelect challengeSelectEditable";
 			this.m_oGameTypeSelect.disabled    = "";
+
+			this.m_oChallengers.Disable();
 		}
 		else
 		{
@@ -2008,10 +1983,9 @@ CKGSChallengeWindow.prototype.private_UpdateOnStateChange = function()
 		this.m_oHandicapInput.disabled     = "disabled";
 		this.m_oTimeSystemSelect.className = "challengeSelect challengeSelectDisabled";
 		this.m_oTimeSystemSelect.disabled  = "disabled";
-		this.m_oChallengerSelect.className = "challengeSelect challengeSelectEditable";
-		this.m_oChallengerSelect.disabled  = "";
-		this.m_oChallengerDiv.className    = "challengePlayer challengePlayerSelect";
 		this.m_oPrivateCheckBox.disabled   = "disabled";
+
+		this.m_oChallengers.Enable();
 	}
 	else if (EKGSChallengeWindowState.ChallengerSubmit === this.m_nState)
 	{
@@ -2042,10 +2016,9 @@ CKGSChallengeWindow.prototype.private_UpdateOnStateChange = function()
 		}
 		this.m_oTimeSystemSelect.className = "challengeSelect challengeSelectDisabled";
 		this.m_oTimeSystemSelect.disabled  = "disabled";
-		this.m_oChallengerSelect.className = "challengeSelect challengeSelectDisabled";
-		this.m_oChallengerSelect.disabled  = "disabled";
-		this.m_oChallengerDiv.className    = "challengePlayer";
 		this.m_oPrivateCheckBox.disabled   = "disabled";
+
+		this.m_oChallengers.Disable();
 
 
 		this.m_oCurrentChallenger        = this.m_oClient.GetCurrentUser();
@@ -2248,6 +2221,9 @@ CKGSChallengeWindow.prototype.private_UpdateGameType = function()
 		this.HtmlElement.PlayersWrapperControl.SetParams(0, this.m_nHeaderHeight * 2 + 10, 1000, 1000, false, true, false, false, -1, 4 * this.m_nPlayersHeight);		
 		this.HtmlElement.RulesWrapperControl.SetParams(0, this.m_nHeaderHeight * 2 + 10 + 4 * this.m_nPlayersHeight + 10, 1000, 1000, false, true, false, false, -1, 9 * this.m_nFieldHeight);	
 		this.m_oPlayersColorsControl.SetParams(10, 0, 0, 0, true, true, false, false, 50, 4 * this.m_nPlayersHeight);
+
+		this.m_oChallengerElement.style.display      = "none";
+		this.m_oRengoChallengerElement.style.display = "block";
 	}
 	else if (EKGSGameType.Simul === nGameType)
 	{
@@ -2258,6 +2234,9 @@ CKGSChallengeWindow.prototype.private_UpdateGameType = function()
 		this.HtmlElement.PlayersWrapperControl.SetParams(0, this.m_nHeaderHeight * 2 + 10, 1000, 1000, false, true, false, false, -1, 2 * this.m_nPlayersHeight);		
 		this.HtmlElement.RulesWrapperControl.SetParams(0, this.m_nHeaderHeight * 2 + 10 + 2 * this.m_nPlayersHeight + 10, 1000, 1000, false, true, false, false, -1, 9 * this.m_nFieldHeight);		
 		this.m_oPlayersColorsControl.SetParams(10, 0, 0, 0, true, true, false, false, 50, 4 * this.m_nPlayersHeight);
+
+		this.m_oChallengerElement.style.display      = "block";
+		this.m_oRengoChallengerElement.style.display = "none";
 	}
 	
 	
@@ -2276,6 +2255,70 @@ CKGSChallengeWindow.prototype.private_IsChallengersReady = function()
 		return true;
 
 	return false;
+};
+CKGSChallengeWindow.prototype.private_CreateChallengerElement = function(oParentDiv, oParentControl)
+{
+	this.m_oChallengers.Reset(oParentDiv, oParentControl);
+	this.m_oChallengers.AddChallenger();
+	this.m_oChallengers.AddChallenger();
+	this.m_oChallengers.AddChallenger();
+
+
+	// this.m_oChallengerDiv    = oEntry.NameDiv;
+	// this.m_oChallengerSelect = oEntry.List;
+	// this.m_oChallengerSpan   = oEntry.NameSpan;
+	// this.m_oChallengerReject = oEntry.RejectSpan;
+
+	this.private_AddEventsForSelect(this.private_OnChangeChallenger, oEntry.List);
+};
+CKGSChallengeWindow.prototype.private_CreateRengoChallengerElement = function(oParentDiv, oParentControl)
+{
+	this.m_oChallengers.Reset(oParentDiv, oParentControl);
+	this.m_oChallengers.AddChallenger();
+	this.m_oChallengers.AddChallenger();
+	this.m_oChallengers.AddChallenger();
+};
+CKGSChallengeWindow.prototype.private_CreateChallengerEntryElement = function(oParentDiv, oParentControl, nTop, fOnPlayerClick, fOnRejectClick)
+{
+	var oChallengerListElement = this.protected_CreateDivElement(oParentDiv, "", "select");
+	var oChallengerListControl = CreateControlContainerByElement(oChallengerListElement);
+	oChallengerListControl.SetParams(0, nTop, 0, 0, true, true, true, false, -1, this.m_nPlayersHeight -1);
+	oChallengerListControl.SetAnchor(true, true, true, false);
+	oParentControl.AddControl(oChallengerListControl);
+	this.private_AddOptionToSelect(oChallengerListElement, "");
+
+	var oChallengerPlayer = this.protected_CreateDivElement(oParentDiv);
+	var oChallengerControl = CreateControlContainerByElement(oChallengerPlayer);
+	oChallengerControl.SetParams(1, nTop + 1, 40, 0, true, true, true, false, -1, this.m_nPlayersHeight - 3);
+	oChallengerControl.SetAnchor(true, true, true, false);
+	oParentControl.AddControl(oChallengerControl);
+	oChallengerPlayer.style.paddingLeft = "3px";
+	oChallengerPlayer.className += "challengePlayer";
+
+	var oChallengerSpan            = document.createElement("span");
+	oChallengerSpan.style["float"] = "left";
+	oChallengerSpan.style.display  = "block";
+	oChallengerSpan.className      = "challengePlayerSpan";
+	oChallengerSpan.innerHTML      = "";
+	oChallengerSpan.title          = "";
+	oChallengerSpan.onclick        = fOnPlayerClick;
+	oChallengerPlayer.appendChild(oChallengerSpan);
+
+	var oChallengerRejectSpan            = document.createElement("span");
+	oChallengerRejectSpan.className      = "challengePlayerSpan challengePlayerRejectSpan";
+	oChallengerRejectSpan.style["float"] = "right";
+	oChallengerRejectSpan.style.display  = "none";
+	oChallengerRejectSpan.innerHTML      = g_oLocalization.KGS.window.challenge.buttonDecline;
+	oChallengerRejectSpan.title          = g_oLocalization.KGS.window.challenge.buttonDeclineHint;
+	oChallengerRejectSpan.onclick        = fOnRejectClick;
+	oChallengerPlayer.appendChild(oChallengerRejectSpan);
+
+	return {
+		List       : oChallengerListElement,
+		NameDiv    : oChallengerPlayer,
+		NameSpan   : oChallengerSpan,
+		RejectSpan : oChallengerRejectSpan
+	};
 };
 
 function CGoUniverseButtonMinimize(fOnClickHandler)
@@ -2343,4 +2386,94 @@ CGoUniverseButtonMinimize.prototype.private_ClickTransformOut = function()
 };
 CGoUniverseButtonMinimize.prototype.private_DrawSelectionBounds = function(Canvas, W, H)
 {
+};
+
+function CKGSChallengeWindowChallengers(oWindow)
+{
+	this.m_arrChallengers = [];
+	this.m_oWindow        = oWindow;
+	this.m_oParentDiv     = null;
+	this.m_oParentControl = null;
+}
+CKGSChallengeWindowChallengers.prototype.Reset = function(oParentDiv, oParentControl)
+{
+	this.m_arrChallengers = [];
+	this.m_oParentDiv     = oParentDiv;
+	this.m_oParentControl = oParentControl;
+};
+CKGSChallengeWindowChallengers.prototype.AddChallenger = function()
+{
+	var nChallengerIndex = this.m_arrChallengers.length;
+
+	var oChallenger = new CKGSChallengeWindowChallengerObject();
+	var oEntry      = this.m_oWindow.private_CreateChallengerEntryElement(
+		this.m_oParentDiv,
+		this.m_oParentControl,
+		nChallengerIndex * this.m_oWindow.m_nPlayersHeight,
+		function()
+		{
+			oChallenger.LoadInfo();
+		},
+		function()
+		{
+			oChallenger.RejectUser();
+		}
+	);
+
+	oChallenger.Init(oEntry);
+	this.m_arrChallengers.push(oEntry);
+};
+CKGSChallengeWindowChallengers.prototype.Disable = function()
+{
+	for (var nIndex = 0, nCount = this.m_arrChallengers.length; nIndex < nCount; ++nIndex)
+	{
+		this.m_arrChallengers.Disable();
+	}
+};
+CKGSChallengeWindowChallengers.prototype.Enable = function()
+{
+	for (var nIndex = 0, nCount = this.m_arrChallengers.length; nIndex < nCount; ++nIndex)
+	{
+		this.m_arrChallengers.Enable();
+	}
+};
+
+function CKGSChallengeWindowChallengerObject()
+{
+	this.m_oSelectedUser  = null;
+	this.m_oDiv           = null;
+	this.m_oListElement   = null;
+	this.m_oNameElement   = null;
+	this.m_oRejectElement = null;
+}
+CKGSChallengeWindowChallengerObject.prototype.Init = function(oEntry)
+{
+	this.m_oSelectedUser  = null;
+	this.m_oDiv           = oEntry.NameDiv;
+	this.m_oListElement   = oEntry.List;
+	this.m_oNameElement   = oEntry.NameSpan;
+	this.m_oRejectElement = oEntry.RejectSpan;
+};
+CKGSChallengeWindowChallengerObject.prototype.LoadInfo = function()
+{
+	if (this.m_oSelectedUser)
+	{
+		oApp.m_oClient.LoadUserInfo(this.m_oSelectedUser.GetName());
+	}
+};
+CKGSChallengeWindowChallengerObject.prototype.RejectUser = function()
+{
+
+};
+CKGSChallengeWindowChallengerObject.prototype.Disable = function()
+{
+	this.m_oListElement.className = "challengeSelect challengeSelectDisabled";
+	this.m_oListElement.disabled  = "disabled";
+	this.m_oDiv.className         = "challengePlayer";
+};
+CKGSChallengeWindowChallengerObject.prototype.Enable = function()
+{
+	this.m_oListElement.className = "challengeSelect challengeSelectEditable";
+	this.m_oListElement.disabled  = "";
+	this.m_oDiv.className         = "challengePlayer challengePlayerSelect";
 };
