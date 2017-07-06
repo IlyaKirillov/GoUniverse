@@ -520,12 +520,14 @@ CKGSChallengeWindow.prototype.Close = function()
 };
 CKGSChallengeWindow.prototype.OnSubmit = function(oUser, oProposal)
 {
-	this.m_arrChallengers.push({
-		Proposal : oProposal,
-		User     : oUser
-	});
+	// this.m_arrChallengers.push({
+	// 	Proposal : oProposal,
+	// 	User     : oUser
+	// });
+	//
+	// this.private_AddOptionToSelect(this.m_oChallengerSelect, oUser.GetName());
 
-	this.private_AddOptionToSelect(this.m_oChallengerSelect, oUser.GetName());
+	this.m_oChallengers.AddUser(oUser, oProposal);
 
 	if (1 === this.m_arrChallengers.length)
 	{
@@ -2219,6 +2221,7 @@ CKGSChallengeWindow.prototype.private_UpdateGameType = function()
 
 		this.m_oChallengerElement.style.display      = "none";
 		this.m_oRengoChallengerElement.style.display = "block";
+		this.m_oChallengers.SwitchToRengo();
 	}
 	else if (EKGSGameType.Simul === nGameType)
 	{
@@ -2232,6 +2235,7 @@ CKGSChallengeWindow.prototype.private_UpdateGameType = function()
 
 		this.m_oChallengerElement.style.display      = "block";
 		this.m_oRengoChallengerElement.style.display = "none";
+		this.m_oChallengers.SwitchToRegular();
 	}
 	
 	
@@ -2307,6 +2311,10 @@ CKGSChallengeWindow.prototype.private_CreateChallengerEntryElement = function(oP
 		RejectSpan : oChallengerRejectSpan
 	};
 };
+CKGSChallengeWindow.prototype.OnChangeChallengers = function()
+{
+
+};
 
 function CGoUniverseButtonMinimize(fOnClickHandler)
 {
@@ -2378,8 +2386,13 @@ CGoUniverseButtonMinimize.prototype.private_DrawSelectionBounds = function(Canva
 
 function CKGSChallengeWindowChallengersManager(oWindow)
 {
-	this.m_oRegular = new CKGSChallengeWindowChallengersObject(oWindow);
-	this.m_oRengo   = new CKGSChallengeWindowChallengersObject(oWindow);
+	this.m_oWindow  = oWindow;
+	this.m_oRegular = new CKGSChallengeWindowChallengersObject(oWindow, this);
+	this.m_oRengo   = new CKGSChallengeWindowChallengersObject(oWindow, this);
+
+	this.m_oCurrent = this.m_oRegular;
+
+	this.m_arrUsers = [];
 }
 CKGSChallengeWindowChallengersManager.prototype.Disable = function()
 {
@@ -2408,11 +2421,50 @@ CKGSChallengeWindowChallengersManager.prototype.SetChallenger = function(oUser, 
 	this.m_oRegular.SetChallenger(oUser, nIndex);
 	this.m_oRengo.SetChallenger(oUser, nIndex);
 };
+CKGSChallengeWindowChallengersManager.prototype.SwitchToRegular = function()
+{
+	this.m_oCurrent = this.m_oRegular;
+};
+CKGSChallengeWindowChallengersManager.prototype.SwitchToRengo = function()
+{
+	this.m_oCurrent = this.m_oRengo;
+};
+CKGSChallengeWindowChallengersManager.prototype.AddUser = function(oUser, oProposal)
+{
+	this.m_arrUsers.push({
+		User     : oUser,
+		Proposal : oProposal
+	});
 
-function CKGSChallengeWindowChallengersObject(oWindow)
+	this.m_oCurrent.AddUser(oUser);
+};
+CKGSChallengeWindowChallengersManager.prototype.GetUser = function(nIndex)
+{
+	if (this.m_arrUsers[nIndex])
+		return this.m_arrUsers[nIndex].User;
+
+	return null;
+};
+CKGSChallengeWindowChallengersManager.prototype.GetIndexByUser = function(oUser)
+{
+	for (var nIndex = 0, nCount = this.m_arrUsers.length; nIndex < nCount; ++nIndex)
+	{
+		if (oUser === this.m_arrUsers[nIndex].User)
+			return nIndex;
+	}
+
+	return -1;
+};
+CKGSChallengeWindowChallengersManager.prototype.GetWindow = function()
+{
+	return this.m_oWindow;
+};
+
+function CKGSChallengeWindowChallengersObject(oWindow, oManager)
 {
 	this.m_arrChallengers = [];
 	this.m_oWindow        = oWindow;
+	this.m_oManager       = oManager;
 	this.m_oParentDiv     = null;
 	this.m_oParentControl = null;
 }
@@ -2426,7 +2478,7 @@ CKGSChallengeWindowChallengersObject.prototype.AddChallenger = function()
 {
 	var nChallengerIndex = this.m_arrChallengers.length;
 
-	var oChallenger = new CKGSChallengeWindowChallengerObject();
+	var oChallenger = new CKGSChallengeWindowChallengerObject(this.m_oManager, this);
 	var oEntry      = this.m_oWindow.private_CreateChallengerEntryElement(
 		this.m_oParentDiv,
 		this.m_oParentControl,
@@ -2463,9 +2515,43 @@ CKGSChallengeWindowChallengersObject.prototype.SetChallenger = function(oUser, n
 	if (this.m_arrChallengers[nIndex])
 		this.m_arrChallengers[nIndex].SetChallenger(oUser);
 };
-
-function CKGSChallengeWindowChallengerObject()
+CKGSChallengeWindowChallengersObject.prototype.AddUser = function(oUser)
 {
+	for (var nIndex = 0, nCount = this.m_arrChallengers.length; nIndex < nCount; ++nIndex)
+	{
+		this.m_arrChallengers[nIndex].AddUser(oUser);
+	}
+};
+CKGSChallengeWindowChallengersObject.prototype.OnChangeChallengers = function(oChallengerObject, oUser)
+{
+	var oPrevUser = oChallengerObject.GetSelectedUser();
+	oChallengerObject.SetSelectedUser(oUser);
+
+	if (oUser)
+	{
+		var bSwitched = false;
+		for (var nIndex = 0, nCount = this.m_arrChallengers.length; nIndex < nCount; ++nIndex)
+		{
+			if (this.m_arrChallengers[nIndex] !== oChallengerObject && this.m_arrChallengers[nIndex].GetSelectedUser() === oUser)
+			{
+				if (!bSwitched)
+				{
+					this.m_arrChallengers[nIndex].SetSelectedUser(oPrevUser);
+					bSwitched = true;
+				}
+				else
+				{
+					this.m_arrChallengers[nIndex].SetSelectedUser(null);
+				}
+			}
+		}
+	}
+};
+
+function CKGSChallengeWindowChallengerObject(oManager, oParent)
+{
+	this.m_oManager       = oManager;
+	this.m_oParent        = oParent;
 	this.m_oSelectedUser  = null;
 	this.m_oDiv           = null;
 	this.m_oListElement   = null;
@@ -2479,6 +2565,9 @@ CKGSChallengeWindowChallengerObject.prototype.Init = function(oEntry)
 	this.m_oListElement   = oEntry.List;
 	this.m_oNameElement   = oEntry.NameSpan;
 	this.m_oRejectElement = oEntry.RejectSpan;
+
+	var oThis = this;
+	this.private_AddEventsForSelect(function(){oThis.private_OnSelectUser();}, this.m_oListElement);
 };
 CKGSChallengeWindowChallengerObject.prototype.LoadInfo = function()
 {
@@ -2508,4 +2597,58 @@ CKGSChallengeWindowChallengerObject.prototype.SetChallenger = function(oUser)
 	this.m_oSelectedUser          = oUser;
 	this.m_oNameElement.innerHTML = this.m_oSelectedUser.GetName() + "[" + this.m_oSelectedUser.GetStringRank() + "]";
 	this.m_oNameElement.title     = g_oLocalization.KGS.window.challenge.challengerHint;
+};
+CKGSChallengeWindowChallengerObject.prototype.SetSelectedUser = function(oUser)
+{
+	if (!oUser)
+	{
+		this.m_oSelectedUser = null;
+
+		this.m_oNameElement.innerHTML = "";
+		this.m_oNameElement.title     = "";
+
+		this.m_oRejectElement.style.display = "none";
+
+		this.m_oListElement.selectedIndex = 0;
+	}
+	else
+	{
+		this.m_oSelectedUser = oUser;
+
+		this.m_oNameElement.innerHTML = oUser.GetName() + "[" + oUser.GetStringRank() + "]";
+		this.m_oNameElement.title     = g_oLocalization.KGS.window.challenge.challengerHint;
+
+		this.m_oRejectElement.style.display = "block";
+
+		this.m_oListElement.selectedIndex = this.m_oManager.GetIndexByUser(oUser) + 1;
+	}
+};
+CKGSChallengeWindowChallengerObject.prototype.AddUser = function(oUser)
+{
+	this.private_AddOptionToSelect(this.m_oListElement, oUser.GetName());
+};
+CKGSChallengeWindowChallengerObject.prototype.GetSelectedUser = function()
+{
+	return this.m_oSelectedUser;
+};
+CKGSChallengeWindowChallengerObject.prototype.private_AddOptionToSelect = function(oSelect, sName)
+{
+	var oOption         = document.createElement("option");
+	oOption.value       = sName;
+	oOption.textContent = sName;
+	oSelect.appendChild(oOption);
+};
+CKGSChallengeWindowChallengerObject.prototype.private_OnSelectUser = function()
+{
+	var oUser = this.m_oListElement.selectedIndex <= 0 ? null : this.m_oManager.GetUser(this.m_oListElement.selectedIndex - 1);
+	this.m_oParent.OnChangeChallengers(this, oUser);
+	this.m_oManager.GetWindow().OnChangeChallengers();
+};
+CKGSChallengeWindowChallengerObject.prototype.private_AddEventsForSelect = function(fOnChange, oSelect)
+{
+	oSelect.addEventListener("change", function(e)
+	{
+		if (fOnChange)
+			fOnChange(e);
+	}, false);
 };
