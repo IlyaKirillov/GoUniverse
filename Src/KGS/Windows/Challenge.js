@@ -2617,7 +2617,11 @@ CKGSChallengeWindowChallengerObject.prototype.LoadInfo = function()
 };
 CKGSChallengeWindowChallengerObject.prototype.RejectUser = function()
 {
-
+	if (this.m_oSelectedUser)
+	{
+		oApp.m_oClient.DeclineChallenge(this.m_oManager.GetWindow().m_nChannelId, this.m_oSelectedUser.GetName())
+		this.m_oManager.RemoveUser(this.m_oSelectedUser);
+	}
 };
 CKGSChallengeWindowChallengerObject.prototype.Disable = function()
 {
