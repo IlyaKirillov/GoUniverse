@@ -86,7 +86,6 @@ function CKGSChallengeWindow()
 	this.m_oChallengers = new CKGSChallengeWindowChallengersManager(this);
 
 	this.m_oCurrentChallenger = null;
-	this.m_arrChallengers     = [];
 	this.m_arrRooms           = [];
 
 	this.m_oRengoChallenger1  = null;
@@ -111,8 +110,6 @@ function CKGSChallengeWindow()
 	this.m_oByoYomiTimeInput  = null;
 	this.m_oByoYomiCountInput = null;
 	this.m_oOverCountLabel    = null;
-	this.m_oChallengerSelect  = null;
-	this.m_oChallengerSpan    = null;
 	this.m_oPrivateCheckBox   = null;
 
 	var oThis = this;
@@ -241,95 +238,6 @@ function CKGSChallengeWindow()
 			nValue = KGS_MAX_HANDICAP;
 
 		oThis.m_oHandicapInput.value = nValue;
-	};
-	this.private_OnChangeChallenger = function()
-	{
-		var oChallengerListElement = oThis.m_oChallengerSelect;
-		var oChallengerSpan        = oThis.m_oChallengerSpan;
-
-		// Ищем выделенного игрока в списке
-		var nSelectedIndex = oChallengerListElement.selectedIndex;
-
-		var bChangedColors = false;
-		// 0 - элемент пустая строка
-		if (nSelectedIndex <= 0)
-		{
-			oThis.m_oCurrentChallenger = null;
-			oThis.m_oButtons.Ok.Hide();
-
-			oChallengerSpan.innerHTML = "";
-			oChallengerSpan.title     = "";
-
-			oThis.m_oHandicapInput.value = oThis.private_GetDefaultHandicap();
-			oThis.m_oKomiInput.value     = oThis.private_GetDefaultKomi();
-			oThis.m_bNigiri              = true;
-
-			oThis.m_oKomiInput.className     = "challengeInput";
-			oThis.m_oKomiInput.disabled      = "disabled";
-			oThis.m_oHandicapInput.className = "challengeInput";
-			oThis.m_oHandicapInput.disabled  = "disabled";
-
-			oThis.m_oChallengerReject.style.display = "none";
-
-			oThis.private_SetSelectedGameType(oThis.private_GetDefaultGameType());
-		}
-		else
-		{
-			var oChallenger = oThis.m_arrChallengers[nSelectedIndex - 1].User;
-			var oProposal   = oThis.m_arrChallengers[nSelectedIndex - 1].Proposal;
-			oThis.m_oCurrentChallenger = oChallenger;
-			oThis.m_oButtons.Ok.Show();
-
-			oChallengerSpan.innerHTML = oChallenger.GetName() + "[" + oChallenger.GetStringRank() + "]";
-			oChallengerSpan.title     = g_oLocalization.KGS.window.challenge.challengerHint;
-
-			oThis.m_oHandicapInput.value = oProposal.GetHandicap();
-			oThis.m_oKomiInput.value     = oProposal.GetKomi();
-			oThis.m_bNigiri              = oProposal.IsNigiri();
-			oThis.private_SetSelectedGameType(oProposal.GetGameType());
-
-			if (true !== oThis.m_bNigiri)
-			{
-				var oBlackUser = oProposal.GetBlack();
-				if (oBlackUser && oBlackUser.GetName() === oThis.m_oCurrentChallenger.GetName())
-					oThis.m_bCreatorBlack = false;
-				else
-					oThis.m_bCreatorBlack = true;
-
-				oThis.m_oKomiInput.className     = "challengeInput challengeInputEditable";
-				oThis.m_oKomiInput.disabled      = "";
-				oThis.m_oHandicapInput.className = "challengeInput challengeInputEditable";
-				oThis.m_oHandicapInput.disabled  = "";
-			}
-			else
-			{
-				oThis.m_oKomiInput.className     = "challengeInput";
-				oThis.m_oKomiInput.disabled      = "disabled";
-				oThis.m_oHandicapInput.className = "challengeInput";
-				oThis.m_oHandicapInput.disabled  = "disabled";
-			}
-
-			if (oThis.m_bNigiri !== oThis.private_GetDefaultNigiri() || (true !== oThis.m_bNigiri && oThis.m_bCreatorBlack !== oThis.private_GetDefaultIsCreatorBlack()))
-				bChangedColors = true;
-
-			if (oThis.private_GetDefaultHandicap() !== oProposal.GetHandicap())
-				oThis.m_oHandicapInput.className += " challengeInputChanged";
-
-			if (Math.abs(oThis.private_GetDefaultKomi() - oProposal.GetKomi()) > 0.001)
-				oThis.m_oKomiInput.className += " challengeInputChanged";
-
-			if (oThis.private_GetSelectedGameType() !== oThis.private_GetDefaultGameType())
-				oThis.m_oGameTypeSelect.className += " challengeSelectChanged";
-
-			oThis.m_oChallengerReject.style.display = "block";
-		}
-
-		oThis.private_DrawPlayerColor(bChangedColors);
-		oThis.Update_Size(); // Нужно вызывать из-за кнопки OK
-	};
-	this.private_OnChangeRengoChallenger = function()
-	{
-		// TODO: Реализовать
 	};
 	this.private_OnChangeColors = function()
 	{
@@ -520,22 +428,11 @@ CKGSChallengeWindow.prototype.Close = function()
 };
 CKGSChallengeWindow.prototype.OnSubmit = function(oUser, oProposal)
 {
-	// this.m_arrChallengers.push({
-	// 	Proposal : oProposal,
-	// 	User     : oUser
-	// });
-	//
-	// this.private_AddOptionToSelect(this.m_oChallengerSelect, oUser.GetName());
+	var isFilled = this.m_oChallengers.IsFilled();
 
 	this.m_oChallengers.AddUser(oUser, oProposal);
-
-	if (1 === this.m_arrChallengers.length)
-	{
-		this.m_oChallengerSelect.selectedIndex = 1;
-		this.private_OnChangeChallenger();
-		this.Update_Size(); // Для обсчета кнопки Ok
+	if (!isFilled && this.m_oChallengers.IsFilled())
 		this.m_oClient.m_oApp.GetSound().PlayChallenger();
-	}
 
 	this.m_oClient.SendChallengeNotification(this.m_nChannelId);
 };
@@ -630,24 +527,6 @@ CKGSChallengeWindow.prototype.OnChallengeCreated = function(nChannelId)
 CKGSChallengeWindow.prototype.OnUserRemoved = function(oUser)
 {
 	this.m_oChallengers.RemoveUser(oUser);
-	//
-	// for (var nIndex = 0, nCount = this.m_arrChallengers.length; nIndex < nCount; ++nIndex)
-	// {
-	// 	if (this.m_arrChallengers[nIndex].User.GetName() === oUser.GetName())
-	// 	{
-	// 		this.m_arrChallengers.splice(nIndex, 1);
-	// 		this.m_oChallengerSelect.remove(nIndex + 1);
-	//
-	// 		if (this.m_oCurrentChallenger && this.m_oCurrentChallenger.GetName() === oUser.GetName())
-	// 		{
-	// 			this.m_oChallengerSelect.selectedIndex = 0;
-	// 			this.private_OnChangeChallenger();
-	// 			this.private_SetState(EKGSChallengeWindowState.CreatorProposal);
-	// 		}
-	//
-	// 		return;
-	// 	}
-	// }
 };
 CKGSChallengeWindow.prototype.GetChallengeCreator = function()
 {
@@ -707,7 +586,7 @@ CKGSChallengeWindow.prototype.IsVisible = function()
 };
 CKGSChallengeWindow.prototype.HaveChallengers = function()
 {
-	return (this.m_arrChallengers.length > 0 ? true : false);
+	return this.m_oChallengers.HaveChallengers();
 };
 CKGSChallengeWindow.prototype.IsWaitingForAccept = function()
 {
@@ -2062,15 +1941,6 @@ CKGSChallengeWindow.prototype.private_UpdateKomiAndHandicapFields = function()
 		this.m_oHandicapInput.disabled  = "disabled";
 	}
 };
-CKGSChallengeWindow.prototype.private_RejectChallenge = function()
-{
-	if (this.m_oCurrentChallenger)
-	{
-		var oUser = this.m_oCurrentChallenger;
-		this.OnUserRemoved(oUser);
-		this.m_oClient.DeclineChallenge(this.m_nChannelId, oUser.GetName());
-	}
-};
 CKGSChallengeWindow.prototype.private_FillDefaultCreatorValues = function()
 {
 	var oGlobalSettings = this.private_GetGlobalSettings();
@@ -2260,12 +2130,6 @@ CKGSChallengeWindow.prototype.private_IsChallengersReady = function()
 CKGSChallengeWindow.prototype.private_CreateChallengerElement = function(oParentDiv, oParentControl)
 {
 	this.m_oChallengers.InitRegular(oParentDiv, oParentControl);
-
-	// this.m_oChallengerSelect = oEntry.List;
-	// this.m_oChallengerSpan   = oEntry.NameSpan;
-	// this.m_oChallengerReject = oEntry.RejectSpan;
-
-	//this.private_AddEventsForSelect(this.private_OnChangeChallenger, oEntry.List);
 };
 CKGSChallengeWindow.prototype.private_CreateRengoChallengerElement = function(oParentDiv, oParentControl)
 {
@@ -2315,7 +2179,83 @@ CKGSChallengeWindow.prototype.private_CreateChallengerEntryElement = function(oP
 };
 CKGSChallengeWindow.prototype.OnChangeChallengers = function()
 {
+	var nGameType = this.private_GetSelectedGameType();
+	if (EKGSGameType.Rengo === nGameType)
+	{
 
+	}
+	else if (EKGSGameType.Simul === nGameType)
+	{
+		// TODO: Реализовать
+	}
+	else
+	{
+		var bChangedColors = false;
+
+		var oUser = this.m_oChallengers.GetSelectedUser(0);
+		if (oUser)
+		{
+			var oProposal = this.m_oChallengers.GetUserProposal(oUser);
+
+			this.m_oButtons.Ok.Show();
+
+			this.m_oHandicapInput.value = oProposal.GetHandicap();
+			this.m_oKomiInput.value     = oProposal.GetKomi();
+			this.m_bNigiri              = oProposal.IsNigiri();
+			this.private_SetSelectedGameType(oProposal.GetGameType());
+
+			if (true !== this.m_bNigiri)
+			{
+				var oBlackUser = oProposal.GetBlack();
+				if (oBlackUser && oBlackUser.GetName() === oUser.GetName())
+					this.m_bCreatorBlack = false;
+				else
+					this.m_bCreatorBlack = true;
+
+				this.m_oKomiInput.className     = "challengeInput challengeInputEditable";
+				this.m_oKomiInput.disabled      = "";
+				this.m_oHandicapInput.className = "challengeInput challengeInputEditable";
+				this.m_oHandicapInput.disabled  = "";
+			}
+			else
+			{
+				this.m_oKomiInput.className     = "challengeInput";
+				this.m_oKomiInput.disabled      = "disabled";
+				this.m_oHandicapInput.className = "challengeInput";
+				this.m_oHandicapInput.disabled  = "disabled";
+			}
+
+			if (this.m_bNigiri !== this.private_GetDefaultNigiri() || (true !== this.m_bNigiri && this.m_bCreatorBlack !== this.private_GetDefaultIsCreatorBlack()))
+				bChangedColors = true;
+
+			if (this.private_GetDefaultHandicap() !== oProposal.GetHandicap())
+				this.m_oHandicapInput.className += " challengeInputChanged";
+
+			if (Math.abs(this.private_GetDefaultKomi() - oProposal.GetKomi()) > 0.001)
+				this.m_oKomiInput.className += " challengeInputChanged";
+
+			if (this.private_GetSelectedGameType() !== this.private_GetDefaultGameType())
+				this.m_oGameTypeSelect.className += " challengeSelectChanged";
+		}
+		else
+		{
+			this.m_oButtons.Ok.Hide();
+
+			this.m_oHandicapInput.value = this.private_GetDefaultHandicap();
+			this.m_oKomiInput.value     = this.private_GetDefaultKomi();
+			this.m_bNigiri              = true;
+
+			this.m_oKomiInput.className     = "challengeInput";
+			this.m_oKomiInput.disabled      = "disabled";
+			this.m_oHandicapInput.className = "challengeInput";
+			this.m_oHandicapInput.disabled  = "disabled";
+
+			this.private_SetSelectedGameType(this.private_GetDefaultGameType());
+		}
+
+		this.Update_Size(); // Нужно вызывать из-за кнопки OK
+		this.private_DrawPlayerColor(bChangedColors);
+	}
 };
 
 function CGoUniverseButtonMinimize(fOnClickHandler)
@@ -2477,6 +2417,28 @@ CKGSChallengeWindowChallengersManager.prototype.RemoveUser = function(oUser)
 		}
 	}
 };
+CKGSChallengeWindowChallengersManager.prototype.GetSelectedUser = function(nIndex)
+{
+	return this.m_oCurrent.GetSelectedUser(nIndex);
+};
+CKGSChallengeWindowChallengersManager.prototype.GetUserProposal = function(oUser)
+{
+	for (var nIndex = 0, nCount = this.m_arrUsers.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.m_arrUsers[nIndex].User.GetName().toLowerCase() === oUser.GetName().toLowerCase())
+			return this.m_arrUsers[nIndex].Proposal;
+	}
+
+	return null;
+};
+CKGSChallengeWindowChallengersManager.prototype.IsFilled = function()
+{
+	return this.m_oCurrent.IsFilled();
+};
+CKGSChallengeWindowChallengersManager.prototype.HaveChallengers = function()
+{
+	return (this.m_arrUsers.length > 0 ? true : false);
+};
 
 function CKGSChallengeWindowChallengersObject(oWindow, oManager)
 {
@@ -2540,18 +2502,13 @@ CKGSChallengeWindowChallengersObject.prototype.AddUser = function(oUser)
 		this.m_arrChallengers[nIndex].AddUser(oUser);
 	}
 
-	var nUsersCount = this.m_oManager.GetUsersCount();
-	if (nUsersCount <= this.m_arrChallengers.length)
+	for (var nIndex = 0, nCount = this.m_arrChallengers.length; nIndex < nCount; ++nIndex)
 	{
-		for (var nIndex = 0, nCount = this.m_arrChallengers.length; nIndex < nCount; ++nIndex)
+		if (!this.m_arrChallengers[nIndex].GetSelectedUser())
 		{
-			if (!this.m_arrChallengers[nIndex].GetSelectedUser())
-			{
-				this.m_arrChallengers[nIndex].SetSelectedUser(oUser);
-				break;
-			}
+			this.m_arrChallengers[nIndex].SetSelectedUser(oUser);
+			break;
 		}
-
 	}
 };
 CKGSChallengeWindowChallengersObject.prototype.OnChangeChallengers = function(oChallengerObject, oUser)
@@ -2585,6 +2542,23 @@ CKGSChallengeWindowChallengersObject.prototype.RemoveUser = function(nRemoveInde
 	{
 		this.m_arrChallengers[nIndex].RemoveUser(nRemoveIndex);
 	}
+};
+CKGSChallengeWindowChallengersObject.prototype.GetSelectedUser = function(nIndex)
+{
+	if (this.m_arrChallengers[nIndex])
+		return this.m_arrChallengers[nIndex].GetSelectedUser();
+
+	return null;
+};
+CKGSChallengeWindowChallengersObject.prototype.IsFilled = function()
+{
+	for (var nIndex = 0, nCount = this.m_arrChallengers.length; nIndex < nCount; ++nIndex)
+	{
+		if (!this.m_arrChallengers[nIndex].GetSelectedUser())
+			return false;
+	}
+
+	return true;
 };
 
 function CKGSChallengeWindowChallengerObject(oManager, oParent)
@@ -2665,6 +2639,8 @@ CKGSChallengeWindowChallengerObject.prototype.SetSelectedUser = function(oUser)
 
 		this.m_oListElement.selectedIndex = this.m_oManager.GetIndexByUser(oUser) + 1;
 	}
+
+	this.m_oManager.GetWindow().OnChangeChallengers();
 };
 CKGSChallengeWindowChallengerObject.prototype.AddUser = function(oUser)
 {
@@ -2692,7 +2668,6 @@ CKGSChallengeWindowChallengerObject.prototype.private_OnSelectUser = function()
 {
 	var oUser = this.m_oListElement.selectedIndex <= 0 ? null : this.m_oManager.GetUser(this.m_oListElement.selectedIndex - 1);
 	this.m_oParent.OnChangeChallengers(this, oUser);
-	this.m_oManager.GetWindow().OnChangeChallengers();
 };
 CKGSChallengeWindowChallengerObject.prototype.private_AddEventsForSelect = function(fOnChange, oSelect)
 {
