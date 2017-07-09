@@ -1471,7 +1471,6 @@ CKGSClient.prototype.private_HandleUserRecord = function(oUserRecord, bUpdateUse
 };
 CKGSClient.prototype.private_HandleGameJoin = function(oMessage)
 {
-	console.log(oMessage);
 	var nGameRoomId = oMessage.channelId;
 
 	if (this.m_aGames[nGameRoomId])
@@ -2129,6 +2128,12 @@ CKGSClient.prototype.private_HandleChallengeJoin = function(oMessage)
 	var oGameRecord = this.m_oAllGames[nChannelId];
 	if (this.m_oChallenges[nChannelId] || !oGameRecord)
 		return;
+
+	if (!oGameRecord.GetProposal() || EKGSGameType.Simul === oGameRecord.GetProposal().GetGameType())
+	{
+		CreateKGSWindow(EKGSWindowType.Information, {Client : this, App : this.m_oApp, Caption : g_oLocalization.common.window.captionWarning, Text : "Sorry, simulations are not supported in the current version.", Image : "WarningSpanWarning", W : 347, H : 144});
+		return;
+	}
 
 	var oWindow = CreateKGSWindow(EKGSWindowType.Challenge, {ChannelId : nChannelId, GameRecord : oGameRecord, Client : this, App: this.m_oApp});
 	this.m_oChallenges[nChannelId] = oWindow;

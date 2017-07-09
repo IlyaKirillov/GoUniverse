@@ -1342,13 +1342,6 @@ CKGSChallengeWindow.prototype.private_OkChallenge = function()
 	}
 	else if (EKGSChallengeWindowState.ChallengerSubmit === this.m_nState)
 	{
-		if (nGameType === EKGSGameType.Simul)
-		{
-			this.Close();
-			CreateKGSWindow(EKGSWindowType.Information, {Client : this, App : this.m_oApp, Caption : g_oLocalization.common.window.captionWarning, Text : "Sorry, simulations are not supported in the current version.", Image : "WarningSpanWarning", W : 347, H : 144});
-			return;
-		}
-
 		this.m_oClient.SendSubmitChallenge(this.m_nChannelId, nGameType, oRules, this.m_bNigiri, this.m_bCreatorBlack, this.m_oOwner.GetName(), bPrivate);
 		this.private_SetState(EKGSChallengeWindowState.ChallengerWaiting);
 	}
