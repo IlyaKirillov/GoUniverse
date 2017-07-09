@@ -2034,10 +2034,10 @@ CKGSChallengeWindow.prototype.private_UpdateKomiAndHandicapFields = function()
 		return;
 
 	if (true !== this.m_bNigiri
-		&& (EKGSChallengeWindowState.ChallengerSubmit === this.m_nState
-		|| (EKGSChallengeWindowState.CreatorProposal === this.m_nState
-		&& null !== this.m_oChallengers.IsFilled()))
+		&& ((EKGSChallengeWindowState.ChallengerSubmit === this.m_nState
 		&& EKGSGameType.Rengo !== this.private_GetSelectedGameType())
+		|| (EKGSChallengeWindowState.CreatorProposal === this.m_nState
+		&& null !== this.m_oChallengers.IsFilled())))
 	{
 		this.m_oKomiInput.className     = "challengeInput challengeInputEditable";
 		this.m_oKomiInput.disabled      = "";

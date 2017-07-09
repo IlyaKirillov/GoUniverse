@@ -1193,6 +1193,14 @@ CKGSGameRoom.prototype.IsOurMove = function()
 {
 	return this.m_bOurMove;
 };
+CKGSGameRoom.prototype.IsMainPlayer = function()
+{
+	if ((this.m_oBlack && this.m_oBlack.GetName() === this.m_oClient.GetUserName())
+		|| (this.m_oWhite && this.m_oWhite.GetName() === this.m_oClient.GetUserName()))
+		return true;
+
+	return false;
+};
 CKGSGameRoom.prototype.SendMove = function(nGameRoomId, X, Y)
 {
 	if (!this.IsOurMove() || !this.IsPlayer())
@@ -1227,7 +1235,7 @@ CKGSGameRoom.prototype.SendPass = function(nGameRoomId)
 };
 CKGSGameRoom.prototype.SendMarkLife = function(nGameRoomId, X, Y, bAlive)
 {
-	if (!this.IsCountingScores() || !this.IsPlayer())
+	if (!this.IsCountingScores() || !this.IsMainPlayer())
 		return;
 
 	this.private_SendCommand({
@@ -1314,9 +1322,13 @@ CKGSGameRoom.prototype.StartCountScores = function()
 	if (this.IsPlayer())
 	{
 		this.m_bCountScores = true;
-		this.m_oGameTree.Get_DrawingBoard().Start_CountScoresInMatch();
-		this.m_oGameTree.Set_ShowTarget(true, true);
 		this.m_oGameTree.Get_Drawing().GoUniverseOnCounting();
+
+		if (this.IsMainPlayer())
+		{
+			this.m_oGameTree.Get_DrawingBoard().Start_CountScoresInMatch();
+			this.m_oGameTree.Set_ShowTarget(true, true);
+		}
 	}
 };
 CKGSGameRoom.prototype.EndCountScores = function()

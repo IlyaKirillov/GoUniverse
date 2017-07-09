@@ -1750,7 +1750,17 @@ CGoUniverseDrawingCountingScores.prototype.Init = function(sDivId)
 	this.m_oWhiteDone = this.private_CreatePlayer(nHeaderH + nInfoH, nPlayerH, oWhiteDiv, this.m_sWhiteName);
 	this.m_oBlackDone = this.private_CreatePlayer(nHeaderH + nInfoH + nPlayerH, nPlayerH, oBlackDiv, this.m_sBlackName);
 	this.private_CreateAcceptButton(nHeaderH + nInfoH + 2 * nPlayerH, nButtonH, oAcceptDiv);
-	this.private_CreateResumeButton(nHeaderH + nInfoH + 2 * nPlayerH + nButtonH, nButtonH, oResumeDiv);
+
+
+	if (!this.m_oGameRoom.IsMainPlayer())
+	{
+		oAcceptDiv.style.display = "none";
+		this.private_CreateResumeButton(nHeaderH + nInfoH + 2 * nPlayerH, nButtonH, oResumeDiv);
+	}
+	else
+	{
+		this.private_CreateResumeButton(nHeaderH + nInfoH + 2 * nPlayerH + nButtonH, nButtonH, oResumeDiv);
+	}
 };
 CGoUniverseDrawingCountingScores.prototype.private_CreateDiv = function(oParent)
 {
@@ -1883,7 +1893,10 @@ CGoUniverseDrawingCountingScores.prototype.private_CreateResumeButton = function
 };
 CGoUniverseDrawingCountingScores.prototype.GetHeight = function()
 {
-	return this.nHeaderH + this.nInfoH + 2 * this.nPlayerH + 2 * this.nButtonH + 3;
+	if (!this.m_oGameRoom.IsMainPlayer())
+		return this.nHeaderH + this.nInfoH + 2 * this.nPlayerH + this.nButtonH + 3;
+	else
+		return this.nHeaderH + this.nInfoH + 2 * this.nPlayerH + 2 * this.nButtonH + 3;
 };
 CGoUniverseDrawingCountingScores.prototype.UpdateDoneState = function(bWhiteDone, bBlackDone)
 {
