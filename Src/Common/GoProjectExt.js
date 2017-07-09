@@ -1233,6 +1233,13 @@ CGoUniverseDrawingGameState.prototype.Update = function()
 		}
 
 		sText += (BOARD_BLACK ===  nNext ? g_oLocalization.gameRoom.blackToPlay : g_oLocalization.gameRoom.whiteToPlay);
+
+		if (this.m_oGameRoom && this.m_oGameRoom.IsRengo())
+		{
+			var oNextMoveUser = this.m_oGameRoom.GetNextMoveUser();
+			if (oNextMoveUser)
+				sText += " (" + oNextMoveUser.GetName() + ")";
+		}
 	}
 
 	Common.Set_InnerTextToElement(this.m_oDiv, sText);

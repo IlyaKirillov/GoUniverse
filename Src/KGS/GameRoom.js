@@ -45,6 +45,7 @@ function CKGSGameRoom(oClient, nGameRoomId)
 	this.m_oWhiteInfoHandler   = null;
 	this.m_oUsers              = {};
 	this.m_oDrawing            = null;
+	this.m_oNextMoveUser       = null;
 }
 CKGSGameRoom.prototype.GetRoomId = function()
 {
@@ -61,6 +62,13 @@ CKGSGameRoom.prototype.GetGameTree = function()
 CKGSGameRoom.prototype.IsDemonstration = function()
 {
 	return this.m_bDemo;
+};
+CKGSGameRoom.prototype.IsRengo = function()
+{
+	if (this.m_oBlack2 && this.m_oWhite2)
+		return true;
+
+	return false;
 };
 CKGSGameRoom.prototype.GetBlackTime = function()
 {
@@ -383,6 +391,7 @@ CKGSGameRoom.prototype.HandleGameActions = function(arrActions)
 			this.EndCountScores();
 
 			var oUser = GetKGSUser(oAction.user);
+			this.private_SetNextMoveUser(oUser);
 			if (this.IsPlayer() && this.m_oGameTree)
 			{
 				if (oUser.GetName() === this.m_oClient.GetUserName())
@@ -1478,6 +1487,16 @@ CKGSGameRoom.prototype.SetDrawing = function(oDrawing)
 CKGSGameRoom.prototype.LoadFile = function(oGameTree)
 {
 	console.log(oGameTree);
+};
+CKGSGameRoom.prototype.private_SetNextMoveUser = function(oUser)
+{
+	this.m_oNextMoveUser = oUser;
+	if (this.m_oStateHandler)
+		this.m_oStateHandler.Update();
+};
+CKGSGameRoom.prototype.GetNextMoveUser = function()
+{
+	return this.m_oNextMoveUser;
 };
 
 function CKGSEditorHandler(oClient, oGame)
