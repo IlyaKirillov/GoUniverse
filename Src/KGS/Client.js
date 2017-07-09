@@ -2132,6 +2132,12 @@ CKGSClient.prototype.private_HandleChallengeJoin = function(oMessage)
 	if (!oGameRecord.GetProposal() || EKGSGameType.Simul === oGameRecord.GetProposal().GetGameType())
 	{
 		CreateKGSWindow(EKGSWindowType.Information, {Client : this, App : this.m_oApp, Caption : g_oLocalization.common.window.captionWarning, Text : "Sorry, simulations are not supported in the current version.", Image : "WarningSpanWarning", W : 347, H : 144});
+
+		this.private_SendMessage({
+			"type"     : "UNJOIN_REQUEST",
+			"channelId": nChannelId
+		});
+
 		return;
 	}
 
