@@ -548,6 +548,10 @@ input.challengeInputChanged {
 	font-weight : bold;
 }
 
+div.challengeCheckBoxLabelChanged {
+	color : rgb(199, 40, 40);
+}
+
 select.challengeSelect {
 	border          : 1px transparent;
 	outline         : none;

@@ -753,7 +753,7 @@ CKGSClient.prototype.SendSubmitChallenge = function(nChannelId, nGameType, oRule
 		"players"   : arrPlayers
 	});
 };
-CKGSClient.prototype.SendChallengeProposal = function(nChannelId, nGameType, oRules, bNigiri, bCreatorBlack, sCreator, sChallenger, bPrivate)
+CKGSClient.prototype.SendChallengeProposal = function(nChannelId, nGameType, oRules, bNigiri, arrPlayers, bPrivate)
 {
 	this.private_SendMessage({
 		"channelId" : nChannelId,
@@ -762,16 +762,10 @@ CKGSClient.prototype.SendChallengeProposal = function(nChannelId, nGameType, oRu
 		"nigiri"    : bNigiri,
 		"rules"     : oRules,
 		"private"   : bPrivate,
-		"players"   : [{
-			"role" : bCreatorBlack ? "black" : "white",
-			"name" : sCreator
-		}, {
-			"role" : bCreatorBlack ? "white" : "black",
-			"name" : sChallenger
-		}]
+		"players"   : arrPlayers
 	});
 };
-CKGSClient.prototype.SendAcceptChallenge = function(nChannelId, nGameType, oRules, bNigiri, bCreatorBlack, sCreator, sChallenger, bPrivate)
+CKGSClient.prototype.SendAcceptChallenge = function(nChannelId, nGameType, oRules, bNigiri, arrPlayers, bPrivate)
 {
 	this.private_SendMessage({
 		"channelId" : nChannelId,
@@ -780,13 +774,7 @@ CKGSClient.prototype.SendAcceptChallenge = function(nChannelId, nGameType, oRule
 		"nigiri"    : bNigiri,
 		"rules"     : oRules,
 		"private"   : bPrivate,
-		"players"   : [{
-			"role" : bCreatorBlack ? "black" : "white",
-			"name" : sCreator
-		}, {
-			"role" : bCreatorBlack ? "white" : "black",
-			"name" : sChallenger
-		}]
+		"players"   : arrPlayers
 	});
 };
 CKGSClient.prototype.RetryChallenge = function(nChannelId)

@@ -230,6 +230,10 @@ CKGSGameListRecord.prototype.SetLoadingGameTree = function(oGameTree)
 {
 	this.m_oLoadingGameTree = oGameTree;
 };
+CKGSGameListRecord.prototype.SetProposal = function(oProposal)
+{
+	this.m_oProposal = oProposal;
+};
 
 function CKGSChallengeProposal(oGameRecord)
 {
@@ -243,6 +247,8 @@ function CKGSChallengeProposal(oGameRecord)
 	this.m_arrPlayers = [];
 	this.m_oWhite     = null;
 	this.m_oBlack     = null;
+	this.m_oWhite2    = null;
+	this.m_oBlack2    = null;
 	this.m_bPrivate   = true === oGameRecord.private ? true : false;
 
 	this.private_ParseGameType(oGameRecord.gameType);
@@ -308,6 +314,14 @@ CKGSChallengeProposal.prototype.private_ParsePlayers = function(arrPlayers)
 		{
 			this.m_oBlack = GetKGSUser(oRecord["user"]);
 		}
+		else if ("white_2" === oRecord["role"] && oRecord["user"])
+		{
+			this.m_oWhite2 = GetKGSUser(oRecord["user"]);
+		}
+		else if ("black_2" === oRecord["role"] && oRecord["user"])
+		{
+			this.m_oBlack2 = GetKGSUser(oRecord["user"]);
+		}
 	}
 };
 CKGSChallengeProposal.prototype.GetTimeSettingsString = function()
@@ -325,4 +339,12 @@ CKGSChallengeProposal.prototype.GetBlack = function()
 CKGSChallengeProposal.prototype.IsPrivate = function()
 {
 	return this.m_bPrivate;
+};
+CKGSChallengeProposal.prototype.GetBlack2 = function()
+{
+	return this.m_oBlack2;
+};
+CKGSChallengeProposal.prototype.GetWhite2 = function()
+{
+	return this.m_oWhite2;
 };

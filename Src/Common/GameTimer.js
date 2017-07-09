@@ -493,3 +493,7 @@ CTimeSettings.prototype.GetCountDownLimit = function()
 
 	return 0;
 };
+CTimeSettings.prototype.GetType = function()
+{
+	return this.m_nType;
+};
