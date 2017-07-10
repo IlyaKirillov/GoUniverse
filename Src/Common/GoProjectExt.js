@@ -103,7 +103,8 @@ CDrawing.prototype.Create_GoUniverseViewerTemplate = function(sDivId, oApp, oTab
 		MenuButtonControl  : null,
 		EditButtonControl  : null,
 		ManagerControl     : null,
-		ReviewControl      : null
+		ReviewControl      : null,
+		PassButton         : null
 	};
 
 	this.private_GoUniverseCreateWrappingMainDiv(sDivId);
@@ -449,6 +450,8 @@ CDrawing.prototype.private_GoUniverseCreateMatchToolbar = function(oParentContro
 	oDrawingToolbar.Init(sToolbarInnerDivId, this.m_oGameTree);
 
 	this.m_aElements.push(oDrawingToolbar);
+
+	this.m_oGoUniversePr.PassButton = oButtonPass;
 };
 CDrawing.prototype.private_GoUniverseCreateReviewPanel = function(oParentControl, oParentDiv, sDivId, nTop, nH)
 {
@@ -578,6 +581,16 @@ CDrawing.prototype.GoUniverseGetChatInputElement = function()
 CDrawing.prototype.GoUniverseOnStartReview = function()
 {
 	this.GoUniverseOnView();
+};
+CDrawing.prototype.GoUniverseEnablePass = function()
+{
+	if (this.m_oGoUniversePr && this.m_oGoUniversePr.PassButton)
+		this.m_oGoUniversePr.PassButton.SetEnabled(true);
+};
+CDrawing.prototype.GoUniverseDisablePass = function()
+{
+	if (this.m_oGoUniversePr && this.m_oGoUniversePr.PassButton)
+		this.m_oGoUniversePr.PassButton.SetEnabled(false);
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Специальный класс с комментариями
@@ -1622,6 +1635,10 @@ CGoUniverseButtonPass.prototype.GetMinWidth = function()
 {
 	g_oTextMeasurer.SetFont("20px Times New Roman, Sans serif");
 	return g_oTextMeasurer.Measure(g_oLocalization.gameRoom.button.pass) + 12;
+};
+CGoUniverseButtonPass.prototype.SetEnabled = function(isEnabled)
+{
+	this.Set_Enabled(isEnabled);
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Кнопка Resign

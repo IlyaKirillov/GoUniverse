@@ -1303,6 +1303,8 @@ CKGSGameRoom.prototype.private_OurMove = function()
 	else if (true === this.IsWhitePlayer() && BOARD_WHITE !== this.m_oGameTree.Get_NextMove())
 		this.m_oGameTree.Set_NextMove(BOARD_WHITE);
 
+	if (this.m_oDrawing)
+		this.m_oDrawing.GoUniverseEnablePass();
 
 	this.m_oGameTree.Set_ShowTarget(true, true);
 	this.m_oGameTree.Set_EditingFlags({NewNode : true, Move : true});
@@ -1319,6 +1321,9 @@ CKGSGameRoom.prototype.private_OpponentMove = function()
 	this.m_oGameTree.Set_ShowTarget(false, true);
 	this.m_oGameTree.Forbid_All();
 	this.m_oGameTree.Set_EditingFlags({Move : true});
+
+	if (this.m_oDrawing)
+		this.m_oDrawing.GoUniverseDisablePass();
 
 	this.m_oClient.m_oApp.GetSound().StopCountDown();
 };
