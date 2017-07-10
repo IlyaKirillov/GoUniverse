@@ -435,16 +435,10 @@ CDrawing.prototype.private_GoUniverseCreateMatchToolbar = function(oParentContro
 	var oButtonPass = new CGoUniverseButtonPass(this, this.m_oGameRoom);
 	var oButtonResign = new CGoUniverseButtonResign(this, this.m_oGameRoom);
 
-	var nButtonW = Math.max(72,
-		oButtonUndo.GetMinWidth(),
-		oButtonPass.GetMinWidth(),
-		oButtonResign.GetMinWidth()
-	);
-
 	var oDrawingToolbar = new CDrawingToolbar(this);
-	oDrawingToolbar.Add_Control(oButtonUndo, nButtonW, 1, EToolbarFloat.Left);
-	oDrawingToolbar.Add_Control(oButtonPass, nButtonW, 1, EToolbarFloat.Left);
-	oDrawingToolbar.Add_Control(oButtonResign, nButtonW, 1, EToolbarFloat.Left);
+	oDrawingToolbar.Add_Control(oButtonUndo, Math.max(72, oButtonUndo.GetMinWidth()), 1, EToolbarFloat.Left);
+	oDrawingToolbar.Add_Control(oButtonPass, Math.max(72, oButtonPass.GetMinWidth()), 1, EToolbarFloat.Left);
+	oDrawingToolbar.Add_Control(oButtonResign, Math.max(72, oButtonResign.GetMinWidth()), 1, EToolbarFloat.Left);
 	oDrawingToolbar.Add_Control(new CDrawingButtonAbout(this), 36, 1, EToolbarFloat.Right);
 	oDrawingToolbar.Add_Control(new CDrawingButtonGameInfo(this), 36, 1, EToolbarFloat.Right);
 	oDrawingToolbar.Init(sToolbarInnerDivId, this.m_oGameTree);
