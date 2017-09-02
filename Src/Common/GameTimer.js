@@ -211,7 +211,7 @@ CTimeSettings.prototype.private_OnTickTimer = function(nSecondsLeft)
 		this.m_nMainTime = Math.max(0, nSecondsLeft);
 
 		if (this.m_fOnTick)
-			this.m_fOnTick(this.private_SecondsToString(this.m_nMainTime) + " SD");
+			this.m_fOnTick(this.private_SecondsToString(this.m_nMainTime, 10) + " SD");
 
 		break;
 	}
@@ -227,7 +227,7 @@ CTimeSettings.prototype.private_OnTickTimer = function(nSecondsLeft)
 		{
 			this.m_nOverTimeCur = Math.max(0, nSecondsLeft);
 			if (this.m_fOnTick)
-				this.m_fOnTick(this.private_SecondsToString(nSecondsLeft) + " (" + this.m_nOverCountCur + ")");
+				this.m_fOnTick(this.private_SecondsToString(nSecondsLeft, 3) + " (" + this.m_nOverCountCur + ")");
 		}
 
 		break;
@@ -244,7 +244,7 @@ CTimeSettings.prototype.private_OnTickTimer = function(nSecondsLeft)
 		{
 			this.m_nOverTimeCur = Math.max(0, nSecondsLeft);
 			if (this.m_fOnTick)
-				this.m_fOnTick(this.private_SecondsToString(nSecondsLeft) + "/" + this.m_nOverCountCur);
+				this.m_fOnTick(this.private_SecondsToString(nSecondsLeft, 3) + "/" + this.m_nOverCountCur);
 		}
 		break;
 	}
@@ -322,7 +322,7 @@ CTimeSettings.prototype.IsCanadian = function()
 {
 	return (this.m_nType === ETimeSettings.Canadian ? true : false);
 };
-CTimeSettings.prototype.private_SecondsToString = function(_seconds)
+CTimeSettings.prototype.private_SecondsToString = function(_seconds, _msThreshold)
 {
 	var nHours    = Math.floor(_seconds / 3600);
 	var nMinutes  = Math.floor((_seconds - (nHours * 3600)) / 60);
@@ -335,9 +335,11 @@ CTimeSettings.prototype.private_SecondsToString = function(_seconds)
 	var sMSeconds = "" + nMSeconds;
 
 	if (nHours > 0)
-		return sHours + ':' + sMinutes + ':' + sSeconds + "." + sMSeconds;
+		return sHours + ':' + sMinutes + ':' + sSeconds;
 	else if (nMinutes > 0)
-		return sMinutes + ':' + sSeconds + "." + sMSeconds;
+		return sMinutes + ':' + sSeconds;
+	else if (undefined === _msThreshold || sSeconds > _msThreshold - 1)
+		return sSeconds;
 	else
 		return sSeconds + "." + sMSeconds;
 };
@@ -378,7 +380,7 @@ CTimeSettings.prototype.ToString = function()
 	}
 	case ETimeSettings.Absolute:
 	{
-		return (this.private_SecondsToString(this.m_nMainTime) + " SD");
+		return (this.private_SecondsToString(this.m_nMainTime, 10) + " SD");
 		break;
 	}
 	case ETimeSettings.ByoYomi:
@@ -389,7 +391,7 @@ CTimeSettings.prototype.ToString = function()
 		}
 		else
 		{
-			return (this.private_SecondsToString(this.m_nOverTimeCur) + " (" + this.m_nOverCountCur + ")");
+			return (this.private_SecondsToString(this.m_nOverTimeCur, 3) + " (" + this.m_nOverCountCur + ")");
 		}
 
 		break;
@@ -402,7 +404,7 @@ CTimeSettings.prototype.ToString = function()
 		}
 		else
 		{
-			return (this.private_SecondsToString(this.m_nOverTimeCur) + "/" + this.m_nOverCountCur);
+			return (this.private_SecondsToString(this.m_nOverTimeCur, 3) + "/" + this.m_nOverCountCur);
 		}
 		break;
 	}
