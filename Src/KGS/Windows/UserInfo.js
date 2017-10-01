@@ -2005,10 +2005,16 @@ CKGSUserInfoGamesList.prototype.Handle_RightClick = function(oRecord, e)
 	if (!oClient)
 		return;
 
-	var isDemo = oRecord.IsDemo();
+	var isDemo    = oRecord.IsDemo();
 	var isPrivate = oRecord.IsPrivate();
-	var sUrl = oRecord.GetUrl();
-	var nX = e.pageX, nY = e.pageY;
+	var sUrl      = oRecord.GetUrl();
+	var nX        = e.pageX,
+		nY        = e.pageY;
+
+	var isPrivateForMe = isPrivate;
+	if (true === isPrivate)
+		isPrivateForMe = oRecord.CheckUserOwnership(oClient.GetCurrentUser()) ? false : true;
+
 	var oContextMenu = new CVisualContextMenu(this.m_oApp, nX, nY);
 	var oThis = this;
 	function privateLoadIn(e, isLoadPrivately)
@@ -2068,7 +2074,7 @@ CKGSUserInfoGamesList.prototype.Handle_RightClick = function(oRecord, e)
 			privateLoadSgfByUrl(sUrl, privateDownload);
 		}, isPrivate || "" === sUrl);
 		oContextMenu.AddListItem(g_oLocalization.KGS.window.userInfo.gamesArchive.contextMenu.loadIn, privateLoadIn, isPrivate, false);
-		oContextMenu.AddListItem(g_oLocalization.KGS.window.userInfo.gamesArchive.contextMenu.loadPIn, privateLoadIn, isPrivate, true);
+		oContextMenu.AddListItem(g_oLocalization.KGS.window.userInfo.gamesArchive.contextMenu.loadPIn, privateLoadIn, isPrivateForMe, true);
 	}
 
 	oContextMenu.Show();
@@ -2087,6 +2093,8 @@ function CKGSUserInfoGamesListRecord(oClient)
 	this.m_oBlack     = null;
 	this.m_oWhite     = null;
 	this.m_oOwner     = null;
+	this.m_oBlack2    = null;
+	this.m_oWhite2    = null;
 	this.m_bPrivate   = false;
 	this.m_sScore     = "";
 	this.m_nSize      = 19;
@@ -2229,6 +2237,29 @@ CKGSUserInfoGamesListRecord.prototype.IsDemo = function()
 {
 	if (this.m_oOwner)
 		return true;
+
+	return false;
+};
+CKGSUserInfoGamesListRecord.prototype.CheckUserOwnership = function(oUser)
+{
+	if (!oUser)
+		return false;
+
+	var sName = oUser.GetName().toLowerCase();
+
+	var sBlackName  = this.m_oBlack ? this.m_oBlack.GetName().toLowerCase() : null;
+	var sWhiteName  = this.m_oWhite ? this.m_oWhite.GetName().toLowerCase() : null;
+	var sOwnerName  = this.m_oOwner ? this.m_oOwner.GetName().toLowerCase() : null;
+	var sBlack2Name = this.m_oBlack2 ? this.m_oBlack2.GetName().toLowerCase() : null;
+	var sWhite2Name = this.m_oWhite2 ? this.m_oBlack2.GetName().toLowerCase() : null;
+
+	if ((sBlackName && sBlackName === sName)
+		|| (sWhiteName && sWhiteName === sName)
+		|| (sOwnerName && sOwnerName === sName)
+		|| (sBlack2Name && sBlack2Name === sName)
+		|| (sWhite2Name && sWhite2Name === sName))
+		return true;
+
 
 	return false;
 };
