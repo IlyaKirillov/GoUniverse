@@ -443,7 +443,7 @@ var g_oLocalization_enUS = {
 				fieldKomi          : "Komi",
 				fieldTimeSystem    : "Time system",
 				fieldMainTime      : "Main time",
-				fieldByoYomiTime   : "Byo-tomi",
+				fieldByoYomiTime   : "Byo-yomi",
 				fieldPeriods       : "Periods",
 				fieldStones        : "Stones",
 
