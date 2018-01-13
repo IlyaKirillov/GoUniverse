@@ -217,10 +217,10 @@ html, body {
 }
 
 div.Selectable {
-	user-select         : all;
-	-webkit-user-select : auto;
-	-moz-user-select    : all;
-	-ms-user-select     : all;
+	user-select         : text;
+	-webkit-user-select : text;
+	-moz-user-select    : text;
+	-ms-user-select     : text;
 	white-space         : pre-wrap;
 	word-wrap           : break-word
 }

@@ -133,7 +133,6 @@ CKGSUserInfoWindow.prototype.Init = function(sDivId, oPr)
 	var oMainControl = this.HtmlElement.InnerControl;
 
 	oMainDiv.style.fontSize = "16px";
-	oMainDiv.className += " Selectable";
 	oMainDiv.style.backgroundColor = "rgb(243, 243, 243)";
 
 	var sTabsId         = sDivId + "T";
@@ -918,6 +917,7 @@ CKGSUserInfoWindow.prototype.private_AddInfoField = function(oParent, oParentCon
 	oParent.appendChild(oLabel);
 
 	var oDiv = document.createElement("div");
+	oDiv.className += " Selectable";
 	oParent.appendChild(oDiv);
 
 	oDiv.style.position    = "absolute";
@@ -1082,6 +1082,7 @@ CKGSUserInfoWindow.prototype.private_CreateInfoPage = function(oDiv, oControl)
 	oControl.AddControl(oAvatarControl);
 
 	this.m_oExtensionDiv = this.protected_CreateDivElement(oDiv, sExtension);
+	this.m_oExtensionDiv.className += " Selectable";
 	var oExtensionControl = CreateControlContainer(sExtension);
 	oExtensionControl.Bounds.SetParams(5, sInfoHeight + 10, 5, nBot, true, true, true, true, -1, -1);
 	oExtensionControl.Anchor = (g_anchor_top | g_anchor_right | g_anchor_left | g_anchor_bottom);

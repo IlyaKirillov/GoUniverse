@@ -9,7 +9,7 @@
  * Time     11:50
  */
 
-var net = require('net');
+//var net = require('net');
 
 function CIGSClient(oApp)
 {
