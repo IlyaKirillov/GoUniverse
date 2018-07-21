@@ -585,6 +585,12 @@ CGoUniverseApplication.prototype.AddGameRoom = function(oGame)
 	var oTab = new CVisualGameRoomTab(this);
 	var oGameRoomControl = oTab.InitGameRoom("divMainId", oGame);
 
+	var oGameTreeHandler = new CGameRoomEventHandler(oGame);
+	oGameTreeHandler.Send("Test");
+	oGameTreeHandler.Send({Type : "GameName", GameName : oGame.GetWhiteName() + " vs. " + oGame.GetBlackName()});
+
+	var oWindow = window.open("./gameRoom.html?id=" + oGame.GetRoomId(), '_blank', "menubar=no,location=yes,resizable=yes,scrollbars=no,status=no");
+
 	if (oGame.IsPlayer())
 		this.m_oGameRoomTabs.AddOwnGameTab(oTab);
 	else
@@ -2128,5 +2134,43 @@ CVisualChatTabsPanel.prototype.private_CheckScrollVisibility = function()
 	if (isHidden !== this.m_oChatTabsScroll.IsHidden())
 	{
 		this.m_oChatTabs.OnScrollShowHide(!this.m_oChatTabsScroll.IsHidden());
+	}
+};
+
+function CGameRoomEventHandler(oGameRoom)
+{
+	this.GameRoom = oGameRoom;
+	
+	this.Channel  = new BroadcastChannel("GoUniverse.GameRoom=" + oGameRoom.GetRoomId());
+
+	this.MessagesToSend = [];
+
+	this.Ready = false;
+
+	var oThis = this;
+	this.Channel.onmessage = function(e)
+	{
+		var oMessage = e.data;
+		var sType = oMessage.Type;
+		switch (sType)
+		{
+			case "Ready": oThis.private_HandleReady(); break;
+		}
+	};
+}
+CGameRoomEventHandler.prototype.Send = function(oMessage)
+{
+	if (this.Ready)
+		this.Channel.postMessage(oMessage);
+	else
+		this.MessagesToSend.push(oMessage);
+}
+CGameRoomEventHandler.prototype.private_HandleReady = function()
+{
+	this.Ready = true;
+
+	for (var nIndex = 0, nCount = this.MessagesToSend.length; nIndex < nCount; ++nIndex)
+	{
+		this.Send(this.MessagesToSend[nIndex]);		
 	}
 };

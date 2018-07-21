@@ -40,7 +40,7 @@ function EncodeSurrogateChar(nUnicode)
 	}
 }
 
-var urlRegEx = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-]*)?\??(?:[\-\+=&;%@\.\w]*)#?(?:[\=\.\-\!\/\\\w]*))?)/g;
+var urlRegEx = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\wа-яА-ЯёЁ]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\wа-яА-ЯёЁ]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\wа-яА-ЯёЁ\-]*)?\??(?:[\-\+=&;%@\.\wа-яА-ЯёЁ]*)#?(?:[\=\.\-\!\/\\\wа-яА-ЯёЁ]*))?)/g;
 var userRegEx = /(\\user=)([A-Za-z0-9]+)(;)/g;
 var gameRegEx = /(\\game=)([0-9]*)(;)([^(;)]+)(;)/g;
 
@@ -563,4 +563,18 @@ function StringToSeconds(sString)
 		nSeconds = 0;
 
 	return (nSeconds + 60 * nMinutes + 3600 * nHours);
+}
+
+function GetJsonFromUrl()
+{
+	var sQuery  = location.search.substr(1);
+	var oResult = {};
+
+	sQuery.split("&").forEach(function(sPart) 
+	{
+		var oItem = sPart.split("=");
+		oResult[oItem[0]] = decodeURIComponent(oItem[1]);
+	});
+	
+	return oResult;
 }

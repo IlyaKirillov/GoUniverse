@@ -1,0 +1,104 @@
+<html>
+<head>
+	<meta charset="UTF-8">
+
+	<link href='http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css' rel='stylesheet' type='text/css'>
+
+	<link rel="icon" href="Files/Favicon.ico" type="image/x-icon">
+
+	<script type="text/javascript" language="JavaScript" src="External/GoProject/WebSDK/Common.js"></script>
+	<script type="text/javascript" language="JavaScript" src="External/GoProject/WebSDK/Drawing/Controls.js"></script>
+	<script type="text/javascript" language="JavaScript" src="External/GoProject/WebSDK/Drawing/Board.js"></script>
+	<script type="text/javascript" language="JavaScript"
+			src="External/GoProject/WebSDK/Drawing/BoardTarget.js"></script>
+	<script type="text/javascript" language="JavaScript" src="External/GoProject/WebSDK/Drawing/HtmlEvents.js"></script>
+	<script type="text/javascript" language="JavaScript" src="External/GoProject/WebSDK/Drawing/Mark.js"></script>
+	<script type="text/javascript" language="JavaScript" src="External/GoProject/WebSDK/Drawing/Button.js"></script>
+	<script type="text/javascript" language="JavaScript" src="External/GoProject/WebSDK/Drawing/Toolbar.js"></script>
+	<script type="text/javascript" language="JavaScript" src="External/GoProject/WebSDK/Drawing/Drawing.js"></script>
+	<script type="text/javascript" language="JavaScript"
+			src="External/GoProject/WebSDK/Drawing/InterfaceState.js"></script>
+	<script type="text/javascript" language="JavaScript" src="External/GoProject/WebSDK/Drawing/Comments.js"></script>
+	<script type="text/javascript" language="JavaScript" src="External/GoProject/WebSDK/Drawing/Navigator.js"></script>
+	<script type="text/javascript" language="JavaScript"
+			src="External/GoProject/WebSDK/Drawing/NavigatorMap.js"></script>
+	<script type="text/javascript" language="JavaScript" src="External/GoProject/WebSDK/Drawing/Slider.js"></script>
+	<script type="text/javascript" language="JavaScript" src="External/GoProject/WebSDK/Drawing/Sound.js"></script>
+	<script type="text/javascript" language="JavaScript"
+			src="External/GoProject/WebSDK/Drawing/Presentation.js"></script>
+	<script type="text/javascript" language="JavaScript"
+			src="External/GoProject/WebSDK/Drawing/VerticalTabs.js"></script>
+	<script type="text/javascript" language="JavaScript" src="External/GoProject/WebSDK/Drawing/Window.js"></script>
+	<script type="text/javascript" language="JavaScript" src="External/GoProject/WebSDK/Command.js"></script>
+	<script type="text/javascript" language="JavaScript" src="External/GoProject/WebSDK/Consts.js"></script>
+	<script type="text/javascript" language="JavaScript" src="External/GoProject/WebSDK/GameTree.js"></script>
+	<script type="text/javascript" language="JavaScript" src="External/GoProject/WebSDK/GifWriter.js"></script>
+	<script type="text/javascript" language="JavaScript" src="External/GoProject/WebSDK/LogicBoard.js"></script>
+	<script type="text/javascript" language="JavaScript" src="External/GoProject/WebSDK/Memory.js"></script>
+	<script type="text/javascript" language="JavaScript" src="External/GoProject/WebSDK/Move.js"></script>
+	<script type="text/javascript" language="JavaScript" src="External/GoProject/WebSDK/Node.js"></script>
+	<script type="text/javascript" language="JavaScript" src="External/GoProject/WebSDK/Territory.js"></script>
+	<script type="text/javascript" language="JavaScript" src="External/GoProject/WebSDK/SgfReader.js"></script>
+	<script type="text/javascript" language="JavaScript" src="External/GoProject/WebSDK/SgfWriter.js"></script>
+	<script type="text/javascript" language="JavaScript" src="External/GoProject/WebSDK/Api.js"></script>
+	<script type="text/javascript" language="JavaScript" src="External/GoProject/WebSDK/Version.js"></script>
+
+	<script type="text/javascript" language="JavaScript" src="Common/Common.js"></script>
+	<script type="text/javascript" language="JavaScript" src="Common/ListView.js"></script>
+	<script type="text/javascript" language="JavaScript" src="Common/GoUniverseApp.js"></script>
+	<script type="text/javascript" language="JavaScript" src="Common/VisualTabs.js"></script>
+	<script type="text/javascript" language="JavaScript" src="Common/Popup.js"></script>
+	<script type="text/javascript" language="JavaScript" src="Common/VerticalScroll.js"></script>
+	<script type="text/javascript" language="JavaScript" src="Common/GoProjectExt.js"></script>
+	<script type="text/javascript" language="JavaScript" src="Common/GameTimer.js"></script>
+	<script type="text/javascript" language="JavaScript" src="Common/ListBase.js"></script>
+	<script type="text/javascript" language="JavaScript" src="Common/Version.js"></script>
+	<script type="text/javascript" language="JavaScript" src="Common/AboutWindow.js"></script>
+	<script type="text/javascript" language="JavaScript" src="Common/BezierInterpolation.js"></script>
+	<script type="text/javascript" language="JavaScript" src="Common/GlobalSettings.js"></script>
+
+
+	<script type="text/javascript" language="JavaScript" src="KGS/Common.js"></script>
+	<script type="text/javascript" language="JavaScript" src="KGS/PlayersList.js"></script>
+	<script type="text/javascript" language="JavaScript" src="KGS/GamesList.js"></script>
+	<script type="text/javascript" language="JavaScript" src="KGS/RoomList.js"></script>
+	<script type="text/javascript" language="JavaScript" src="KGS/Client.js"></script>
+	<script type="text/javascript" language="JavaScript" src="KGS/User.js"></script>
+	<script type="text/javascript" language="JavaScript" src="KGS/GameListRecord.js"></script>
+	<script type="text/javascript" language="JavaScript" src="KGS/InGamePlayersList.js"></script>
+	<script type="text/javascript" language="JavaScript" src="KGS/GameRoom.js"></script>
+	<script type="text/javascript" language="JavaScript" src="KGS/AutomatchPreferences.js"></script>
+	<script type="text/javascript" language="JavaScript" src="KGS/UsersList.js"></script>
+
+	<script type="text/javascript" language="JavaScript" src="KGS/Windows/Window.js"></script>
+	<script type="text/javascript" language="JavaScript" src="KGS/Windows/RoomList.js"></script>
+	<script type="text/javascript" language="JavaScript" src="KGS/Windows/UserInfo.js"></script>
+	<script type="text/javascript" language="JavaScript" src="KGS/Windows/RoomInfo.js"></script>
+	<script type="text/javascript" language="JavaScript" src="KGS/Windows/Information.js"></script>
+	<script type="text/javascript" language="JavaScript" src="KGS/Windows/Challenge.js"></script>
+	<script type="text/javascript" language="JavaScript" src="KGS/Windows/UndoRequest.js"></script>
+	<script type="text/javascript" language="JavaScript" src="KGS/Windows/AutomatchSetup.js"></script>
+
+	<script type="text/javascript" language="JavaScript" src="IGS/Client.js"></script>
+
+	<script type="text/javascript" language="JavaScript" src="Localizations/enUS.js"></script>
+	<script type="text/javascript" language="JavaScript" src="Localizations/Localization.js"></script>
+	<script type="text/javascript" language="JavaScript" src="Localizations/ruRU.js"></script>
+	<script type="text/javascript" language="JavaScript" src="Localizations/frFR.js"></script>
+	<script type="text/javascript" language="JavaScript" src="Localizations/deDE.js"></script>
+	<script type="text/javascript" language="JavaScript" src="Localizations/LanguageCodes.js"></script>
+
+	<script type="text/javascript" language="JavaScript" src="MainGameRoom.js"></script>
+
+	<link rel="stylesheet" type="text/css" href="Styles.css">
+</head>
+<body id="bodyId"
+	  style="position: relative;background-image: url(Files/BackgroundR.png)">
+
+<div id="divIdGoUniverse" style="width:100vw;height:100vh;font-family: 'Segoe UI', Tahoma, sans-serif">
+
+
+
+</div>
+</body>
+</html>
