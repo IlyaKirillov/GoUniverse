@@ -346,7 +346,7 @@ CKGSUserInfoWindow.prototype.OnUserAvatar = function()
 	oImg.style.float  = "right";
 	oImg.style.width  = "141px";
 	oImg.style.height = "200px";
-	oImg.src          = "http://goserver.gokgs.com/avatars/" + this.m_sUserName + ".jpg";
+	oImg.src          = "http://files.gokgs.com/avatars/" + this.m_sUserName + ".jpg";
 	this.m_oAvatarDiv.appendChild(oImg);
 };
 CKGSUserInfoWindow.prototype.OnUserGameArchive = function(oMessage)

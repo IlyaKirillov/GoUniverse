@@ -191,7 +191,7 @@ CKGSGameRoom.prototype.SetPlayers = function(oGameRecord)
 		if (oBlackUser)
 		{
 			if (oBlackUser.HasAvatar())
-				this.m_sBlackAvatar = "http://goserver.gokgs.com/avatars/" + oBlackUser.GetName() + ".jpg";
+				this.m_sBlackAvatar = "http://files.gokgs.com/avatars/" + oBlackUser.GetName() + ".jpg";
 			else if (oBlackUser.IsRobot())
 				this.m_sBlackAvatar = "Files/Robot.png";
 			else
@@ -202,7 +202,7 @@ CKGSGameRoom.prototype.SetPlayers = function(oGameRecord)
 		if (oWhiteUser)
 		{
 			if (oWhiteUser.HasAvatar())
-				this.m_sWhiteAvatar = "http://goserver.gokgs.com/avatars/" + oWhiteUser.GetName() + ".jpg";
+				this.m_sWhiteAvatar = "http://files.gokgs.com/avatars/" + oWhiteUser.GetName() + ".jpg";
 			else if (oWhiteUser.IsRobot())
 				this.m_sWhiteAvatar = "Files/Robot.png";
 			else
