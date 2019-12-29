@@ -589,7 +589,7 @@ CGoUniverseApplication.prototype.AddGameRoom = function(oGame)
 	oGameTreeHandler.Send("Test");
 	oGameTreeHandler.Send({Type : "GameName", GameName : oGame.GetWhiteName() + " vs. " + oGame.GetBlackName()});
 
-	var oWindow = window.open("./gameRoom.html?id=" + oGame.GetRoomId(), '_blank', "menubar=no,location=yes,resizable=yes,scrollbars=no,status=no");
+	//var oWindow = window.open("./gameRoom.html?id=" + oGame.GetRoomId(), '_blank', "menubar=no,location=yes,resizable=yes,scrollbars=no,status=no");
 
 	if (oGame.IsPlayer())
 		this.m_oGameRoomTabs.AddOwnGameTab(oTab);
