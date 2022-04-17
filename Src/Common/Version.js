@@ -9,4 +9,4 @@
  * Time     1:44
  */
 
-var g_sGoUniverseVersion = "1.5.9";
+var g_sGoUniverseVersion = "1.5.11";

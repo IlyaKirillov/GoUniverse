@@ -31,7 +31,7 @@ function CGoUniverseApplication()
 	this.m_arrPopups           = [];
 	
 	this.m_oSound              = new CBoardSound();
-	this.m_oSound.Init("http://webgoboard.net/Sound");
+	this.m_oSound.Init("https://ilyakirillov.github.io/webgoboard.io/Sound");
 	//this.m_oSound.Init("Files/Sound");
 	this.m_bFocused            = true;
 
